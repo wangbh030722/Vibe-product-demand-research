@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vibe Product Demand Research"
+  short_description: "Route product ideas to the right demand evidence path."
+  default_prompt: "Use $vibe-product-demand-research to decide whether this product demand is real and route it to the right research path."

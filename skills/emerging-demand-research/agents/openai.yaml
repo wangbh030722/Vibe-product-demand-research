@@ -1,0 +1,4 @@
+interface:
+  display_name: "Emerging Demand Research"
+  short_description: "Validate real demand for new or early product ideas."
+  default_prompt: "Use $emerging-demand-research to validate whether this emerging product demand is real using user pain, workaround, search, and payment evidence."

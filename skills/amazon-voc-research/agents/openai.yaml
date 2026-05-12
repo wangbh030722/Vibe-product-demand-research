@@ -1,0 +1,4 @@
+interface:
+  display_name: "Amazon VOC Research"
+  short_description: "Create evidence-backed Amazon VOC and category research reports."
+  default_prompt: "Research an Amazon category with broad web search and Amazon page collection, then produce a linked VOC insight report."
