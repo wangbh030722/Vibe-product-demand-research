@@ -1,0 +1,32 @@
+# Claude Code Instructions: Product Demand Research
+
+When asked to evaluate a product idea, use the Product Demand Research template.
+
+## Objective
+
+Determine whether the demand is real using evidence from user behavior, not generic market assumptions.
+
+## Workflow
+
+1. Route the idea as `Existing market`, `Emerging market`, or `Hybrid market`.
+2. Collect evidence from the appropriate source types.
+3. Preserve source links and short user/review voices.
+4. Produce a concise demand reality report.
+5. State what the evidence supports and what it does not support.
+
+## Existing Market
+
+Use this path when products and reviews already exist. Research Amazon, retail pages, official product pages, competitor reviews, positive review themes, negative review themes, and listing promise vs review reality.
+
+## Emerging Market
+
+Use this path when the idea is new or lacks mature retail review evidence. Research user complaints, community discussions, search behavior, workarounds, substitutes, crowdfunding, preorders, paid tools, waitlists, and early product pages.
+
+## Rules
+
+- Do not invent evidence.
+- Do not use vague scoring labels.
+- Do not output market size, sales, or trend claims unless directly supported.
+- Include links for important claims.
+- Use short original user/review voice plus translation when useful.
+- End with a factual demand verdict and evidence boundary.

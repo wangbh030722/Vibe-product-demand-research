@@ -1,39 +1,135 @@
 # Vibe Product Demand Research
 
-Codex skill pack for validating whether a product demand is real.
+> A portable research template for validating whether a product demand is real.
 
-## Skills
+`Vibe Product Demand Research` is a lightweight skill/agent template that helps an AI research assistant judge whether a product idea is backed by real user behavior, not just hype.
 
-- `vibe-product-demand-research`: Router and synthesis layer. Decides whether a product idea should be researched as an existing market, emerging market, or hybrid market.
-- `amazon-voc-research`: Existing-market VOC reference for Amazon/retail product review evidence.
-- `emerging-demand-research`: Emerging-market reference for user pain, workaround, search, and willingness-to-pay evidence.
+It can be used in Codex, Claude Code, OpenCode, CodeX, or any agent system that can read Markdown instructions.
 
-## Install
+<p>
+  <img alt="Template" src="https://img.shields.io/badge/type-agent%20template-111827">
+  <img alt="Research" src="https://img.shields.io/badge/focus-demand%20validation-2563eb">
+  <img alt="Evidence" src="https://img.shields.io/badge/output-evidence%20based-16a34a">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-7c3aed">
+</p>
 
-Copy the desired skill folder into your Codex skills directory:
+## What It Does
 
-```bash
-cp -R skills/vibe-product-demand-research ~/.codex/skills/
+```mermaid
+flowchart LR
+    A["Product idea / category"] --> B["Route demand type"]
+    B --> C["Existing market"]
+    B --> D["Emerging market"]
+    B --> E["Hybrid market"]
+    C --> F["Amazon / retail VOC"]
+    D --> G["User pain / workaround / payment signals"]
+    E --> H["VOC + emerging signals"]
+    F --> I["Demand reality verdict"]
+    G --> I
+    H --> I
 ```
 
-For the full pack:
+The template routes a product idea into one of three research paths:
+
+| Path | Use when | Evidence focus |
+|---|---|---|
+| Existing market | Mature category with products and reviews | Amazon, retail reviews, competitor VOC, good/bad review themes |
+| Emerging market | New product, new category, or weak retail evidence | User complaints, workarounds, search behavior, crowdfunding, paid tools |
+| Hybrid market | Products exist, but the proposed behavior/use case is new | Existing-product VOC plus early demand signals |
+
+## Repository Structure
+
+```text
+skills/
+  vibe-product-demand-research/   # Codex-compatible router skill
+  amazon-voc-research/            # Existing-market VOC skill
+  emerging-demand-research/       # New-market demand validation skill
+
+templates/
+  codex/                          # Project-level Codex instruction template
+  claude-code/                    # CLAUDE.md template
+  opencode/                       # AGENTS.md template
+  generic-agent/                  # Portable Markdown agent instructions
+```
+
+## Quick Start
+
+Clone the repository:
+
+```bash
+git clone https://github.com/wangbh030722/Vibe-product-demand-research.git
+cd Vibe-product-demand-research
+```
+
+### Use as Codex Skills
+
+Copy the full skill pack:
 
 ```bash
 cp -R skills/* ~/.codex/skills/
 ```
 
-Restart Codex after installation so the new skill metadata is loaded.
-
-## Default Use
-
-Invoke:
+Then restart Codex and invoke:
 
 ```text
-$vibe-product-demand-research Research whether this product demand is real: <your product idea>
+$vibe-product-demand-research Research whether this product demand is real: <product idea>
 ```
 
-The skill will route the research to:
+### Use with Claude Code
 
-- Existing market: Amazon/retail VOC evidence.
-- Emerging market: user pain, workaround, search, and payment evidence.
-- Hybrid market: both paths with a clear evidence boundary.
+Copy the Claude Code template into your project:
+
+```bash
+cp templates/claude-code/CLAUDE.md ./CLAUDE.md
+```
+
+Then ask Claude Code:
+
+```text
+Use the demand research template in CLAUDE.md to evaluate this product idea: <product idea>
+```
+
+### Use with OpenCode / CodeX / Other Agents
+
+Copy the generic or AGENTS template into your project:
+
+```bash
+cp templates/opencode/AGENTS.md ./AGENTS.md
+```
+
+or:
+
+```bash
+cp templates/generic-agent/PRODUCT_DEMAND_RESEARCH.md ./PRODUCT_DEMAND_RESEARCH.md
+```
+
+Then tell your agent to follow that file when researching product demand.
+
+## Output Principles
+
+- Use real evidence, not vibes.
+- Include source links wherever possible.
+- Quote short user voices with Chinese translation when useful.
+- Do not invent reviews, counts, trends, market size, or payment signals.
+- Do not use vague labels like `high`, `medium`, `low`, or `strong demand`.
+- If evidence is missing, say so directly.
+- End with a factual demand verdict and evidence boundary.
+
+## Example Verdicts
+
+```text
+Demand is supported by repeated user complaints and workaround behavior.
+Payment evidence was not collected.
+```
+
+```text
+Demand is supported by existing retail reviews, but the new use case requires separate validation.
+```
+
+```text
+Current evidence is mostly media attention; user pain evidence is thin.
+```
+
+## License
+
+MIT
