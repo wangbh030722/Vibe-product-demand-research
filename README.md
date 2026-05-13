@@ -44,6 +44,7 @@ skills/
   vibe-product-demand-research/   # Codex-compatible router skill
   amazon-voc-research/            # Existing-market VOC skill
   emerging-demand-research/       # New-market demand validation skill
+  method-two-crawler-pipeline/     # Lower-cost crawler + evidence-pack pipeline
 
 templates/
   codex/                          # Project-level Codex instruction template
@@ -114,6 +115,37 @@ Then tell your agent to follow that file when researching product demand.
 - Do not use vague labels like `high`, `medium`, `low`, or `strong demand`.
 - If evidence is missing, say so directly.
 - End with a factual demand verdict and evidence boundary.
+
+## Method Two: Crawler Pipeline
+
+When paid Amazon/VOC APIs are too expensive, use the cheaper method-two pipeline:
+
+```mermaid
+flowchart LR
+    A["Collectors"] --> B["Raw JSONL"]
+    B --> C["Clean / dedupe / rank"]
+    C --> D["Evidence pack"]
+    D --> E["Agent report"]
+```
+
+This path keeps Amazon reviews optional instead of making them the bottleneck.
+
+| Source | V1 role |
+|---|---|
+| Reddit | User complaints, workarounds, raw language |
+| YouTube comments | Product experience and creator-audience feedback |
+| Product Hunt | Early product feedback |
+| Kickstarter / Indiegogo | Preorder, backer, and payment signals |
+| App Store / Chrome Web Store | Software and companion-app reviews |
+| Google/search/SEO | Discovery and problem phrases |
+| Amazon search/product pages | Lightweight competitor and ASIN discovery |
+| Amazon reviews | Optional manual import or later paid source |
+
+Use the Codex skill:
+
+```text
+$method-two-crawler-pipeline Plan a low-cost crawler and evidence-pack workflow for this product idea: <product idea>
+```
 
 ## Example Verdicts
 

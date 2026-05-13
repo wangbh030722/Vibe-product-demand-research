@@ -55,6 +55,26 @@ Include:
 - Demand reality insights.
 - Demand verdict with evidence boundary.
 
+## Method Two: Low-Cost Crawler Pipeline
+
+When paid review APIs are too expensive, use a staged crawler pipeline:
+
+```text
+collector scripts -> raw JSONL -> cleaner/dedupe/ranker -> evidence pack -> agent report
+```
+
+Prioritize:
+
+- Reddit for complaints, workarounds, and raw user language.
+- YouTube comments for product experience and creator-audience feedback.
+- Product Hunt for early product feedback.
+- Kickstarter / Indiegogo for preorder and payment signals.
+- App Store / Chrome Web Store for app and extension reviews.
+- Search/SEO pages for discovery signals and problem phrases.
+- Amazon search/product pages for lightweight product discovery.
+
+Do not make Amazon review scraping the V1 bottleneck. Treat Amazon reviews as optional manual import or later paid data.
+
 ## Evidence Rules
 
 - Do not invent reviews, comments, counts, sales, trends, market size, or payment signals.

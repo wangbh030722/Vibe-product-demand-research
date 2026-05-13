@@ -17,3 +17,13 @@ Route the idea first:
 - Do not invent reviews, comments, counts, trends, market size, or payment signals.
 - Avoid vague demand scores.
 - End with a factual demand verdict.
+
+## Method Two Pipeline
+
+If the request mentions cheap crawlers, avoiding expensive APIs, or method two, use the method-two crawler pipeline:
+
+```text
+collector scripts -> raw JSONL -> cleaner/dedupe/ranker -> evidence pack -> agent report
+```
+
+Use Reddit, YouTube comments, Product Hunt, crowdfunding, app/extension stores, search signals, and Amazon light product discovery before considering paid Amazon review APIs.

@@ -22,6 +22,16 @@ Use this path when products and reviews already exist. Research Amazon, retail p
 
 Use this path when the idea is new or lacks mature retail review evidence. Research user complaints, community discussions, search behavior, workarounds, substitutes, crowdfunding, preorders, paid tools, waitlists, and early product pages.
 
+## Method Two Pipeline
+
+If paid Amazon/VOC APIs are too expensive, use a lower-cost pipeline:
+
+```text
+collector scripts -> raw JSONL -> cleaner/dedupe/ranker -> evidence pack -> agent report
+```
+
+Prioritize Reddit, YouTube comments, Product Hunt, Kickstarter, Indiegogo, App Store, Chrome Web Store, search signals, and lightweight Amazon product discovery. Do not make Amazon review scraping the first bottleneck.
+
 ## Rules
 
 - Do not invent evidence.

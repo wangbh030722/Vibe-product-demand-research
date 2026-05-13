@@ -20,6 +20,16 @@ For existing markets, collect retail/product/review evidence from Amazon, Best B
 
 For emerging markets, collect user-pain, workaround, search, payment, preorder, crowdfunding, community, and substitute evidence from public sources.
 
+## Low-Cost Crawler Pipeline
+
+When paid review APIs are too expensive, use:
+
+```text
+collector scripts -> raw JSONL -> cleaner/dedupe/ranker -> evidence pack -> agent report
+```
+
+Prioritize Reddit, YouTube comments, Product Hunt, Kickstarter, Indiegogo, App Store, Chrome Web Store, search signals, and Amazon light product discovery. Keep Amazon review text optional or manually imported until a stable low-cost source exists.
+
 ## Output
 
 Include collection summary, evidence rows, user voices or review voices, workarounds/substitutes, payment signals when collected, demand insights, and a factual verdict.

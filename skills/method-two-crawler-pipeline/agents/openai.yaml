@@ -1,0 +1,4 @@
+interface:
+  display_name: "Method Two Crawler Pipeline"
+  short_description: "Cheaper crawler-plus-evidence-pack path for demand research."
+  default_prompt: "Use $method-two-crawler-pipeline to plan a low-cost crawler, cleaning, evidence-pack, and agent-report workflow for product demand research."
