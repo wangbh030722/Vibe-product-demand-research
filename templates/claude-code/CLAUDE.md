@@ -14,6 +14,9 @@ Determine whether the demand is real using evidence from user behavior, not gene
 4. Produce a concise demand reality report.
 5. State what the evidence supports and what it does not support.
 
+Only render evidence sections that contain collected, linked evidence. Do not include placeholder rows or empty sections.
+Do not use fake links or placeholder URLs in evidence tables.
+
 ## Existing Market
 
 Use this path when products and reviews already exist. Research Amazon, retail pages, official product pages, competitor reviews, positive review themes, negative review themes, and listing promise vs review reality.

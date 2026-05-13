@@ -16,6 +16,9 @@ Route the idea first:
 - Include short user/review voices with translation when useful.
 - Do not invent reviews, comments, counts, trends, market size, or payment signals.
 - Avoid vague demand scores.
+- Only display evidence rows that have source links.
+- Do not show empty sections or placeholder rows.
+- Do not use fake links or placeholder URLs in evidence tables.
 - End with a factual demand verdict.
 
 ## Method Two Pipeline

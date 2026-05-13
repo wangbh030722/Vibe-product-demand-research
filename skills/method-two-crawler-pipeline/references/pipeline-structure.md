@@ -2,6 +2,10 @@
 
 Use this structure for the cheaper crawler-based demand research path.
 
+## Display Rule
+
+Only render sections that contain collected, source-linked evidence. Do not display empty sections or placeholder rows in the main report. Placeholder links such as `https://reddit.com/...`, `https://youtube.com/watch?v=...`, `https://example.com`, or any URL containing `...` must not appear in evidence tables. If a missing source affects the verdict, mention it briefly in the final evidence boundary.
+
 ## 1. Collection Plan
 
 | Field | Result |
@@ -10,7 +14,6 @@ Use this structure for the cheaper crawler-based demand research path.
 | Market route | Existing / emerging / hybrid |
 | Time window | Requested period or `Not specified` |
 | Primary sources | Reddit, YouTube, Product Hunt, crowdfunding, search, Amazon light, etc. |
-| Excluded sources | Sources skipped with short reason |
 | Collection mode | Scripted crawl / manual import / mixed |
 
 ## 2. Raw Collection Summary
@@ -40,10 +43,14 @@ Categories:
 | Rank | Pain theme | Source | Link | Original voice | Chinese translation | Scenario | Insight |
 |---:|---|---|---|---|---|---|---|
 
+Include a row only if the source and link are available.
+
 ## 5. Workaround Evidence
 
 | Workaround | Source | Link | User behavior | Friction | Insight |
 |---|---|---|---|---|---|
+
+Include a row only if the source and link are available.
 
 ## 6. Payment Signal Evidence
 
@@ -52,10 +59,14 @@ Categories:
 
 Examples: crowdfunding backers, preorder, paid app, subscription, paid community, purchase comment, independent-store pricing.
 
+Omit this section if no linked payment signal was collected.
+
 ## 7. Search and Discovery Evidence
 
 | Signal | Source | Observed phrase/result | Link | What it proves | What it does not prove |
 |---|---|---|---|---|---|
+
+Include a row only if the source and link are available.
 
 ## 8. Amazon Light Snapshot
 
@@ -63,6 +74,8 @@ Examples: crowdfunding backers, preorder, paid app, subscription, paid community
 |---|---|---|---|---:|---:|---:|---|---|
 
 This section is for product discovery only. Do not treat it as review VOC unless review text was actually collected or imported.
+
+Omit this section if no Amazon product/search evidence was collected.
 
 ## 9. Evidence Pack Verdict Inputs
 
@@ -77,14 +90,15 @@ Examples:
 - only media coverage, no user voice
 - Amazon products exist but review text not collected
 
-## 10. Not Reported
+## 10. Evidence Boundary
 
-| Item | Status |
+Use this section only for missing evidence that affects the verdict. Keep it short.
+
+| Boundary | Impact |
 |---|---|
 
 Examples:
 
-- `Amazon review text | Not collected`
-- `Exact sales | Not collected`
-- `Market size | Current sample too small; not reported`
-- `Growth trend | Collected sample does not support a trend claim`
+- `Amazon review text was not collected | Do not present mature Amazon VOC conclusions`
+- `No linked payment evidence collected | Do not claim purchase intent`
+- `No time-series data collected | Do not claim growth trend`

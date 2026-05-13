@@ -34,9 +34,12 @@ Prioritize Reddit, YouTube comments, Product Hunt, Kickstarter, Indiegogo, App S
 
 Include collection summary, evidence rows, user voices or review voices, workarounds/substitutes, payment signals when collected, demand insights, and a factual verdict.
 
+Only display collected evidence. Evidence rows require source links. Do not show empty sections or placeholder rows.
+Do not use fake links or placeholder URLs in evidence tables.
+
 ## Guardrails
 
 - Do not invent comments, reviews, counts, sales, market size, or trends.
 - Do not use `high`, `medium`, `low`, `strong`, or similar labels as evidence.
-- If data is missing, say `Not collected`, `No verifiable link found`, or `Current sample too small; not reported`.
+- If data is missing, omit it from the main evidence tables and mention it only in the final evidence boundary when it affects the verdict.
 - Every important conclusion needs a source link or evidence row.

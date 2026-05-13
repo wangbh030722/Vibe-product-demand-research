@@ -55,6 +55,9 @@ Include:
 - Demand reality insights.
 - Demand verdict with evidence boundary.
 
+Only show sections with collected evidence. Evidence rows require source links. Do not include placeholder rows or empty sections.
+Do not use fake links or placeholder URLs in evidence tables.
+
 ## Method Two: Low-Cost Crawler Pipeline
 
 When paid review APIs are too expensive, use a staged crawler pipeline:
@@ -80,7 +83,7 @@ Do not make Amazon review scraping the V1 bottleneck. Treat Amazon reviews as op
 - Do not invent reviews, comments, counts, sales, trends, market size, or payment signals.
 - Do not use vague ratings such as `high`, `medium`, `low`, `strong`, or `weak`.
 - Use exact collected values when available.
-- If evidence is unavailable, write a short status such as `Not collected`, `No verifiable link found`, or `Current sample too small; not reported`.
+- If evidence is unavailable, do not show it in the main evidence tables. Mention it only in the final evidence boundary if it affects the verdict.
 - Important claims must cite links, user voices, review rows, source rows, or exact collected counts.
 
 ## Verdict Style

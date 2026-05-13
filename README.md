@@ -109,11 +109,14 @@ Then tell your agent to follow that file when researching product demand.
 ## Output Principles
 
 - Use real evidence, not vibes.
-- Include source links wherever possible.
+- Include source links for every evidence row.
+- Show only collected evidence in the main report.
+- Do not display empty sections or placeholder rows.
+- Do not use fake or placeholder links in evidence tables.
 - Quote short user voices with Chinese translation when useful.
 - Do not invent reviews, counts, trends, market size, or payment signals.
 - Do not use vague labels like `high`, `medium`, `low`, or `strong demand`.
-- If evidence is missing, say so directly.
+- If missing evidence affects the verdict, mention it briefly in the final evidence boundary.
 - End with a factual demand verdict and evidence boundary.
 
 ## Method Two: Crawler Pipeline

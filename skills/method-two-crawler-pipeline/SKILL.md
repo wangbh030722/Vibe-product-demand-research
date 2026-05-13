@@ -105,9 +105,20 @@ It should include:
 - Search/discovery signals.
 - Substitute and competitor map.
 - Amazon light product snapshot when available.
-- Missing or unsupported claims.
 
 See `references/pipeline-structure.md` for the default evidence-pack structure.
+
+## Display Rules
+
+- Main report sections should only show collected evidence.
+- Do not display empty sections just to preserve the template.
+- Do not show rows such as `Not collected`, `No verifiable link found`, or `Current sample too small` inside primary evidence tables.
+- Evidence rows require a source and link. If no source link is available, do not include the row in the evidence table.
+- Placeholder links such as `https://example.com`, `https://reddit.com/...`, `https://youtube.com/watch?v=...`, or any URL containing `...` must never appear in evidence tables.
+- If showing a template-only example, label it clearly as a structure example and do not present it as collected evidence.
+- Use a short final `Evidence boundary` or `Not covered` note only when missing evidence affects the verdict.
+- Do not pad Top lists. If only 3 linked evidence rows were collected, output 3 rows.
+- Every insight must point back to a linked evidence row, source, or exact collected count.
 
 ## Agent Reporting
 
