@@ -80,3 +80,14 @@ Use factual verdicts, not scores:
 - `Current sample too small; demand judgment not reported.`
 
 Each verdict must include an evidence boundary.
+
+## Final Output Format
+
+For complete reports, output both:
+
+1. A concise Markdown research summary in the conversation.
+2. A clean, animated HTML report page suitable for sharing or opening locally.
+
+Use `references/output-format.md` for the required report structure and HTML style direction.
+
+The HTML page should be Nothing-inspired: minimal black/white palette, strong typography, thin grid lines, high-contrast evidence cards, source-link chips, subtle scroll/reveal animation, and restrained motion. Do not copy proprietary assets or code from any external design repository.

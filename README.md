@@ -51,6 +51,7 @@ templates/
   claude-code/                    # CLAUDE.md template
   opencode/                       # AGENTS.md template
   generic-agent/                  # Portable Markdown agent instructions
+  html-report/                    # Self-contained animated HTML report template
 ```
 
 ## Quick Start
@@ -118,6 +119,23 @@ Then tell your agent to follow that file when researching product demand.
 - Do not use vague labels like `high`, `medium`, `low`, or `strong demand`.
 - If missing evidence affects the verdict, mention it briefly in the final evidence boundary.
 - End with a factual demand verdict and evidence boundary.
+- Complete reports should include a self-contained HTML page with a clean, animated, Nothing-inspired visual style.
+
+## HTML Report Output
+
+The final report can include a shareable HTML page:
+
+```text
+templates/html-report/index.html
+```
+
+Design direction:
+
+- Minimal black/white palette with one restrained accent color.
+- Strong typography, thin grid lines, compact evidence cards.
+- Subtle scroll reveal and hover motion.
+- Source links displayed as first-class evidence.
+- No empty sections, placeholder links, fake charts, or unsupported scores.
 
 ## Method Two: Crawler Pipeline
 

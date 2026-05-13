@@ -13,9 +13,12 @@ Determine whether the demand is real using evidence from user behavior, not gene
 3. Preserve source links and short user/review voices.
 4. Produce a concise demand reality report.
 5. State what the evidence supports and what it does not support.
+6. When file output is available, create a self-contained HTML report page.
 
 Only render evidence sections that contain collected, linked evidence. Do not include placeholder rows or empty sections.
 Do not use fake links or placeholder URLs in evidence tables.
+
+The HTML page should use a clean Nothing-inspired style: black/white, thin grid lines, strong typography, compact evidence cards, and subtle scroll/hover animation.
 
 ## Existing Market
 

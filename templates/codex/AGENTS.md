@@ -20,6 +20,7 @@ Route the idea first:
 - Do not show empty sections or placeholder rows.
 - Do not use fake links or placeholder URLs in evidence tables.
 - End with a factual demand verdict.
+- For complete reports, also create a self-contained HTML page with a clean Nothing-inspired visual style.
 
 ## Method Two Pipeline
 

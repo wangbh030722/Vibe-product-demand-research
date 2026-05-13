@@ -54,9 +54,19 @@ Include:
 - Payment or purchase signals when collected.
 - Demand reality insights.
 - Demand verdict with evidence boundary.
+- A self-contained HTML report page when file output is available.
 
 Only show sections with collected evidence. Evidence rows require source links. Do not include placeholder rows or empty sections.
 Do not use fake links or placeholder URLs in evidence tables.
+
+## HTML Report
+
+When creating the HTML report:
+
+- Use a clean Nothing-inspired style: black/white, thin grid lines, strong type hierarchy, compact evidence cards.
+- Add subtle animation such as scroll reveal and hover motion.
+- Keep it self-contained with inline CSS and small inline JavaScript.
+- Do not include empty sections, placeholder links, fake charts, or unsupported scores.
 
 ## Method Two: Low-Cost Crawler Pipeline
 

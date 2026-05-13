@@ -32,10 +32,12 @@ Prioritize Reddit, YouTube comments, Product Hunt, Kickstarter, Indiegogo, App S
 
 ## Output
 
-Include collection summary, evidence rows, user voices or review voices, workarounds/substitutes, payment signals when collected, demand insights, and a factual verdict.
+Include collection summary, evidence rows, user voices or review voices, workarounds/substitutes, payment signals when collected, demand insights, a factual verdict, and a self-contained HTML report page when file output is available.
 
 Only display collected evidence. Evidence rows require source links. Do not show empty sections or placeholder rows.
 Do not use fake links or placeholder URLs in evidence tables.
+
+HTML reports should use a clean Nothing-inspired style: black/white palette, thin grid lines, strong typography, compact evidence cards, and subtle animation.
 
 ## Guardrails
 
