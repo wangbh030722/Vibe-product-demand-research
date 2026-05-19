@@ -5,17 +5,31 @@ description: Plan and use a method-two demand research pipeline that separates c
 
 # Method Two Crawler Pipeline
 
+## Position in the router
+
+**This is a collection mode, not a market type.** It stacks on whichever main route (`existing`, `emerging`, `hybrid`) was selected by [`../vibe-product-demand-research/SKILL.md`](../vibe-product-demand-research/SKILL.md).
+
+Triggers `collection_mode: crawler-pipeline` when any of these hold:
+
+- The user explicitly says "no paid APIs", "cheap", "self-host", "free", or "budget".
+- The target marketplace is blocked, rate-limited, or unavailable for the `target_market` (e.g. Amazon US access from a region without access; Amazon refuses scraping for the IP class).
+- The user wants reproducible local re-runs against the same raw corpus.
+
+The route still drives **which evidence layers** are required (VOC layers for existing, pain/workaround/payment for emerging, both + conflict resolution for hybrid). This skill only changes **how the evidence gets collected**.
+
+Evidence integrity rules: [`../../references/evidence-rules.md`](../../references/evidence-rules.md).
+
 ## Purpose
 
-Use this as the more complete, lower-cost architecture for product demand research when paid review APIs are too expensive or unreliable.
+Lower-cost architecture for evidence collection when paid review APIs are too expensive or unreliable.
 
-The core idea:
+The core flow:
 
 ```text
 collector scripts -> raw JSONL -> cleaner/dedupe/ranker -> evidence pack -> agent report
 ```
 
-The agent should not directly consume huge raw crawls. Scripts collect and normalize data first; the agent reads a compact evidence pack and applies the demand-research rules.
+The agent should not directly consume huge raw crawls. Scripts collect and normalize data first; the agent reads a compact evidence pack and applies the demand-research rules for the active route.
 
 ## Source Priority
 
@@ -122,12 +136,14 @@ See `references/pipeline-structure.md` for the default evidence-pack structure.
 
 ## Agent Reporting
 
-After the evidence pack exists, use `vibe-product-demand-research` rules:
+After the evidence pack exists, hand off to the route declared in the routing token:
 
-- Route the market as existing, emerging, or hybrid.
-- For existing-market evidence, preserve VOC-style positives/negatives.
-- For emerging-market evidence, emphasize pain, workarounds, search, and payment behavior.
-- End with a factual demand verdict and evidence boundary.
+- `route: existing` → apply [`../amazon-voc-research/SKILL.md`](../amazon-voc-research/SKILL.md) layers (Competitor Ledger, Listing Claims, Top Positive/Negative Voices, Counter-evidence, etc.).
+- `route: emerging` → apply [`../emerging-demand-research/SKILL.md`](../emerging-demand-research/SKILL.md) layers (Problem Evidence, Workarounds, Willingness-to-Pay, Counter-evidence, etc.).
+- `route: hybrid` → both layer sets plus the required Conflict Resolution section.
+- End with the structured YAML verdict from [`../vibe-product-demand-research/references/output-format.md`](../vibe-product-demand-research/references/output-format.md).
+
+Counter-evidence is required regardless of route. The crawler pipeline must run an explicit counter-evidence search pass (failed Kickstarters, abandoned repos, discontinued listings, "this isn't worth solving" comments) and feed those records into the evidence pack.
 
 ## Guardrails
 

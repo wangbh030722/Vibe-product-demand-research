@@ -122,7 +122,23 @@ Do not infer value perception from price alone. Tie it to review language.
 
 Keep insights concise and descriptive. Do not give unsupported product instructions. Insights must be derived from the collected product rows, review rows, source links, or exact counts.
 
-## 16. Market-Entry Facts
+## 16. Counter-evidence (mandatory)
+
+| Counter-signal | Evidence | Source link | Effect on verdict |
+|---|---|---|---|
+
+Examples of counter-signals:
+- Discontinued or out-of-stock-for-months products in the same niche.
+- Established alternatives with high review volume and persistent low ratings.
+- Negative review themes that argue the underlying job is not worth solving.
+- Editorial verdicts that the category is in decline.
+
+If a real counter-evidence search returns nothing, output a single row:
+`Counter-evidence search performed; none found. | Queries: <list> | <links to the empty search result pages> | Verdict gating still applies.`
+
+The verdict cannot be `supported` if this section is empty without that explicit note.
+
+## 17. Market-Entry Facts
 
 | Fact | Evidence | Boundary |
 |---|---|---|
@@ -134,7 +150,11 @@ Example boundaries:
 - `No time-series collection; trend not reported`
 - `Review sample includes 1-3 star reviews only`
 
-## 17. Not Reported
+## 18. Structured Verdict
+
+End the report with the YAML verdict block defined in [`../../vibe-product-demand-research/references/output-format.md`](../../vibe-product-demand-research/references/output-format.md). `status: supported` requires the Counter-evidence section to be non-empty and `counter_evidence_addressed: true`.
+
+## 19. Not Reported
 
 | Item | Status |
 |---|---|

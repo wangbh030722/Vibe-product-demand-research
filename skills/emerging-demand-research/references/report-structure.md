@@ -54,26 +54,46 @@ Do not treat search visibility alone as purchase intent.
 
 Types: direct competitor, indirect competitor, adjacent product, manual workaround, service substitute, behavior substitute.
 
-## 7. Demand Reality Insights
+## 7. Counter-evidence (mandatory)
+
+| Counter-signal | Evidence | Source link | Effect on verdict |
+|---|---|---|---|
+
+Examples:
+- Failed crowdfunding for the same or near-neighbor idea.
+- Abandoned open-source projects targeting the same pain.
+- High-volume comments saying current workarounds are good enough.
+- Editorial / community verdicts that prior attempts at the category failed.
+
+If a real counter-evidence search returns nothing:
+`Counter-evidence search performed; none found. | Queries: <list> | <links to empty search-result pages> | Verdict gating still applies.`
+
+The verdict cannot be `supported` if this section is empty without that explicit note.
+
+## 8. Demand Reality Insights
 
 | Rank | Insight | Supporting evidence | Evidence boundary |
 |---:|---|---|---|
 
 Insights must cite rows from problem evidence, workarounds, payment signals, search signals, or substitutes.
 
-## 8. Demand Verdict
+## 9. Demand Verdict
 
-| Verdict | Evidence | Boundary |
-|---|---|---|
+Natural-language verdict (factual, not a score) plus the structured YAML block from [`../../vibe-product-demand-research/references/output-format.md`](../../vibe-product-demand-research/references/output-format.md).
 
-Use factual conclusions:
+`status: supported` requires:
 
-- `Demand is supported by repeated user complaints and workaround behavior.`
-- `Demand is visible, but payment evidence is not collected.`
-- `Current evidence is mostly media attention; user pain evidence is thin.`
-- `Current sample too small; demand judgment not reported.`
+- Non-empty Counter-evidence section AND `counter_evidence_addressed: true`.
+- `evidence_counts.voices > 0` and `evidence_counts.workarounds > 0`.
 
-## 9. Not Reported
+Example natural-language verdicts:
+
+- `Demand is supported by repeated user complaints across Reddit and YouTube, three independent workarounds, and one funded crowdfunding signal. Counter-evidence found no comparable failed campaigns in the last 24 months.`
+- `Demand is visible, but payment evidence is not collected. Verdict: partially_supported.`
+- `Current evidence is mostly media attention; user-pain evidence is thin. Verdict: insufficient.`
+- `Current sample too small; demand judgment withheld.`
+
+## 10. Not Reported
 
 | Item | Status |
 |---|---|

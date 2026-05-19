@@ -32,13 +32,13 @@ Use Amazon/retail pages only when they help identify adjacent substitutes or hyb
 
 ## Evidence Rules
 
-- Every source, user voice, product, workaround, payment signal, and trend/discovery signal must include a link when available.
-- Do not use placeholders such as `X`, `xx%`, `many`, `several`, `high`, `medium`, `low`, `strong`, or `weak`.
-- Use exact collected values. If a value is unavailable, write a short status or omit the metric.
-- Do not output market size, exact sales, search volume, or growth claims unless the collected data directly supports them.
-- Do not invent user comments, quotes, reviews, waitlist counts, backing amounts, or payment behavior.
-- Quote only short source-faithful excerpts. Put interpretation in the insight field, not in the original voice field.
-- Do not explain missing evidence as `no API available` in the report.
+Evidence integrity rules (banned language, link integrity, number rules, quote rules, data-status vocabulary) live in [`../../references/evidence-rules.md`](../../references/evidence-rules.md). Follow them; do not restate.
+
+The emerging route additionally requires:
+
+- Cross-community corroboration: a pain claim is only counted as `voice evidence` when it appears in at least two independent communities. Single-thread anecdotes are recorded but flagged.
+- Workaround threshold: at least one collected workaround per major pain claim, or that pain claim is downgraded to `signal, not validated demand`.
+- Counter-evidence (mandatory): see the section below.
 
 ## Mandatory Output Layers
 
@@ -68,13 +68,20 @@ At minimum, include:
 6. **Substitute and competitor map**
    - Direct competitors, indirect competitors, adjacent substitutes, and workaround flows.
 
-7. **Demand reality insights**
+7. **Counter-evidence (mandatory)**
+   - Failed crowdfunding campaigns for the same idea or near-neighbor.
+   - Dead / abandoned open-source or community projects targeting the same pain.
+   - High-volume user comments saying current workarounds are good enough or the problem isn't worth solving.
+   - Media verdicts that prior attempts at the category failed.
+   - If a real counter-evidence search returns nothing, write `Counter-evidence search performed; none found.` plus queries used. Do not leave this section empty.
+
+8. **Demand reality insights**
    - Insights must be derived from evidence rows.
    - Answer whether the pain looks real, whether user behavior exists, what job the product serves, and why current solutions fall short.
 
-8. **Demand verdict**
-   - Use factual verdicts, not numeric or vague scores.
-   - Include evidence boundaries.
+9. **Demand verdict**
+   - Natural-language sentence + structured YAML block (schema in [`../vibe-product-demand-research/references/output-format.md`](../vibe-product-demand-research/references/output-format.md)).
+   - `status: supported` requires non-empty Counter-evidence section and `counter_evidence_addressed: true`.
 
 ## Demand Verdict Style
 

@@ -7,87 +7,115 @@ description: Route and synthesize product demand validation research for existin
 
 ## Purpose
 
-Use this as the router and synthesis layer for product demand validation. The goal is to judge whether a product demand is real based on evidence, not to produce generic market advice.
+Router + synthesis layer for product demand validation. The goal is to judge whether a product demand is real based on evidence, not to produce generic market advice.
 
-Route to:
+Sub-skills:
 
-- The bundled `amazon-voc-research` reference for existing products, mature categories, Amazon/retail categories, competitor review mining, and VOC based on product/review pages.
-- The bundled `emerging-demand-research` reference for non-stock, new-category, early-market, new-interaction, or potential products where Amazon reviews are insufficient or misleading.
-- Both skills for hybrid markets where some products exist but the actual proposed behavior, interaction, or use case is still emerging.
+- `amazon-voc-research` — mature categories with retail review coverage.
+- `emerging-demand-research` — new categories with pain / workaround / willingness-to-pay signals.
+- `method-two-crawler-pipeline` — collection mode for cost-constrained or API-blocked runs (modifier, not a separate market type).
+
+Shared rules:
+
+- Evidence integrity: see [`references/evidence-rules.md`](../../references/evidence-rules.md). All evidence-language, link-integrity, counter-evidence, and verdict requirements live there. Do not restate them here.
+- Output format: see [`references/output-format.md`](references/output-format.md).
+- HTML style: parameters are defined in [`templates/html-report/index.html`](../../templates/html-report/index.html) via CSS custom properties (`--bg`, `--accent`, `--type-scale`, etc.). Do not prescribe visual style in prose; reference the template tokens instead.
+
+## Required Inputs
+
+Before routing, collect or assume:
+
+- `product_idea` — short description of the product / use case.
+- `target_market` — one of `US | CN | JP | EU | global | other:<code>`. Required. Drives platform selection.
+- `budget_mode` — `standard` (default) or `crawler-pipeline` (when the user says "no paid APIs", "cheap", "self-host", or when the major retail layer for the target market is blocked).
+
+If `target_market` is missing, ask the user once, then proceed.
 
 ## Routing Workflow
 
-Start every task with a short routing diagnosis:
+### Step 1 — Quantitative diagnosis
 
-| Check | Evidence to look for | Route implication |
+Run a fast scan and count the following signals before declaring a route:
+
+| Signal | Threshold | Implies |
 |---|---|---|
-| Existing Amazon/retail products | Amazon, Best Buy, Walmart, Target, category pages, product reviews | Existing market |
-| Clear competitor set | Named brands, review pages, comparison pages, marketplace listings | Existing market or hybrid |
-| New interaction/use case | Little Amazon review evidence, new hardware/software behavior, early media coverage, prototypes | Emerging market |
-| User pain exists outside shopping context | Reddit complaints, forums, YouTube comments, search behavior, workaround discussions | Emerging market |
-| Some product evidence plus new behavior | Retail products exist, but the user asks about a new use case or new product form | Hybrid market |
+| Direct product hits on the relevant marketplace's first 2 result pages (Amazon for US, 京东/天猫 for CN, etc.) | ≥ 5 distinct listings AND combined visible reviews ≥ 200 | Existing-market candidate |
+| Same pain phrase appearing across independent communities (Reddit / YouTube / forums / niche communities) | ≥ 3 distinct sources, each with ≥ 1 organic discussion thread | Emerging-market candidate |
+| Both rows above satisfied | — | Hybrid |
+| Neither row satisfied after a real scan | — | `insufficient` — return early; do not fabricate a route |
 
-Output exactly one of:
+`budget_mode = crawler-pipeline` is **orthogonal** to the route. It stacks on whichever main route was chosen.
 
-- `Existing market: use amazon-voc-research`
-- `Emerging market: use emerging-demand-research`
-- `Hybrid market: use both and synthesize`
+### Step 2 — Output the routing token
 
-Then perform or request the appropriate research path. If producing the final report directly, synthesize the relevant skill outputs into a demand-reality report.
+Output exactly one block:
 
-## Evidence Standards
+```yaml
+route: existing | emerging | hybrid | insufficient
+collection_mode: standard | crawler-pipeline
+target_market: <code>
+rationale: <one short sentence citing the counts that satisfied the threshold>
+```
 
-- Do not use vague ratings such as `high`, `medium`, `low`, `strong`, `weak`, or `medium-high` as substitutes for evidence.
-- Do not invent counts, reviews, market size, sales, BSR, search volume, or trend claims.
-- If a source layer is missing, use a short status such as `Not collected`, `No verifiable link found`, `Current sample too small; not reported`, or `Collected sample does not support a trend claim`.
-- Do not explain missing evidence as `no API available` in the user-facing report.
-- Demand conclusions must cite concrete evidence: review rows, user-voice rows, workaround rows, payment rows, source links, or exact collected counts.
+### Step 3 — Pre-research collection plan
 
-## Report Synthesis
+Before any deep collection, output a plan:
 
-For existing markets, preserve the `amazon-voc-research` evidence layers:
+```yaml
+collection_plan:
+  platforms: [reddit, youtube, product_hunt, amazon, ...]   # adjusted by target_market
+  sample_targets:
+    voices: 12
+    workarounds: 5
+    payment_signals: 3
+    counter_evidence: 3
+  time_budget_minutes: 20
+```
 
-- Amazon/search/category links.
-- Direct product links and official/independent links.
-- Top 1-5 positive review voices.
-- Top 1-5 negative review voices.
-- Listing promise vs review reality.
-- Market-entry facts.
+Platform list is locale-aware. Examples:
 
-For emerging markets, preserve the `emerging-demand-research` evidence layers:
+- `target_market: US` → reddit, youtube, x, hacker_news, amazon, best_buy, walmart, target, product_hunt, kickstarter, indiegogo.
+- `target_market: CN` → 小红书, 什么值得买, B站, 知乎, 京东, 天猫, 淘宝, 微博, 抖音.
+- `target_market: JP` → twitter_jp, amazon_jp, 価格.com, 楽天, note, makuake.
 
-- Problem evidence and raw user voice.
-- Existing workarounds.
-- Willingness-to-pay signals.
-- Search and discovery signals.
-- Substitute and competitor map.
-- Demand reality insights and verdict.
+If `collection_mode = crawler-pipeline`, follow [`../method-two-crawler-pipeline/SKILL.md`](../method-two-crawler-pipeline/SKILL.md) for the collector flow regardless of route.
 
-For hybrid markets, include both:
+Reconcile planned vs actual in the final `Collection Summary`.
 
-1. Existing-product VOC evidence.
-2. Emerging-demand evidence for the new behavior/use case.
-3. A boundary statement explaining which conclusions come from product reviews and which come from early-market signals.
+### Step 4 — Run the route
 
-## Final Demand Verdict
+- `existing` → follow [`../amazon-voc-research/SKILL.md`](../amazon-voc-research/SKILL.md).
+- `emerging` → follow [`../emerging-demand-research/SKILL.md`](../emerging-demand-research/SKILL.md).
+- `hybrid` → run both, then synthesize per the next section.
 
-Use factual verdicts, not scores:
+### Step 5 — Synthesize and emit reports
 
-- `Demand is supported by repeated user complaints and workaround behavior.`
-- `Demand is supported by existing retail reviews, but the new use case requires separate validation.`
-- `Demand is visible, but payment evidence is not collected.`
-- `Current evidence is mostly media attention; user pain evidence is thin.`
-- `Current sample too small; demand judgment not reported.`
+Output formats and required layers are defined in [`references/output-format.md`](references/output-format.md), including:
 
-Each verdict must include an evidence boundary.
+- Required evidence layers per route.
+- The structured YAML verdict block.
+- Conflict-resolution section (hybrid only).
+- HTML report shape (sections gated by `data-route`).
 
-## Final Output Format
+## Hybrid: Conflict Resolution (required)
+
+When a hybrid run produces contradictions across layers (e.g. Amazon reviews suggest the feature has no demand while Reddit shows recurring requests), the report must include a `Conflict resolution` section that lists, for each contradiction:
+
+- The two evidence rows in tension (with links).
+- The most plausible explanations (saturation in old form factor vs demand for new form factor; pro vs casual segment; regional difference; etc.).
+- The single piece of additional evidence that would settle it.
+
+Without this section, hybrid verdicts cannot be `supported`; downgrade to `partially_supported`.
+
+## Verdict
+
+See the YAML schema and natural-language phrasing rules in [`references/output-format.md`](references/output-format.md). Counter-evidence and `status` gating rules are in [`references/evidence-rules.md`](../../references/evidence-rules.md).
+
+## Final Output
 
 For complete reports, output both:
 
-1. A concise Markdown research summary in the conversation.
-2. A clean, animated HTML report page suitable for sharing or opening locally.
+1. A concise Markdown summary in the conversation: route token, collection plan reconciliation, 3-5 evidence-backed insights, the structured verdict, link to the HTML report.
+2. A self-contained HTML report based on [`templates/html-report/index.html`](../../templates/html-report/index.html), with `data-route` and `data-style` set on `<body>`.
 
-Use `references/output-format.md` for the required report structure and HTML style direction.
-
-The HTML page should be Nothing-inspired: minimal black/white palette, strong typography, thin grid lines, high-contrast evidence cards, source-link chips, subtle scroll/reveal animation, and restrained motion. Do not copy proprietary assets or code from any external design repository.
+Do not paste the full long report into chat if an HTML report was produced.
