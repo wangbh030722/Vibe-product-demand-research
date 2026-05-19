@@ -82,6 +82,16 @@ If `collection_mode = crawler-pipeline`, follow [`../method-two-crawler-pipeline
 
 Reconcile planned vs actual in the final `Collection Summary`.
 
+### Raw-voice fallback (mandatory)
+
+Standard WebSearch + WebFetch is editorial-dominant. Reddit, marketplace reviews, and most community sources are typically rate-limited or anti-bot blocked in standard mode. Therefore:
+
+1. **Attempt raw-voice collection first**, before any editorial digest. Try the locale-aware primary platforms (Reddit / marketplace reviews / community threads) directly.
+2. **If two or more raw-voice fetches fail** (host blocked, login required, empty response): switch `collection_mode` to `crawler-pipeline` and continue.
+3. **If crawler-pipeline is unavailable in this environment**: emit `status: insufficient` with `missing_layers: [raw_voice]`. Do not produce a "demand verdict" backed only by editorial. The report becomes a *media digest* and must be labeled as such in the thesis.
+
+Editorial-only research is structurally a different artifact from demand research. Do not let the visual polish of an editorial-heavy report disguise an empty raw-voice layer.
+
 ### Step 4 — Run the route
 
 - `existing` → follow [`../amazon-voc-research/SKILL.md`](../amazon-voc-research/SKILL.md).

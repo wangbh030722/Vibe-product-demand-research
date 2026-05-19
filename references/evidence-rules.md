@@ -2,6 +2,47 @@
 
 Single source of truth for evidence integrity across all skills in this repo. The router and every sub-skill (`amazon-voc-research`, `emerging-demand-research`, `method-two-crawler-pipeline`) reference this file. Do not restate these rules inside individual `SKILL.md` files — link here instead.
 
+## Source class: raw voice vs editorial (hard distinction)
+
+Demand research is a primary-source artifact. Editorial coverage is a secondary signal at best. The two are tracked in **separate counters** and gated separately.
+
+### Raw voice (the only thing that counts as `voices`)
+
+A row qualifies as raw voice **only if all four** are true:
+
+1. **Primary user platform** — Reddit / YouTube comments / X / Quora / Hacker News / Discord-or-forum / 小红书 / B站 / 知乎 / 微博 / 抖音 / TikTok / marketplace review (Amazon, 京东, 天猫, Best Buy, Walmart, Target, App Store, Play Store, Chrome Web Store) / crowdfunding-campaign comments / vendor-page reviews.
+2. **Identifiable poster** — username, handle, or anonymized-but-stable reviewer ID. "Some users" / "many people" does not qualify.
+3. **Permalink to the post or comment** — not the platform home page, not a search result.
+4. **Verbatim quote** — original-language text, source-faithful. Paraphrase belongs in the `insight` field, not in the voice field.
+
+A marketplace product page that exposes review themes with counts (e.g. Best Buy theme tags) counts as **one** voice row, not as N.
+
+### Editorial signals (separate counter)
+
+Anything written by a journalist, analyst, blogger, reviewer-site, post-mortem author, or industry-newsletter writer about the product. Useful, but downstream — it cites the same user voices a few hops removed. Editorial gives you the shape of the conversation; it does not prove the conversation exists.
+
+Editorial rows **cannot** count toward `evidence_counts.voices`. They count toward `evidence_counts.editorial_signals`.
+
+### Route-specific minimums
+
+| Route | Required raw voice for `partially_supported` | Required for `supported` |
+|---|---|---|
+| existing | ≥ 5 marketplace customer reviews with verbatim quotes and permalinks | ≥ 12, drawn from ≥ 2 marketplaces or marketplace + community |
+| emerging | ≥ 5 community-post voices across ≥ 2 independent communities | ≥ 12, across ≥ 3 communities, with ≥ 3 distinct workarounds attached |
+| hybrid | both rows above | both rows above |
+
+If raw voice cannot reach these minimums after a real collection attempt, **status must be `insufficient`** regardless of how strong the editorial pile looks.
+
+### Auto-downgrade and crawler-pipeline fallback
+
+If two or more direct fetches to primary user platforms fail in `collection_mode: standard` (anti-bot block, login required, host unreachable):
+
+1. Record the failure as a `data-status: Not collected — host blocked` line.
+2. Switch `collection_mode` to `crawler-pipeline` and try again, OR
+3. If crawler-pipeline is unavailable in this environment, emit the verdict as `insufficient` with `missing_layers: [raw_voice]` and explicitly recommend re-running under crawler-pipeline mode.
+
+Standard mode is editorial-dominant by nature (WebSearch indexes prefer it). Do not let an editorial-heavy collection masquerade as evidence-backed demand research.
+
 ## Banned language in user-facing reports
 
 Do not use any of the following as substitutes for evidence:

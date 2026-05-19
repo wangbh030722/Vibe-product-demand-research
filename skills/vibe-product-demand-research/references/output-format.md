@@ -26,21 +26,25 @@ verdict:
   target_market: <code>
   one_line: "<factual sentence, not a score>"
   evidence_counts:
-    reviews: 0
-    voices: 0
+    voices_raw: 0           # primary-source user voices ONLY — see evidence-rules.md
+    voices_marketplace: 0   # subset of voices_raw, from shopping platforms
+    voices_community: 0     # subset of voices_raw, from Reddit/YT/forums/etc.
     workarounds: 0
     payment_signals: 0
     search_signals: 0
     counter_evidence: 0
-  missing_layers: []          # e.g. [longitudinal_trend, payment_signals]
+    editorial_signals: 0    # journalism / analyst / blog / post-mortem — secondary
+  missing_layers: []        # e.g. [raw_voice, longitudinal_trend]
   counter_evidence_addressed: false
-  conflicts_resolved: null    # only used when route == hybrid; true | false | null
+  conflicts_resolved: null  # hybrid only; true | false | null
 ```
 
 `status` gating (mirrors `evidence-rules.md`):
 
-- `supported` requires `counter_evidence_addressed: true`, route-appropriate counts > 0, and (for hybrid) `conflicts_resolved: true`.
-- Otherwise downgrade to the next-highest applicable status.
+- `supported` requires `counter_evidence_addressed: true`, route-appropriate **raw voice** minimums (see evidence-rules.md table), and (for hybrid) `conflicts_resolved: true`.
+- `partially_supported` requires at least the `partially_supported` raw-voice minimum AND non-empty counter-evidence.
+- **`voices_raw == 0` forces `status: insufficient`**, regardless of how high `editorial_signals` is.
+- If `collection_mode: standard` failed to reach raw voice, append `missing_layers: [raw_voice]` and recommend `crawler-pipeline` in the report's method note.
 
 Natural-language verdict examples (the `one_line` field):
 
@@ -50,19 +54,49 @@ Natural-language verdict examples (the `one_line` field):
 - `Current sample too small; demand judgment withheld.`
 - `Evidence contradicts: retail reviews show saturation, but community discussion shows recurring requests for a new form factor.`
 
-## HTML Report Sections
+## Report shape: lead with the claim, not the method
 
-The HTML report is generated from [`../../../templates/html-report/index.html`](../../../templates/html-report/index.html). Section visibility is driven by `<body data-route="...">`:
+A demand-research report is not a data dump. It must read like an analyst's note, not a spreadsheet export. The structure below is **mandatory ordering**:
 
-### Shared (all routes)
+1. **Thesis (hero)** — one or two sentences. The single non-consensus claim of this report. Built from the structured verdict YAML's `one_line` plus the status pill.
+2. **Headline insights** — exactly 3–5 callout cards. Each is a sharp, falsifiable claim. Not a category description.
+3. **The hinge** — the conflict-resolution section (hybrid) or the central counter-evidence finding (existing/emerging). This is the most-likely-to-be-wrong-or-right part of the report; do not hide it.
+4. **Supporting evidence** — compact tables. Reader should be able to skim and skip. Voice rows, competitor ledger, workarounds, etc. live here.
+5. **Counter-evidence** — featured, not buried. Often this is where the non-consensus framing comes from.
+6. **Method note** — one sentence. Platforms scanned, sample sizes, what's missing. Not a section, not a table — a single line at the bottom.
+7. **Sources** — last. A compact footnote-style roll. The reader should not have to wade through sources to reach insights.
 
-1. **Verdict Hero** — built from the structured verdict YAML. Renders status pill, route + collection_mode + target_market chips, the `one_line`, an evidence-counts row, and a `missing_layers` strip.
-2. **Collection Summary** — planned vs actual platforms, sample counts, time spent, and what was not reported.
-3. **Evidence Sources** — every source must have a working link. No placeholder URLs.
+`Collection Summary` is no longer a top-of-page section. It collapses into the single-sentence method note. If the reader cares about methodology details, they can read the YAML verdict block.
 
-### Route-specific (gated by `data-route`)
+### Insight style (mandatory)
 
-| Section | existing | emerging | hybrid |
+Headline insights must satisfy:
+
+- **Non-consensus or sharp restatement** — if a smart industry reader would already agree with the sentence without reading the report, drop it. "Privacy is a concern" doesn't qualify. "Bystander privacy is the new asbestos — pricing it today is impossible" does.
+- **Falsifiable** — name what would prove it wrong.
+- **Specific** — names a product, a number, an event, or a regulatory line.
+
+Each headline insight in the HTML report is rendered as a featured card with three fields:
+- `claim` (the sentence)
+- `evidence` (one-line citation, with link)
+- `falsifier` (what would make this wrong)
+
+### Bilingual rule (CN target reader)
+
+When the report is for a Chinese-speaking reader (default unless overridden), the canonical voice is:
+
+- All narrative, headers, callouts, insights → **Chinese**.
+- All source excerpts → **English original kept verbatim**, followed by a short Chinese paraphrase only when the original is non-trivial. Do not translate every English quote — preserve the source voice.
+- URLs, brand names, regulatory citations → keep in original (do not transliterate).
+- Section labels in the template stay in English (`THESIS`, `INSIGHTS`, `COUNTER-EVIDENCE`) as a typographic anchor — they're labels, not body copy.
+
+For non-CN readers, the same pattern inverts: narrative in the target language, source excerpts verbatim.
+
+### Route-specific evidence layers (gated by `data-route`)
+
+These remain required, but they live in the **supporting evidence** section, not at the top:
+
+| Layer | existing | emerging | hybrid |
 |---|---|---|---|
 | Competitor Ledger | ✅ | — | ✅ |
 | Listing Promise vs Review Reality | ✅ | — | ✅ |
@@ -73,15 +107,15 @@ The HTML report is generated from [`../../../templates/html-report/index.html`](
 | Willingness-to-Pay Signals | — | ✅ | ✅ |
 | Search & Discovery Signals | — | ✅ | ✅ |
 | Substitute & Competitor Map | — | ✅ | ✅ |
-| Conflict Resolution | — | — | ✅ (required) |
-| Counter-evidence | ✅ | ✅ | ✅ |
-| Insight Grid | ✅ | ✅ | ✅ |
+| Conflict Resolution | — | — | ✅ (the hinge, surface high) |
+| Counter-evidence | ✅ | ✅ | ✅ (the hinge, surface high) |
 
 ### Per-section rendering rules
 
 - Mark each section's container `data-collected="0"` if no rows were collected. CSS hides `[data-collected="0"]` so the page never shows an empty block.
-- Voice rows include: original-language excerpt, Chinese translation (when useful), source type label, source link, theme, and an `insight` field.
+- Voice rows include: original-language excerpt, source link, theme, an `insight` field. Chinese paraphrase only when the English is non-trivial.
 - Every row that asserts a number or a quote must link to a source.
+- Tables in supporting evidence use compact density (`data-density="tight"`); reader should be able to skim a 6-row table in 5 seconds.
 
 ## HTML Style
 

@@ -31,6 +31,16 @@ collector scripts -> raw JSONL -> cleaner/dedupe/ranker -> evidence pack -> agen
 
 The agent should not directly consume huge raw crawls. Scripts collect and normalize data first; the agent reads a compact evidence pack and applies the demand-research rules for the active route.
 
+**Reference implementation: [`../../templates/crawler/`](../../templates/crawler/)**
+
+Python stdlib collectors that bypass WebFetch's anti-bot blocks:
+
+- `collect_reddit.py` — direct `reddit.com/r/<sub>/.json` with polite UA. Partial success (some subs 403).
+- `collect_hn.py` — HN Algolia search API. Reliable.
+- `clean.py` — dedupe + keyword categorization → `summary.json` evidence pack.
+
+Marketplace collectors (Amazon/Best Buy/京东) are **not yet implemented** — see `templates/crawler/README.md` for honest status and extension priorities. Until marketplace VOC is available, no `hybrid` route can reach `status: supported` under the gating in `references/evidence-rules.md`. This is by design.
+
 ## Source Priority
 
 Do not make Amazon reviews the V1 bottleneck.
