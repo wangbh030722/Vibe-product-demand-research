@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>真需求研判 · Demand Research</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="dot"></span> Demand Research</div>
+  <div class="status" id="health"></div>
+</header>
+
+<main class="shell">
+
+  <!-- ===== INPUT VIEW ===== -->
+  <section id="view-input" class="view active">
+    <div class="hero">
+      <div class="eyebrow">真需求 / 伪需求 研判工具</div>
+      <h1>把一个产品想法丢进来,<br>看用户原话怎么说。</h1>
+      <p class="lede">输入一个产品想法,工具会自动从 Reddit / Hacker News 抓真实用户发言,按存量市场或非存量市场两条路径出报告。所有引用都带原文 + permalink。</p>
+
+      <form id="form" class="form">
+        <label class="field">
+          <span class="label">产品想法</span>
+          <textarea id="idea" rows="3" placeholder="例:AI 智能眼镜,主流眼镜形态 + 多模态助理&#10;例:个人 AI 音乐教练&#10;例:儿童降噪睡眠耳塞" required></textarea>
+        </label>
+        <div class="row">
+          <label class="field">
+            <span class="label">目标市场</span>
+            <select id="locale">
+              <option value="US">US</option>
+              <option value="CN">CN</option>
+              <option value="JP">JP</option>
+              <option value="EU">EU</option>
+              <option value="global">global</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="label">模式(可选,默认自动)</span>
+            <select id="mode">
+              <option value="">auto</option>
+              <option value="existing">existing(存量市场)</option>
+              <option value="non_stock">non_stock(非存量市场)</option>
+              <option value="hybrid">hybrid(混合)</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit" class="run">Run →</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== RUNNING VIEW ===== -->
+  <section id="view-running" class="view">
+    <div class="eyebrow" id="running-title">运行中</div>
+    <h2 class="running-h2" id="running-idea">…</h2>
+    <ol class="phase-list" id="phases"></ol>
+  </section>
+
+  <!-- ===== RESULT VIEW ===== -->
+  <section id="view-result" class="view">
+
+    <div class="verdict-hero" id="verdict-hero">
+      <div class="eyebrow" id="verdict-eyebrow">结果</div>
+      <h1 id="verdict-headline">…</h1>
+      <p class="lede" id="verdict-oneline"></p>
+      <div class="status-row" id="verdict-pills"></div>
+    </div>
+
+    <!-- Existing-market VOC panel -->
+    <section class="panel" id="panel-voc" hidden>
+      <div class="panel-head">
+        <div class="label">VOC · 真实用户原话</div>
+        <h2>用户在说什么</h2>
+      </div>
+      <div class="voc-thesis" id="voc-thesis"></div>
+      <div class="voc-grid">
+        <div class="voc-col">
+          <h3 class="voc-h3">痛点 Top</h3>
+          <div id="voc-pain"></div>
+        </div>
+        <div class="voc-col">
+          <h3 class="voc-h3">正面 Top</h3>
+          <div id="voc-positive"></div>
+        </div>
+        <div class="voc-col">
+          <h3 class="voc-h3">反向证据 Top</h3>
+          <div id="voc-counter"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Non-stock 3-column panel -->
+    <section class="panel" id="panel-nonstock" hidden>
+      <div class="panel-head">
+        <div class="label">非存量市场 · 三视图并排</div>
+        <h2>客观框架 · 反向证据 · 定性评论</h2>
+      </div>
+      <div class="ns-grid">
+        <article class="ns-col" id="ns-framework">
+          <div class="ns-head"><span class="ns-tag">客观</span><h3>结构化评分</h3><p class="ns-sub">5 维度规则评分,数据来源可追溯</p></div>
+          <div class="ns-body"></div>
+        </article>
+        <article class="ns-col" id="ns-counter">
+          <div class="ns-head"><span class="ns-tag">客观</span><h3>反向证据清单</h3><p class="ns-sub">历史失败案例 + 前提是否重蹈</p></div>
+          <div class="ns-body"></div>
+        </article>
+        <article class="ns-col ns-subjective" id="ns-qual">
+          <div class="ns-head"><span class="ns-tag subj">主观</span><h3>AI 定性评论</h3><p class="ns-sub">LLM 写的批评性评论,不作为独立证据</p></div>
+          <div class="ns-body"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Method note + raw evidence -->
+    <section class="panel panel-foot">
+      <div class="method" id="method-note"></div>
+      <details>
+        <summary>原始 evidence pack(可展开)</summary>
+        <pre id="raw-pack"></pre>
+      </details>
+    </section>
+
+    <div class="actions"><button id="new-run">← 跑新的一个</button></div>
+  </section>
+
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>

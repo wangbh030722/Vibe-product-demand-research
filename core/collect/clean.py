@@ -26,26 +26,33 @@ CATEGORY_KEYS = {
     "workaround": [
         r"\bworkaround\b", r"\binstead i\b", r"\bi just\b", r"\bi use\b", r"\bi end up\b",
         r"\bmanually\b", r"\bsimpl(y|er) (use|do)\b", r"\bi switched to\b", r"\bduct tape\b",
+        r"我现在用", r"我用的是", r"自己弄", r"自己做", r"替代品", r"凑合", r"将就",
     ],
     "payment_signal": [
         r"\bpre[- ]?order\b", r"\bbacked\b", r"\bkickstarter\b", r"\bindiegogo\b",
         r"\bwaitlist\b", r"\bsubscription\b", r"\b\$\d+", r"\bbought\b", r"\bordered\b",
+        r"预订", r"预购", r"众筹", r"会员费", r"订阅", r"购买", r"下单", r"入手", r"¥\d+",
     ],
     "counter_evidence": [
         r"\brefund(ed|ing)?\b", r"\breturn(ed|ing)?\b", r"\bregret\b", r"\bwaste of money\b",
         r"\bdiscontinued\b", r"\bdead\b", r"\bfailed\b", r"\babandoned\b", r"\bgave up\b",
         r"\bdoesn'?t (work|do)\b", r"\bnot worth\b", r"\bsold (it|mine)\b",
+        r"退货", r"退款", r"后悔", r"白买", r"翻车", r"停产", r"凉了", r"不值得", r"卖掉",
     ],
     "pain": [
         r"\bbattery\b", r"\bovrheat", r"\boverheat\b", r"\bcrash(es|ed|ing)?\b",
         r"\bbug\b", r"\blag(s|gy)?\b", r"\bprivacy\b", r"\brecording\b",
         r"\bcreepy\b", r"\bcamera\b", r"\bbroken?\b", r"\buncomfortab", r"\bhurts?\b",
         r"\bannoying\b", r"\bdisappoint", r"\bissue\b", r"\bproblem\b",
+        r"难用", r"卡顿", r"发烫", r"耗电", r"反人类", r"垃圾", r"坑",
+        r"不好用", r"问题", r"故障", r"失望", r"差评",
     ],
     "positive": [
         r"\blove (it|mine|these)\b", r"\bawesome\b", r"\bgame[- ]changer\b",
         r"\bworth (it|every)\b", r"\bamazing\b", r"\bsurprisingly good\b",
         r"\bcouldn'?t (live|go) without\b", r"\bgreat for\b",
+        r"好用", r"真香", r"yyds", r"非常推荐", r"性价比", r"值得", r"惊艳", r"离不开",
+        r"超棒", r"真的好", r"舒服",
     ],
 }
 
