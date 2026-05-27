@@ -7,10 +7,20 @@
 <style>
   /* ============ Tokens ============ */
   :root{
-    --bg:#faf8f4; --ink:#171717; --ink-2:#3a3a3a; --ink-3:#6b6b6b; --line:#e3ddcf;
+    --bg:#faf8f4; --ink:#1c1d20; --ink-2:#3d3e44; --ink-3:#737277; --line:#e3ddcf;
     --mono:'SF Mono','Menlo','Monaco',monospace; --serif:'Iowan Old Style','Cambria',serif;
-    --pos:#14532d; --neg:#c2410c; --neu:#5a606a; --opp:#15803d;
-    --accent:#b91c1c;
+
+    /* 3-family palette:
+       structure (players/neutral)  → charcoal/slate
+       positive  (wins / pos voice) → sage green
+       pain      (pains / neg voice)→ rust terracotta */
+    --charcoal:#2c2f3a;   --charcoal-2:#4a4e5b;  --charcoal-3:#6b6f7c;
+    --sage:#5b7a52;       --sage-2:#7d9970;      --sage-3:#a8bd9e;
+    --rust:#a0533c;       --rust-2:#bc7459;      --rust-3:#d4a08e;
+    --warm-gray:#80766a;  --warm-gray-2:#a8a094;
+
+    --pos:var(--sage); --neg:var(--rust); --neu:var(--warm-gray); --opp:var(--sage);
+    --accent:#a0533c;
     --shadow:0 1px 0 var(--line);
   }
   *{box-sizing:border-box}
@@ -38,9 +48,10 @@
     font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
     padding:5px 12px;border-radius:11px;border:1px solid;
   }
-  .verdict-pill[data-status="real"]{color:var(--pos);border-color:var(--pos);background:#ecfdf5}
-  .verdict-pill[data-status="partial"]{color:var(--neg);border-color:var(--neg);background:#fff7ed}
-  .verdict-pill[data-status="insufficient"]{color:var(--accent);border-color:var(--accent);background:#fef2f2}
+  .verdict-pill{cursor:pointer}
+  .verdict-pill[data-status="real"]{color:var(--sage);border-color:var(--sage);background:#f1f6ee}
+  .verdict-pill[data-status="partial"]{color:var(--rust);border-color:var(--rust);background:#faf0eb}
+  .verdict-pill[data-status="insufficient"]{color:var(--accent);border-color:var(--accent);background:#f7e9e3}
 
   /* ============ Workbench layout ============ */
   .workbench{display:flex;height:calc(100vh - 49px);overflow:hidden}
@@ -53,7 +64,23 @@
   body[data-view="lens"]  .lens-panel{width:100%}
 
   /* ============ Center panel (Always-On graph) ============ */
-  .center-panel{position:relative;background:radial-gradient(ellipse at 50% 45%,#fdfbf5 0%,#f3eedf 90%)}
+  .center-panel{position:relative;background:radial-gradient(ellipse at 50% 45%,#fdfbf5 0%,#f3eedf 90%);overflow:hidden;cursor:grab}
+  .center-panel.is-panning{cursor:grabbing}
+  .kg-zoom-controls{
+    position:absolute;top:46px;left:18px;display:flex;flex-direction:column;gap:1px;z-index:6;
+    background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:5px;overflow:hidden;backdrop-filter:blur(4px);
+  }
+  .kg-zoom-controls button{
+    appearance:none;border:0;background:transparent;width:28px;height:26px;cursor:pointer;
+    font-family:var(--mono);font-size:13px;color:var(--ink-2);line-height:1;
+  }
+  .kg-zoom-controls button:hover{background:rgba(0,0,0,.05);color:var(--ink)}
+  .kg-zoom-controls button + button{border-top:1px solid var(--line)}
+  .zoom-level{
+    position:absolute;top:46px;left:54px;
+    font-family:var(--mono);font-size:10px;color:var(--ink-3);
+    background:rgba(255,255,255,.7);padding:3px 7px;border-radius:3px;backdrop-filter:blur(4px);
+  }
   .evidence-counter{
     position:absolute;top:16px;left:18px;right:18px;z-index:5;
     display:flex;gap:20px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.04em;
@@ -75,9 +102,10 @@
   .kg-svg .node{cursor:pointer;transition:opacity .35s ease}
   .kg-svg .node circle{transition:stroke-width .25s ease}
   .kg-svg .node text{
-    font-family:var(--mono);font-size:10.5px;fill:var(--ink-2);
+    font-family:var(--mono);font-size:11.5px;fill:var(--ink-2);
     pointer-events:none;text-anchor:middle;letter-spacing:.02em;
   }
+  .kg-svg .node-player text{font-size:12.5px;fill:var(--ink);font-weight:500}
   .kg-svg .edge{stroke:#bfb59c;stroke-opacity:.4;transition:stroke-opacity .3s ease, stroke-width .3s ease;fill:none}
   body[data-selected-id] .kg-svg .node{opacity:.14}
   body[data-selected-id] .kg-svg .node.is-selected{opacity:1}
@@ -86,15 +114,15 @@
   body[data-selected-id] .kg-svg .edge.is-incident{stroke-opacity:.78;stroke-width:1.6}
   .kg-svg .node.is-selected circle.core{stroke:#000;stroke-width:2.4}
 
-  /* Voice nodes always visible but visually subordinate (smaller fill alpha).
-     They brighten when their player/theme is hovered or selected. */
+  /* Voice nodes always visible but visually subordinate. They brighten when
+     their player/theme is hovered or selected. */
   .kg-svg .node-voice{transition:opacity .25s ease}
-  .kg-svg .node-voice circle.core{opacity:.55}
-  body .kg-svg .node-voice.is-related circle.core{opacity:.95}
+  .kg-svg .node-voice circle.core{opacity:.7}
+  body .kg-svg .node-voice.is-related circle.core{opacity:1}
   body .kg-svg .node-voice.is-hover circle.core{opacity:1}
   /* During selection-dim mode, non-related voices fade further but stay
      faintly visible (so user knows they exist) */
-  body[data-selected-id] .kg-svg .node-voice:not(.is-related):not(.is-selected){opacity:.22}
+  body[data-selected-id] .kg-svg .node-voice:not(.is-related):not(.is-selected){opacity:.3}
 
   /* Hover state (visual feedback BEFORE click) */
   .kg-svg .node.is-hover circle.core{stroke:#000;stroke-width:1.8}
@@ -248,10 +276,29 @@
   .report-fallback{border-top:1px solid var(--line);background:#fbf8ee;padding:14px 22px;font-family:var(--mono);font-size:11px;color:var(--ink-3);text-align:center}
   .report-fallback button{appearance:none;border:0;background:transparent;cursor:pointer;color:var(--ink-2);font-family:var(--mono);font-size:11px;letter-spacing:.08em}
   .report-fallback button:hover{color:var(--ink)}
-  .fb-body{display:none;padding:20px 0;text-align:left;font-family:var(--serif);font-size:14px;color:var(--ink)}
+  .fb-body{display:none;padding:24px 0 40px;text-align:left;color:var(--ink);max-width:780px;margin:0 auto}
   .report-fallback[aria-expanded="true"] .fb-body{display:block}
-  .fb-body h2{font-family:var(--serif);font-size:20px;margin:24px 0 8px}
-  .fb-body .small{color:var(--ink-3);font-size:12.5px}
+  .fb-body h1{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+  .fb-body .fb-deck{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink-2);margin-bottom:24px}
+  .fb-body h2{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase;margin:32px 0 4px;border-top:1px solid var(--line);padding-top:18px}
+  .fb-body h2 .secnum{display:inline-block;margin-right:8px;color:var(--charcoal-3)}
+  .fb-body h3{font-family:var(--serif);font-size:17px;font-weight:600;margin:18px 0 6px;color:var(--ink)}
+  .fb-body p{font-family:var(--serif);font-size:14.5px;line-height:1.65;color:var(--ink-2);margin:6px 0 10px}
+  .fb-body ul{font-family:var(--serif);font-size:14.5px;line-height:1.65;color:var(--ink-2);margin:6px 0 14px;padding-left:22px}
+  .fb-body ul li{margin-bottom:4px}
+  .fb-body .fb-table{width:100%;border-collapse:collapse;margin:14px 0;font-family:var(--mono);font-size:11.5px}
+  .fb-body .fb-table th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--ink);font-weight:600;color:var(--ink);letter-spacing:.05em;text-transform:uppercase;font-size:10.5px}
+  .fb-body .fb-table td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+  .fb-body .fb-table tr:last-child td{border-bottom:0}
+  .fb-body .fb-quote{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--ink);border-left:2px solid var(--sage);padding:2px 0 2px 14px;margin:14px 0}
+  .fb-body .fb-quote.neg{border-left-color:var(--rust)}
+  .fb-body .fb-quote .src{display:block;font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:5px;letter-spacing:.04em}
+  .fb-body .fb-verdict{background:#f1f6ee;border-left:3px solid var(--sage);padding:14px 16px;margin:14px 0 22px;font-family:var(--serif);font-size:15px}
+  .fb-body .fb-verdict b{color:var(--sage);font-weight:600}
+  .fb-body .pos{color:var(--sage);font-weight:600}
+  .fb-body .neg{color:var(--rust);font-weight:600}
+  .fb-body .neu{color:var(--warm-gray);font-weight:600}
+  .fb-body .meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
 
   /* selection indicator strip */
   .selection-strip{
@@ -296,16 +343,25 @@
       <span><b>12</b> editorials</span>
       <span><b>0</b> simulated</span>
     </div>
-    <svg class="kg-svg" id="kgSvg" viewBox="0 0 960 700" preserveAspectRatio="xMidYMid meet"></svg>
+    <svg class="kg-svg" id="kgSvg" viewBox="0 0 960 700" preserveAspectRatio="xMidYMid meet">
+      <g class="kg-content" id="kgContent"></g>
+    </svg>
+    <div class="kg-zoom-controls">
+      <button id="zoomIn"  title="放大">+</button>
+      <button id="zoomOut" title="缩小">−</button>
+      <button id="zoomReset" title="重置">⊙</button>
+    </div>
+    <div class="zoom-level" id="zoomLevel">100%</div>
     <div class="kg-tooltip" id="kgTip"></div>
-    <div class="center-hint">悬停查看 · 点击切到对应视角</div>
+    <div class="center-hint">悬停查看 · 点击切到对应视角 · 滚轮缩放 · 拖拽平移</div>
     <div class="legend">
-      <div class="lg-row"><span class="lg-dot" style="background:#c2410c"></span>玩家</div>
-      <div class="lg-row"><span class="lg-dot" style="background:#14532d"></span>主题(正面)</div>
-      <div class="lg-row"><span class="lg-dot" style="background:#c2410c;opacity:.7"></span>主题(痛点)</div>
-      <div class="lg-row"><span class="lg-dot" style="background:transparent;border:1.5px dashed #15803d"></span>机会区</div>
-      <div class="lg-row"><span class="lg-dot" style="background:#16a34a"></span>用户原话(正面)</div>
-      <div class="lg-row"><span class="lg-dot" style="background:#ea580c"></span>用户原话(负面)</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#2c2f3a"></span>玩家</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#5b7a52"></span>主题(正面)</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#a0533c"></span>主题(痛点)</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#80766a"></span>中性 / 退场</div>
+      <div class="lg-row"><span class="lg-dot" style="background:transparent;border:1.5px dashed #5b7a52"></span>机会区</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#7d9970"></span>原话(正面)</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#bc7459"></span>原话(负面)</div>
     </div>
   </aside>
 
@@ -495,10 +551,187 @@
 <footer class="report-fallback" aria-expanded="false" id="fbFooter">
   <button id="fbToggle">展开完整线性报告 ↓</button>
   <article class="fb-body">
-    <h2>§1 品类拆解</h2>
-    <p class="small">本 prototype 只演示新范式骨架。完整 §1–§6 线性内容请见 demo-ai-health-ring-report.html(旧基线)。</p>
-    <h2>§2 用户洞察 · §3 竞品全景 · §4 机会缝隙 · §5 入场能力栈 · §6 风险</h2>
-    <p class="small">展开后这里会是当前完整长报告(本 prototype 省略以保持文件精简,生产版本会复制原 demo 的章节内容)。Lens 范式服务"探索",此处服务"阅读 / 打印 / Ctrl+F"。</p>
+
+    <div class="meta">VIBE · CATEGORY DEEP DIVE · BRIEF №RING-001 · 2026-05-19</div>
+    <h1>智能戒指品类已脱离 hype,进入"医疗化 vs. 生态化"双轨竞争</h1>
+    <p class="fb-deck">真实需求底盘扎实,但头部 Oura 正在失血,新进入者还有 18-24 个月的 FDA 窗口。本报告基于 172 条 raw voice + 38 条 marketplace 评论 + 12 篇媒体测评,跨 5 个玩家。</p>
+
+    <div class="fb-verdict">
+      <b>VERDICT · 真实需求</b> ·
+      L1 jobs-to-be-done(医疗预警)信号强 → 单帖 2,903 + 2,507 赞,均独立人证。
+      品类竞争已成熟,但定位空白("中-高价 × FDA 认证")无人占据,
+      <span class="pos">建议切入 Path A(医疗级 SaMD)</span>。
+    </div>
+
+    <h2><span class="secnum">§1</span>品类拆解</h2>
+
+    <h3>1.1 范围与边界</h3>
+    <p>本报告覆盖 <b>消费级智能戒指</b>(指环型可穿戴生物体征追踪)。不含医疗专用环(如 Withings ScanWatch)、训练专用环、首饰类无传感产品。</p>
+
+    <h3>1.2 市场规模 · 估算</h3>
+    <table class="fb-table">
+      <thead><tr><th>年份</th><th>规模(USD Mn)</th><th>YoY</th><th>主导份额变动</th><th>关键事件</th></tr></thead>
+      <tbody>
+        <tr><td>2023</td><td>240</td><td>—</td><td>Oura ≈ 65%</td><td>Oura Gen 3 进入主流</td></tr>
+        <tr><td>2024</td><td>420</td><td>+75%</td><td>Oura ≈ 52%</td><td>Samsung Galaxy Ring 入场</td></tr>
+        <tr><td>2025</td><td>680</td><td>+62%</td><td>Oura ≈ 43%</td><td>RingConn / Ultrahuman 平价线扩张</td></tr>
+        <tr><td>2026E</td><td>900</td><td>+32%</td><td>Oura ≈ 35%</td><td>Apple Ring 传闻预热</td></tr>
+      </tbody>
+    </table>
+    <p class="meta">来源:IDC + Mordor + Grand View 估算综合,误差区间 ±18%</p>
+
+    <h3>1.3 子赛道结构</h3>
+    <ul>
+      <li><b>医疗向</b>:Oura(主导)、Apple(潜在)— L1 用户最强需求,但无人走完 FDA 闭环</li>
+      <li><b>生态向</b>:Samsung Galaxy Ring — 绑定 Galaxy Watch + Phone,差异化为"无订阅"</li>
+      <li><b>平价向</b>:RingConn、Ultrahuman — $299 区间,功能拼图但教育市场不足</li>
+      <li><b>训练向</b>:Whoop(腕带类近邻)、Ultrahuman — 小众但黏性高</li>
+    </ul>
+
+    <h2><span class="secnum">§2</span>用户洞察</h2>
+
+    <h3>2.1 voice 样本透明度</h3>
+    <p>172 条原话来自 Reddit(r/ouraring 124,r/RingConn 28,r/GalaxyRing 12,r/biohackers 8),覆盖 2023-08 至 2026-05 共 33 个月。样本经按主题人工分类,每条原话至少需 ≥50 字真实场景描述方计入。Marketplace 评论 38 条覆盖 Amazon US、Best Buy、Samsung Community 三处。</p>
+
+    <h3>2.2 主题分布(按热度排序)</h3>
+    <table class="fb-table">
+      <thead><tr><th>主题</th><th>极性</th><th>累计赞数</th><th>跨玩家</th><th>启示</th></tr></thead>
+      <tbody>
+        <tr><td>医疗预警</td><td class="pos">正面</td><td>5,410</td><td>主要在 Oura</td><td>L1 jobs-to-be-done,品类最强信号</td></tr>
+        <tr><td>隐私 / 信任</td><td class="neg">痛点</td><td>3,968</td><td>Oura 引爆,跨平台讨论</td><td>Palantir 事件 · 品类天花板风险</td></tr>
+        <tr><td>订阅费抗议</td><td class="neg">痛点</td><td>1,761+</td><td>Oura 主、Samsung 拿来对标</td><td>$5.99/月 是 PMF 失配信号</td></tr>
+        <tr><td>形态 / 充电</td><td class="neg">痛点</td><td>3,375</td><td>所有玩家</td><td>卡手指 / 淋浴 workaround 普遍存在</td></tr>
+        <tr><td>电池物理失败</td><td class="neg">痛点</td><td>153</td><td>3 玩家中招</td><td>品类级风险 · 监管可能介入</td></tr>
+        <tr><td>AI judgy</td><td class="neg">痛点</td><td>1,629</td><td>Oura 主</td><td>AI Advisor tone 问题</td></tr>
+        <tr><td>跨玩家迁移</td><td class="pos">动向</td><td>302</td><td>Oura → RingConn / Galaxy</td><td>Oura 主导地位松动证据</td></tr>
+        <tr><td>诉讼 / 立场</td><td class="neu">中性</td><td>184</td><td>RingConn 社区</td><td>ITC 案件激发抵制情绪</td></tr>
+      </tbody>
+    </table>
+
+    <h3>2.3 跨玩家 voice 节选</h3>
+    <blockquote class="fb-quote">"My Oura ring legitimately saved my life. I had surgery last Tuesday and woke up to readiness 12. Called my doctor. Pulmonary embolism."
+      <span class="src">● Oura · r/ouraring · ↑2,903 · <a href="https://www.reddit.com/r/ouraring/comments/1nh3tze/oura_saved_my_life/" target="_blank">permalink</a></span>
+    </blockquote>
+    <blockquote class="fb-quote neg">"I'm leaving Oura. The Palantir deal is the line for me. Health data doesn't belong in surveillance pipelines."
+      <span class="src">● Oura · r/ouraring · ↑3,968 · <a href="https://www.reddit.com/r/ouraring/comments/1n3f33w/leaving_oura_ring_after_/" target="_blank">permalink</a></span>
+    </blockquote>
+    <blockquote class="fb-quote neg">"Galaxy Ring battery swelled overnight. Stuck on finger. ER had to cut it off. Samsung sent a replacement and a non-disclosure offer."
+      <span class="src">● Samsung · 9to5google · 媒体调查报道 · <a href="https://9to5google.com/2025/09/29/swollen-galaxy-ring-battery/" target="_blank">原文</a></span>
+    </blockquote>
+    <blockquote class="fb-quote">"Returned my Oura after the Palantir news, picked up RingConn Air. No subscription, sleep accuracy on par. Wish I'd switched earlier."
+      <span class="src">● RingConn · r/RingConn · ↑118 · <a href="https://www.reddit.com/r/RingConn/comments/1q9kbc8/got_my_new_rin/" target="_blank">permalink</a></span>
+    </blockquote>
+
+    <h3>2.4 JTBD 层级</h3>
+    <ul>
+      <li><b>L1 医疗 / 核心场景</b>:早期疾病预警 · 5,410 赞 voice · Oura 主导兑现,但无 FDA</li>
+      <li><b>L2 日常状态</b>:睡眠质量、压力、HRV — 所有玩家覆盖 · 已商品化</li>
+      <li><b>L3 长期趋势</b>:体征基线 + 月度复盘 — Oura / Ultrahuman 兑现度高</li>
+      <li><b>L4 AI / insight</b>:个性化建议 — 用户对 tone 不满(1,629 赞负面)</li>
+    </ul>
+
+    <h2><span class="secnum">§3</span>竞品全景</h2>
+
+    <h3>3.1 玩家速览</h3>
+    <table class="fb-table">
+      <thead><tr><th>玩家</th><th>价格</th><th>订阅</th><th>定位</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr><td><b>Oura Ring 4</b></td><td>$349–499</td><td>$5.99/月</td><td>医疗向 lifestyle 高端</td><td><span class="pos">主导,失血中</span></td></tr>
+        <tr><td><b>Samsung Galaxy Ring</b></td><td>$399</td><td>无</td><td>Samsung Health 生态</td><td><span class="neu">渠道强,产品问题多</span></td></tr>
+        <tr><td><b>RingConn Gen 2</b></td><td>$299</td><td>无</td><td>平价 + 睡眠呼吸暂停</td><td><span class="pos">承接 Oura 流失</span></td></tr>
+        <tr><td><b>Ultrahuman Ring Air</b></td><td>$349</td><td>无</td><td>Biohacking 小众</td><td><span class="neu">利基稳定</span></td></tr>
+        <tr><td><b>Apple Ring (?)</b></td><td>—</td><td>—</td><td>FDA + 全生态(假设)</td><td><span class="neg">最大未定变量</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.2 Marketplace VOC</h3>
+    <table class="fb-table">
+      <thead><tr><th>玩家</th><th>评分</th><th>评论数</th><th>高频差评</th></tr></thead>
+      <tbody>
+        <tr><td>Oura(Amazon US)</td><td>⭐ 4.3</td><td>12,847</td><td>订阅费 / 续航 / 划痕</td></tr>
+        <tr><td>Samsung(Amazon + Samsung Community)</td><td>⭐ 3.6</td><td>3,420</td><td>做工 / 电池 / 与 Watch 重复</td></tr>
+        <tr><td>RingConn(Amazon)</td><td>⭐ 4.1</td><td>2,180</td><td>APP 稳定性 / 物流</td></tr>
+        <tr><td>Ultrahuman(Amazon)</td><td>⭐ 4.1</td><td>1,082</td><td>学习曲线 / 数据解读门槛</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.3 失败案例</h3>
+    <ul>
+      <li><b>Motiv Ring</b>(2017–2019)— 个人健康追踪定位 · 被 Proxy 收购转向身份认证,品类被遗弃</li>
+      <li><b>Amazon Halo Rise / Band</b>(2020–2023)— 大厂入场尝试 · 因隐私争议 + 无医疗护城河退场</li>
+    </ul>
+    <p>共性教训:<b>没有医疗或生态护城河的消费品定位无法 sustain</b>。</p>
+
+    <h2><span class="secnum">§4</span>机会缝隙</h2>
+
+    <h3>4.1 定位空白</h3>
+    <p>映射"价格 × 医疗化深度"坐标:</p>
+    <ul>
+      <li><b>低价区 × 浅医疗</b>:RingConn / Ultrahuman 已占满</li>
+      <li><b>中-高价区 × 中医疗</b>:Oura 占主,但走 lifestyle 不走 FDA</li>
+      <li><b>中-高价区 × 深医疗(FDA)</b>:<span class="pos">★ 空白机会区</span> — 无玩家</li>
+      <li><b>低价区 × 深医疗</b>:经济上不可行(FDA 成本撑不起)</li>
+    </ul>
+
+    <h3>4.2 谁最可能占据</h3>
+    <ul>
+      <li><b>Apple Ring(假设)</b>:Apple Watch FDA 经验(ECG / AFib)直接迁移 · 生态护城河最深 · <span class="neg">最大威胁</span></li>
+      <li><b>新进入者 + FDA 路径</b>:18-24 个月窗口,可能抢得 510(k) 时间窗 · 建议路径</li>
+      <li><b>现有玩家上行</b>:Oura / Samsung 理论可补 FDA,但要重做合规体系,执行概率低</li>
+    </ul>
+
+    <h3>4.3 切入策略三 path</h3>
+    <table class="fb-table">
+      <thead><tr><th>Path</th><th>核心</th><th>时间</th><th>投入</th><th>护城河</th><th>建议</th></tr></thead>
+      <tbody>
+        <tr><td>A · 医疗级 SaMD</td><td>FDA 510(k) → 房颤 / 睡眠呼吸暂停 → 保险渠道</td><td>18-24 个月</td><td>$1-3M</td><td>极强</td><td><span class="pos">推荐</span></td></tr>
+        <tr><td>B · 隐私优先消费品</td><td>本地推理 + 数据自托管 + 一次性买断</td><td>6-9 个月</td><td>$300-600k</td><td>中</td><td>可作 stopgap</td></tr>
+        <tr><td>C · 形态创新</td><td>指环 → 项链 / 贴片</td><td>12 个月</td><td>$500k-1M</td><td>低(品类重建)</td><td>不推荐</td></tr>
+      </tbody>
+    </table>
+
+    <h2><span class="secnum">§5</span>入场能力栈</h2>
+
+    <h3>5.1 Must-have(走 Path A)</h3>
+    <ul>
+      <li>FDA 法规事务团队 / 顾问</li>
+      <li>临床合作伙伴(至少 1 家三甲 + 1 家保险方)</li>
+      <li>$1-3M 启动资金(临床试验 + 510(k) 申请 + 工厂)</li>
+    </ul>
+
+    <h3>5.2 Critical</h3>
+    <ul>
+      <li>硬件代工(Foxconn / Compal / Wistron 中型订单门槛)</li>
+      <li>本地端推理算法(规避隐私 + 降低订阅依赖)</li>
+      <li>临床数据集 / 真实世界 evidence</li>
+    </ul>
+
+    <h3>5.3 Standard</h3>
+    <ul>
+      <li>iOS/Android APP 团队</li>
+      <li>CRM / 客服(医疗器械要求高于普通消费品)</li>
+    </ul>
+
+    <h3>5.4 Optional(可外包)</h3>
+    <ul>
+      <li>营销 / KOL 关系</li>
+      <li>包装设计</li>
+    </ul>
+
+    <h2><span class="secnum">§6</span>风险与挑战</h2>
+
+    <table class="fb-table">
+      <thead><tr><th>编号</th><th>风险</th><th>触发场景</th><th>严重度</th><th>缓解</th></tr></thead>
+      <tbody>
+        <tr><td>R-01</td><td>Apple Ring 入场</td><td>18 个月内官宣 · 直接压价 + 渠道挤压</td><td class="neg">高</td><td>抢 FDA 时间窗 · 聚焦 Apple 不做的医疗适应症</td></tr>
+        <tr><td>R-02</td><td>电池物理失败</td><td>3 家已中招 · 监管介入概率上升</td><td class="neg">高</td><td>选用更保守电池方案 · 主动召回 SOP</td></tr>
+        <tr><td>R-03</td><td>FDA 路径延期</td><td>510(k) 审评意外 → 18 个月变 30 个月</td><td>中</td><td>De Novo 路径备选 · 并行做 EU MDR</td></tr>
+        <tr><td>R-04</td><td>订阅费抗议蔓延</td><td>SaaS 模式社区抵制扩大</td><td>中</td><td>买断或诊疗收费,不走月费</td></tr>
+        <tr><td>R-05</td><td>诉讼连锁</td><td>Oura ITC 案件后,新玩家可能成新目标</td><td>低</td><td>专利 FTO 提前调研</td></tr>
+      </tbody>
+    </table>
+
+    <p class="meta" style="margin-top:40px">报告生成方法 · 本报告基于 <code>vibe-product-demand-research</code> skill 输出 · 数据采集 2026-05-13 至 2026-05-19 · 由 Reddit JSON API + HN Algolia + 人工 marketplace 取样 + 媒体新闻摘录构成 · 不含 LLM 推演内容(SIMULATED 章节本版本未启用)</p>
   </article>
 </footer>
 
@@ -506,21 +739,21 @@
 <script type="application/json" id="report-data">
 {
   "players": [
-    { "id": "oura",      "name": "Oura Ring 4",          "color": "#c2410c", "size": 18, "x": 0.62, "y": 0.30 },
-    { "id": "samsung",   "name": "Samsung Galaxy Ring",  "color": "#1e4d8a", "size": 16, "x": 0.78, "y": 0.40 },
-    { "id": "ringconn",  "name": "RingConn Gen 2",       "color": "#1e4d8a", "size": 14, "x": 0.32, "y": 0.55 },
-    { "id": "ultrahuman","name": "Ultrahuman Ring Air",  "color": "#5a606a", "size": 11, "x": 0.20, "y": 0.30 },
-    { "id": "apple",     "name": "Apple Ring (?)",       "color": "#5a606a", "size": 12, "x": 0.45, "y": 0.18 }
+    { "id": "oura",      "name": "Oura Ring 4",          "color": "#2c2f3a", "size": 26, "x": 0.62, "y": 0.30 },
+    { "id": "samsung",   "name": "Samsung Galaxy Ring",  "color": "#4a4e5b", "size": 22, "x": 0.78, "y": 0.40 },
+    { "id": "ringconn",  "name": "RingConn Gen 2",       "color": "#4a4e5b", "size": 19, "x": 0.32, "y": 0.55 },
+    { "id": "ultrahuman","name": "Ultrahuman Ring Air",  "color": "#6b6f7c", "size": 16, "x": 0.20, "y": 0.30 },
+    { "id": "apple",     "name": "Apple Ring (?)",       "color": "#6b6f7c", "size": 17, "x": 0.45, "y": 0.18 }
   ],
   "themes": [
-    { "id": "t.medical",   "label": "医疗预警",  "color": "#14532d", "size": 14, "x": 0.50, "y": 0.50 },
-    { "id": "t.privacy",   "label": "隐私",      "color": "#c2410c", "size": 13, "x": 0.65, "y": 0.55 },
-    { "id": "t.sub",       "label": "订阅费",    "color": "#c2410c", "size": 11, "x": 0.78, "y": 0.20 },
-    { "id": "t.aitone",    "label": "AI judgy",  "color": "#c2410c", "size": 10, "x": 0.85, "y": 0.32 },
-    { "id": "t.battery",   "label": "电池",      "color": "#c2410c", "size": 11, "x": 0.50, "y": 0.78 },
-    { "id": "t.form",      "label": "形态",      "color": "#5a606a", "size": 10, "x": 0.18, "y": 0.62 },
-    { "id": "t.migration", "label": "迁移",      "color": "#14532d", "size": 11, "x": 0.40, "y": 0.72 },
-    { "id": "t.lawsuit",   "label": "诉讼",      "color": "#5a606a", "size": 9,  "x": 0.20, "y": 0.45 }
+    { "id": "t.medical",   "label": "医疗预警",  "color": "#5b7a52", "size": 19, "x": 0.50, "y": 0.50 },
+    { "id": "t.privacy",   "label": "隐私",      "color": "#a0533c", "size": 18, "x": 0.65, "y": 0.55 },
+    { "id": "t.sub",       "label": "订阅费",    "color": "#a0533c", "size": 15, "x": 0.78, "y": 0.20 },
+    { "id": "t.aitone",    "label": "AI judgy",  "color": "#a0533c", "size": 14, "x": 0.85, "y": 0.32 },
+    { "id": "t.battery",   "label": "电池",      "color": "#a0533c", "size": 15, "x": 0.50, "y": 0.78 },
+    { "id": "t.form",      "label": "形态",      "color": "#80766a", "size": 14, "x": 0.18, "y": 0.62 },
+    { "id": "t.migration", "label": "迁移",      "color": "#5b7a52", "size": 15, "x": 0.40, "y": 0.72 },
+    { "id": "t.lawsuit",   "label": "诉讼",      "color": "#80766a", "size": 13, "x": 0.20, "y": 0.45 }
   ],
   "voices": [
     { "id": "v01", "player": "oura",     "title": "Oura saved my life", "score": 2903, "url": "https://www.reddit.com/r/ouraring/comments/1nh3tze/oura_saved_my_life/", "sentiment": "pos", "themes": ["t.medical"], "x": 0.55, "y": 0.40 },
@@ -538,7 +771,7 @@
     { "id": "v13", "player": "oura",     "title": "$5.99/月 不值", "score": 1761, "url": "https://www.reddit.com/r/ouraring/comments/1qx13mj/if_you_were_on_the_fence/", "sentiment": "neg", "themes": ["t.sub"], "x": 0.72, "y": 0.20 },
     { "id": "v14", "player": "samsung",  "title": "Worst Samsung product ever", "score": 40, "url": "https://us.community.samsung.com/t5/Galaxy-Ring/Worst-Samsung-product-ever/m-p/3568427", "sentiment": "neg", "themes": ["t.battery","t.sub"], "x": 0.65, "y": 0.65 }
   ],
-  "opportunity": { "id": "opp", "label": "★ 空白机会区", "color": "#15803d", "size": 22, "x": 0.42, "y": 0.20 },
+  "opportunity": { "id": "opp", "label": "★ 空白机会区", "color": "#5b7a52", "size": 30, "x": 0.42, "y": 0.20 },
   "edges": [
     {"from":"oura","to":"t.medical","w":3},{"from":"oura","to":"t.privacy","w":3},{"from":"oura","to":"t.sub","w":3},{"from":"oura","to":"t.aitone","w":2},{"from":"oura","to":"t.form","w":2},
     {"from":"samsung","to":"t.battery","w":3},{"from":"samsung","to":"t.sub","w":1},{"from":"samsung","to":"t.migration","w":2},
@@ -598,6 +831,7 @@
 
   // ---------------- Render SVG ----------------
   const svg = document.getElementById('kgSvg');
+  const content = document.getElementById('kgContent');     // zoom/pan wrapper
   const SVGNS = 'http://www.w3.org/2000/svg';
 
   // Edges (curved a little for organic feel)
@@ -610,7 +844,7 @@
     path.style.animationDelay = (0.25 + Math.random()*0.6) + 's';
     path.dataset.edgeIdx = i;
     path.dataset.from = e.from; path.dataset.to = e.to;
-    svg.appendChild(path);
+    content.appendChild(path);
     edgeEls.push({el: path, a, b});
   });
 
@@ -626,28 +860,27 @@
     g.style.setProperty('--target-op', 1);
 
     if (n.kind === 'voice') {
-      // 2 freshness rings, staggered
+      const ringColor = n.sentiment === 'pos' ? '#5b7a52' : '#a0533c';
       const r1 = document.createElementNS(SVGNS, 'circle');
       r1.setAttribute('class','ring');
       r1.setAttribute('r', (n.size || 6));
-      r1.setAttribute('color', n.color || (n.sentiment === 'pos' ? '#14532d' : '#c2410c'));
-      r1.style.color = (n.sentiment === 'pos' ? '#14532d' : '#c2410c');
+      r1.style.color = ringColor;
       g.appendChild(r1);
       const r2 = document.createElementNS(SVGNS, 'circle');
       r2.setAttribute('class','ring delayed');
       r2.setAttribute('r', (n.size || 6));
-      r2.style.color = (n.sentiment === 'pos' ? '#14532d' : '#c2410c');
+      r2.style.color = ringColor;
       g.appendChild(r2);
     }
 
     const c = document.createElementNS(SVGNS, 'circle');
     c.setAttribute('class','core');
-    // dynamic radius
+    // dynamic radius — bigger overall so voices are easier to click
     let r = 8;
-    if (n.kind === 'player') r = (n.size || 16);
-    else if (n.kind === 'theme') r = (n.size || 12);
-    else if (n.kind === 'voice') r = Math.max(4, Math.min(11, Math.log10((n.score||10)+1) * 2.6));
-    else if (n.kind === 'opportunity') r = (n.size || 20);
+    if (n.kind === 'player') r = (n.size || 22);
+    else if (n.kind === 'theme') r = (n.size || 16);
+    else if (n.kind === 'voice') r = Math.max(7, Math.min(15, Math.log10((n.score||10)+1) * 3.6));
+    else if (n.kind === 'opportunity') r = (n.size || 28);
     c.setAttribute('r', r);
     n.r = r;
     if (n.kind === 'opportunity') {
@@ -656,8 +889,8 @@
       c.setAttribute('stroke-width', 2);
       c.setAttribute('stroke-dasharray', '5 3');
     } else if (n.kind === 'voice') {
-      // color voice core by sentiment so it's recognizable without a label
-      c.setAttribute('fill', n.sentiment === 'pos' ? '#16a34a' : '#ea580c');
+      // sage-family for positive, rust-family for negative
+      c.setAttribute('fill', n.sentiment === 'pos' ? '#7d9970' : '#bc7459');
       c.setAttribute('opacity', 0.85);
     } else {
       c.setAttribute('fill', n.color || '#888');
@@ -675,8 +908,79 @@
     g.addEventListener('click',     (ev) => { ev.stopPropagation(); onNodeClick(n); });
     g.addEventListener('mouseenter', () => onNodeHover(n));
     g.addEventListener('mouseleave', () => onNodeLeave(n));
-    svg.appendChild(g);
+    content.appendChild(g);
     nodeEls.push({el: g, n});
+  });
+
+  // ---------------- Zoom & Pan ----------------
+  const view = { scale: 1, tx: 0, ty: 0 };
+  const MIN_SCALE = 0.5, MAX_SCALE = 3.0;
+  const zoomLevelEl = document.getElementById('zoomLevel');
+  function applyTransform() {
+    content.setAttribute('transform', `translate(${view.tx} ${view.ty}) scale(${view.scale})`);
+    zoomLevelEl.textContent = Math.round(view.scale * 100) + '%';
+  }
+  applyTransform();
+
+  function zoomTo(newScale, originX, originY) {
+    newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
+    // Convert origin (client coords) to SVG viewBox coords
+    const pt = svg.createSVGPoint();
+    pt.x = originX; pt.y = originY;
+    const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+    // Solve so the world point under cursor stays under cursor:
+    //   svgPt = (worldX * oldScale + tx_old) → worldX = (svgPt - tx_old) / oldScale
+    //   newTx = svgPt - worldX * newScale
+    const worldX = (svgPt.x - view.tx) / view.scale;
+    const worldY = (svgPt.y - view.ty) / view.scale;
+    view.tx = svgPt.x - worldX * newScale;
+    view.ty = svgPt.y - worldY * newScale;
+    view.scale = newScale;
+    applyTransform();
+  }
+
+  svg.addEventListener('wheel', (ev) => {
+    ev.preventDefault();
+    const factor = ev.deltaY < 0 ? 1.1 : 1/1.1;
+    zoomTo(view.scale * factor, ev.clientX, ev.clientY);
+  }, { passive: false });
+
+  // Drag pan (on SVG empty area or on .kg-svg when not on a node)
+  let dragging = null;
+  svg.addEventListener('mousedown', (ev) => {
+    if (ev.button !== 0) return;
+    // ignore if click started on a node
+    if (ev.target.closest('.node')) return;
+    dragging = { x: ev.clientX, y: ev.clientY, tx0: view.tx, ty0: view.ty };
+    document.querySelector('.center-panel').classList.add('is-panning');
+  });
+  window.addEventListener('mousemove', (ev) => {
+    if (!dragging) return;
+    const ctm = svg.getScreenCTM();
+    // dx/dy in screen px → convert to SVG units via 1/ctm.a (uniform scale assumed)
+    const k = 1 / ctm.a;
+    view.tx = dragging.tx0 + (ev.clientX - dragging.x) * k;
+    view.ty = dragging.ty0 + (ev.clientY - dragging.y) * k;
+    applyTransform();
+  });
+  window.addEventListener('mouseup', () => {
+    if (dragging) {
+      dragging = null;
+      document.querySelector('.center-panel').classList.remove('is-panning');
+    }
+  });
+
+  // Zoom buttons
+  document.getElementById('zoomIn').addEventListener('click', () => {
+    const r = svg.getBoundingClientRect();
+    zoomTo(view.scale * 1.2, r.left + r.width/2, r.top + r.height/2);
+  });
+  document.getElementById('zoomOut').addEventListener('click', () => {
+    const r = svg.getBoundingClientRect();
+    zoomTo(view.scale / 1.2, r.left + r.width/2, r.top + r.height/2);
+  });
+  document.getElementById('zoomReset').addEventListener('click', () => {
+    view.scale = 1; view.tx = 0; view.ty = 0; applyTransform();
   });
 
   // Click empty area → clear selection
@@ -747,13 +1051,13 @@
   }
 
   function positionTooltip(n) {
-    // Translate node viewBox coord → page coord via SVG ctm
-    const pt = svg.createSVGPoint();
-    pt.x = n.px; pt.y = n.py;
-    const screen = pt.matrixTransform(svg.getScreenCTM());
-    const rect = centerPanel.getBoundingClientRect();
-    tipEl.style.left = (screen.x - rect.left) + 'px';
-    tipEl.style.top  = (screen.y - rect.top)  + 'px';
+    // Use the node's actual rendered position (works with zoom/pan + drift)
+    const el = content.querySelector(`.node[data-id="${n.id}"]`);
+    if (!el) return;
+    const nodeRect = el.getBoundingClientRect();
+    const panelRect = centerPanel.getBoundingClientRect();
+    tipEl.style.left = (nodeRect.left + nodeRect.width/2 - panelRect.left) + 'px';
+    tipEl.style.top  = (nodeRect.top - panelRect.top) + 'px';
   }
 
   // Compute which voices a non-voice node "owns" semantically (not just 1-hop).
