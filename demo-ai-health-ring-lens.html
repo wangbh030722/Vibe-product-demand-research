@@ -86,13 +86,15 @@
   body[data-selected-id] .kg-svg .edge.is-incident{stroke-opacity:.78;stroke-width:1.6}
   .kg-svg .node.is-selected circle.core{stroke:#000;stroke-width:2.4}
 
-  /* Voice nodes hidden by default — too noisy. Surface only when related
-     (a connected player/theme is hovered or selected). */
-  .kg-svg .node-voice{opacity:0; pointer-events:none; transition:opacity .25s ease}
-  body .kg-svg .node-voice.is-related{opacity:.85; pointer-events:auto}
-  body[data-lens="voices"] .kg-svg .node-voice{opacity:.85; pointer-events:auto}
-  /* Beat the global selection-dimming rule for non-related voices */
-  body[data-selected-id] .kg-svg .node-voice:not(.is-related){opacity:0; pointer-events:none}
+  /* Voice nodes always visible but visually subordinate (smaller fill alpha).
+     They brighten when their player/theme is hovered or selected. */
+  .kg-svg .node-voice{transition:opacity .25s ease}
+  .kg-svg .node-voice circle.core{opacity:.55}
+  body .kg-svg .node-voice.is-related circle.core{opacity:.95}
+  body .kg-svg .node-voice.is-hover circle.core{opacity:1}
+  /* During selection-dim mode, non-related voices fade further but stay
+     faintly visible (so user knows they exist) */
+  body[data-selected-id] .kg-svg .node-voice:not(.is-related):not(.is-selected){opacity:.22}
 
   /* Hover state (visual feedback BEFORE click) */
   .kg-svg .node.is-hover circle.core{stroke:#000;stroke-width:1.8}
@@ -621,8 +623,7 @@
     g.dataset.id = n.id;
     g.dataset.kind = n.kind;
     g.style.animationDelay = (kindDelay[n.kind] + Math.random()*0.3) + 's';
-    // Voice nodes fade-in to 0 — they only surface on hover/selection (handled by .is-related)
-    g.style.setProperty('--target-op', n.kind === 'voice' ? 0 : 1);
+    g.style.setProperty('--target-op', 1);
 
     if (n.kind === 'voice') {
       // 2 freshness rings, staggered
