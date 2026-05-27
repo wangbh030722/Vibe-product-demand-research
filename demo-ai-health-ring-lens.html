@@ -86,6 +86,34 @@
   body[data-selected-id] .kg-svg .edge.is-incident{stroke-opacity:.78;stroke-width:1.6}
   .kg-svg .node.is-selected circle.core{stroke:#000;stroke-width:2.4}
 
+  /* Voice nodes hidden by default — too noisy. Surface only when related
+     (a connected player/theme is hovered or selected). */
+  .kg-svg .node-voice{opacity:0; pointer-events:none; transition:opacity .25s ease}
+  body .kg-svg .node-voice.is-related{opacity:.85; pointer-events:auto}
+  body[data-lens="voices"] .kg-svg .node-voice{opacity:.85; pointer-events:auto}
+  /* Beat the global selection-dimming rule for non-related voices */
+  body[data-selected-id] .kg-svg .node-voice:not(.is-related){opacity:0; pointer-events:none}
+
+  /* Hover state (visual feedback BEFORE click) */
+  .kg-svg .node.is-hover circle.core{stroke:#000;stroke-width:1.8}
+  .kg-svg .node.is-hover-neighbor{opacity:.9 !important}
+  .kg-svg .edge.is-hover-incident{stroke-opacity:.65;stroke-width:1.5}
+
+  /* Floating tooltip */
+  .kg-tooltip{
+    position:absolute;pointer-events:none;z-index:20;
+    background:rgba(23,23,23,.94);color:#f5f1e7;
+    font-family:var(--mono);font-size:11px;letter-spacing:.02em;
+    padding:8px 11px;border-radius:5px;max-width:280px;line-height:1.5;
+    opacity:0;transition:opacity .12s ease;transform:translate(-50%,calc(-100% - 14px));
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+  }
+  .kg-tooltip.show{opacity:1}
+  .kg-tooltip .tt-title{color:#fff;font-family:var(--serif);font-size:13.5px;letter-spacing:0;margin-bottom:3px}
+  .kg-tooltip .tt-meta{color:#a8a39a;font-size:10.5px}
+  .kg-tooltip .tt-score{color:#fbbf24;font-weight:600;margin-left:6px}
+  .kg-tooltip .tt-hint{color:#a8a39a;font-size:10px;margin-top:6px;padding-top:5px;border-top:1px solid #3a3a3a}
+
   /* Voice freshness ring */
   .kg-svg .node-voice .ring{
     fill:none;stroke:currentColor;stroke-opacity:.32;
@@ -267,7 +295,8 @@
       <span><b>0</b> simulated</span>
     </div>
     <svg class="kg-svg" id="kgSvg" viewBox="0 0 960 700" preserveAspectRatio="xMidYMid meet"></svg>
-    <div class="center-hint">点击节点 · 右侧自动切到对应视角</div>
+    <div class="kg-tooltip" id="kgTip"></div>
+    <div class="center-hint">悬停查看 · 点击切到对应视角</div>
     <div class="legend">
       <div class="lg-row"><span class="lg-dot" style="background:#c2410c"></span>玩家</div>
       <div class="lg-row"><span class="lg-dot" style="background:#14532d"></span>主题(正面)</div>
@@ -592,7 +621,8 @@
     g.dataset.id = n.id;
     g.dataset.kind = n.kind;
     g.style.animationDelay = (kindDelay[n.kind] + Math.random()*0.3) + 's';
-    g.style.setProperty('--target-op', n.kind === 'voice' ? 0.82 : 1);
+    // Voice nodes fade-in to 0 — they only surface on hover/selection (handled by .is-related)
+    g.style.setProperty('--target-op', n.kind === 'voice' ? 0 : 1);
 
     if (n.kind === 'voice') {
       // 2 freshness rings, staggered
@@ -639,16 +669,11 @@
       t.setAttribute('y', r + 14);
       t.textContent = n.name || n.label;
       g.appendChild(t);
-    } else {
-      // Native SVG <title> renders as browser tooltip on hover
-      const tip = document.createElementNS(SVGNS, 'title');
-      const sentLabel = n.sentiment === 'pos' ? '正面' : '负面';
-      const playerLabel = (nodes[n.player] && nodes[n.player].name) || n.player;
-      tip.textContent = `${sentLabel} · ${playerLabel}\n"${n.title}"\n↑${n.score.toLocaleString()}`;
-      g.appendChild(tip);
     }
 
-    g.addEventListener('click', (ev) => { ev.stopPropagation(); onNodeClick(n); });
+    g.addEventListener('click',     (ev) => { ev.stopPropagation(); onNodeClick(n); });
+    g.addEventListener('mouseenter', () => onNodeHover(n));
+    g.addEventListener('mouseleave', () => onNodeLeave(n));
     svg.appendChild(g);
     nodeEls.push({el: g, n});
   });
@@ -687,17 +712,130 @@
   }
   requestAnimationFrame(tick);
 
+  // ---------------- Hover ----------------
+  const tipEl = document.getElementById('kgTip');
+  const centerPanel = document.querySelector('.center-panel');
+
+  function tooltipFor(n) {
+    if (n.kind === 'voice') {
+      const sent = n.sentiment === 'pos' ? '正面' : '负面';
+      const player = (nodes[n.player] && nodes[n.player].name) || n.player;
+      const theme = n.themes.map(t => (nodes[t] && nodes[t].label) || t).join(' · ');
+      return `<div class="tt-title">${n.title}</div>
+              <div class="tt-meta">${sent} · ${player} · ${theme}<span class="tt-score">↑${n.score.toLocaleString()}</span></div>
+              <div class="tt-hint">点击 → 切到「用户声音」并锁定该主题</div>`;
+    }
+    if (n.kind === 'player') {
+      const voiceCount = (incidentEdges[n.id] || new Set()).size;
+      return `<div class="tt-title">${n.name}</div>
+              <div class="tt-meta">玩家 · 关联 ${voiceCount} 个主题/原话</div>
+              <div class="tt-hint">点击 → 看该玩家档案</div>`;
+    }
+    if (n.kind === 'theme') {
+      const voiceCount = data.voices.filter(v => v.themes.includes(n.id)).length;
+      return `<div class="tt-title">${n.label}</div>
+              <div class="tt-meta">主题 · ${voiceCount} 条原话讨论</div>
+              <div class="tt-hint">点击 → 看该主题下的所有用户声音</div>`;
+    }
+    if (n.kind === 'opportunity') {
+      return `<div class="tt-title">${n.label}</div>
+              <div class="tt-meta">机会缝隙 · 无玩家占据</div>
+              <div class="tt-hint">点击 → 看完整机会分析</div>`;
+    }
+    return '';
+  }
+
+  function positionTooltip(n) {
+    // Translate node viewBox coord → page coord via SVG ctm
+    const pt = svg.createSVGPoint();
+    pt.x = n.px; pt.y = n.py;
+    const screen = pt.matrixTransform(svg.getScreenCTM());
+    const rect = centerPanel.getBoundingClientRect();
+    tipEl.style.left = (screen.x - rect.left) + 'px';
+    tipEl.style.top  = (screen.y - rect.top)  + 'px';
+  }
+
+  // Compute which voices a non-voice node "owns" semantically (not just 1-hop).
+  // Player → all voices where voice.player == player.id
+  // Theme  → all voices where voice.themes includes theme.id
+  // Voice  → no related voices (it IS the voice)
+  // Opp    → voices connected to themes that are connected to opp (rare)
+  function relatedVoicesFor(n) {
+    if (n.kind === 'player') return data.voices.filter(v => v.player === n.id).map(v => v.id);
+    if (n.kind === 'theme')  return data.voices.filter(v => v.themes.includes(n.id)).map(v => v.id);
+    if (n.kind === 'opportunity') {
+      const oppThemes = Array.from(neighbors[n.id] || []);
+      return data.voices.filter(v => v.themes.some(t => oppThemes.includes(t))).map(v => v.id);
+    }
+    return [];
+  }
+
+  function onNodeHover(n) {
+    // Don't override if there's an active selection lock
+    if (document.body.dataset.selectedId === n.id) {
+      tipEl.innerHTML = tooltipFor(n);
+      positionTooltip(n);
+      tipEl.classList.add('show');
+      return;
+    }
+    // Visual highlight
+    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-hover','is-hover-neighbor'));
+    svg.querySelectorAll('.edge').forEach(l => l.classList.remove('is-hover-incident'));
+    const sel = svg.querySelector(`.node[data-id="${n.id}"]`);
+    if (sel) sel.classList.add('is-hover');
+    // Light up 1-hop neighbors (themes/players/etc)
+    (neighbors[n.id] || new Set()).forEach(nid => {
+      const nb = svg.querySelector(`.node[data-id="${nid}"]`);
+      if (!nb) return;
+      nb.classList.add('is-hover-neighbor');
+      if (nb.classList.contains('node-voice')) nb.classList.add('is-related');
+    });
+    // Reveal semantically-related voices (2-hop for players, 1-hop for themes)
+    relatedVoicesFor(n).forEach(vid => {
+      const vn = svg.querySelector(`.node[data-id="${vid}"]`);
+      if (vn) { vn.classList.add('is-related'); vn.classList.add('is-hover-neighbor'); }
+    });
+    (incidentEdges[n.id] || new Set()).forEach(idx => {
+      const ln = svg.querySelector(`.edge[data-edge-idx="${idx}"]`);
+      if (ln) ln.classList.add('is-hover-incident');
+    });
+    // Tooltip
+    tipEl.innerHTML = tooltipFor(n);
+    positionTooltip(n);
+    tipEl.classList.add('show');
+  }
+
+  function onNodeLeave(n) {
+    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-hover','is-hover-neighbor'));
+    svg.querySelectorAll('.edge').forEach(l => l.classList.remove('is-hover-incident'));
+    tipEl.classList.remove('show');
+    // Hide voice nodes that we revealed via hover (unless they're related to current selection)
+    const selId = document.body.dataset.selectedId;
+    const selRelated = selId ? new Set([selId, ...(neighbors[selId] || new Set())]) : new Set();
+    svg.querySelectorAll('.node-voice.is-related').forEach(g => {
+      if (!selRelated.has(g.dataset.id)) g.classList.remove('is-related');
+    });
+  }
+
   // Selection
   function applySelection(id) {
     // Clear
-    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-selected','is-neighbor'));
+    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-selected','is-neighbor','is-related'));
     svg.querySelectorAll('.edge').forEach(l => l.classList.remove('is-incident'));
     if (!id) return;
     const sel = svg.querySelector(`.node[data-id="${id}"]`);
     if (sel) sel.classList.add('is-selected');
     (neighbors[id] || new Set()).forEach(nid => {
       const nb = svg.querySelector(`.node[data-id="${nid}"]`);
-      if (nb) nb.classList.add('is-neighbor');
+      if (!nb) return;
+      nb.classList.add('is-neighbor');
+      if (nb.classList.contains('node-voice')) nb.classList.add('is-related');
+    });
+    // Surface semantically-related voices (2-hop for players)
+    const n = nodes[id];
+    if (n) relatedVoicesFor(n).forEach(vid => {
+      const vn = svg.querySelector(`.node[data-id="${vid}"]`);
+      if (vn) { vn.classList.add('is-related'); vn.classList.add('is-neighbor'); }
     });
     (incidentEdges[id] || new Set()).forEach(idx => {
       const ln = svg.querySelector(`.edge[data-edge-idx="${idx}"]`);
