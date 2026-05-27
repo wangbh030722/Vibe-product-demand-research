@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "demand-app",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["app.py", "--port", "8123"],
+      "port": 8123
+    }
+  ]
+}
