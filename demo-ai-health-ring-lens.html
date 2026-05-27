@@ -273,7 +273,8 @@
       <div class="lg-row"><span class="lg-dot" style="background:#14532d"></span>主题(正面)</div>
       <div class="lg-row"><span class="lg-dot" style="background:#c2410c;opacity:.7"></span>主题(痛点)</div>
       <div class="lg-row"><span class="lg-dot" style="background:transparent;border:1.5px dashed #15803d"></span>机会区</div>
-      <div class="lg-row"><span class="lg-dot" style="background:#888;opacity:.5"></span>用户原话</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#16a34a"></span>用户原话(正面)</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#ea580c"></span>用户原话(负面)</div>
     </div>
   </aside>
 
@@ -623,9 +624,13 @@
       c.setAttribute('stroke', n.color || '#15803d');
       c.setAttribute('stroke-width', 2);
       c.setAttribute('stroke-dasharray', '5 3');
+    } else if (n.kind === 'voice') {
+      // color voice core by sentiment so it's recognizable without a label
+      c.setAttribute('fill', n.sentiment === 'pos' ? '#16a34a' : '#ea580c');
+      c.setAttribute('opacity', 0.85);
     } else {
       c.setAttribute('fill', n.color || '#888');
-      c.setAttribute('opacity', n.kind === 'voice' ? 0.82 : 0.94);
+      c.setAttribute('opacity', 0.94);
     }
     g.appendChild(c);
 
@@ -634,6 +639,13 @@
       t.setAttribute('y', r + 14);
       t.textContent = n.name || n.label;
       g.appendChild(t);
+    } else {
+      // Native SVG <title> renders as browser tooltip on hover
+      const tip = document.createElementNS(SVGNS, 'title');
+      const sentLabel = n.sentiment === 'pos' ? '正面' : '负面';
+      const playerLabel = (nodes[n.player] && nodes[n.player].name) || n.player;
+      tip.textContent = `${sentLabel} · ${playerLabel}\n"${n.title}"\n↑${n.score.toLocaleString()}`;
+      g.appendChild(tip);
     }
 
     g.addEventListener('click', (ev) => { ev.stopPropagation(); onNodeClick(n); });
