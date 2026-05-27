@@ -464,3 +464,247 @@ JS 行为:
 - [ ] 每张数据表前有 filter bar,chip + search + 计数正常
 - [ ] §4 三条 path 各有 SIMULATED What-If 面板,banner 显眼
 - [ ] 复制 HTML 到 `/tmp`,新 tab 打开仍全功能(self-contained)
+
+---
+
+## 9 · Lens-Layout 范式升级(MiroFish 启发,2026-05 重构)
+
+> **本章是范式级升级,不是叠加层**。§8 的 4 个组件全部保留,但它们的容器由"线性长报告"变成 "Always-On 视觉中心 + 可切换 Lens"。旧的线性章节作为 fallback 长页,折叠在 lens 底部。
+
+### 9.1 问题诊断
+
+§8 之前的报告范式是 **"线性长文档 + 4 个增强补丁"**:
+- Knowledge Graph 是 §1 与 §2 之间的 section,**滚下去就消失**
+- Process Bar 只是 sticky 阅读进度,**不是探索状态**
+- Voice 表 / Marketplace 表各自带 Filter,**互相不联动**
+- 用户消费方式仍是 cover → §1 → §2 → … → §6 的**线性消费**
+
+参考 MiroFish (`github.com/666ghj/MiroFish`) 的 `MainView.vue`:
+- `<main>` 这一级就是 horizontal split,左侧 GraphPanel 永远占据物理空间
+- 3-mode view switcher(`graph` | `split` | `workbench`)给用户控制信息密度
+- 进度 = `currentStep.value` 状态,右侧 swap step 组件,**graph 不动**
+- "视觉中心是布局原语,不是内容元素"
+
+本章把这套范式移植到品类研究报告,但严格保留 self-contained static HTML + vanilla JS 形态。
+
+### 9.2 顶层 DOM 结构(强制)
+
+```html
+<body data-mode="EXISTING|NON_STOCK" data-view="split" data-lens="overview">
+  <header class="app-header">
+    <div class="brand">VIBE · CATEGORY DEEP DIVE · {子赛道}</div>
+    <nav class="view-switcher">
+      <button data-view="graph">◧ 全景</button>
+      <button data-view="split" class="active">◫ 50/50</button>
+      <button data-view="lens">◨ 详情</button>
+    </nav>
+    <div class="verdict-pill" data-status="real|partial|insufficient">{verdict}</div>
+  </header>
+
+  <main class="workbench">
+    <!-- 左侧:Always-On 视觉中心 -->
+    <aside class="center-panel">
+      <div class="graph-mount" id="kgSvg"></div>
+      <div class="center-overlays">
+        <div class="evidence-counter">raw voices: 172  ·  marketplace: 38  ·  editorials: 12</div>
+        <div class="legend">...</div>
+      </div>
+    </aside>
+
+    <!-- 右侧:Lens 容器,根据 data-lens 切换内容 -->
+    <section class="lens-panel" data-lens="overview">
+      <nav class="lens-tabs">
+        <button data-lens="overview" class="active">概览</button>
+        <button data-lens="voices">用户声音</button>
+        <button data-lens="players">竞品玩家</button>
+        <button data-lens="opportunity">机会缝隙</button>
+        <button data-lens="strategy">切入策略</button>
+        <button data-lens="risks">风险</button>
+      </nav>
+      <div class="lens-body">
+        <!-- 各 lens 内容在这里 swap,详见 9.4 -->
+      </div>
+    </section>
+  </main>
+
+  <!-- 底部:fallback 长报告(默认折叠) -->
+  <footer class="report-fallback" hidden>
+    <button class="fb-toggle">展开完整报告 ↓</button>
+    <article class="fb-body"><!-- 旧的 §1-§6 线性内容 --></article>
+  </footer>
+</body>
+```
+
+### 9.3 View Switcher(组件 E,新增)
+
+3 个模式,通过 `body[data-view]` CSS 控制左右 panel 宽度,**graph 永不 unmount**:
+
+```css
+body[data-view="graph"]  .center-panel { width: 100%; }
+body[data-view="graph"]  .lens-panel   { width: 0;    opacity: 0; pointer-events: none; }
+body[data-view="split"]  .center-panel { width: 50%; }
+body[data-view="split"]  .lens-panel   { width: 50%; }
+body[data-view="lens"]   .center-panel { width: 0;    opacity: 0; pointer-events: none; }
+body[data-view="lens"]   .lens-panel   { width: 100%; }
+.center-panel, .lens-panel { transition: width 0.32s ease, opacity 0.2s ease; }
+```
+
+切换通过 `document.body.dataset.view = mode`。Graph 内部 selection、缩放、力导向位置全部保留(因为 DOM 不重建)。
+
+### 9.4 Lens 路由(组件 F,新增)
+
+6 个 lens,核心机制:**点击 Graph 节点自动切换到对应 lens**,同时上方 tab 高亮。
+
+| Lens id | 触发方式 | 内容来源(从既有章节迁移) |
+|---|---|---|
+| `overview` | 默认 / 点击空白 / verdict-pill | TL;DR 速读盒 + 章节标题列表 + 证据计数 |
+| `voices` | 点击主题节点 / theme node | §2.2 横向条形 + §2.4 跨玩家 voice 表(filter bar 跟着进来) |
+| `players` | 点击玩家节点 / player node | §3.1 玩家卡 + §3.2 Marketplace VOC 表 + §3.3 失败案例 |
+| `opportunity` | 点击机会区节点 / opp node | §4.1 定位散点图 + §4.2 空白带描述 |
+| `strategy` | 点击 path edge / strategy 节点 | §4.3 切入策略三 path + §8.5 What-If SIMULATED 面板 |
+| `risks` | 点击风险标签 / 手动 tab | §6 风险 R-01..R-05 |
+
+JS 行为:
+
+```js
+// 点 Graph 节点
+function onNodeClick(node) {
+  const lensMap = { player: 'players', theme: 'voices', voice: 'voices',
+                    opportunity: 'opportunity', strategy: 'strategy' };
+  const lens = lensMap[node.kind];
+  if (lens) {
+    document.body.dataset.lens = lens;
+    document.body.dataset.selectedId = node.id;   // lens 内部据此聚焦
+    if (document.body.dataset.view === 'graph') {
+      document.body.dataset.view = 'split';        // 自动展开
+    }
+  }
+}
+
+// 点 tab
+document.querySelectorAll('.lens-tabs button').forEach(b => {
+  b.onclick = () => {
+    document.body.dataset.lens = b.dataset.lens;
+    delete document.body.dataset.selectedId;       // 手动切换 = 不聚焦
+  };
+});
+```
+
+**Lens 容器内部约束**:
+- 每个 lens 是一个 `<div class="lens-view" data-lens-id="...">`,默认 `display:none`,通过 `body[data-lens="X"] .lens-view[data-lens-id="X"] { display: block }` 控制
+- Lens 内若有 `data-focus-target` 元素,渲染时根据 `body[data-selected-id]` 滚动并高亮对应行
+- Lens 切换不刷新 graph,graph 内 selection 与 lens 双向联动
+
+### 9.5 Always-On 视觉中心(组件 G,扩展自 §8.3)
+
+`<aside class="center-panel">` 内除了既有 `kg-svg`,新增 3 个 overlay:
+
+1. **Evidence Counter Strip**(顶部细条)
+   - 实时显示 `raw_voices / marketplace / editorials / simulations` 4 个计数
+   - 数字带 `data-status` 颜色:绿(达标)/ 橙(临界)/ 红(不足)
+   - 鼠标 hover 数字 → graph 上对应类型节点高亮
+
+2. **Verdict Pill**(右上角悬浮)
+   - 跟着 `body[data-status]` 变色:`real`(绿)/ `partial`(橙)/ `insufficient`(红)
+   - 点击 → 跳 `overview` lens 并滚动到 verdict 块
+
+3. **Legend Mini-Map**(右下角)
+   - 节点类型图例 + 一个 minimap 矩形显示当前 viewport
+   - 与 §8.3 既有 legend 合并
+
+### 9.6 Liveness 装饰(组件 H,新增,可选)
+
+Evidence-based 报告本身没有"运行中"概念,但可以借用 MiroFish 的 liveness 设计语言传达"数据真实有时序":
+
+- **入场动画**:首次加载时,graph 节点按 collection_plan 顺序 staggered fade-in(模拟"数据正在汇入"),5 秒内完成
+- **时间戳浮标**:每个 voice 节点 hover 显示 "collected 2026-05-19 14:32"
+- **新鲜度环**:节点边缘有渐变环,亮度随 voice 发布时间衰减(近 30 天最亮,>1 年灰)
+- **collection log strip**(底部细条,可选):一行滚动文本显示数据采集时间线(`14:21 r/RayBanMeta · +47 voices  ·  14:33 HN search · +28 voices  ·  ...`)
+
+实现优先级:入场动画 > 新鲜度环 > collection log。前两个加起来约 40 LOC。
+
+### 9.7 Fallback 长报告
+
+页面底部固定一个折叠区:
+
+```html
+<footer class="report-fallback">
+  <button class="fb-toggle" aria-expanded="false">展开完整报告 ↓</button>
+  <article class="fb-body"><!-- §1-§6 线性结构 --></article>
+</footer>
+```
+
+- 默认折叠,点击展开
+- 展开后是当前 spec §1-§7 的完整线性内容(给打印 / 分享 / 全文搜索 / Ctrl+F 用)
+- **Lens 范式服务"探索",fallback 服务"阅读"**,两者不互斥
+- 打印样式 `@media print` 强制 `.fb-body` 展开,隐藏 `.workbench`
+
+### 9.8 状态模型(单一事实源)
+
+页面状态完全编码在 `<body>` 的 data 属性,无外部 store:
+
+| 属性 | 值 | 含义 |
+|---|---|---|
+| `data-mode` | `EXISTING` / `NON_STOCK` | 数据模式(§2/§3 走哪套规范) |
+| `data-view` | `graph` / `split` / `lens` | 左右 panel 宽度 |
+| `data-lens` | `overview` / `voices` / `players` / `opportunity` / `strategy` / `risks` | 当前 lens |
+| `data-selected-id` | node id / undefined | graph 当前选中节点 |
+| `data-status` | `real` / `partial` / `insufficient` | verdict |
+| `data-style` | `minimal` / `editorial` / `data-dense` | 视觉 token preset(沿用 §P2) |
+
+所有交互最终落点都是修改 `body.dataset.X`,CSS + lens-router JS 据此重渲。可读性、可调试性、可 deeplink 都强。
+
+### 9.9 与 §8 关系
+
+| §8 组件 | 在新范式下的命运 |
+|---|---|
+| §8.2 Process Bar | **降级**:不再是 sticky nav,迁移为 fallback 长报告内部的章节锚点 |
+| §8.3 知识图谱 | **升级为 substrate**:从 section 提到 `<aside class="center-panel">`,Always-On |
+| §8.4 Filter Bar | **保留**:嵌入到 `voices` / `players` lens 内部,与 graph selection 双向联动 |
+| §8.5 What-If SIMULATED | **保留**:迁移到 `strategy` lens 内,SIMULATED 视觉硬约束不变 |
+| §8.6 evidence-rules.md 约束 | **不变** |
+| §8.7 文件大小 | **放宽**:上限 600 KB(新增 view-switcher + lens-router + liveness ≈ 80 KB) |
+
+### 9.10 实现优先级(增量)
+
+1. **P0 · 布局壳**(~ 60 min)
+   - 顶层 DOM 改造(header + workbench + footer)
+   - View Switcher CSS 3 模式
+   - body data 属性状态机骨架
+
+2. **P0 · 2 个 lens 切片**(~ 90 min)
+   - `players` lens(基于现有 §3 内容)
+   - `voices` lens(基于现有 §2.4)
+   - 验证 graph 节点点击路由
+
+3. **P1 · 剩余 4 个 lens**(~ 60 min)
+   - overview / opportunity / strategy / risks
+
+4. **P1 · Always-On overlays**(~ 40 min)
+   - evidence counter strip / verdict pill / mini legend
+
+5. **P2 · Liveness 装饰**(~ 30 min)
+   - 入场动画 + 新鲜度环
+
+6. **P2 · Fallback 长报告**(~ 30 min)
+   - 折叠容器 + 章节复用 + print 样式
+
+7. **验证**(~ 20 min)
+   - 6 个 lens 切换正常
+   - graph selection ↔ lens 内 row 联动
+   - 复制到 `/tmp` 仍 self-contained
+   - 文件大小 < 600 KB
+
+总计 ~ 5.5 小时。
+
+### 9.11 验证清单(在 §8.8 基础上追加)
+
+- [ ] 三种 view mode 切换流畅,graph 状态(selection / 缩放)保留
+- [ ] 点 graph 玩家节点 → `players` lens + 该玩家高亮聚焦
+- [ ] 点 graph 主题节点 → `voices` lens + voice 表自动滚到该主题相关行
+- [ ] Verdict Pill 颜色与底部完整报告 verdict 一致
+- [ ] Evidence Counter 数字与 inline JSON 计数一致
+- [ ] Fallback 长报告默认折叠,展开后包含完整 §1-§6
+- [ ] `@media print` 下 fallback 自动展开,workbench 隐藏
+- [ ] 复制 HTML 到 `/tmp`,新 tab 打开,6 个 lens 全功能 + graph 全交互
+- [ ] body data 属性手动改(DevTools)能正确反映在 UI 上(deeplink-ready)
