@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>智能戒指 · CATEGORY DEEP DIVE · Lens Layout Prototype</title>
+<style>
+  /* ============ Tokens ============ */
+  :root{
+    --bg:#faf8f4; --ink:#171717; --ink-2:#3a3a3a; --ink-3:#6b6b6b; --line:#e3ddcf;
+    --mono:'SF Mono','Menlo','Monaco',monospace; --serif:'Iowan Old Style','Cambria',serif;
+    --pos:#14532d; --neg:#c2410c; --neu:#5a606a; --opp:#15803d;
+    --accent:#b91c1c;
+    --shadow:0 1px 0 var(--line);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:-apple-system,system-ui,sans-serif;font-size:14px;line-height:1.5}
+
+  /* ============ Header ============ */
+  .app-header{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    padding:12px 22px;border-bottom:1px solid var(--line);background:var(--bg);
+    position:sticky;top:0;z-index:50;
+  }
+  .brand{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink-2);text-transform:uppercase}
+  .brand b{color:var(--ink);letter-spacing:.05em}
+  .view-switcher{display:flex;gap:2px;background:#efe9d9;padding:3px;border-radius:6px}
+  .view-switcher button{
+    appearance:none;border:0;background:transparent;color:var(--ink-3);
+    font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+    padding:5px 11px;border-radius:4px;cursor:pointer;
+  }
+  body[data-view="graph"] .vs-graph,
+  body[data-view="split"] .vs-split,
+  body[data-view="lens"]  .vs-lens{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+  .header-right{justify-self:end;display:flex;gap:14px;align-items:center}
+  .verdict-pill{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    padding:5px 12px;border-radius:11px;border:1px solid;
+  }
+  .verdict-pill[data-status="real"]{color:var(--pos);border-color:var(--pos);background:#ecfdf5}
+  .verdict-pill[data-status="partial"]{color:var(--neg);border-color:var(--neg);background:#fff7ed}
+  .verdict-pill[data-status="insufficient"]{color:var(--accent);border-color:var(--accent);background:#fef2f2}
+
+  /* ============ Workbench layout ============ */
+  .workbench{display:flex;height:calc(100vh - 49px);overflow:hidden}
+  .center-panel,.lens-panel{transition:width .32s ease, opacity .25s ease;overflow:hidden}
+  body[data-view="graph"] .center-panel{width:100%}
+  body[data-view="graph"] .lens-panel{width:0;opacity:0;pointer-events:none}
+  body[data-view="split"] .center-panel{width:50%;border-right:1px solid var(--line)}
+  body[data-view="split"] .lens-panel{width:50%}
+  body[data-view="lens"]  .center-panel{width:0;opacity:0;pointer-events:none}
+  body[data-view="lens"]  .lens-panel{width:100%}
+
+  /* ============ Center panel (Always-On graph) ============ */
+  .center-panel{position:relative;background:linear-gradient(180deg,#faf8f4 0%,#f3eedf 100%)}
+  .evidence-counter{
+    position:absolute;top:14px;left:14px;right:14px;z-index:5;
+    display:flex;gap:18px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.04em;
+  }
+  .evidence-counter b{color:var(--ink);font-weight:600;margin-right:3px}
+  .center-hint{
+    position:absolute;bottom:14px;left:14px;font-family:var(--mono);font-size:10.5px;
+    color:var(--ink-3);letter-spacing:.04em;background:rgba(255,255,255,.7);padding:5px 10px;border-radius:4px;
+  }
+  .kg-svg{width:100%;height:100%;display:block}
+  .kg-svg .node{cursor:pointer;transition:opacity .22s}
+  .kg-svg .node circle{transition:stroke-width .22s, r .22s}
+  .kg-svg .node text{font-family:var(--mono);font-size:10px;fill:var(--ink-2);pointer-events:none;text-anchor:middle}
+  .kg-svg .edge{stroke:#b8ad95;stroke-opacity:.45;transition:stroke-opacity .22s, stroke-width .22s}
+  body[data-selected-id] .kg-svg .node{opacity:.16}
+  body[data-selected-id] .kg-svg .node.is-selected{opacity:1}
+  body[data-selected-id] .kg-svg .node.is-neighbor{opacity:.85}
+  body[data-selected-id] .kg-svg .edge{stroke-opacity:.08}
+  body[data-selected-id] .kg-svg .edge.is-incident{stroke-opacity:.85;stroke-width:1.8}
+  .kg-svg .node.is-selected circle{stroke:#000;stroke-width:2.2}
+
+  /* ============ Lens panel ============ */
+  .lens-panel{display:flex;flex-direction:column;background:var(--bg)}
+  .lens-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 18px;background:#fbf8ee}
+  .lens-tabs button{
+    appearance:none;border:0;background:transparent;
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+    padding:13px 14px;cursor:pointer;color:var(--ink-3);border-bottom:2px solid transparent;
+    text-transform:uppercase;
+  }
+  .lens-tabs button.active{color:var(--ink);border-bottom-color:var(--ink)}
+  .lens-body{flex:1;overflow:auto;padding:24px 28px}
+  .lens-view{display:none}
+  body[data-lens="overview"]    .lens-view[data-lens-id="overview"]   ,
+  body[data-lens="voices"]      .lens-view[data-lens-id="voices"]     ,
+  body[data-lens="players"]     .lens-view[data-lens-id="players"]    ,
+  body[data-lens="opportunity"] .lens-view[data-lens-id="opportunity"],
+  body[data-lens="strategy"]    .lens-view[data-lens-id="strategy"]   ,
+  body[data-lens="risks"]       .lens-view[data-lens-id="risks"]      {display:block}
+
+  /* lens content typography */
+  .lens-body h3{font-family:var(--serif);font-size:22px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
+  .lens-body h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;margin:22px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  .lens-body p{margin:0 0 10px;color:var(--ink-2)}
+  .pc-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-bottom:6px}
+  .pc-summary{font-style:italic;color:var(--ink-2);font-family:var(--serif);font-size:14.5px}
+
+  /* overview specifics */
+  .verdict-card{border:1px solid var(--line);background:#fff;padding:18px 20px;border-radius:6px;margin-bottom:18px}
+  .verdict-card .v-title{font-family:var(--serif);font-size:24px;line-height:1.3;margin:8px 0 14px}
+  .verdict-card .v-counts{display:flex;gap:24px;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .verdict-card .v-counts b{font-size:18px;color:var(--ink);font-family:var(--serif);font-weight:600;display:block}
+  .kf{list-style:none;padding:0;margin:0;counter-reset:kf}
+  .kf li{counter-increment:kf;padding:10px 0 10px 32px;position:relative;border-bottom:1px dashed var(--line)}
+  .kf li::before{content:counter(kf,decimal-leading-zero);position:absolute;left:0;top:11px;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em}
+  .kf li:last-child{border-bottom:0}
+  .kf b{color:var(--ink)}
+
+  /* player chips */
+  .player-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .player-chips .chip{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink-3);
+    font-family:var(--mono);font-size:11px;padding:6px 11px;border-radius:4px;cursor:pointer;
+  }
+  body[data-selected-id="oura"]       .chip[data-player-id="oura"]      ,
+  body[data-selected-id="samsung"]    .chip[data-player-id="samsung"]   ,
+  body[data-selected-id="ringconn"]   .chip[data-player-id="ringconn"]  ,
+  body[data-selected-id="ultrahuman"] .chip[data-player-id="ultrahuman"],
+  body[data-selected-id="apple"]      .chip[data-player-id="apple"]     {background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  /* player cards */
+  .player-card{border:1px solid var(--line);background:#fff;border-radius:6px;padding:18px 20px;margin-bottom:14px}
+  body[data-lens="players"][data-selected-id] .player-card{display:none}
+  body[data-selected-id="oura"]       .player-card[data-player-id="oura"]      ,
+  body[data-selected-id="samsung"]    .player-card[data-player-id="samsung"]   ,
+  body[data-selected-id="ringconn"]   .player-card[data-player-id="ringconn"]  ,
+  body[data-selected-id="ultrahuman"] .player-card[data-player-id="ultrahuman"],
+  body[data-selected-id="apple"]      .player-card[data-player-id="apple"]     {display:block}
+
+  /* voice rows */
+  .voice-row{display:grid;grid-template-columns:18px 1fr auto;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);align-items:start;font-size:13.5px}
+  .voice-row:last-child{border-bottom:0}
+  .voice-row .dot{font-size:10px;line-height:18px}
+  .voice-row.pos .dot{color:var(--pos)}
+  .voice-row.neg .dot{color:var(--neg)}
+  .voice-row .vt{color:var(--ink)}
+  .voice-row .vm{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .voice-row .vs{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap;padding-top:1px}
+  .voice-row a{color:inherit;text-decoration:none;border-bottom:1px solid #d6cdb4}
+  .voice-row a:hover{border-bottom-color:var(--ink)}
+
+  /* voices lens filter */
+  .filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+  .filter-bar .fb-lbl{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin-right:4px}
+  .filter-bar .chip{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink-3);
+    font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:4px;cursor:pointer;
+  }
+  .filter-bar .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .voice-row.fb-hidden{display:none}
+
+  /* opp / strategy / risks placeholders */
+  .placeholder-block{border:1px dashed var(--line);background:#fff;padding:24px;border-radius:6px;text-align:center;color:var(--ink-3);font-family:var(--mono);font-size:12px}
+  .opp-card{border:2px dashed var(--opp);background:#f0fdf4;padding:22px;border-radius:6px;margin-bottom:14px}
+  .opp-card h3{color:var(--opp)}
+  .strategy-card{border:1px solid var(--line);background:#fff;border-radius:6px;padding:18px 20px;margin-bottom:14px}
+  .strategy-card.rec{border-color:var(--pos);background:#f7fdf7}
+  .strategy-card h4{margin-top:0;border:0;padding:0;color:var(--ink);font-family:var(--serif);font-size:16px;text-transform:none;letter-spacing:0}
+  .risk-row{display:grid;grid-template-columns:46px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+  .risk-row .rid{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .risk-row .sev{font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:3px;align-self:start}
+  .sev.hi{background:#fef2f2;color:var(--accent)}
+  .sev.md{background:#fff7ed;color:var(--neg)}
+  .sev.lo{background:#f3f4f6;color:var(--ink-3)}
+
+  /* fallback */
+  .report-fallback{border-top:1px solid var(--line);background:#fbf8ee;padding:14px 22px;font-family:var(--mono);font-size:11px;color:var(--ink-3);text-align:center}
+  .report-fallback button{appearance:none;border:0;background:transparent;cursor:pointer;color:var(--ink-2);font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+  .report-fallback button:hover{color:var(--ink)}
+  .fb-body{display:none;padding:20px 0;text-align:left;font-family:var(--serif);font-size:14px;color:var(--ink)}
+  .report-fallback[aria-expanded="true"] .fb-body{display:block}
+  .fb-body h2{font-family:var(--serif);font-size:20px;margin:24px 0 8px}
+  .fb-body .small{color:var(--ink-3);font-size:12.5px}
+
+  /* selection indicator strip */
+  .selection-strip{
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.06em;
+    padding:4px 0 12px;display:none;
+  }
+  body[data-selected-id] .selection-strip{display:block}
+  .selection-strip b{color:var(--ink);font-weight:600}
+  .selection-strip .clear{margin-left:10px;color:var(--accent);cursor:pointer;border-bottom:1px solid var(--accent)}
+
+  @media print{
+    .app-header,.workbench{display:none}
+    .report-fallback{border:0}
+    .report-fallback[aria-expanded] .fb-body{display:block}
+    .report-fallback button{display:none}
+  }
+</style>
+</head>
+<body data-mode="EXISTING" data-view="split" data-lens="overview" data-status="real" data-style="minimal">
+
+<!-- ============ HEADER ============ -->
+<header class="app-header">
+  <div class="brand"><b>VIBE</b> · CATEGORY DEEP DIVE · 智能戒指 · LENS PROTOTYPE</div>
+  <div class="view-switcher" role="tablist">
+    <button data-view="graph" class="vs-graph">◧ 全景</button>
+    <button data-view="split" class="vs-split">◫ 50/50</button>
+    <button data-view="lens"  class="vs-lens">◨ 详情</button>
+  </div>
+  <div class="header-right">
+    <span class="verdict-pill" data-status="real">✓ 真实需求</span>
+  </div>
+</header>
+
+<!-- ============ WORKBENCH ============ -->
+<main class="workbench">
+
+  <!-- LEFT: Always-On knowledge graph -->
+  <aside class="center-panel">
+    <div class="evidence-counter">
+      <span><b>172</b> raw voices</span>
+      <span><b>38</b> marketplace</span>
+      <span><b>12</b> editorials</span>
+      <span><b>0</b> simulated</span>
+    </div>
+    <svg class="kg-svg" id="kgSvg" viewBox="0 0 800 580" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="center-hint">点击节点 · 右侧自动切到对应视角</div>
+  </aside>
+
+  <!-- RIGHT: Lens panel -->
+  <section class="lens-panel">
+    <nav class="lens-tabs">
+      <button data-lens="overview"    class="active">概览</button>
+      <button data-lens="voices">用户声音</button>
+      <button data-lens="players">竞品玩家</button>
+      <button data-lens="opportunity">机会缝隙</button>
+      <button data-lens="strategy">切入策略</button>
+      <button data-lens="risks">风险</button>
+    </nav>
+    <div class="lens-body">
+      <div class="selection-strip">
+        当前选中 · <b id="selLabel">—</b><span class="clear" id="clearSel">清除选择</span>
+      </div>
+
+      <!-- LENS: OVERVIEW -->
+      <div class="lens-view" data-lens-id="overview">
+        <div class="verdict-card">
+          <div class="pc-meta">VERDICT · 2026-05-19</div>
+          <div class="v-title">智能戒指品类已脱离 hype,进入"医疗化 vs. 生态化"双轨竞争 —— 真实需求底盘扎实,但头部失血,新进入者还有窗口。</div>
+          <div class="v-counts">
+            <div><b>172</b> raw voices</div>
+            <div><b>38</b> marketplace</div>
+            <div><b>12</b> editorials</div>
+            <div><b>5</b> players</div>
+          </div>
+        </div>
+
+        <h4>Key Findings</h4>
+        <ol class="kf">
+          <li><b>医疗预警是 L1 jobs-to-be-done</b>。Oura "saved my life" 单帖 2,903 赞,"caught cancer early" 2,507 赞。这是品类最强信号,任何切入都要绕不开。</li>
+          <li><b>头部正在失血</b>。Oura 隐私事件(Palantir)单帖 3,968 赞 "Leaving Oura",大量用户公开向 RingConn / Galaxy 迁移。</li>
+          <li><b>电池是品类级风险</b>。RingConn 戒指爆炸、Samsung Galaxy Ring 胀手指送医、Oura 卡手指去 ER —— 三家都中招。</li>
+          <li><b>订阅费是 PMF 警报</b>。$5.99/月 在 Marketplace 评论里是第一吐槽点(Oura)。Samsung 走"无订阅"路线收割了一波。</li>
+        </ol>
+      </div>
+
+      <!-- LENS: PLAYERS -->
+      <div class="lens-view" data-lens-id="players">
+        <div class="player-chips">
+          <button class="chip" data-player-id="oura">Oura Ring 4</button>
+          <button class="chip" data-player-id="samsung">Samsung Galaxy Ring</button>
+          <button class="chip" data-player-id="ringconn">RingConn Gen 2</button>
+          <button class="chip" data-player-id="ultrahuman">Ultrahuman Ring Air</button>
+          <button class="chip" data-player-id="apple">Apple Ring (假设)</button>
+        </div>
+
+        <article class="player-card" data-player-id="oura">
+          <h3>Oura Ring 4</h3>
+          <div class="pc-meta">$349–499 · 订阅 $5.99/月 · 在售 · 头部</div>
+          <p class="pc-summary">AI Advisor + lifestyle 高端定位 · 主导但正在失血 · 隐私事件后大量用户公开迁出</p>
+          <h4>Top Voices</h4>
+          <div class="voice-row pos"><span class="dot">●</span><div><div class="vt"><a href="https://www.reddit.com/r/ouraring/comments/1nh3tze/oura_saved_my_life/" target="_blank">Oura saved my life</a></div><div class="vm">r/ouraring · 医疗预警</div></div><span class="vs">↑2,903</span></div>
+          <div class="voice-row pos"><span class="dot">●</span><div><div class="vt"><a href="https://www.reddit.com/r/ouraring/comments/1nyt25l/my_oura_ring_data_legiti/" target="_blank">Caught cancer early postpartum</a></div><div class="vm">r/ouraring · 医疗预警</div></div><span class="vs">↑2,507</span></div>
+          <div class="voice-row neg"><span class="dot">●</span><div><div class="vt"><a href="https://www.reddit.com/r/ouraring/comments/1n3f33w/leaving_oura_ring_after_/" target="_blank">Leaving Oura over Palantir deal</a></div><div class="vm">r/ouraring · 隐私 / 信任</div></div><span class="vs">↑3,968</span></div>
+          <div class="voice-row neg"><span class="dot">●</span><div><div class="vt"><a href="https://www.reddit.com/r/ouraring/comments/1qx13mj/if_you_were_on_the_fence/" target="_blank">$5.99/月 不值</a></div><div class="vm">r/ouraring · 订阅费抗议</div></div><span class="vs">↑1,761</span></div>
+          <div class="voice-row neg"><span class="dot">●</span><div><div class="vt"><a href="https://www.reddit.com/r/ouraring/comments/1qtx7tt/finale_update_help_my_ri/" target="_blank">Ring stuck on finger → ER</a></div><div class="vm">r/ouraring · 形态 + 充电</div></div><span class="vs">↑1,740</span></div>
+          <h4>Marketplace VOC</h4>
+          <p>Amazon US <b>⭐ 4.3</b> · 12,847 评论 · 高频差评:订阅费 / 续航 / 划痕</p>
+        </article>
+
+        <article class="player-card" data-player-id="samsung">
+          <h3>Samsung Galaxy Ring</h3>
+          <div class="pc-meta">$399 · 无订阅 · 在售 · Samsung Health 生态</div>
+          <p class="pc-summary">渠道强,但产品基本面问题多 —— 电池胀手指事故、社区集体差评</p>
+          <h4>Top Voices</h4>
+          <div class="voice-row neg"><span class="dot">●</span><div><div class="vt"><a href="https://9to5google.com/2025/09/29/swollen-galaxy-ring-battery/" target="_blank">Galaxy Ring battery swelling → hospital</a></div><div class="vm">9to5google · 电池失败</div></div><span class="vs">↑8 (media)</span></div>
+          <div class="voice-row neg"><span class="dot">●</span><div><div class="vt"><a href="https://us.community.samsung.com/t5/Galaxy-Ring/Worst-Samsung-product-ever/m-p/3568427" target="_blank">"Worst Samsung product ever"</a></div><div class="vm">Samsung Community · 综合</div></div><span class="vs">↑40</span></div>
+          <h4>Marketplace VOC</h4>
+          <p>Samsung Community + Amazon <b>⭐ 3.6</b> · 高频差评:做工 / 电池 / 与 Watch 重复</p>
+        </article>
+
+        <article class="player-card" data-player-id="ringconn">
+          <h3>RingConn Gen 2</h3>
+          <div class="pc-meta">$299 · 无订阅 · 在售 · 平价替代</div>
+          <p class="pc-summary">睡眠呼吸暂停检测是差异点 · 承接了 Oura 流失用户 · 同样有电池物理失败案例</p>
+          <h4>Top Voices</h4>
+          <div class="voice-row pos"><span class="dot">●</span><div><div class="vt"><a href="https://www.reddit.com/r/RingConn/comments/1q9kbc8/got_my_new_rin/" target="_blank">I returned my Oura, got RingConn</a></div><div class="vm">r/RingConn · 跨玩家迁移</div></div><span class="vs">↑118</span></div>
+          <div class="voice-row neg"><span class="dot">●</span><div><div class="vt"><a href="https://www.reddit.com/r/RingConn/comments/1r5eqo6/my_ringconn_ge/" target="_blank">RingConn exploded on finger</a></div><div class="vm">r/RingConn · 电池失败</div></div><span class="vs">↑105</span></div>
+          <div class="voice-row neg"><span class="dot">●</span><div><div class="vt"><a href="https://www.reddit.com/r/RingConn/comments/1s9ixa2/wish_there_was/" target="_blank">Wish there was an 'I'm sick' button</a></div><div class="vm">r/RingConn · AI judgy</div></div><span class="vs">↑114</span></div>
+        </article>
+
+        <article class="player-card" data-player-id="ultrahuman">
+          <h3>Ultrahuman Ring Air</h3>
+          <div class="pc-meta">$349 · 无订阅 · 在售 · Biohacking 小众</div>
+          <p class="pc-summary">训练 / 营养场景 · 用户基数小 · 不是 mass-market 玩家</p>
+          <h4>Top Voices</h4>
+          <p class="placeholder-block">本玩家社区量较小,样本不足 5 条;详见 fallback 长报告 §3.1</p>
+        </article>
+
+        <article class="player-card" data-player-id="apple">
+          <h3>Apple Ring(假设)</h3>
+          <div class="pc-meta">未发布 · FDA + Health 生态 + 全渠道</div>
+          <p class="pc-summary">最大未定变量 —— 若入场,直接挤压所有玩家;最可能占据"机会缝隙"区</p>
+          <p class="placeholder-block">尚无产品上市,无 voice / marketplace 证据;讨论详见 §6 风险</p>
+        </article>
+      </div>
+
+      <!-- LENS: VOICES -->
+      <div class="lens-view" data-lens-id="voices">
+        <p class="pc-meta" id="voiceContext">14 条原话 · 跨 4 个玩家 · 8 个主题</p>
+        <div class="filter-bar" id="voiceFilter">
+          <span class="fb-lbl">情绪</span>
+          <button class="chip active" data-filter="sent" data-val="all">全部</button>
+          <button class="chip" data-filter="sent" data-val="pos">● 正面</button>
+          <button class="chip" data-filter="sent" data-val="neg">● 负面</button>
+          <span class="fb-lbl" style="margin-left:10px">主题</span>
+          <button class="chip active" data-filter="theme" data-val="all">全部</button>
+          <button class="chip" data-filter="theme" data-val="t.medical">医疗预警</button>
+          <button class="chip" data-filter="theme" data-val="t.privacy">隐私</button>
+          <button class="chip" data-filter="theme" data-val="t.sub">订阅费</button>
+          <button class="chip" data-filter="theme" data-val="t.aitone">AI judgy</button>
+          <button class="chip" data-filter="theme" data-val="t.battery">电池</button>
+          <button class="chip" data-filter="theme" data-val="t.form">形态</button>
+          <button class="chip" data-filter="theme" data-val="t.migration">迁移</button>
+          <button class="chip" data-filter="theme" data-val="t.lawsuit">诉讼</button>
+        </div>
+        <div id="voiceList"></div>
+      </div>
+
+      <!-- LENS: OPPORTUNITY -->
+      <div class="lens-view" data-lens-id="opportunity">
+        <div class="opp-card">
+          <h3>★ 空白机会区</h3>
+          <p><b>中-高价 × FDA 认证 × 医疗级 × 保险报销</b> · 没有玩家占据 · 新进入者最该切的位置</p>
+        </div>
+        <h4>为什么是这个位置</h4>
+        <ul>
+          <li>Oura 占据 lifestyle 高端,但没走 FDA 认证</li>
+          <li>Samsung 走生态绑定路线,医疗能力反而被 Watch 抢走</li>
+          <li>RingConn / Ultrahuman 在平价/小众区,无医疗化资源</li>
+          <li>用户最强 voice("救命""早期癌症发现")正落在医疗化 → 但所有玩家的 marketing 都不敢声明医疗</li>
+        </ul>
+        <p class="placeholder-block">完整散点图 + 4 块定位详见 fallback 长报告 §4.1</p>
+      </div>
+
+      <!-- LENS: STRATEGY -->
+      <div class="lens-view" data-lens-id="strategy">
+        <div class="strategy-card rec">
+          <h4>Path A · 医疗级 SaMD(推荐)</h4>
+          <p class="pc-meta">FDA 510(k) → 房颤 / 睡眠呼吸暂停适应症 → 保险渠道</p>
+          <p>对接最强 voice,绕开消费品价格战,有牢固的护城河;时间成本高(18-24 个月)。</p>
+        </div>
+        <div class="strategy-card">
+          <h4>Path B · 隐私优先消费品</h4>
+          <p class="pc-meta">本地推理 + 数据自托管 + 一次性买断</p>
+          <p>直接吃 Oura 失血人群;短期可上市,但天花板低。</p>
+        </div>
+        <div class="strategy-card">
+          <h4>Path C · 形态创新(指环 → 项链 / 贴片)</h4>
+          <p class="pc-meta">绕开戒指物理失败问题</p>
+          <p>避开品类级电池/卡手指风险;但脱离"戒指"心智,重新做品类教育。</p>
+        </div>
+        <p class="placeholder-block">每条 Path 的 SIMULATED What-If 推演详见 §8.5(本 prototype 未实现)</p>
+      </div>
+
+      <!-- LENS: RISKS -->
+      <div class="lens-view" data-lens-id="risks">
+        <div class="risk-row"><span class="rid">R-01</span><div><b>Apple Ring 入场</b><div class="vm" style="font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:3px">最大未定变量 · 若 18 个月内官宣,直接挤压所有定位</div></div><span class="sev hi">高</span></div>
+        <div class="risk-row"><span class="rid">R-02</span><div><b>电池物理失败</b><div class="vm" style="font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:3px">RingConn 爆炸 + Samsung 胀手指 → 品类级信任危机</div></div><span class="sev hi">高</span></div>
+        <div class="risk-row"><span class="rid">R-03</span><div><b>FDA 路径成本</b><div class="vm" style="font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:3px">510(k) 18-24 个月 + $1-3M 投入 · Path A 的最大门槛</div></div><span class="sev md">中</span></div>
+        <div class="risk-row"><span class="rid">R-04</span><div><b>订阅费抗议蔓延</b><div class="vm" style="font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:3px">Marketplace 第一吐槽 · 走 SaaS 模式必撞墙</div></div><span class="sev md">中</span></div>
+        <div class="risk-row"><span class="rid">R-05</span><div><b>诉讼连锁</b><div class="vm" style="font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:3px">Oura ITC 案件已引发社区反弹,新玩家可能成为下一个目标</div></div><span class="sev lo">低</span></div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<!-- ============ FALLBACK ============ -->
+<footer class="report-fallback" aria-expanded="false" id="fbFooter">
+  <button id="fbToggle">展开完整线性报告 ↓</button>
+  <article class="fb-body">
+    <h2>§1 品类拆解</h2>
+    <p class="small">本 prototype 只演示新范式骨架。完整 §1–§6 线性内容请见 demo-ai-health-ring-report.html(旧基线)。</p>
+    <h2>§2 用户洞察 · §3 竞品全景 · §4 机会缝隙 · §5 入场能力栈 · §6 风险</h2>
+    <p class="small">展开后这里会是当前完整长报告(本 prototype 省略以保持文件精简,生产版本会复制原 demo 的章节内容)。Lens 范式服务"探索",此处服务"阅读 / 打印 / Ctrl+F"。</p>
+  </article>
+</footer>
+
+<!-- ============ DATA ============ -->
+<script type="application/json" id="report-data">
+{
+  "players": [
+    { "id": "oura",      "name": "Oura Ring 4",          "color": "#c2410c", "size": 18, "x": 0.62, "y": 0.30 },
+    { "id": "samsung",   "name": "Samsung Galaxy Ring",  "color": "#1e4d8a", "size": 16, "x": 0.78, "y": 0.40 },
+    { "id": "ringconn",  "name": "RingConn Gen 2",       "color": "#1e4d8a", "size": 14, "x": 0.32, "y": 0.55 },
+    { "id": "ultrahuman","name": "Ultrahuman Ring Air",  "color": "#5a606a", "size": 11, "x": 0.20, "y": 0.30 },
+    { "id": "apple",     "name": "Apple Ring (?)",       "color": "#5a606a", "size": 12, "x": 0.45, "y": 0.18 }
+  ],
+  "themes": [
+    { "id": "t.medical",   "label": "医疗预警",  "color": "#14532d", "size": 14, "x": 0.50, "y": 0.50 },
+    { "id": "t.privacy",   "label": "隐私",      "color": "#c2410c", "size": 13, "x": 0.65, "y": 0.55 },
+    { "id": "t.sub",       "label": "订阅费",    "color": "#c2410c", "size": 11, "x": 0.78, "y": 0.20 },
+    { "id": "t.aitone",    "label": "AI judgy",  "color": "#c2410c", "size": 10, "x": 0.85, "y": 0.32 },
+    { "id": "t.battery",   "label": "电池",      "color": "#c2410c", "size": 11, "x": 0.50, "y": 0.78 },
+    { "id": "t.form",      "label": "形态",      "color": "#5a606a", "size": 10, "x": 0.18, "y": 0.62 },
+    { "id": "t.migration", "label": "迁移",      "color": "#14532d", "size": 11, "x": 0.40, "y": 0.72 },
+    { "id": "t.lawsuit",   "label": "诉讼",      "color": "#5a606a", "size": 9,  "x": 0.20, "y": 0.45 }
+  ],
+  "voices": [
+    { "id": "v01", "player": "oura",     "title": "Oura saved my life", "score": 2903, "url": "https://www.reddit.com/r/ouraring/comments/1nh3tze/oura_saved_my_life/", "sentiment": "pos", "themes": ["t.medical"], "x": 0.55, "y": 0.40 },
+    { "id": "v02", "player": "oura",     "title": "Caught cancer early postpartum", "score": 2507, "url": "https://www.reddit.com/r/ouraring/comments/1nyt25l/my_oura_ring_data_legiti/", "sentiment": "pos", "themes": ["t.medical"], "x": 0.48, "y": 0.42 },
+    { "id": "v03", "player": "oura",     "title": "Leaving Oura over Palantir", "score": 3968, "url": "https://www.reddit.com/r/ouraring/comments/1n3f33w/leaving_oura_ring_after_/", "sentiment": "neg", "themes": ["t.privacy"], "x": 0.70, "y": 0.50 },
+    { "id": "v04", "player": "ringconn", "title": "RingConn exploded on finger", "score": 105, "url": "https://www.reddit.com/r/RingConn/comments/1r5eqo6/my_ringconn_ge/", "sentiment": "neg", "themes": ["t.battery"], "x": 0.42, "y": 0.72 },
+    { "id": "v05", "player": "samsung",  "title": "Galaxy Ring battery swelling → hospital", "score": 8, "url": "https://9to5google.com/2025/09/29/swollen-galaxy-ring-battery/", "sentiment": "neg", "themes": ["t.battery"], "x": 0.58, "y": 0.75 },
+    { "id": "v06", "player": "ringconn", "title": "Returned my Oura, got RingConn", "score": 118, "url": "https://www.reddit.com/r/RingConn/comments/1q9kbc8/got_my_new_rin/", "sentiment": "pos", "themes": ["t.migration"], "x": 0.35, "y": 0.68 },
+    { "id": "v07", "player": "ringconn", "title": "Not supporting Oura!", "score": 184, "url": "https://www.reddit.com/r/RingConn/comments/1my1deg/not_supporting/", "sentiment": "neg", "themes": ["t.lawsuit"], "x": 0.22, "y": 0.48 },
+    { "id": "v08", "player": "ringconn", "title": "Wish there was an 'I'm sick' button", "score": 114, "url": "https://www.reddit.com/r/RingConn/comments/1s9ixa2/wish_there_was/", "sentiment": "neg", "themes": ["t.aitone"], "x": 0.80, "y": 0.36 },
+    { "id": "v09", "player": "ringconn", "title": "Ring thought I was biking when I cried", "score": 184, "url": "https://www.reddit.com/r/RingConn/comments/1t1xksd/i_cried_for_al/", "sentiment": "pos", "themes": ["t.aitone"], "x": 0.82, "y": 0.42 },
+    { "id": "v10", "player": "oura",     "title": "Ring stuck on finger → ER", "score": 1740, "url": "https://www.reddit.com/r/ouraring/comments/1qtx7tt/finale_update_help_my_ri/", "sentiment": "neg", "themes": ["t.form"], "x": 0.22, "y": 0.62 },
+    { "id": "v11", "player": "oura",     "title": "Charging in the shower workaround", "score": 1635, "url": "https://www.reddit.com/r/ouraring/comments/1suis9d/i_almost_had_to_get_nake/", "sentiment": "pos", "themes": ["t.form"], "x": 0.15, "y": 0.60 },
+    { "id": "v12", "player": "oura",     "title": "Give us a 'bitchy/funny' toggle", "score": 940, "url": "https://www.reddit.com/r/ouraring/comments/1ta568e/ate_a_family_sized_bag_o/", "sentiment": "neg", "themes": ["t.aitone"], "x": 0.88, "y": 0.32 },
+    { "id": "v13", "player": "oura",     "title": "$5.99/月 不值", "score": 1761, "url": "https://www.reddit.com/r/ouraring/comments/1qx13mj/if_you_were_on_the_fence/", "sentiment": "neg", "themes": ["t.sub"], "x": 0.72, "y": 0.20 },
+    { "id": "v14", "player": "samsung",  "title": "Worst Samsung product ever", "score": 40, "url": "https://us.community.samsung.com/t5/Galaxy-Ring/Worst-Samsung-product-ever/m-p/3568427", "sentiment": "neg", "themes": ["t.battery","t.sub"], "x": 0.65, "y": 0.65 }
+  ],
+  "opportunity": { "id": "opp", "label": "★ 空白机会区", "color": "#15803d", "size": 22, "x": 0.42, "y": 0.20 },
+  "edges": [
+    {"from":"oura","to":"t.medical","w":3},{"from":"oura","to":"t.privacy","w":3},{"from":"oura","to":"t.sub","w":3},{"from":"oura","to":"t.aitone","w":2},{"from":"oura","to":"t.form","w":2},
+    {"from":"samsung","to":"t.battery","w":3},{"from":"samsung","to":"t.sub","w":1},{"from":"samsung","to":"t.migration","w":2},
+    {"from":"ringconn","to":"t.battery","w":2},{"from":"ringconn","to":"t.migration","w":3},{"from":"ringconn","to":"t.lawsuit","w":3},{"from":"ringconn","to":"t.aitone","w":2},
+    {"from":"ultrahuman","to":"t.lawsuit","w":1},
+    {"from":"apple","to":"opp","w":2},
+    {"from":"v01","to":"t.medical","w":1},{"from":"v02","to":"t.medical","w":1},
+    {"from":"v03","to":"t.privacy","w":1},
+    {"from":"v04","to":"t.battery","w":1},{"from":"v05","to":"t.battery","w":1},
+    {"from":"v06","to":"t.migration","w":1},
+    {"from":"v07","to":"t.lawsuit","w":1},
+    {"from":"v08","to":"t.aitone","w":1},{"from":"v09","to":"t.aitone","w":1},{"from":"v12","to":"t.aitone","w":1},
+    {"from":"v10","to":"t.form","w":1},{"from":"v11","to":"t.form","w":1},
+    {"from":"v13","to":"t.sub","w":1},
+    {"from":"v14","to":"t.battery","w":1},
+    {"from":"t.medical","to":"opp","w":3},{"from":"t.privacy","to":"opp","w":2}
+  ]
+}
+</script>
+
+<!-- ============ SCRIPT ============ -->
+<script>
+(function(){
+  const data = JSON.parse(document.getElementById('report-data').textContent);
+  const VW = 800, VH = 580;
+
+  // Build node lookup
+  const nodes = {};
+  const addNode = (n, kind, extra={}) => { nodes[n.id] = Object.assign({kind, ...n}, extra); };
+  data.players.forEach(p => addNode(p, 'player'));
+  data.themes .forEach(t => addNode(t, 'theme'));
+  data.voices .forEach(v => addNode(v, 'voice'));
+  addNode(data.opportunity, 'opportunity');
+
+  // Build incident-edges lookup
+  const neighbors = {};        // id -> Set<id>
+  const incidentEdges = {};    // id -> Set<edgeIdx>
+  data.edges.forEach((e, i) => {
+    if (!neighbors[e.from]) neighbors[e.from] = new Set();
+    if (!neighbors[e.to])   neighbors[e.to]   = new Set();
+    neighbors[e.from].add(e.to);
+    neighbors[e.to].add(e.from);
+    (incidentEdges[e.from] = incidentEdges[e.from] || new Set()).add(i);
+    (incidentEdges[e.to]   = incidentEdges[e.to]   || new Set()).add(i);
+  });
+
+  // Render SVG graph
+  const svg = document.getElementById('kgSvg');
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  // Edges first
+  data.edges.forEach((e, i) => {
+    const a = nodes[e.from], b = nodes[e.to];
+    if (!a || !b) return;
+    const line = document.createElementNS(SVGNS, 'line');
+    line.setAttribute('class','edge');
+    line.setAttribute('x1', a.x * VW); line.setAttribute('y1', a.y * VH);
+    line.setAttribute('x2', b.x * VW); line.setAttribute('y2', b.y * VH);
+    line.setAttribute('stroke-width', 0.6 + e.w * 0.4);
+    line.dataset.edgeIdx = i;
+    line.dataset.from = e.from; line.dataset.to = e.to;
+    svg.appendChild(line);
+  });
+  // Nodes after
+  Object.values(nodes).forEach(n => {
+    const g = document.createElementNS(SVGNS, 'g');
+    g.setAttribute('class', 'node node-' + n.kind);
+    g.setAttribute('transform', `translate(${n.x*VW},${n.y*VH})`);
+    g.dataset.id = n.id;
+    g.dataset.kind = n.kind;
+
+    const c = document.createElementNS(SVGNS, 'circle');
+    c.setAttribute('r', n.size || 8);
+    c.setAttribute('fill', n.kind === 'opportunity' ? 'transparent' : (n.color || '#888'));
+    c.setAttribute('opacity', n.kind === 'voice' ? 0.78 : 0.92);
+    if (n.kind === 'opportunity') {
+      c.setAttribute('stroke', n.color); c.setAttribute('stroke-width', 2);
+      c.setAttribute('stroke-dasharray', '4 3');
+    }
+    g.appendChild(c);
+
+    if (n.kind !== 'voice') {
+      const t = document.createElementNS(SVGNS, 'text');
+      t.setAttribute('y', (n.size || 8) + 13);
+      t.textContent = n.name || n.label;
+      g.appendChild(t);
+    }
+
+    g.addEventListener('click', () => onNodeClick(n));
+    svg.appendChild(g);
+  });
+
+  // Selection
+  function applySelection(id) {
+    // Clear
+    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-selected','is-neighbor'));
+    svg.querySelectorAll('.edge').forEach(l => l.classList.remove('is-incident'));
+    if (!id) return;
+    const sel = svg.querySelector(`.node[data-id="${id}"]`);
+    if (sel) sel.classList.add('is-selected');
+    (neighbors[id] || new Set()).forEach(nid => {
+      const nb = svg.querySelector(`.node[data-id="${nid}"]`);
+      if (nb) nb.classList.add('is-neighbor');
+    });
+    (incidentEdges[id] || new Set()).forEach(idx => {
+      const ln = svg.querySelector(`.edge[data-edge-idx="${idx}"]`);
+      if (ln) ln.classList.add('is-incident');
+    });
+    // selection strip
+    const node = nodes[id];
+    const label = node ? (node.name || node.label || node.title || id) : id;
+    document.getElementById('selLabel').textContent = `${node.kind} · ${label}`;
+  }
+
+  function onNodeClick(node) {
+    const lensFor = { player:'players', theme:'voices', voice:'voices', opportunity:'opportunity' };
+    const lens = lensFor[node.kind];
+    if (!lens) return;
+    document.body.dataset.lens = lens;
+    document.body.dataset.selectedId = node.id;
+    syncTabs();
+    applySelection(node.id);
+    if (document.body.dataset.view === 'graph') document.body.dataset.view = 'split';
+    if (lens === 'voices') filterVoicesBySelection(node);
+  }
+
+  // Lens tabs
+  function syncTabs() {
+    const cur = document.body.dataset.lens;
+    document.querySelectorAll('.lens-tabs button').forEach(b => {
+      b.classList.toggle('active', b.dataset.lens === cur);
+    });
+  }
+  document.querySelectorAll('.lens-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.body.dataset.lens = btn.dataset.lens;
+      delete document.body.dataset.selectedId;
+      applySelection(null);
+      syncTabs();
+      resetVoiceFilter();
+    });
+  });
+
+  // View switcher
+  document.querySelectorAll('.view-switcher button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.body.dataset.view = btn.dataset.view;
+    });
+  });
+
+  // Player chips (inside Players lens)
+  document.querySelectorAll('.player-chips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const pid = chip.dataset.playerId;
+      document.body.dataset.selectedId = pid;
+      applySelection(pid);
+    });
+  });
+
+  // Clear selection
+  document.getElementById('clearSel').addEventListener('click', () => {
+    delete document.body.dataset.selectedId;
+    applySelection(null);
+    resetVoiceFilter();
+  });
+
+  // Verdict pill jumps to overview
+  document.querySelector('.verdict-pill').addEventListener('click', () => {
+    document.body.dataset.lens = 'overview';
+    delete document.body.dataset.selectedId;
+    applySelection(null);
+    syncTabs();
+  });
+
+  // ============ Voices lens ============
+  const voiceList = document.getElementById('voiceList');
+  function renderVoices(filterFn) {
+    voiceList.innerHTML = '';
+    let n = 0;
+    data.voices.forEach(v => {
+      if (filterFn && !filterFn(v)) return;
+      n++;
+      const row = document.createElement('div');
+      row.className = 'voice-row ' + v.sentiment;
+      const themeLabels = v.themes.map(tid => (nodes[tid] && nodes[tid].label) || tid).join(' · ');
+      const playerLabel = (nodes[v.player] && nodes[v.player].name) || v.player;
+      row.innerHTML = `
+        <span class="dot">●</span>
+        <div>
+          <div class="vt"><a href="${v.url}" target="_blank" rel="noopener">${v.title}</a></div>
+          <div class="vm">${playerLabel} · ${themeLabels}</div>
+        </div>
+        <span class="vs">↑${v.score.toLocaleString()}</span>
+      `;
+      voiceList.appendChild(row);
+    });
+    document.getElementById('voiceContext').textContent = `${n} 条原话(共 ${data.voices.length})`;
+  }
+  renderVoices();
+
+  // Filter chips
+  const filterState = { sent: 'all', theme: 'all' };
+  function applyVoiceFilter() {
+    renderVoices(v => {
+      if (filterState.sent !== 'all' && v.sentiment !== filterState.sent) return false;
+      if (filterState.theme !== 'all' && !v.themes.includes(filterState.theme)) return false;
+      return true;
+    });
+  }
+  document.querySelectorAll('#voiceFilter .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const group = chip.dataset.filter, val = chip.dataset.val;
+      filterState[group] = val;
+      document.querySelectorAll(`#voiceFilter .chip[data-filter="${group}"]`).forEach(c =>
+        c.classList.toggle('active', c.dataset.val === val));
+      applyVoiceFilter();
+    });
+  });
+  function resetVoiceFilter() {
+    filterState.sent = 'all'; filterState.theme = 'all';
+    document.querySelectorAll('#voiceFilter .chip').forEach(c => c.classList.toggle('active', c.dataset.val === 'all'));
+    renderVoices();
+  }
+
+  // When a theme node is clicked → pre-filter voices to that theme
+  function filterVoicesBySelection(node) {
+    if (node.kind === 'theme') {
+      filterState.theme = node.id;
+      document.querySelectorAll('#voiceFilter .chip[data-filter="theme"]').forEach(c =>
+        c.classList.toggle('active', c.dataset.val === node.id));
+      applyVoiceFilter();
+    } else if (node.kind === 'voice') {
+      // single-voice: highlight only that voice's themes via theme filter
+      const t = node.themes[0];
+      filterState.theme = t;
+      document.querySelectorAll('#voiceFilter .chip[data-filter="theme"]').forEach(c =>
+        c.classList.toggle('active', c.dataset.val === t));
+      applyVoiceFilter();
+    } else {
+      resetVoiceFilter();
+    }
+  }
+
+  // ============ Fallback toggle ============
+  const fb = document.getElementById('fbFooter');
+  document.getElementById('fbToggle').addEventListener('click', () => {
+    const open = fb.getAttribute('aria-expanded') === 'true';
+    fb.setAttribute('aria-expanded', open ? 'false' : 'true');
+    document.getElementById('fbToggle').textContent = open ? '展开完整线性报告 ↓' : '收起 ↑';
+  });
+
+  // Initial sync
+  syncTabs();
+})();
+</script>
+</body>
+</html>
