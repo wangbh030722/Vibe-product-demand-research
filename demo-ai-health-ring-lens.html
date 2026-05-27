@@ -100,14 +100,14 @@
     100%{stroke-opacity:0;    transform:scale(1.9);}
   }
 
-  /* Stagger fade-in on load */
+  /* Stagger fade-in on load (opacity-only — CSS transform would override SVG transform attr) */
   .kg-svg .node{opacity:0; animation:nodeFadeIn .55s ease forwards}
   .kg-svg .edge{opacity:0; animation:edgeFadeIn .5s ease forwards}
-  body[data-selected-id] .kg-svg .node{animation:none}
-  body[data-selected-id] .kg-svg .edge{animation:none}
+  body[data-selected-id] .kg-svg .node{animation:none; opacity:1}
+  body[data-selected-id] .kg-svg .edge{animation:none; opacity:1}
   @keyframes nodeFadeIn{
-    from{opacity:0; transform:scale(.4);}
-    to  {opacity:var(--target-op,1); transform:scale(1);}
+    from{opacity:0}
+    to  {opacity:var(--target-op,1)}
   }
   @keyframes edgeFadeIn{from{opacity:0}to{opacity:1}}
 
@@ -541,15 +541,17 @@
   data.voices .forEach(v => addNode(v, 'voice'));
   addNode(data.opportunity, 'opportunity');
 
-  // Initial positions: spread from data hints, scale to viewport, mild jitter
+  // Use curated x/y from data (already hand-tuned for layout balance).
+  // Map [0,1] to [PAD, VW-PAD] / [PAD, VH-PAD] so nodes don't hit edges.
+  const PAD_X = 80, PAD_Y = 70;
+  const SX = VW - PAD_X * 2, SY = VH - PAD_Y * 2;
   const nodeArr = Object.values(nodes);
   nodeArr.forEach(n => {
-    n.px = (n.x ?? 0.5) * VW + (Math.random()-0.5)*30;
-    n.py = (n.y ?? 0.5) * VH + (Math.random()-0.5)*30;
-    n.vx = 0; n.vy = 0;
-    // base oscillation phase for idle drift
+    n.bx = PAD_X + (n.x ?? 0.5) * SX;   // base position for drift to oscillate around
+    n.by = PAD_Y + (n.y ?? 0.5) * SY;
+    n.px = n.bx; n.py = n.by;
     n.phase = Math.random() * Math.PI * 2;
-    n.driftAmp = n.kind === 'voice' ? 5 : (n.kind === 'theme' ? 3 : 1.8);
+    n.driftAmp = n.kind === 'voice' ? 6 : (n.kind === 'theme' ? 3.5 : 2);
   });
 
   // Build incident-edges lookup
@@ -561,61 +563,6 @@
     (incidentEdges[e.from] = incidentEdges[e.from] || new Set()).add(i);
     (incidentEdges[e.to]   = incidentEdges[e.to]   || new Set()).add(i);
   });
-
-  // ---------------- Force-directed layout ----------------
-  // Classic spring + repulsion + center pull. ~140 iterations to settle.
-  function runForceLayout(iters) {
-    const REPEL = 6400;    // node-node repulsion
-    const SPRING = 0.04;   // edge spring constant
-    const CENTER = 0.012;  // pull toward center
-    const DAMP = 0.78;
-    for (let it = 0; it < iters; it++) {
-      // repulsion between all pairs
-      for (let i = 0; i < nodeArr.length; i++) {
-        const a = nodeArr[i];
-        for (let j = i+1; j < nodeArr.length; j++) {
-          const b = nodeArr[j];
-          let dx = a.px - b.px, dy = a.py - b.py;
-          let d2 = dx*dx + dy*dy + 0.01;
-          let f = REPEL / d2;
-          let d = Math.sqrt(d2);
-          let fx = (dx/d) * f, fy = (dy/d) * f;
-          a.vx += fx; a.vy += fy;
-          b.vx -= fx; b.vy -= fy;
-        }
-      }
-      // spring on edges
-      data.edges.forEach(e => {
-        const a = nodes[e.from], b = nodes[e.to]; if (!a || !b) return;
-        let dx = b.px - a.px, dy = b.py - a.py;
-        let d = Math.sqrt(dx*dx + dy*dy) + 0.01;
-        // rest length: shorter for higher weight, longer for voice→theme
-        const restBase = (a.kind === 'voice' || b.kind === 'voice') ? 70 : 130;
-        const rest = restBase / Math.max(1, e.w);
-        const f = SPRING * (d - rest);
-        const fx = (dx/d) * f, fy = (dy/d) * f;
-        a.vx += fx; a.vy += fy;
-        b.vx -= fx; b.vy -= fy;
-      });
-      // center pull
-      nodeArr.forEach(n => {
-        n.vx += (CX - n.px) * CENTER;
-        n.vy += (CY - n.py) * CENTER;
-      });
-      // integrate + damp
-      nodeArr.forEach(n => {
-        n.vx *= DAMP; n.vy *= DAMP;
-        n.px += n.vx; n.py += n.vy;
-        // bounds
-        const m = 40;
-        n.px = Math.max(m, Math.min(VW-m, n.px));
-        n.py = Math.max(m, Math.min(VH-m, n.py));
-      });
-    }
-  }
-  runForceLayout(180);
-  // snapshot settled positions for idle drift
-  nodeArr.forEach(n => { n.bx = n.px; n.by = n.py; });
 
   // ---------------- Render SVG ----------------
   const svg = document.getElementById('kgSvg');
