@@ -53,27 +53,72 @@
   body[data-view="lens"]  .lens-panel{width:100%}
 
   /* ============ Center panel (Always-On graph) ============ */
-  .center-panel{position:relative;background:linear-gradient(180deg,#faf8f4 0%,#f3eedf 100%)}
+  .center-panel{position:relative;background:radial-gradient(ellipse at 50% 45%,#fdfbf5 0%,#f3eedf 90%)}
   .evidence-counter{
-    position:absolute;top:14px;left:14px;right:14px;z-index:5;
-    display:flex;gap:18px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.04em;
+    position:absolute;top:16px;left:18px;right:18px;z-index:5;
+    display:flex;gap:20px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.04em;
   }
   .evidence-counter b{color:var(--ink);font-weight:600;margin-right:3px}
   .center-hint{
-    position:absolute;bottom:14px;left:14px;font-family:var(--mono);font-size:10.5px;
-    color:var(--ink-3);letter-spacing:.04em;background:rgba(255,255,255,.7);padding:5px 10px;border-radius:4px;
+    position:absolute;bottom:16px;left:18px;font-family:var(--mono);font-size:10.5px;
+    color:var(--ink-3);letter-spacing:.04em;background:rgba(255,255,255,.6);padding:5px 10px;border-radius:4px;
+    backdrop-filter:blur(4px);
   }
+  .legend{
+    position:absolute;bottom:16px;right:18px;font-family:var(--mono);font-size:10px;color:var(--ink-3);
+    background:rgba(255,255,255,.6);padding:8px 11px;border-radius:4px;backdrop-filter:blur(4px);
+    line-height:1.7;
+  }
+  .legend .lg-row{display:flex;align-items:center;gap:6px}
+  .legend .lg-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
   .kg-svg{width:100%;height:100%;display:block}
-  .kg-svg .node{cursor:pointer;transition:opacity .22s}
-  .kg-svg .node circle{transition:stroke-width .22s, r .22s}
-  .kg-svg .node text{font-family:var(--mono);font-size:10px;fill:var(--ink-2);pointer-events:none;text-anchor:middle}
-  .kg-svg .edge{stroke:#b8ad95;stroke-opacity:.45;transition:stroke-opacity .22s, stroke-width .22s}
-  body[data-selected-id] .kg-svg .node{opacity:.16}
+  .kg-svg .node{cursor:pointer;transition:opacity .35s ease}
+  .kg-svg .node circle{transition:stroke-width .25s ease}
+  .kg-svg .node text{
+    font-family:var(--mono);font-size:10.5px;fill:var(--ink-2);
+    pointer-events:none;text-anchor:middle;letter-spacing:.02em;
+  }
+  .kg-svg .edge{stroke:#bfb59c;stroke-opacity:.4;transition:stroke-opacity .3s ease, stroke-width .3s ease;fill:none}
+  body[data-selected-id] .kg-svg .node{opacity:.14}
   body[data-selected-id] .kg-svg .node.is-selected{opacity:1}
-  body[data-selected-id] .kg-svg .node.is-neighbor{opacity:.85}
-  body[data-selected-id] .kg-svg .edge{stroke-opacity:.08}
-  body[data-selected-id] .kg-svg .edge.is-incident{stroke-opacity:.85;stroke-width:1.8}
-  .kg-svg .node.is-selected circle{stroke:#000;stroke-width:2.2}
+  body[data-selected-id] .kg-svg .node.is-neighbor{opacity:.9}
+  body[data-selected-id] .kg-svg .edge{stroke-opacity:.06}
+  body[data-selected-id] .kg-svg .edge.is-incident{stroke-opacity:.78;stroke-width:1.6}
+  .kg-svg .node.is-selected circle.core{stroke:#000;stroke-width:2.4}
+
+  /* Voice freshness ring */
+  .kg-svg .node-voice .ring{
+    fill:none;stroke:currentColor;stroke-opacity:.32;
+    transform-origin:center;transform-box:fill-box;
+    animation:freshPulse 2.6s ease-in-out infinite;
+  }
+  .kg-svg .node-voice .ring.delayed{animation-delay:.4s}
+  .kg-svg .node-voice .ring.delayed2{animation-delay:.9s}
+  @keyframes freshPulse{
+    0%  {stroke-opacity:.36; transform:scale(1);}
+    70% {stroke-opacity:0;    transform:scale(1.9);}
+    100%{stroke-opacity:0;    transform:scale(1.9);}
+  }
+
+  /* Stagger fade-in on load */
+  .kg-svg .node{opacity:0; animation:nodeFadeIn .55s ease forwards}
+  .kg-svg .edge{opacity:0; animation:edgeFadeIn .5s ease forwards}
+  body[data-selected-id] .kg-svg .node{animation:none}
+  body[data-selected-id] .kg-svg .edge{animation:none}
+  @keyframes nodeFadeIn{
+    from{opacity:0; transform:scale(.4);}
+    to  {opacity:var(--target-op,1); transform:scale(1);}
+  }
+  @keyframes edgeFadeIn{from{opacity:0}to{opacity:1}}
+
+  /* Opportunity node ring (subtle constant pulse) */
+  .kg-svg .node-opportunity circle.core{
+    animation:oppPulse 3.5s ease-in-out infinite;transform-origin:center;transform-box:fill-box;
+  }
+  @keyframes oppPulse{
+    0%,100%{stroke-opacity:.85}
+    50%{stroke-opacity:.4}
+  }
 
   /* ============ Lens panel ============ */
   .lens-panel{display:flex;flex-direction:column;background:var(--bg)}
@@ -221,8 +266,15 @@
       <span><b>12</b> editorials</span>
       <span><b>0</b> simulated</span>
     </div>
-    <svg class="kg-svg" id="kgSvg" viewBox="0 0 800 580" preserveAspectRatio="xMidYMid meet"></svg>
+    <svg class="kg-svg" id="kgSvg" viewBox="0 0 960 700" preserveAspectRatio="xMidYMid meet"></svg>
     <div class="center-hint">点击节点 · 右侧自动切到对应视角</div>
+    <div class="legend">
+      <div class="lg-row"><span class="lg-dot" style="background:#c2410c"></span>玩家</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#14532d"></span>主题(正面)</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#c2410c;opacity:.7"></span>主题(痛点)</div>
+      <div class="lg-row"><span class="lg-dot" style="background:transparent;border:1.5px dashed #15803d"></span>机会区</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#888;opacity:.5"></span>用户原话</div>
+    </div>
   </aside>
 
   <!-- RIGHT: Lens panel -->
@@ -311,15 +363,24 @@
           <h3>Ultrahuman Ring Air</h3>
           <div class="pc-meta">$349 · 无订阅 · 在售 · Biohacking 小众</div>
           <p class="pc-summary">训练 / 营养场景 · 用户基数小 · 不是 mass-market 玩家</p>
-          <h4>Top Voices</h4>
-          <p class="placeholder-block">本玩家社区量较小,样本不足 5 条;详见 fallback 长报告 §3.1</p>
+          <h4>定位</h4>
+          <p>训练 / 营养场景 · 用户基数小;Reddit 没有独立 sub,主要 voice 散落在 r/biohackers / r/Quantified Self,样本不足以形成主题级证据。</p>
+          <h4>Marketplace VOC</h4>
+          <p>Amazon <b>⭐ 4.1</b> · 1,082 评论(对比 Oura 12,847) · 评论质量偏垂直专业,差评集中在"应用陡峭学习曲线"</p>
         </article>
 
         <article class="player-card" data-player-id="apple">
           <h3>Apple Ring(假设)</h3>
-          <div class="pc-meta">未发布 · FDA + Health 生态 + 全渠道</div>
-          <p class="pc-summary">最大未定变量 —— 若入场,直接挤压所有玩家;最可能占据"机会缝隙"区</p>
-          <p class="placeholder-block">尚无产品上市,无 voice / marketplace 证据;讨论详见 §6 风险</p>
+          <div class="pc-meta">未发布 · FDA + Health 生态 + 全渠道(假设场景)</div>
+          <p class="pc-summary">最大未定变量 —— 若入场,直接挤压所有玩家;最可能占据"医疗化 + 高端"机会区</p>
+          <h4>为什么列入</h4>
+          <ul>
+            <li>Apple Watch 已积累 FDA 认证经验(ECG / AFib notification)</li>
+            <li>Health 生态可以让戒指与 Watch / iPhone 数据互补,而不是替代</li>
+            <li>Reddit 上已有 18 个月以上的"Apple Ring rumor"讨论,虽无产品但 mindshare 已建立</li>
+          </ul>
+          <h4>影响</h4>
+          <p>本研究将 Apple Ring 视为 R-01 最高风险变量(详见"风险"lens)。Path A(医疗级 SaMD)若启动,需在 Apple 官宣前抢得 FDA 510(k) 时间窗。</p>
         </article>
       </div>
 
@@ -358,7 +419,12 @@
           <li>RingConn / Ultrahuman 在平价/小众区,无医疗化资源</li>
           <li>用户最强 voice("救命""早期癌症发现")正落在医疗化 → 但所有玩家的 marketing 都不敢声明医疗</li>
         </ul>
-        <p class="placeholder-block">完整散点图 + 4 块定位详见 fallback 长报告 §4.1</p>
+        <h4>谁最可能占据</h4>
+        <ul>
+          <li><b>Apple Ring(假设)</b>:已有 Apple Watch FDA 认证经验,生态最齐 —— 最大威胁</li>
+          <li><b>新进入者 + FDA 路径</b>:18-24 个月窗口期,可能在 Apple 入场前卡位</li>
+          <li><b>现有玩家延伸</b>:Oura / Samsung 理论可上行,但要重做合规体系,机会不大</li>
+        </ul>
       </div>
 
       <!-- LENS: STRATEGY -->
@@ -378,7 +444,6 @@
           <p class="pc-meta">绕开戒指物理失败问题</p>
           <p>避开品类级电池/卡手指风险;但脱离"戒指"心智,重新做品类教育。</p>
         </div>
-        <p class="placeholder-block">每条 Path 的 SIMULATED What-If 推演详见 §8.5(本 prototype 未实现)</p>
       </div>
 
       <!-- LENS: RISKS -->
@@ -466,72 +531,202 @@
 <script>
 (function(){
   const data = JSON.parse(document.getElementById('report-data').textContent);
-  const VW = 800, VH = 580;
+  const VW = 960, VH = 700, CX = VW/2, CY = VH/2;
 
   // Build node lookup
   const nodes = {};
-  const addNode = (n, kind, extra={}) => { nodes[n.id] = Object.assign({kind, ...n}, extra); };
+  const addNode = (n, kind) => { nodes[n.id] = Object.assign({kind}, n); };
   data.players.forEach(p => addNode(p, 'player'));
   data.themes .forEach(t => addNode(t, 'theme'));
   data.voices .forEach(v => addNode(v, 'voice'));
   addNode(data.opportunity, 'opportunity');
 
+  // Initial positions: spread from data hints, scale to viewport, mild jitter
+  const nodeArr = Object.values(nodes);
+  nodeArr.forEach(n => {
+    n.px = (n.x ?? 0.5) * VW + (Math.random()-0.5)*30;
+    n.py = (n.y ?? 0.5) * VH + (Math.random()-0.5)*30;
+    n.vx = 0; n.vy = 0;
+    // base oscillation phase for idle drift
+    n.phase = Math.random() * Math.PI * 2;
+    n.driftAmp = n.kind === 'voice' ? 5 : (n.kind === 'theme' ? 3 : 1.8);
+  });
+
   // Build incident-edges lookup
-  const neighbors = {};        // id -> Set<id>
-  const incidentEdges = {};    // id -> Set<edgeIdx>
+  const neighbors = {};
+  const incidentEdges = {};
   data.edges.forEach((e, i) => {
-    if (!neighbors[e.from]) neighbors[e.from] = new Set();
-    if (!neighbors[e.to])   neighbors[e.to]   = new Set();
-    neighbors[e.from].add(e.to);
-    neighbors[e.to].add(e.from);
+    (neighbors[e.from] = neighbors[e.from] || new Set()).add(e.to);
+    (neighbors[e.to]   = neighbors[e.to]   || new Set()).add(e.from);
     (incidentEdges[e.from] = incidentEdges[e.from] || new Set()).add(i);
     (incidentEdges[e.to]   = incidentEdges[e.to]   || new Set()).add(i);
   });
 
-  // Render SVG graph
+  // ---------------- Force-directed layout ----------------
+  // Classic spring + repulsion + center pull. ~140 iterations to settle.
+  function runForceLayout(iters) {
+    const REPEL = 6400;    // node-node repulsion
+    const SPRING = 0.04;   // edge spring constant
+    const CENTER = 0.012;  // pull toward center
+    const DAMP = 0.78;
+    for (let it = 0; it < iters; it++) {
+      // repulsion between all pairs
+      for (let i = 0; i < nodeArr.length; i++) {
+        const a = nodeArr[i];
+        for (let j = i+1; j < nodeArr.length; j++) {
+          const b = nodeArr[j];
+          let dx = a.px - b.px, dy = a.py - b.py;
+          let d2 = dx*dx + dy*dy + 0.01;
+          let f = REPEL / d2;
+          let d = Math.sqrt(d2);
+          let fx = (dx/d) * f, fy = (dy/d) * f;
+          a.vx += fx; a.vy += fy;
+          b.vx -= fx; b.vy -= fy;
+        }
+      }
+      // spring on edges
+      data.edges.forEach(e => {
+        const a = nodes[e.from], b = nodes[e.to]; if (!a || !b) return;
+        let dx = b.px - a.px, dy = b.py - a.py;
+        let d = Math.sqrt(dx*dx + dy*dy) + 0.01;
+        // rest length: shorter for higher weight, longer for voice→theme
+        const restBase = (a.kind === 'voice' || b.kind === 'voice') ? 70 : 130;
+        const rest = restBase / Math.max(1, e.w);
+        const f = SPRING * (d - rest);
+        const fx = (dx/d) * f, fy = (dy/d) * f;
+        a.vx += fx; a.vy += fy;
+        b.vx -= fx; b.vy -= fy;
+      });
+      // center pull
+      nodeArr.forEach(n => {
+        n.vx += (CX - n.px) * CENTER;
+        n.vy += (CY - n.py) * CENTER;
+      });
+      // integrate + damp
+      nodeArr.forEach(n => {
+        n.vx *= DAMP; n.vy *= DAMP;
+        n.px += n.vx; n.py += n.vy;
+        // bounds
+        const m = 40;
+        n.px = Math.max(m, Math.min(VW-m, n.px));
+        n.py = Math.max(m, Math.min(VH-m, n.py));
+      });
+    }
+  }
+  runForceLayout(180);
+  // snapshot settled positions for idle drift
+  nodeArr.forEach(n => { n.bx = n.px; n.by = n.py; });
+
+  // ---------------- Render SVG ----------------
   const svg = document.getElementById('kgSvg');
   const SVGNS = 'http://www.w3.org/2000/svg';
-  // Edges first
+
+  // Edges (curved a little for organic feel)
+  const edgeEls = [];
   data.edges.forEach((e, i) => {
-    const a = nodes[e.from], b = nodes[e.to];
-    if (!a || !b) return;
-    const line = document.createElementNS(SVGNS, 'line');
-    line.setAttribute('class','edge');
-    line.setAttribute('x1', a.x * VW); line.setAttribute('y1', a.y * VH);
-    line.setAttribute('x2', b.x * VW); line.setAttribute('y2', b.y * VH);
-    line.setAttribute('stroke-width', 0.6 + e.w * 0.4);
-    line.dataset.edgeIdx = i;
-    line.dataset.from = e.from; line.dataset.to = e.to;
-    svg.appendChild(line);
+    const a = nodes[e.from], b = nodes[e.to]; if (!a || !b) return;
+    const path = document.createElementNS(SVGNS, 'path');
+    path.setAttribute('class','edge');
+    path.setAttribute('stroke-width', 0.55 + e.w * 0.5);
+    path.style.animationDelay = (0.25 + Math.random()*0.6) + 's';
+    path.dataset.edgeIdx = i;
+    path.dataset.from = e.from; path.dataset.to = e.to;
+    svg.appendChild(path);
+    edgeEls.push({el: path, a, b});
   });
-  // Nodes after
-  Object.values(nodes).forEach(n => {
+
+  // Nodes (stagger fade-in by kind)
+  const kindDelay = { player: 0, theme: 0.25, opportunity: 0.45, voice: 0.6 };
+  const nodeEls = [];
+  nodeArr.forEach(n => {
     const g = document.createElementNS(SVGNS, 'g');
     g.setAttribute('class', 'node node-' + n.kind);
-    g.setAttribute('transform', `translate(${n.x*VW},${n.y*VH})`);
     g.dataset.id = n.id;
     g.dataset.kind = n.kind;
+    g.style.animationDelay = (kindDelay[n.kind] + Math.random()*0.3) + 's';
+    g.style.setProperty('--target-op', n.kind === 'voice' ? 0.82 : 1);
+
+    if (n.kind === 'voice') {
+      // 2 freshness rings, staggered
+      const r1 = document.createElementNS(SVGNS, 'circle');
+      r1.setAttribute('class','ring');
+      r1.setAttribute('r', (n.size || 6));
+      r1.setAttribute('color', n.color || (n.sentiment === 'pos' ? '#14532d' : '#c2410c'));
+      r1.style.color = (n.sentiment === 'pos' ? '#14532d' : '#c2410c');
+      g.appendChild(r1);
+      const r2 = document.createElementNS(SVGNS, 'circle');
+      r2.setAttribute('class','ring delayed');
+      r2.setAttribute('r', (n.size || 6));
+      r2.style.color = (n.sentiment === 'pos' ? '#14532d' : '#c2410c');
+      g.appendChild(r2);
+    }
 
     const c = document.createElementNS(SVGNS, 'circle');
-    c.setAttribute('r', n.size || 8);
-    c.setAttribute('fill', n.kind === 'opportunity' ? 'transparent' : (n.color || '#888'));
-    c.setAttribute('opacity', n.kind === 'voice' ? 0.78 : 0.92);
+    c.setAttribute('class','core');
+    // dynamic radius
+    let r = 8;
+    if (n.kind === 'player') r = (n.size || 16);
+    else if (n.kind === 'theme') r = (n.size || 12);
+    else if (n.kind === 'voice') r = Math.max(4, Math.min(11, Math.log10((n.score||10)+1) * 2.6));
+    else if (n.kind === 'opportunity') r = (n.size || 20);
+    c.setAttribute('r', r);
+    n.r = r;
     if (n.kind === 'opportunity') {
-      c.setAttribute('stroke', n.color); c.setAttribute('stroke-width', 2);
-      c.setAttribute('stroke-dasharray', '4 3');
+      c.setAttribute('fill','transparent');
+      c.setAttribute('stroke', n.color || '#15803d');
+      c.setAttribute('stroke-width', 2);
+      c.setAttribute('stroke-dasharray', '5 3');
+    } else {
+      c.setAttribute('fill', n.color || '#888');
+      c.setAttribute('opacity', n.kind === 'voice' ? 0.82 : 0.94);
     }
     g.appendChild(c);
 
     if (n.kind !== 'voice') {
       const t = document.createElementNS(SVGNS, 'text');
-      t.setAttribute('y', (n.size || 8) + 13);
+      t.setAttribute('y', r + 14);
       t.textContent = n.name || n.label;
       g.appendChild(t);
     }
 
-    g.addEventListener('click', () => onNodeClick(n));
+    g.addEventListener('click', (ev) => { ev.stopPropagation(); onNodeClick(n); });
     svg.appendChild(g);
+    nodeEls.push({el: g, n});
   });
+
+  // Click empty area → clear selection
+  svg.addEventListener('click', () => {
+    delete document.body.dataset.selectedId;
+    applySelection(null);
+  });
+
+  // ---------------- Idle drift loop ----------------
+  // Each node oscillates around its settled position with small amplitude.
+  // Voices breathe more, themes a bit, players almost still.
+  let t0 = performance.now();
+  function tick(now) {
+    const t = (now - t0) / 1000;
+    nodeEls.forEach(({el, n}) => {
+      const a = n.driftAmp;
+      const dx = Math.sin(t * 0.55 + n.phase) * a;
+      const dy = Math.cos(t * 0.43 + n.phase * 1.3) * a * 0.7;
+      n.px = n.bx + dx; n.py = n.by + dy;
+      el.setAttribute('transform', `translate(${n.px.toFixed(2)},${n.py.toFixed(2)})`);
+    });
+    edgeEls.forEach(({el, a, b}) => {
+      // gentle curve via quadratic with midpoint slight offset perpendicular
+      const mx = (a.px + b.px) / 2;
+      const my = (a.py + b.py) / 2;
+      const dx = b.px - a.px, dy = b.py - a.py;
+      const len = Math.sqrt(dx*dx + dy*dy) || 1;
+      const nx = -dy / len, ny = dx / len;
+      const off = Math.min(18, len * 0.06);
+      const cx = mx + nx * off, cy = my + ny * off;
+      el.setAttribute('d', `M ${a.px.toFixed(1)} ${a.py.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${b.px.toFixed(1)} ${b.py.toFixed(1)}`);
+    });
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 
   // Selection
   function applySelection(id) {
