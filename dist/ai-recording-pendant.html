@@ -1,0 +1,1585 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title id="docTitle">CATEGORY DEEP DIVE</title>
+<style>
+  /* ============ Tokens ============ */
+  :root{
+    --bg:#faf8f4; --ink:#1c1d20; --ink-2:#3d3e44; --ink-3:#737277; --line:#e3ddcf;
+    --mono:'SF Mono','Menlo','Monaco',monospace; --serif:'Iowan Old Style','Cambria',serif;
+
+    /* 3-family palette:
+       structure (players/neutral)  → charcoal/slate
+       positive  (wins / pos voice) → sage green
+       pain      (pains / neg voice)→ rust terracotta */
+    --charcoal:#2c2f3a;   --charcoal-2:#4a4e5b;  --charcoal-3:#6b6f7c;
+    --sage:#5b7a52;       --sage-2:#7d9970;      --sage-3:#a8bd9e;
+    --rust:#a0533c;       --rust-2:#bc7459;      --rust-3:#d4a08e;
+    --warm-gray:#80766a;  --warm-gray-2:#a8a094;
+
+    --pos:var(--sage); --neg:var(--rust); --neu:var(--warm-gray); --opp:var(--sage);
+    --accent:#a0533c;
+    --shadow:0 1px 0 var(--line);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:-apple-system,system-ui,sans-serif;font-size:14px;line-height:1.5}
+
+  /* ============ Header ============ */
+  .app-header{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    padding:12px 22px;border-bottom:1px solid var(--line);background:var(--bg);
+    position:sticky;top:0;z-index:50;
+  }
+  .brand{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink-2);text-transform:uppercase}
+  .brand b{color:var(--ink);letter-spacing:.05em}
+  .view-switcher{display:flex;gap:2px;background:#efe9d9;padding:3px;border-radius:6px}
+  .view-switcher button{
+    appearance:none;border:0;background:transparent;color:var(--ink-3);
+    font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+    padding:5px 11px;border-radius:4px;cursor:pointer;
+  }
+  body[data-view="graph"] .vs-graph,
+  body[data-view="split"] .vs-split,
+  body[data-view="lens"]  .vs-lens{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+  .header-right{justify-self:end;display:flex;gap:14px;align-items:center}
+  .verdict-pill{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    padding:5px 12px;border-radius:11px;border:1px solid;
+  }
+  .verdict-pill{cursor:pointer}
+  .verdict-pill[data-status="real"]{color:var(--sage);border-color:var(--sage);background:#f1f6ee}
+  .verdict-pill[data-status="partial"]{color:var(--rust);border-color:var(--rust);background:#faf0eb}
+  .verdict-pill[data-status="insufficient"]{color:var(--accent);border-color:var(--accent);background:#f7e9e3}
+
+  /* ============ Workbench layout ============ */
+  .workbench{display:flex;height:calc(100vh - 49px);overflow:hidden}
+  .center-panel,.lens-panel{transition:width .32s ease, opacity .25s ease;overflow:hidden}
+  body[data-view="graph"] .center-panel{width:100%}
+  body[data-view="graph"] .lens-panel{width:0;opacity:0;pointer-events:none}
+  body[data-view="split"] .center-panel{width:50%;border-right:1px solid var(--line)}
+  body[data-view="split"] .lens-panel{width:50%}
+  body[data-view="lens"]  .center-panel{width:0;opacity:0;pointer-events:none}
+  body[data-view="lens"]  .lens-panel{width:100%}
+
+  /* ============ Center panel (Always-On graph) ============ */
+  .center-panel{position:relative;background:radial-gradient(ellipse at 50% 45%,#fdfbf5 0%,#f3eedf 90%);overflow:hidden;cursor:grab}
+  .center-panel.is-panning{cursor:grabbing}
+  .kg-zoom-controls{
+    position:absolute;top:46px;left:18px;display:flex;flex-direction:column;gap:1px;z-index:6;
+    background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:5px;overflow:hidden;backdrop-filter:blur(4px);
+  }
+  .kg-zoom-controls button{
+    appearance:none;border:0;background:transparent;width:28px;height:26px;cursor:pointer;
+    font-family:var(--mono);font-size:13px;color:var(--ink-2);line-height:1;
+  }
+  .kg-zoom-controls button:hover{background:rgba(0,0,0,.05);color:var(--ink)}
+  .kg-zoom-controls button + button{border-top:1px solid var(--line)}
+  .zoom-level{
+    position:absolute;top:46px;left:54px;
+    font-family:var(--mono);font-size:10px;color:var(--ink-3);
+    background:rgba(255,255,255,.7);padding:3px 7px;border-radius:3px;backdrop-filter:blur(4px);
+  }
+  .evidence-counter{
+    position:absolute;top:16px;left:18px;right:18px;z-index:5;
+    display:flex;gap:20px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.04em;
+  }
+  .evidence-counter b{color:var(--ink);font-weight:600;margin-right:3px}
+  .center-hint{
+    position:absolute;bottom:16px;left:18px;font-family:var(--mono);font-size:10.5px;
+    color:var(--ink-3);letter-spacing:.04em;background:rgba(255,255,255,.6);padding:5px 10px;border-radius:4px;
+    backdrop-filter:blur(4px);
+  }
+  .legend{
+    position:absolute;bottom:16px;right:18px;font-family:var(--mono);font-size:10px;color:var(--ink-3);
+    background:rgba(255,255,255,.6);padding:8px 11px;border-radius:4px;backdrop-filter:blur(4px);
+    line-height:1.7;
+  }
+  .legend .lg-row{display:flex;align-items:center;gap:6px}
+  .legend .lg-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+  .kg-svg{width:100%;height:100%;display:block}
+  .kg-svg .node{cursor:pointer;transition:opacity .35s ease}
+  .kg-svg .node circle{transition:stroke-width .25s ease}
+  .kg-svg .node text{
+    font-family:var(--mono);font-size:11.5px;fill:var(--ink-2);
+    pointer-events:none;text-anchor:middle;letter-spacing:.02em;
+  }
+  .kg-svg .node-player text{font-size:12.5px;fill:var(--ink);font-weight:500}
+  .kg-svg .edge{stroke:#bfb59c;stroke-opacity:.4;transition:stroke-opacity .3s ease, stroke-width .3s ease;fill:none}
+  body[data-selected-id] .kg-svg .node{opacity:.14}
+  body[data-selected-id] .kg-svg .node.is-selected{opacity:1}
+  body[data-selected-id] .kg-svg .node.is-neighbor{opacity:.9}
+  body[data-selected-id] .kg-svg .edge{stroke-opacity:.06}
+  body[data-selected-id] .kg-svg .edge.is-incident{stroke-opacity:.78;stroke-width:1.6}
+  .kg-svg .node.is-selected circle.core{stroke:#000;stroke-width:2.4}
+
+  /* Voice nodes always visible but visually subordinate. They brighten when
+     their player/theme is hovered or selected. */
+  .kg-svg .node-voice{transition:opacity .25s ease}
+  .kg-svg .node-voice circle.core{opacity:.7}
+  body .kg-svg .node-voice.is-related circle.core{opacity:1}
+  body .kg-svg .node-voice.is-hover circle.core{opacity:1}
+  /* During selection-dim mode, non-related voices fade further but stay
+     faintly visible (so user knows they exist) */
+  body[data-selected-id] .kg-svg .node-voice:not(.is-related):not(.is-selected){opacity:.3}
+
+  /* Hover state (visual feedback BEFORE click) */
+  .kg-svg .node.is-hover circle.core{stroke:#000;stroke-width:1.8}
+  .kg-svg .node.is-hover-neighbor{opacity:.9 !important}
+  .kg-svg .edge.is-hover-incident{stroke-opacity:.65;stroke-width:1.5}
+
+  /* Floating tooltip */
+  .kg-tooltip{
+    position:absolute;pointer-events:none;z-index:20;
+    background:rgba(23,23,23,.94);color:#f5f1e7;
+    font-family:var(--mono);font-size:11px;letter-spacing:.02em;
+    padding:8px 11px;border-radius:5px;max-width:280px;line-height:1.5;
+    opacity:0;transition:opacity .12s ease;transform:translate(-50%,calc(-100% - 14px));
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+  }
+  .kg-tooltip.show{opacity:1}
+  .kg-tooltip .tt-title{color:#fff;font-family:var(--serif);font-size:13.5px;letter-spacing:0;margin-bottom:3px}
+  .kg-tooltip .tt-meta{color:#a8a39a;font-size:10.5px}
+  .kg-tooltip .tt-score{color:#fbbf24;font-weight:600;margin-left:6px}
+  .kg-tooltip .tt-hint{color:#a8a39a;font-size:10px;margin-top:6px;padding-top:5px;border-top:1px solid #3a3a3a}
+
+  /* Voice freshness ring */
+  .kg-svg .node-voice .ring{
+    fill:none;stroke:currentColor;stroke-opacity:.32;
+    transform-origin:center;transform-box:fill-box;
+    animation:freshPulse 2.6s ease-in-out infinite;
+  }
+  .kg-svg .node-voice .ring.delayed{animation-delay:.4s}
+  .kg-svg .node-voice .ring.delayed2{animation-delay:.9s}
+  @keyframes freshPulse{
+    0%  {stroke-opacity:.36; transform:scale(1);}
+    70% {stroke-opacity:0;    transform:scale(1.9);}
+    100%{stroke-opacity:0;    transform:scale(1.9);}
+  }
+
+  /* Stagger fade-in on load (opacity-only — CSS transform would override SVG transform attr) */
+  .kg-svg .node{opacity:0; animation:nodeFadeIn .55s ease forwards}
+  .kg-svg .edge{opacity:0; animation:edgeFadeIn .5s ease forwards}
+  body[data-selected-id] .kg-svg .node{animation:none; opacity:1}
+  body[data-selected-id] .kg-svg .edge{animation:none; opacity:1}
+  @keyframes nodeFadeIn{
+    from{opacity:0}
+    to  {opacity:var(--target-op,1)}
+  }
+  @keyframes edgeFadeIn{from{opacity:0}to{opacity:1}}
+
+  /* Opportunity node ring (subtle constant pulse) */
+  .kg-svg .node-opportunity circle.core{
+    animation:oppPulse 3.5s ease-in-out infinite;transform-origin:center;transform-box:fill-box;
+  }
+  @keyframes oppPulse{
+    0%,100%{stroke-opacity:.85}
+    50%{stroke-opacity:.4}
+  }
+
+  /* ============ Lens panel ============ */
+  .lens-panel{display:flex;flex-direction:column;background:var(--bg)}
+  .lens-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 18px;background:#fbf8ee}
+  .lens-tabs button{
+    appearance:none;border:0;background:transparent;
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+    padding:13px 14px;cursor:pointer;color:var(--ink-3);border-bottom:2px solid transparent;
+    text-transform:uppercase;
+  }
+  .lens-tabs button.active{color:var(--ink);border-bottom-color:var(--ink)}
+  .lens-body{flex:1;overflow:auto;padding:24px 28px}
+  .lens-view{display:none}
+  body[data-lens="overview"]    .lens-view[data-lens-id="overview"]   ,
+  body[data-lens="voices"]      .lens-view[data-lens-id="voices"]     ,
+  body[data-lens="players"]     .lens-view[data-lens-id="players"]    ,
+  body[data-lens="opportunity"] .lens-view[data-lens-id="opportunity"],
+  body[data-lens="strategy"]    .lens-view[data-lens-id="strategy"]   ,
+  body[data-lens="risks"]       .lens-view[data-lens-id="risks"]      {display:block}
+
+  /* lens content typography */
+  .lens-body h3{font-family:var(--serif);font-size:22px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
+  .lens-body h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;margin:22px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  .lens-body p{margin:0 0 10px;color:var(--ink-2)}
+  .pc-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-bottom:6px}
+  .pc-summary{font-style:italic;color:var(--ink-2);font-family:var(--serif);font-size:14.5px}
+
+  /* overview specifics */
+  .verdict-card{border:1px solid var(--line);background:#fff;padding:18px 20px;border-radius:6px;margin-bottom:18px}
+  .verdict-card .v-title{font-family:var(--serif);font-size:24px;line-height:1.3;margin:8px 0 14px}
+  .verdict-card .v-counts{display:flex;gap:24px;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .verdict-card .v-counts b{font-size:18px;color:var(--ink);font-family:var(--serif);font-weight:600;display:block}
+  .kf{list-style:none;padding:0;margin:0;counter-reset:kf}
+  .kf li{counter-increment:kf;padding:10px 0 10px 32px;position:relative;border-bottom:1px dashed var(--line)}
+  .kf li::before{content:counter(kf,decimal-leading-zero);position:absolute;left:0;top:11px;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em}
+  .kf li:last-child{border-bottom:0}
+  .kf b{color:var(--ink)}
+
+  /* player chips */
+  .player-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .player-chips .chip{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink-3);
+    font-family:var(--mono);font-size:11px;padding:6px 11px;border-radius:4px;cursor:pointer;
+  }
+  body[data-selected-id="oura"]       .chip[data-player-id="oura"]      ,
+  body[data-selected-id="samsung"]    .chip[data-player-id="samsung"]   ,
+  body[data-selected-id="ringconn"]   .chip[data-player-id="ringconn"]  ,
+  body[data-selected-id="ultrahuman"] .chip[data-player-id="ultrahuman"],
+  body[data-selected-id="apple"]      .chip[data-player-id="apple"]     {background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  /* player cards */
+  .player-card{border:1px solid var(--line);background:#fff;border-radius:6px;padding:18px 20px;margin-bottom:14px}
+  body[data-lens="players"][data-selected-id] .player-card{display:none}
+  body[data-selected-id="oura"]       .player-card[data-player-id="oura"]      ,
+  body[data-selected-id="samsung"]    .player-card[data-player-id="samsung"]   ,
+  body[data-selected-id="ringconn"]   .player-card[data-player-id="ringconn"]  ,
+  body[data-selected-id="ultrahuman"] .player-card[data-player-id="ultrahuman"],
+  body[data-selected-id="apple"]      .player-card[data-player-id="apple"]     {display:block}
+
+  /* voice rows */
+  .voice-row{display:grid;grid-template-columns:18px 1fr auto;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);align-items:start;font-size:13.5px}
+  .voice-row:last-child{border-bottom:0}
+  .voice-row .dot{font-size:10px;line-height:18px}
+  .voice-row.pos .dot{color:var(--pos)}
+  .voice-row.neg .dot{color:var(--neg)}
+  .voice-row .vt{color:var(--ink)}
+  .voice-row .vm{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .voice-row .vs{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap;padding-top:1px}
+  .voice-row a{color:inherit;text-decoration:none;border-bottom:1px solid #d6cdb4}
+  .voice-row a:hover{border-bottom-color:var(--ink)}
+
+  /* voices lens filter */
+  .filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+  .filter-bar .fb-lbl{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin-right:4px}
+  .filter-bar .chip{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink-3);
+    font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:4px;cursor:pointer;
+  }
+  .filter-bar .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .voice-row.fb-hidden{display:none}
+
+  /* opp / strategy / risks placeholders */
+  .placeholder-block{border:1px dashed var(--line);background:#fff;padding:24px;border-radius:6px;text-align:center;color:var(--ink-3);font-family:var(--mono);font-size:12px}
+  .opp-card{border:2px dashed var(--opp);background:#f0fdf4;padding:22px;border-radius:6px;margin-bottom:14px}
+  .opp-card h3{color:var(--opp)}
+  .strategy-card{border:1px solid var(--line);background:#fff;border-radius:6px;padding:18px 20px;margin-bottom:14px}
+  .strategy-card.rec{border-color:var(--pos);background:#f7fdf7}
+  .strategy-card h4{margin-top:0;border:0;padding:0;color:var(--ink);font-family:var(--serif);font-size:16px;text-transform:none;letter-spacing:0}
+  .risk-row{display:grid;grid-template-columns:46px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+  .risk-row .rid{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .risk-row .sev{font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:3px;align-self:start}
+  .sev.hi{background:#fef2f2;color:var(--accent)}
+  .sev.md{background:#fff7ed;color:var(--neg)}
+  .sev.lo{background:#f3f4f6;color:var(--ink-3)}
+
+  /* fallback */
+  .report-fallback{border-top:1px solid var(--line);background:#fbf8ee;padding:14px 22px;font-family:var(--mono);font-size:11px;color:var(--ink-3);text-align:center}
+  .report-fallback button{appearance:none;border:0;background:transparent;cursor:pointer;color:var(--ink-2);font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+  .report-fallback button:hover{color:var(--ink)}
+  .fb-body{display:none;padding:24px 0 40px;text-align:left;color:var(--ink);max-width:780px;margin:0 auto}
+  .report-fallback[aria-expanded="true"] .fb-body{display:block}
+  .fb-body h1{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+  .fb-body .fb-deck{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink-2);margin-bottom:24px}
+  .fb-body h2{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase;margin:32px 0 4px;border-top:1px solid var(--line);padding-top:18px}
+  .fb-body h2 .secnum{display:inline-block;margin-right:8px;color:var(--charcoal-3)}
+  .fb-body h3{font-family:var(--serif);font-size:17px;font-weight:600;margin:18px 0 6px;color:var(--ink)}
+  .fb-body p{font-family:var(--serif);font-size:14.5px;line-height:1.65;color:var(--ink-2);margin:6px 0 10px}
+  .fb-body ul{font-family:var(--serif);font-size:14.5px;line-height:1.65;color:var(--ink-2);margin:6px 0 14px;padding-left:22px}
+  .fb-body ul li{margin-bottom:4px}
+  .fb-body .fb-table{width:100%;border-collapse:collapse;margin:14px 0;font-family:var(--mono);font-size:11.5px}
+  .fb-body .fb-table th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--ink);font-weight:600;color:var(--ink);letter-spacing:.05em;text-transform:uppercase;font-size:10.5px}
+  .fb-body .fb-table td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+  .fb-body .fb-table tr:last-child td{border-bottom:0}
+  .fb-body .fb-quote{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--ink);border-left:2px solid var(--sage);padding:2px 0 2px 14px;margin:14px 0}
+  .fb-body .fb-quote.neg{border-left-color:var(--rust)}
+  .fb-body .fb-quote .src{display:block;font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:5px;letter-spacing:.04em}
+  .fb-body .fb-verdict{background:#f1f6ee;border-left:3px solid var(--sage);padding:14px 16px;margin:14px 0 22px;font-family:var(--serif);font-size:15px}
+  .fb-body .fb-verdict b{color:var(--sage);font-weight:600}
+  .fb-body .pos{color:var(--sage);font-weight:600}
+  .fb-body .neg{color:var(--rust);font-weight:600}
+  .fb-body .neu{color:var(--warm-gray);font-weight:600}
+  .fb-body .meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+
+  /* selection indicator strip */
+  .selection-strip{
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.06em;
+    padding:4px 0 12px;display:none;
+  }
+  body[data-selected-id] .selection-strip{display:block}
+  .selection-strip b{color:var(--ink);font-weight:600}
+  .selection-strip .clear{margin-left:10px;color:var(--accent);cursor:pointer;border-bottom:1px solid var(--accent)}
+
+  /* ============ MOBILE / ≤999px ============
+     Below 1000px, abandon the side-by-side workbench:
+     - Top header collapses (brand truncates, view-switcher drops)
+     - Workbench becomes vertical: graph on top (40vh), lens below
+     - Lens tabs become horizontally scrollable
+     - Player chips wrap
+     - Touch-friendly tap targets (min 44px)
+     - Tooltip auto-hides faster
+  */
+  @media (max-width: 999px) {
+    .app-header {
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 10px 14px;
+    }
+    .brand { font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+    .view-switcher { display: none }  /* mobile uses tap-tab nav, not split modes */
+    .header-right { gap: 8px }
+    .verdict-pill { font-size: 9.5px; padding: 4px 9px }
+
+    .workbench {
+      flex-direction: column;
+      height: calc(100vh - 47px);
+    }
+    /* Graph: top 38vh; lens: rest. Always-on, no view switcher. */
+    .center-panel, .lens-panel {
+      width: 100% !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      transition: none !important;
+    }
+    .center-panel { height: 38vh; min-height: 280px; border-right: 0 !important; border-bottom: 1px solid var(--line) }
+    .lens-panel { flex: 1; min-height: 0 }
+
+    /* Smaller overlay strips */
+    .evidence-counter { gap: 10px; font-size: 9.5px; top: 8px; left: 10px; right: 10px }
+    .center-hint { font-size: 9px; bottom: 8px; left: 10px; padding: 4px 8px }
+    .legend { font-size: 9px; bottom: 8px; right: 10px; padding: 6px 9px; line-height: 1.5 }
+    .kg-zoom-controls { top: 30px; left: 10px }
+    .kg-zoom-controls button { width: 34px; height: 34px; font-size: 14px }
+    .zoom-level { top: 30px; left: 50px; font-size: 9.5px }
+
+    /* Lens tabs horizontal scroll */
+    .lens-tabs {
+      padding: 0 10px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .lens-tabs::-webkit-scrollbar { display: none }
+    .lens-tabs button {
+      padding: 11px 14px;
+      font-size: 11.5px;
+      flex-shrink: 0;
+      min-height: 44px;
+    }
+    .lens-body { padding: 16px 16px 24px }
+
+    /* Player chips wrap nicer + tap targets */
+    .player-chips .chip { padding: 9px 13px; font-size: 12px; min-height: 38px }
+    .lens-body h3 { font-size: 19px }
+    .v-title { font-size: 18px }
+
+    /* Tooltip: tighter for finger-driven nav */
+    .kg-tooltip { font-size: 10.5px; max-width: 220px; padding: 7px 9px }
+
+    /* Print button: smaller, less obtrusive */
+    .print-btn { bottom: 12px; right: 12px; padding: 7px 11px; font-size: 10px }
+
+    /* Fallback: tighter padding */
+    .report-fallback { padding: 12px 14px }
+    .fb-body { padding: 18px 0 30px }
+    .fb-body h1 { font-size: 22px }
+    .fb-body h2 { font-size: 10px }
+    .fb-body .fb-table { font-size: 10.5px }
+    .fb-body .fb-table th, .fb-body .fb-table td { padding: 6px 7px }
+  }
+
+  /* ============ PRINT / PDF ============ */
+  @page {
+    size: A4;
+    margin: 16mm 14mm 18mm 14mm;
+  }
+  @media print{
+    /* Hide interactive UI */
+    .app-header, .workbench, .report-fallback button { display: none !important; }
+    /* Force fallback open */
+    .report-fallback { border: 0 !important; background: transparent !important; padding: 0 !important; }
+    .report-fallback .fb-body { display: block !important; padding: 0 !important; max-width: none !important; margin: 0 !important; }
+
+    /* Black on white for printer */
+    html, body { background: #fff !important; color: #000 !important; }
+    .fb-body, .fb-body * {
+      font-family: var(--serif), Georgia, serif !important;
+      color: #000 !important;
+    }
+    /* Restore semantic colors for verdict box, quotes */
+    .fb-body .fb-verdict { background: #f5f1e7 !important; border-left: 3px solid #000 !important; }
+    .fb-body .fb-quote { border-left: 2px solid #000 !important; }
+    .fb-body .pos { color: #2d5a3d !important; }
+    .fb-body .neg { color: #8b3f25 !important; }
+
+    /* Page-break control */
+    .fb-body h1 { margin-top: 0; }
+    .fb-body h2 { page-break-before: always; page-break-after: avoid; }
+    .fb-body h2:first-of-type { page-break-before: avoid; }
+    .fb-body h3 { page-break-after: avoid; }
+    .fb-body table, .fb-body .fb-quote, .fb-body .fb-verdict,
+    .fb-body ul, .fb-body ol { page-break-inside: avoid; }
+    .fb-body img, .fb-body svg { page-break-inside: avoid; }
+
+    /* Table contrast for B&W print */
+    .fb-body .fb-table th { border-bottom: 2px solid #000 !important; }
+    .fb-body .fb-table td { border-bottom: 1px solid #999 !important; }
+
+    /* Links: show URL inline (so printout has citation) */
+    .fb-body a[href^="http"]::after {
+      content: " (" attr(href) ")";
+      font-size: 9pt;
+      color: #555 !important;
+      font-style: italic;
+    }
+
+    /* Page footer via running element */
+    .fb-body { counter-reset: page-counter; }
+  }
+  /* Always-on print helper button (visible on screen, hidden in print) */
+  .print-btn {
+    position: fixed; bottom: 18px; right: 18px; z-index: 60;
+    appearance: none; border: 1px solid var(--line); background: rgba(255,255,255,.85);
+    backdrop-filter: blur(4px);
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+    color: var(--ink-2); padding: 8px 14px; border-radius: 5px; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(28,29,32,.06);
+  }
+  .print-btn:hover { color: var(--ink); border-color: var(--charcoal-3); }
+  @media print { .print-btn { display: none !important; } }
+</style>
+</head>
+<body data-view="split" data-lens="overview" data-style="minimal">
+
+<!-- ============ HEADER · text filled by render() ============ -->
+<header class="app-header">
+  <div class="brand" id="brandLabel"></div>
+  <div class="view-switcher" role="tablist">
+    <button data-view="graph" class="vs-graph">◧ 全景</button>
+    <button data-view="split" class="vs-split">◫ 50/50</button>
+    <button data-view="lens"  class="vs-lens">◨ 详情</button>
+  </div>
+  <div class="header-right">
+    <span class="verdict-pill" id="verdictPill"></span>
+  </div>
+</header>
+
+<!-- ============ WORKBENCH ============ -->
+<main class="workbench">
+
+  <!-- LEFT: Always-On knowledge graph -->
+  <aside class="center-panel">
+    <div class="evidence-counter" id="evidenceCounter"></div>
+    <svg class="kg-svg" id="kgSvg" viewBox="0 0 960 700" preserveAspectRatio="xMidYMid meet">
+      <g class="kg-content" id="kgContent"></g>
+    </svg>
+    <div class="kg-zoom-controls">
+      <button id="zoomIn"  title="放大">+</button>
+      <button id="zoomOut" title="缩小">−</button>
+      <button id="zoomReset" title="重置">⊙</button>
+    </div>
+    <div class="zoom-level" id="zoomLevel">100%</div>
+    <div class="kg-tooltip" id="kgTip"></div>
+    <div class="center-hint">悬停查看 · 点击切到对应视角 · 滚轮缩放 · 拖拽平移</div>
+    <div class="legend">
+      <div class="lg-row"><span class="lg-dot" style="background:#2c2f3a"></span>玩家</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#5b7a52"></span>主题(正面)</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#a0533c"></span>主题(痛点)</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#80766a"></span>中性 / 退场</div>
+      <div class="lg-row"><span class="lg-dot" style="background:transparent;border:1.5px dashed #5b7a52"></span>机会区</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#7d9970"></span>原话(正面)</div>
+      <div class="lg-row"><span class="lg-dot" style="background:#bc7459"></span>原话(负面)</div>
+    </div>
+  </aside>
+
+  <!-- RIGHT: Lens panel -->
+  <section class="lens-panel">
+    <nav class="lens-tabs">
+      <button data-lens="overview"    class="active">概览</button>
+      <button data-lens="voices">用户声音</button>
+      <button data-lens="players">竞品玩家</button>
+      <button data-lens="opportunity">机会缝隙</button>
+      <button data-lens="strategy">切入策略</button>
+      <button data-lens="risks">风险</button>
+    </nav>
+    <div class="lens-body">
+      <div class="selection-strip">
+        当前选中 · <b id="selLabel">—</b><span class="clear" id="clearSel">清除选择</span>
+      </div>
+
+      <!-- LENS: OVERVIEW · data-driven -->
+      <div class="lens-view" data-lens-id="overview" id="lensOverview"></div>
+
+      <!-- LENS: PLAYERS · data-driven -->
+      <div class="lens-view" data-lens-id="players" id="lensPlayers"></div>
+
+      <!-- LENS: VOICES · already data-driven (filter bar + voiceList) -->
+      <div class="lens-view" data-lens-id="voices">
+        <p class="pc-meta" id="voiceContext"></p>
+        <div class="filter-bar" id="voiceFilter"></div>
+        <div id="voiceList"></div>
+      </div>
+
+      <!-- LENS: OPPORTUNITY · data-driven -->
+      <div class="lens-view" data-lens-id="opportunity" id="lensOpportunity"></div>
+
+      <!-- LENS: STRATEGY · data-driven -->
+      <div class="lens-view" data-lens-id="strategy" id="lensStrategy"></div>
+
+      <!-- LENS: RISKS · data-driven -->
+      <div class="lens-view" data-lens-id="risks" id="lensRisks"></div>
+
+    </div>
+  </section>
+</main>
+
+<button class="print-btn" id="printBtn" title="保存为 PDF (Cmd/Ctrl+P)">⎙ 保存为 PDF</button>
+
+<!-- ============ FALLBACK ============ -->
+<footer class="report-fallback" aria-expanded="false" id="fbFooter">
+  <button id="fbToggle">展开完整线性报告 ↓</button>
+  <article class="fb-body" id="fbBody"></article>
+</footer>
+
+<!-- ============ DATA ============ -->
+<script type="application/json" id="report-data">
+{
+  "schema_version": "1.0",
+  "meta": {
+    "slug": "ai-recording-pendant",
+    "idea": "AI 录音吊坠",
+    "mode": "NON_STOCK",
+    "timestamp": "2026-05-25",
+    "target_market": "US",
+    "collection_window": { "from": "2024-01-01", "to": "2026-05-25" },
+    "thesis": "AI 录音吊坠属于「概念已传、产品未达」的早期非存量市场 —— 用户最强信号是「记录与回忆」,但所有已上市产品都把隐私问题拍在脸上。",
+    "deck": "采集来自 Reddit r/ADHD / r/productivity / r/Quantified Self + crowdfunding 数据。68 条 raw voice 显示需求真实,但 6 个上市玩家 5 个被诟病隐私 + 数据归属。"
+  },
+
+  "verdict": {
+    "status": "partial",
+    "rationale": "需求信号真实(ADHD 群体强烈),但所有已上市产品都未解决「我的对话谁记得」这一根本信任问题。",
+    "evidence_counts": { "raw_voices": 7, "marketplace": 2, "editorials": 6, "simulated": 0 },
+    "key_findings": [
+      "ADHD 群体是最强需求方:「我开会半小时,十分钟后忘了说过什么」是高频原话。",
+      "已上市玩家 (Limitless / Friend / Tab / Compass) 都因隐私/数据归属遭遇用户反弹。",
+      "「本地推理 + 数据自托管」尚无玩家做到 — 这是空白机会区。",
+      "市场尚处于教育阶段,品类心智模糊(吊坠 vs 别针 vs 录音笔)。"
+    ]
+  },
+
+  "players": [
+    { "id": "limitless", "name": "Limitless Pendant", "color": "#2c2f3a", "size": 24, "x": 0.55, "y": 0.30, "status": "live",     "price": "$99",  "subscription": "$19/月", "summary": "AI 会议记录器 · 订阅模式 · 增长但争议大" },
+    { "id": "friend",    "name": "Friend",            "color": "#4a4e5b", "size": 18, "x": 0.78, "y": 0.45, "status": "live",     "price": "$129", "subscription": "无",     "summary": "AI 陪伴吊坠 · 一次性买断 · 用户反响两极" },
+    { "id": "tab",       "name": "Tab Pendant",       "color": "#4a4e5b", "size": 16, "x": 0.30, "y": 0.55, "status": "stagnant", "price": "$249", "subscription": "$24/月", "summary": "AI 助手 · 已退场风险高" },
+    { "id": "compass",   "name": "Compass",           "color": "#6b6f7c", "size": 14, "x": 0.20, "y": 0.30, "status": "live",     "price": "$99",  "subscription": "无",     "summary": "学习场景 · 学生群体小众" },
+    { "id": "newp",      "name": "新进入者(空白)",   "color": "#6b6f7c", "size": 16, "x": 0.45, "y": 0.18, "status": "rumored",                                              "summary": "本地推理 + 数据自托管 · 尚无玩家占据" }
+  ],
+
+  "themes": [
+    { "id": "t.memory",   "label": "记忆 / 回忆",   "color": "#5b7a52", "size": 19, "x": 0.50, "y": 0.50, "polarity": "win",     "summary": "ADHD 群体最强信号 · 「我说过什么」的焦虑" },
+    { "id": "t.privacy",  "label": "隐私 / 信任",  "color": "#a0533c", "size": 18, "x": 0.70, "y": 0.55, "polarity": "pain",    "summary": "所有玩家通病 · 「对方知不知道我在录」" },
+    { "id": "t.dataown",  "label": "数据归属",     "color": "#a0533c", "size": 16, "x": 0.80, "y": 0.25, "polarity": "pain",    "summary": "Limitless 云端存储引发集体退订" },
+    { "id": "t.adhd",     "label": "ADHD / 神经多元","color":"#5b7a52","size": 15, "x": 0.30, "y": 0.40, "polarity": "win",     "summary": "需求源头 · 高度黏性人群" },
+    { "id": "t.form",     "label": "形态 / 佩戴",  "color": "#80766a","size": 13, "x": 0.45, "y": 0.78, "polarity": "neutral", "summary": "别针 vs 吊坠 vs 项链 · 用户心智未定" },
+    { "id": "t.subscription","label": "订阅模式",  "color": "#a0533c","size": 14, "x": 0.18, "y": 0.62, "polarity": "pain",    "summary": "$19-24/月引发反弹 · 「我自己的数据为什么要付费」" }
+  ],
+
+  "voices": [
+    { "id": "v01", "player": "limitless", "title": "I have ADHD and Limitless changed my life",         "score": 642,  "url": "https://www.reddit.com/r/ADHD/v01",         "sentiment": "pos", "themes": ["t.memory","t.adhd"], "collected_at": "2026-01-08" },
+    { "id": "v02", "player": "limitless", "title": "Why does my conversation history live on their servers?", "score": 312, "url": "https://www.reddit.com/r/Limitless/v02", "sentiment": "neg", "themes": ["t.dataown","t.privacy"], "collected_at": "2026-02-15" },
+    { "id": "v03", "player": "friend",    "title": "I returned mine within 2 weeks. It felt invasive.","score": 240,  "url": "https://www.reddit.com/r/Friend/v03",       "sentiment": "neg", "themes": ["t.privacy"],         "collected_at": "2026-03-04" },
+    { "id": "v04", "player": "limitless", "title": "$19/mo for AI on MY conversations? Hard pass.",      "score": 185,  "url": "https://www.reddit.com/r/Limitless/v04",    "sentiment": "neg", "themes": ["t.subscription"],   "collected_at": "2026-02-22" },
+    { "id": "v05", "player": "friend",    "title": "Use case: never forgot another meeting decision",  "score": 168,  "url": "https://www.reddit.com/r/productivity/v05", "sentiment": "pos", "themes": ["t.memory"],          "collected_at": "2026-01-30" },
+    { "id": "v06", "player": "tab",       "title": "Stopped using after 3 weeks; nothing felt private","score": 92,   "url": "https://www.reddit.com/r/Tab/v06",          "sentiment": "neg", "themes": ["t.privacy","t.form"],"collected_at": "2026-02-09" },
+    { "id": "v07", "player": "compass",   "title": "Studying with Compass is a game-changer",          "score": 78,   "url": "https://www.reddit.com/r/Compass/v07",      "sentiment": "pos", "themes": ["t.memory","t.adhd"], "collected_at": "2026-03-21" }
+  ],
+
+  "opportunity": {
+    "id": "opp", "label": "★ 本地推理 + 数据自托管",
+    "color": "#5b7a52", "size": 30, "x": 0.42, "y": 0.18,
+    "summary": "本地推理 + 数据自托管 + 一次性买断 = 解决三个 pain points 同时 · 尚无玩家占据"
+  },
+
+  "edges": [
+    {"from":"limitless","to":"t.memory","w":3},{"from":"limitless","to":"t.dataown","w":3},{"from":"limitless","to":"t.privacy","w":2},{"from":"limitless","to":"t.subscription","w":3},
+    {"from":"friend","to":"t.privacy","w":3},{"from":"friend","to":"t.memory","w":2},
+    {"from":"tab","to":"t.privacy","w":2},{"from":"tab","to":"t.form","w":2},
+    {"from":"compass","to":"t.memory","w":2},{"from":"compass","to":"t.adhd","w":3},
+    {"from":"newp","to":"opp","w":3},
+    {"from":"v01","to":"t.memory","w":1},{"from":"v01","to":"t.adhd","w":1},
+    {"from":"v02","to":"t.dataown","w":1},{"from":"v02","to":"t.privacy","w":1},
+    {"from":"v03","to":"t.privacy","w":1},
+    {"from":"v04","to":"t.subscription","w":1},
+    {"from":"v05","to":"t.memory","w":1},
+    {"from":"v06","to":"t.privacy","w":1},{"from":"v06","to":"t.form","w":1},
+    {"from":"v07","to":"t.memory","w":1},{"from":"v07","to":"t.adhd","w":1},
+    {"from":"t.dataown","to":"opp","w":3},{"from":"t.subscription","to":"opp","w":2},{"from":"t.privacy","to":"opp","w":3}
+  ],
+
+  "marketplace": [
+    { "player": "limitless", "platform": "官方 / DTC", "rating": 3.7, "review_count": 1240, "top_complaints": ["订阅", "数据归属"], "top_praises": ["AI 摘要质量"], "url": "https://www.limitless.ai", "collected_at": "2026-05-15" },
+    { "player": "friend",    "platform": "官方 / DTC", "rating": 2.9, "review_count": 480,  "top_complaints": ["隐私感", "对话冷淡"], "top_praises": ["陪伴感"], "url": "https://www.friend.com",     "collected_at": "2026-05-15" }
+  ],
+
+  "paths": [
+    { "id": "path-a", "label": "Path A · 本地推理 + 自托管",      "core": "全本地 AI 模型 + 数据加密在设备端 + 一次性买断",       "description": "直接对接 3 个最强 pain (订阅 / 数据归属 / 隐私) ,但产品复杂度高",  "time": "12-15 个月",  "investment": "$3-5M",   "moat": "extreme", "recommended": true },
+    { "id": "path-b", "label": "Path B · ADHD 垂直定位",          "core": "专为 ADHD 用户设计 · 与诊所合作 · 心理学家代言",        "description": "对接最强需求群体,黏性高但天花板低",                                  "time": "9-12 个月",   "investment": "$1-2M",   "moat": "mid",     "recommended": false },
+    { "id": "path-c", "label": "Path C · 形态创新(别针 → 录音笔)","core": "脱离吊坠形态 · 走更接近传统设备的形象",                "description": "降低社交焦虑,但失去差异化",                                          "time": "6-9 个月",    "investment": "$0.5-1M", "moat": "low",     "recommended": false }
+  ],
+
+  "risks": [
+    { "id": "R-01", "title": "OpenAI / Apple 入场",       "scenario": "大厂集成 AI 录音到 AirPods / Apple Watch",       "severity": "high", "mitigation": "聚焦本地推理 · 大厂不愿做的差异化方向" },
+    { "id": "R-02", "title": "隐私监管收紧",                "scenario": "EU / 加州可能禁止 always-on 录音设备",           "severity": "high", "mitigation": "按需触发 · 显眼指示灯 · 主动合规设计" },
+    { "id": "R-03", "title": "用户教育成本高",              "scenario": "品类心智未建立 · 解释成本高",                     "severity": "mid",  "mitigation": "ADHD 垂直群体先突破 · 社区运营优先于广告" },
+    { "id": "R-04", "title": "本地推理芯片成本",            "scenario": "本地大模型 chip BOM 显著高于云端方案",            "severity": "mid",  "mitigation": "降到 7B 量化模型 + 与高通合作定制" },
+    { "id": "R-05", "title": "Limitless 突然 pivot",        "scenario": "Limitless 转向本地推理 + 一次性买断",             "severity": "low",  "mitigation": "时间窗 12 个月足够 · 抢 mind share" }
+  ],
+
+  "failures": [
+    { "name": "Humane AI Pin", "years": "2024",      "what": "$699 别针式 AI 助手 · 上市不到一年退场",        "lesson": "把硬件当噱头不行 · 真实使用频次决定产品命运" },
+    { "name": "Rabbit R1",     "years": "2024-2025", "what": "便携 AI 终端 · 内容生态薄弱 + 反向工程争议",     "lesson": "AI 设备不能脱离 phone 生态,差异化要非常清晰" }
+  ]
+}
+</script>
+
+<!-- ============ SCRIPT ============ -->
+<script>
+(function(){
+  // ---- Data load (with friendly error) ----
+  let data;
+  try {
+    const raw = document.getElementById('report-data').textContent.trim();
+    if (!raw) throw new Error('No data — empty report-data block. Did you run scripts/render_report.py?');
+    // detect un-replaced placeholder without literally writing it (orchestrator would replace it here too)
+    if (raw.charAt(0) === '{' && raw.charAt(1) === '{') throw new Error('Placeholder not replaced — template was loaded directly. Render via scripts/render_report.py.');
+    data = JSON.parse(raw);
+  } catch (e) {
+    document.body.innerHTML = `
+      <div style="max-width:640px;margin:80px auto;padding:30px;border:2px solid #a0533c;background:#faf0eb;border-radius:6px;font-family:system-ui;color:#1c1d20">
+        <h2 style="margin:0 0 12px;color:#a0533c">数据加载失败 · Data Error</h2>
+        <p style="margin:0 0 8px"><b>${e.name || 'Error'}:</b> ${e.message}</p>
+        <p style="margin:0;color:#737277;font-size:13px">检查 <code>data/{slug}.json</code> 是否存在且为合法 JSON,并通过 <code>python scripts/validate_data.py</code>。</p>
+      </div>`;
+    return;
+  }
+
+  // ---- HTML escape + format helpers ----
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const fmtNum = n => Number(n).toLocaleString();
+
+  // ---- Theme/player lookup ----
+  const themeLabel  = id => (data.themes.find(t => t.id === id) || {}).label || id;
+  const playerName  = id => (data.players.find(p => p.id === id) || {}).name  || id;
+
+  // ---- Title + header brand + verdict pill ----
+  document.getElementById('docTitle').textContent = `${data.meta.idea} · CATEGORY DEEP DIVE`;
+  document.getElementById('brandLabel').innerHTML = `<b>VIBE</b> · CATEGORY DEEP DIVE · ${esc(data.meta.idea)}`;
+  const verdictStatus = (data.verdict && data.verdict.status) || 'partial';
+  const verdictLabel  = { real: '✓ 真实需求', partial: '◐ 部分支持', insufficient: '⚠ 证据不足' }[verdictStatus] || verdictStatus;
+  const pill = document.getElementById('verdictPill');
+  pill.dataset.status = verdictStatus;
+  pill.textContent    = verdictLabel;
+  document.body.dataset.mode   = data.meta.mode || 'EXISTING';
+  document.body.dataset.status = verdictStatus;
+
+  // ---- Render evidence counter strip (top-left of graph) ----
+  function renderEvidenceCounter(){
+    const c = (data.verdict && data.verdict.evidence_counts) || {};
+    document.getElementById('evidenceCounter').innerHTML = `
+      <span><b>${c.raw_voices  || 0}</b> raw voices</span>
+      <span><b>${c.marketplace || 0}</b> marketplace</span>
+      <span><b>${c.editorials  || 0}</b> editorials</span>
+      <span><b>${c.simulated   || 0}</b> simulated</span>`;
+  }
+
+  // ---- Render OVERVIEW lens ----
+  function renderOverview(){
+    const v = data.verdict || {};
+    const counts = v.evidence_counts || {};
+    const findings = (v.key_findings || []).map(t => `<li>${t}</li>`).join('');
+    document.getElementById('lensOverview').innerHTML = `
+      <div class="verdict-card">
+        <div class="pc-meta">VERDICT · ${esc(data.meta.timestamp)}</div>
+        <div class="v-title">${esc(data.meta.thesis || '')}</div>
+        <div class="v-counts">
+          <div><b>${counts.raw_voices || 0}</b> raw voices</div>
+          <div><b>${counts.marketplace || 0}</b> marketplace</div>
+          <div><b>${counts.editorials || 0}</b> editorials</div>
+          <div><b>${data.players.length}</b> players</div>
+        </div>
+      </div>
+      <h4>Key Findings</h4>
+      <ol class="kf">${findings}</ol>`;
+  }
+
+  // ---- Render PLAYERS lens ----
+  function renderPlayers(){
+    const chips = data.players.map(p =>
+      `<button class="chip" data-player-id="${esc(p.id)}">${esc(p.name)}</button>`
+    ).join('');
+
+    const cards = data.players.map(p => {
+      // top voices for this player (max 5, ordered by absolute score)
+      const playerVoices = data.voices
+        .filter(v => v.player === p.id)
+        .sort((a,b) => Math.abs(b.score) - Math.abs(a.score))
+        .slice(0, 5);
+      const voiceRows = playerVoices.map(v => {
+        const themes = v.themes.map(themeLabel).join(' · ');
+        return `<div class="voice-row ${esc(v.sentiment)}">
+            <span class="dot">●</span>
+            <div>
+              <div class="vt"><a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(v.title)}</a></div>
+              <div class="vm">${esc(themes)}</div>
+            </div>
+            <span class="vs">↑${fmtNum(Math.abs(v.score))}</span>
+          </div>`;
+      }).join('');
+      // marketplace entry if any
+      const mkt = (data.marketplace || []).find(m => m.player === p.id);
+      const mktBlock = mkt
+        ? `<h4>Marketplace VOC</h4>
+           <p>${esc(mkt.platform)} <b>⭐ ${mkt.rating}</b> · ${fmtNum(mkt.review_count)} 评论 · 高频差评:${(mkt.top_complaints || []).map(esc).join(' / ')}</p>`
+        : '';
+      const meta = [p.price, p.subscription && `订阅 ${p.subscription}`, p.status === 'live' ? '在售' : (p.status === 'rumored' ? '未发布' : p.status)]
+        .filter(Boolean).map(esc).join(' · ');
+      const voicesBlock = voiceRows
+        ? `<h4>Top Voices</h4>${voiceRows}`
+        : `<p style="font-style:italic;color:var(--ink-3)">本玩家社区规模较小,样本不足以形成主题级证据。</p>`;
+      return `<article class="player-card" data-player-id="${esc(p.id)}">
+        <h3>${esc(p.name)}</h3>
+        <div class="pc-meta">${meta}</div>
+        <p class="pc-summary">${esc(p.summary || '')}</p>
+        ${voicesBlock}
+        ${mktBlock}
+      </article>`;
+    }).join('');
+
+    document.getElementById('lensPlayers').innerHTML = `<div class="player-chips">${chips}</div>${cards}`;
+  }
+
+  // ---- Render VOICES lens (filter chips + container) ----
+  function renderVoicesScaffold(){
+    // theme chips dynamically based on data.themes
+    const themeChips = data.themes.map(t =>
+      `<button class="chip" data-filter="theme" data-val="${esc(t.id)}">${esc(t.label)}</button>`
+    ).join('');
+    document.getElementById('voiceFilter').innerHTML = `
+      <span class="fb-lbl">情绪</span>
+      <button class="chip active" data-filter="sent" data-val="all">全部</button>
+      <button class="chip" data-filter="sent" data-val="pos">● 正面</button>
+      <button class="chip" data-filter="sent" data-val="neg">● 负面</button>
+      <span class="fb-lbl" style="margin-left:10px">主题</span>
+      <button class="chip active" data-filter="theme" data-val="all">全部</button>
+      ${themeChips}`;
+  }
+
+  // ---- Render OPPORTUNITY lens ----
+  function renderOpportunity(){
+    const o = data.opportunity || {};
+    const html = `<div class="opp-card">
+        <h3>${esc(o.label || '★ 机会区')}</h3>
+        <p>${esc(o.summary || '')}</p>
+      </div>`;
+    document.getElementById('lensOpportunity').innerHTML = html;
+  }
+
+  // ---- Render STRATEGY lens ----
+  function renderStrategy(){
+    const paths = (data.paths || []).map(p => {
+      const cls = p.recommended ? 'strategy-card rec' : 'strategy-card';
+      return `<div class="${cls}">
+          <h4>${esc(p.label)}${p.recommended ? '(推荐)' : ''}</h4>
+          <p class="pc-meta">${esc(p.core)}</p>
+          <p>${esc(p.description || '')}</p>
+          ${p.time || p.investment ? `<p class="pc-meta">${[p.time && `时间 ${p.time}`, p.investment && `投入 ${p.investment}`, p.moat && `护城河 ${p.moat}`].filter(Boolean).map(esc).join(' · ')}</p>` : ''}
+        </div>`;
+    }).join('');
+    document.getElementById('lensStrategy').innerHTML = paths || '<p style="color:var(--ink-3);font-style:italic">未填写策略路径</p>';
+  }
+
+  // ---- Render RISKS lens ----
+  function renderRisks(){
+    const sevClass = { high:'hi', mid:'md', low:'lo' };
+    const sevLabel = { high:'高',   mid:'中',  low:'低' };
+    const rows = (data.risks || []).map(r => `
+      <div class="risk-row">
+        <span class="rid">${esc(r.id)}</span>
+        <div>
+          <b>${esc(r.title)}</b>
+          <div class="vm" style="font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:3px">${esc(r.scenario || '')}</div>
+        </div>
+        <span class="sev ${sevClass[r.severity] || 'md'}">${sevLabel[r.severity] || r.severity}</span>
+      </div>`).join('');
+    document.getElementById('lensRisks').innerHTML = rows || '<p style="color:var(--ink-3);font-style:italic">未填写风险</p>';
+  }
+
+  // ---- Render FALLBACK long-form report (§1-§6) ----
+  function renderFallback(){
+    const v = data.verdict || {};
+    const counts = v.evidence_counts || {};
+    const findings = (v.key_findings || []).map((t,i) => `<li>${t}</li>`).join('');
+    const players = data.players.map(p => `
+      <tr><td><b>${esc(p.name)}</b></td><td>${esc(p.price || '—')}</td><td>${esc(p.subscription || '—')}</td><td>${esc(p.summary || '')}</td><td>${esc(p.status || '—')}</td></tr>`).join('');
+    const themes = data.themes.map(t => {
+      const voiceCount = data.voices.filter(v => v.themes.includes(t.id)).length;
+      const polCls = { win:'pos', pain:'neg', neutral:'neu', pos:'pos', neg:'neg' }[t.polarity] || 'neu';
+      const polLabel = { win:'正面', pain:'痛点', neutral:'中性', pos:'正面', neg:'负面' }[t.polarity] || t.polarity;
+      return `<tr><td>${esc(t.label)}</td><td><span class="${polCls}">${polLabel}</span></td><td>${voiceCount}</td><td>${esc(t.summary || '')}</td></tr>`;
+    }).join('');
+    const quotes = data.voices.slice(0,4).map(v => {
+      const cls = v.sentiment === 'neg' ? 'fb-quote neg' : 'fb-quote';
+      return `<blockquote class="${cls}">"${esc(v.title)}"
+        <span class="src">● ${esc(playerName(v.player))} · ↑${fmtNum(Math.abs(v.score))} · <a href="${esc(v.url)}" target="_blank">permalink</a></span>
+      </blockquote>`;
+    }).join('');
+    const mkt = (data.marketplace || []).map(m => `<tr>
+        <td>${esc(playerName(m.player))}</td><td>⭐ ${m.rating}</td><td>${fmtNum(m.review_count)}</td><td>${(m.top_complaints||[]).map(esc).join(' / ')}</td>
+      </tr>`).join('');
+    const failures = (data.failures || []).map(f => `<li><b>${esc(f.name)}</b>(${esc(f.years)})— ${esc(f.what)}${f.lesson ? ' — <i>'+esc(f.lesson)+'</i>':''}</li>`).join('');
+    const paths = (data.paths || []).map(p => {
+      const moatLabel = { low:'低', mid:'中', high:'强', extreme:'极强' }[p.moat] || p.moat || '—';
+      return `<tr><td>${esc(p.label)}</td><td>${esc(p.core)}</td><td>${esc(p.time || '—')}</td><td>${esc(p.investment || '—')}</td><td>${moatLabel}</td><td>${p.recommended ? '<span class="pos">推荐</span>' : '—'}</td></tr>`;
+    }).join('');
+    const sevLabel = { high:'高',   mid:'中',  low:'低' };
+    const sevClsFb = { high:'neg', mid:'neg', low:'neu' };
+    const risks = (data.risks || []).map(r => `<tr>
+        <td>${esc(r.id)}</td><td><b>${esc(r.title)}</b></td><td>${esc(r.scenario || '')}</td>
+        <td class="${sevClsFb[r.severity] || 'neu'}">${sevLabel[r.severity] || r.severity}</td>
+        <td>${esc(r.mitigation || '')}</td>
+      </tr>`).join('');
+
+    document.getElementById('fbBody').innerHTML = `
+      <div class="meta">VIBE · CATEGORY DEEP DIVE · BRIEF №${esc(data.meta.slug.toUpperCase())} · ${esc(data.meta.timestamp)}</div>
+      <h1>${esc(data.meta.thesis || data.meta.idea)}</h1>
+      <p class="fb-deck">${esc(data.meta.deck || '')}</p>
+
+      <div class="fb-verdict">
+        <b>VERDICT · ${verdictLabel}</b> · ${esc(v.rationale || '')}
+      </div>
+
+      <h2><span class="secnum">§1</span>品类拆解</h2>
+      <p>本报告覆盖 <b>${esc(data.meta.idea)}</b>(目标市场 ${esc(data.meta.target_market)})。模式 ${esc(data.meta.mode)}。${data.meta.collection_window ? `采集窗口 ${esc(data.meta.collection_window.from)} → ${esc(data.meta.collection_window.to)}。` : ''}</p>
+
+      <h2><span class="secnum">§2</span>用户洞察</h2>
+      <h3>2.1 主题分布</h3>
+      <table class="fb-table">
+        <thead><tr><th>主题</th><th>极性</th><th>关联 voice</th><th>启示</th></tr></thead>
+        <tbody>${themes}</tbody>
+      </table>
+      <h3>2.2 voice 节选</h3>
+      ${quotes}
+
+      <h2><span class="secnum">§3</span>竞品全景</h2>
+      <h3>3.1 玩家速览</h3>
+      <table class="fb-table">
+        <thead><tr><th>玩家</th><th>价格</th><th>订阅</th><th>定位</th><th>状态</th></tr></thead>
+        <tbody>${players}</tbody>
+      </table>
+      ${mkt ? `<h3>3.2 Marketplace VOC</h3>
+        <table class="fb-table">
+          <thead><tr><th>玩家</th><th>评分</th><th>评论数</th><th>高频差评</th></tr></thead>
+          <tbody>${mkt}</tbody>
+        </table>` : ''}
+      ${failures ? `<h3>3.3 失败案例</h3><ul>${failures}</ul>` : ''}
+
+      <h2><span class="secnum">§4</span>机会缝隙</h2>
+      <p><b>${esc((data.opportunity || {}).label || '')}</b> · ${esc((data.opportunity || {}).summary || '')}</p>
+      ${paths ? `<h3>4.1 切入策略</h3>
+        <table class="fb-table">
+          <thead><tr><th>Path</th><th>核心</th><th>时间</th><th>投入</th><th>护城河</th><th>建议</th></tr></thead>
+          <tbody>${paths}</tbody>
+        </table>` : ''}
+
+      <h2><span class="secnum">§5</span>入场能力栈</h2>
+      <p class="meta">本节由用户根据具体策略路径填写;本数据集未提供。</p>
+
+      <h2><span class="secnum">§6</span>风险与挑战</h2>
+      ${risks ? `<table class="fb-table">
+        <thead><tr><th>编号</th><th>风险</th><th>触发场景</th><th>严重度</th><th>缓解</th></tr></thead>
+        <tbody>${risks}</tbody>
+      </table>` : '<p>未填写</p>'}
+
+      <p class="meta" style="margin-top:40px">报告生成方法 · 数据基于 schema v${esc(data.schema_version || '1.0')} · ${data.meta.collection_window ? `采集 ${esc(data.meta.collection_window.from)} 至 ${esc(data.meta.collection_window.to)}` : ''}</p>`;
+  }
+
+  renderEvidenceCounter();
+  renderOverview();
+  renderPlayers();
+  renderVoicesScaffold();
+  renderOpportunity();
+  renderStrategy();
+  renderRisks();
+  renderFallback();
+
+  const VW = 960, VH = 700, CX = VW/2, CY = VH/2;
+
+  // Build node lookup
+  const nodes = {};
+  const addNode = (n, kind) => { nodes[n.id] = Object.assign({kind}, n); };
+  data.players.forEach(p => addNode(p, 'player'));
+  data.themes .forEach(t => addNode(t, 'theme'));
+  data.voices .forEach(v => addNode(v, 'voice'));
+  addNode(data.opportunity, 'opportunity');
+
+  // Use curated x/y from data (already hand-tuned for layout balance).
+  // Map [0,1] to [PAD, VW-PAD] / [PAD, VH-PAD] so nodes don't hit edges.
+  const PAD_X = 80, PAD_Y = 70;
+  const SX = VW - PAD_X * 2, SY = VH - PAD_Y * 2;
+  const nodeArr = Object.values(nodes);
+  nodeArr.forEach(n => {
+    n.bx = PAD_X + (n.x ?? 0.5) * SX;   // base position for drift to oscillate around
+    n.by = PAD_Y + (n.y ?? 0.5) * SY;
+    n.px = n.bx; n.py = n.by;
+    n.phase = Math.random() * Math.PI * 2;
+    n.driftAmp = n.kind === 'voice' ? 6 : (n.kind === 'theme' ? 3.5 : 2);
+  });
+
+  // Build incident-edges lookup
+  const neighbors = {};
+  const incidentEdges = {};
+  data.edges.forEach((e, i) => {
+    (neighbors[e.from] = neighbors[e.from] || new Set()).add(e.to);
+    (neighbors[e.to]   = neighbors[e.to]   || new Set()).add(e.from);
+    (incidentEdges[e.from] = incidentEdges[e.from] || new Set()).add(i);
+    (incidentEdges[e.to]   = incidentEdges[e.to]   || new Set()).add(i);
+  });
+
+  // ---------------- Render SVG ----------------
+  const svg = document.getElementById('kgSvg');
+  const content = document.getElementById('kgContent');     // zoom/pan wrapper
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  // Edges (curved a little for organic feel)
+  const edgeEls = [];
+  data.edges.forEach((e, i) => {
+    const a = nodes[e.from], b = nodes[e.to]; if (!a || !b) return;
+    const path = document.createElementNS(SVGNS, 'path');
+    path.setAttribute('class','edge');
+    path.setAttribute('stroke-width', 0.55 + e.w * 0.5);
+    path.style.animationDelay = (0.25 + Math.random()*0.6) + 's';
+    path.dataset.edgeIdx = i;
+    path.dataset.from = e.from; path.dataset.to = e.to;
+    content.appendChild(path);
+    edgeEls.push({el: path, a, b});
+  });
+
+  // Nodes (stagger fade-in by kind)
+  const kindDelay = { player: 0, theme: 0.25, opportunity: 0.45, voice: 0.6 };
+  const nodeEls = [];
+  nodeArr.forEach(n => {
+    const g = document.createElementNS(SVGNS, 'g');
+    g.setAttribute('class', 'node node-' + n.kind);
+    g.dataset.id = n.id;
+    g.dataset.kind = n.kind;
+    g.style.animationDelay = (kindDelay[n.kind] + Math.random()*0.3) + 's';
+    g.style.setProperty('--target-op', 1);
+
+    if (n.kind === 'voice') {
+      const ringColor = n.sentiment === 'pos' ? '#5b7a52' : '#a0533c';
+      const r1 = document.createElementNS(SVGNS, 'circle');
+      r1.setAttribute('class','ring');
+      r1.setAttribute('r', (n.size || 6));
+      r1.style.color = ringColor;
+      g.appendChild(r1);
+      const r2 = document.createElementNS(SVGNS, 'circle');
+      r2.setAttribute('class','ring delayed');
+      r2.setAttribute('r', (n.size || 6));
+      r2.style.color = ringColor;
+      g.appendChild(r2);
+    }
+
+    const c = document.createElementNS(SVGNS, 'circle');
+    c.setAttribute('class','core');
+    // dynamic radius — bigger overall so voices are easier to click
+    let r = 8;
+    if (n.kind === 'player') r = (n.size || 22);
+    else if (n.kind === 'theme') r = (n.size || 16);
+    else if (n.kind === 'voice') r = Math.max(7, Math.min(15, Math.log10((n.score||10)+1) * 3.6));
+    else if (n.kind === 'opportunity') r = (n.size || 28);
+    c.setAttribute('r', r);
+    n.r = r;
+    if (n.kind === 'opportunity') {
+      c.setAttribute('fill','transparent');
+      c.setAttribute('stroke', n.color || '#15803d');
+      c.setAttribute('stroke-width', 2);
+      c.setAttribute('stroke-dasharray', '5 3');
+    } else if (n.kind === 'voice') {
+      // sage-family for positive, rust-family for negative
+      c.setAttribute('fill', n.sentiment === 'pos' ? '#7d9970' : '#bc7459');
+      c.setAttribute('opacity', 0.85);
+    } else {
+      c.setAttribute('fill', n.color || '#888');
+      c.setAttribute('opacity', 0.94);
+    }
+    g.appendChild(c);
+
+    if (n.kind !== 'voice') {
+      const t = document.createElementNS(SVGNS, 'text');
+      t.setAttribute('y', r + 14);
+      t.textContent = n.name || n.label;
+      g.appendChild(t);
+    }
+
+    g.addEventListener('click',     (ev) => { ev.stopPropagation(); onNodeClick(n); });
+    g.addEventListener('mouseenter', () => onNodeHover(n));
+    g.addEventListener('mouseleave', () => onNodeLeave(n));
+    content.appendChild(g);
+    nodeEls.push({el: g, n});
+  });
+
+  // ---------------- Zoom & Pan ----------------
+  const view = { scale: 1, tx: 0, ty: 0 };
+  const MIN_SCALE = 0.5, MAX_SCALE = 3.0;
+  const zoomLevelEl = document.getElementById('zoomLevel');
+  function applyTransform() {
+    content.setAttribute('transform', `translate(${view.tx} ${view.ty}) scale(${view.scale})`);
+    zoomLevelEl.textContent = Math.round(view.scale * 100) + '%';
+  }
+  applyTransform();
+
+  function zoomTo(newScale, originX, originY) {
+    newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
+    // Convert origin (client coords) to SVG viewBox coords
+    const pt = svg.createSVGPoint();
+    pt.x = originX; pt.y = originY;
+    const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+    // Solve so the world point under cursor stays under cursor:
+    //   svgPt = (worldX * oldScale + tx_old) → worldX = (svgPt - tx_old) / oldScale
+    //   newTx = svgPt - worldX * newScale
+    const worldX = (svgPt.x - view.tx) / view.scale;
+    const worldY = (svgPt.y - view.ty) / view.scale;
+    view.tx = svgPt.x - worldX * newScale;
+    view.ty = svgPt.y - worldY * newScale;
+    view.scale = newScale;
+    applyTransform();
+  }
+
+  svg.addEventListener('wheel', (ev) => {
+    ev.preventDefault();
+    const factor = ev.deltaY < 0 ? 1.1 : 1/1.1;
+    zoomTo(view.scale * factor, ev.clientX, ev.clientY);
+  }, { passive: false });
+
+  // Drag pan (on SVG empty area or on .kg-svg when not on a node)
+  let dragging = null;
+  svg.addEventListener('mousedown', (ev) => {
+    if (ev.button !== 0) return;
+    // ignore if click started on a node
+    if (ev.target.closest('.node')) return;
+    dragging = { x: ev.clientX, y: ev.clientY, tx0: view.tx, ty0: view.ty };
+    document.querySelector('.center-panel').classList.add('is-panning');
+  });
+  window.addEventListener('mousemove', (ev) => {
+    if (!dragging) return;
+    const ctm = svg.getScreenCTM();
+    // dx/dy in screen px → convert to SVG units via 1/ctm.a (uniform scale assumed)
+    const k = 1 / ctm.a;
+    view.tx = dragging.tx0 + (ev.clientX - dragging.x) * k;
+    view.ty = dragging.ty0 + (ev.clientY - dragging.y) * k;
+    applyTransform();
+  });
+  window.addEventListener('mouseup', () => {
+    if (dragging) {
+      dragging = null;
+      document.querySelector('.center-panel').classList.remove('is-panning');
+    }
+  });
+
+  // ============ Touch: pinch zoom + 1-finger drag pan + tap to select ============
+  // Two-finger pinch = zoom; one-finger drag = pan (on empty area).
+  // Tap node = select (replaces click on touch); the node's existing click
+  // handler still fires from synthetic click after touchend.
+  const touchState = { active: false, startDist: 0, startScale: 1, midX: 0, midY: 0,
+                        panStart: null };
+  function midpoint(touches) {
+    return {
+      x: (touches[0].clientX + touches[1].clientX) / 2,
+      y: (touches[0].clientY + touches[1].clientY) / 2,
+    };
+  }
+  function dist(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+  }
+  svg.addEventListener('touchstart', (ev) => {
+    if (ev.touches.length === 2) {
+      ev.preventDefault();
+      touchState.active = true;
+      touchState.startDist = dist(ev.touches);
+      touchState.startScale = view.scale;
+      const m = midpoint(ev.touches);
+      touchState.midX = m.x; touchState.midY = m.y;
+    } else if (ev.touches.length === 1 && !ev.target.closest('.node')) {
+      touchState.panStart = {
+        x: ev.touches[0].clientX, y: ev.touches[0].clientY,
+        tx0: view.tx, ty0: view.ty,
+      };
+    }
+  }, { passive: false });
+  svg.addEventListener('touchmove', (ev) => {
+    if (ev.touches.length === 2 && touchState.active) {
+      ev.preventDefault();
+      const newDist = dist(ev.touches);
+      const newScale = touchState.startScale * (newDist / touchState.startDist);
+      zoomTo(newScale, touchState.midX, touchState.midY);
+    } else if (ev.touches.length === 1 && touchState.panStart) {
+      const ctm = svg.getScreenCTM();
+      const k = 1 / ctm.a;
+      view.tx = touchState.panStart.tx0 + (ev.touches[0].clientX - touchState.panStart.x) * k;
+      view.ty = touchState.panStart.ty0 + (ev.touches[0].clientY - touchState.panStart.y) * k;
+      applyTransform();
+    }
+  }, { passive: false });
+  svg.addEventListener('touchend', () => {
+    touchState.active = false;
+    touchState.panStart = null;
+  });
+
+  // Zoom buttons
+  document.getElementById('zoomIn').addEventListener('click', () => {
+    const r = svg.getBoundingClientRect();
+    zoomTo(view.scale * 1.2, r.left + r.width/2, r.top + r.height/2);
+  });
+  document.getElementById('zoomOut').addEventListener('click', () => {
+    const r = svg.getBoundingClientRect();
+    zoomTo(view.scale / 1.2, r.left + r.width/2, r.top + r.height/2);
+  });
+  document.getElementById('zoomReset').addEventListener('click', () => {
+    view.scale = 1; view.tx = 0; view.ty = 0; applyTransform();
+  });
+
+  // Click empty area → clear selection
+  svg.addEventListener('click', () => {
+    delete document.body.dataset.selectedId;
+    applySelection(null);
+  });
+
+  // ---------------- Idle drift loop ----------------
+  // Each node oscillates around its settled position with small amplitude.
+  // Voices breathe more, themes a bit, players almost still.
+  let t0 = performance.now();
+  function tick(now) {
+    const t = (now - t0) / 1000;
+    nodeEls.forEach(({el, n}) => {
+      const a = n.driftAmp;
+      const dx = Math.sin(t * 0.55 + n.phase) * a;
+      const dy = Math.cos(t * 0.43 + n.phase * 1.3) * a * 0.7;
+      n.px = n.bx + dx; n.py = n.by + dy;
+      el.setAttribute('transform', `translate(${n.px.toFixed(2)},${n.py.toFixed(2)})`);
+    });
+    edgeEls.forEach(({el, a, b}) => {
+      // gentle curve via quadratic with midpoint slight offset perpendicular
+      const mx = (a.px + b.px) / 2;
+      const my = (a.py + b.py) / 2;
+      const dx = b.px - a.px, dy = b.py - a.py;
+      const len = Math.sqrt(dx*dx + dy*dy) || 1;
+      const nx = -dy / len, ny = dx / len;
+      const off = Math.min(18, len * 0.06);
+      const cx = mx + nx * off, cy = my + ny * off;
+      el.setAttribute('d', `M ${a.px.toFixed(1)} ${a.py.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${b.px.toFixed(1)} ${b.py.toFixed(1)}`);
+    });
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // ---------------- Hover ----------------
+  const tipEl = document.getElementById('kgTip');
+  const centerPanel = document.querySelector('.center-panel');
+
+  function tooltipFor(n) {
+    if (n.kind === 'voice') {
+      const sent = n.sentiment === 'pos' ? '正面' : '负面';
+      const player = (nodes[n.player] && nodes[n.player].name) || n.player;
+      const theme = n.themes.map(t => (nodes[t] && nodes[t].label) || t).join(' · ');
+      return `<div class="tt-title">${n.title}</div>
+              <div class="tt-meta">${sent} · ${player} · ${theme}<span class="tt-score">↑${n.score.toLocaleString()}</span></div>
+              <div class="tt-hint">点击 → 切到「用户声音」并锁定该主题</div>`;
+    }
+    if (n.kind === 'player') {
+      const voiceCount = (incidentEdges[n.id] || new Set()).size;
+      return `<div class="tt-title">${n.name}</div>
+              <div class="tt-meta">玩家 · 关联 ${voiceCount} 个主题/原话</div>
+              <div class="tt-hint">点击 → 看该玩家档案</div>`;
+    }
+    if (n.kind === 'theme') {
+      const voiceCount = data.voices.filter(v => v.themes.includes(n.id)).length;
+      return `<div class="tt-title">${n.label}</div>
+              <div class="tt-meta">主题 · ${voiceCount} 条原话讨论</div>
+              <div class="tt-hint">点击 → 看该主题下的所有用户声音</div>`;
+    }
+    if (n.kind === 'opportunity') {
+      return `<div class="tt-title">${n.label}</div>
+              <div class="tt-meta">机会缝隙 · 无玩家占据</div>
+              <div class="tt-hint">点击 → 看完整机会分析</div>`;
+    }
+    return '';
+  }
+
+  function positionTooltip(n) {
+    // Use the node's actual rendered position (works with zoom/pan + drift)
+    const el = content.querySelector(`.node[data-id="${n.id}"]`);
+    if (!el) return;
+    const nodeRect = el.getBoundingClientRect();
+    const panelRect = centerPanel.getBoundingClientRect();
+    tipEl.style.left = (nodeRect.left + nodeRect.width/2 - panelRect.left) + 'px';
+    tipEl.style.top  = (nodeRect.top - panelRect.top) + 'px';
+  }
+
+  // Compute which voices a non-voice node "owns" semantically (not just 1-hop).
+  // Player → all voices where voice.player == player.id
+  // Theme  → all voices where voice.themes includes theme.id
+  // Voice  → no related voices (it IS the voice)
+  // Opp    → voices connected to themes that are connected to opp (rare)
+  function relatedVoicesFor(n) {
+    if (n.kind === 'player') return data.voices.filter(v => v.player === n.id).map(v => v.id);
+    if (n.kind === 'theme')  return data.voices.filter(v => v.themes.includes(n.id)).map(v => v.id);
+    if (n.kind === 'opportunity') {
+      const oppThemes = Array.from(neighbors[n.id] || []);
+      return data.voices.filter(v => v.themes.some(t => oppThemes.includes(t))).map(v => v.id);
+    }
+    return [];
+  }
+
+  function onNodeHover(n) {
+    // Don't override if there's an active selection lock
+    if (document.body.dataset.selectedId === n.id) {
+      tipEl.innerHTML = tooltipFor(n);
+      positionTooltip(n);
+      tipEl.classList.add('show');
+      return;
+    }
+    // Visual highlight
+    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-hover','is-hover-neighbor'));
+    svg.querySelectorAll('.edge').forEach(l => l.classList.remove('is-hover-incident'));
+    const sel = svg.querySelector(`.node[data-id="${n.id}"]`);
+    if (sel) sel.classList.add('is-hover');
+    // Light up 1-hop neighbors (themes/players/etc)
+    (neighbors[n.id] || new Set()).forEach(nid => {
+      const nb = svg.querySelector(`.node[data-id="${nid}"]`);
+      if (!nb) return;
+      nb.classList.add('is-hover-neighbor');
+      if (nb.classList.contains('node-voice')) nb.classList.add('is-related');
+    });
+    // Reveal semantically-related voices (2-hop for players, 1-hop for themes)
+    relatedVoicesFor(n).forEach(vid => {
+      const vn = svg.querySelector(`.node[data-id="${vid}"]`);
+      if (vn) { vn.classList.add('is-related'); vn.classList.add('is-hover-neighbor'); }
+    });
+    (incidentEdges[n.id] || new Set()).forEach(idx => {
+      const ln = svg.querySelector(`.edge[data-edge-idx="${idx}"]`);
+      if (ln) ln.classList.add('is-hover-incident');
+    });
+    // Tooltip
+    tipEl.innerHTML = tooltipFor(n);
+    positionTooltip(n);
+    tipEl.classList.add('show');
+  }
+
+  function onNodeLeave(n) {
+    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-hover','is-hover-neighbor'));
+    svg.querySelectorAll('.edge').forEach(l => l.classList.remove('is-hover-incident'));
+    tipEl.classList.remove('show');
+    // Hide voice nodes that we revealed via hover (unless they're related to current selection)
+    const selId = document.body.dataset.selectedId;
+    const selRelated = selId ? new Set([selId, ...(neighbors[selId] || new Set())]) : new Set();
+    svg.querySelectorAll('.node-voice.is-related').forEach(g => {
+      if (!selRelated.has(g.dataset.id)) g.classList.remove('is-related');
+    });
+  }
+
+  // Selection
+  function applySelection(id) {
+    // Clear
+    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-selected','is-neighbor','is-related'));
+    svg.querySelectorAll('.edge').forEach(l => l.classList.remove('is-incident'));
+    if (!id) return;
+    const sel = svg.querySelector(`.node[data-id="${id}"]`);
+    if (sel) sel.classList.add('is-selected');
+    (neighbors[id] || new Set()).forEach(nid => {
+      const nb = svg.querySelector(`.node[data-id="${nid}"]`);
+      if (!nb) return;
+      nb.classList.add('is-neighbor');
+      if (nb.classList.contains('node-voice')) nb.classList.add('is-related');
+    });
+    // Surface semantically-related voices (2-hop for players)
+    const n = nodes[id];
+    if (n) relatedVoicesFor(n).forEach(vid => {
+      const vn = svg.querySelector(`.node[data-id="${vid}"]`);
+      if (vn) { vn.classList.add('is-related'); vn.classList.add('is-neighbor'); }
+    });
+    (incidentEdges[id] || new Set()).forEach(idx => {
+      const ln = svg.querySelector(`.edge[data-edge-idx="${idx}"]`);
+      if (ln) ln.classList.add('is-incident');
+    });
+    // selection strip
+    const node = nodes[id];
+    const label = node ? (node.name || node.label || node.title || id) : id;
+    document.getElementById('selLabel').textContent = `${node.kind} · ${label}`;
+  }
+
+  function onNodeClick(node) {
+    const lensFor = { player:'players', theme:'voices', voice:'voices', opportunity:'opportunity' };
+    const lens = lensFor[node.kind];
+    if (!lens) return;
+    document.body.dataset.lens = lens;
+    document.body.dataset.selectedId = node.id;
+    syncTabs();
+    applySelection(node.id);
+    if (document.body.dataset.view === 'graph') document.body.dataset.view = 'split';
+    if (lens === 'voices') filterVoicesBySelection(node);
+  }
+
+  // Lens tabs
+  function syncTabs() {
+    const cur = document.body.dataset.lens;
+    document.querySelectorAll('.lens-tabs button').forEach(b => {
+      b.classList.toggle('active', b.dataset.lens === cur);
+    });
+  }
+  document.querySelectorAll('.lens-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.body.dataset.lens = btn.dataset.lens;
+      delete document.body.dataset.selectedId;
+      applySelection(null);
+      syncTabs();
+      resetVoiceFilter();
+    });
+  });
+
+  // View switcher
+  document.querySelectorAll('.view-switcher button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.body.dataset.view = btn.dataset.view;
+    });
+  });
+
+  // Player chips (inside Players lens)
+  document.querySelectorAll('.player-chips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const pid = chip.dataset.playerId;
+      document.body.dataset.selectedId = pid;
+      applySelection(pid);
+    });
+  });
+
+  // Clear selection
+  document.getElementById('clearSel').addEventListener('click', () => {
+    delete document.body.dataset.selectedId;
+    applySelection(null);
+    resetVoiceFilter();
+  });
+
+  // Verdict pill jumps to overview
+  document.querySelector('.verdict-pill').addEventListener('click', () => {
+    document.body.dataset.lens = 'overview';
+    delete document.body.dataset.selectedId;
+    applySelection(null);
+    syncTabs();
+  });
+
+  // ============ Voices lens ============
+  const voiceList = document.getElementById('voiceList');
+  function renderVoices(filterFn) {
+    voiceList.innerHTML = '';
+    let n = 0;
+    data.voices.forEach(v => {
+      if (filterFn && !filterFn(v)) return;
+      n++;
+      const row = document.createElement('div');
+      row.className = 'voice-row ' + v.sentiment;
+      const themeLabels = v.themes.map(tid => (nodes[tid] && nodes[tid].label) || tid).join(' · ');
+      const playerLabel = (nodes[v.player] && nodes[v.player].name) || v.player;
+      row.innerHTML = `
+        <span class="dot">●</span>
+        <div>
+          <div class="vt"><a href="${v.url}" target="_blank" rel="noopener">${v.title}</a></div>
+          <div class="vm">${playerLabel} · ${themeLabels}</div>
+        </div>
+        <span class="vs">↑${v.score.toLocaleString()}</span>
+      `;
+      voiceList.appendChild(row);
+    });
+    document.getElementById('voiceContext').textContent = `${n} 条原话(共 ${data.voices.length})`;
+  }
+  renderVoices();
+
+  // Filter chips
+  const filterState = { sent: 'all', theme: 'all' };
+  function applyVoiceFilter() {
+    renderVoices(v => {
+      if (filterState.sent !== 'all' && v.sentiment !== filterState.sent) return false;
+      if (filterState.theme !== 'all' && !v.themes.includes(filterState.theme)) return false;
+      return true;
+    });
+  }
+  document.querySelectorAll('#voiceFilter .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const group = chip.dataset.filter, val = chip.dataset.val;
+      filterState[group] = val;
+      document.querySelectorAll(`#voiceFilter .chip[data-filter="${group}"]`).forEach(c =>
+        c.classList.toggle('active', c.dataset.val === val));
+      applyVoiceFilter();
+    });
+  });
+  function resetVoiceFilter() {
+    filterState.sent = 'all'; filterState.theme = 'all';
+    document.querySelectorAll('#voiceFilter .chip').forEach(c => c.classList.toggle('active', c.dataset.val === 'all'));
+    renderVoices();
+  }
+
+  // When a theme node is clicked → pre-filter voices to that theme
+  function filterVoicesBySelection(node) {
+    if (node.kind === 'theme') {
+      filterState.theme = node.id;
+      document.querySelectorAll('#voiceFilter .chip[data-filter="theme"]').forEach(c =>
+        c.classList.toggle('active', c.dataset.val === node.id));
+      applyVoiceFilter();
+    } else if (node.kind === 'voice') {
+      // single-voice: highlight only that voice's themes via theme filter
+      const t = node.themes[0];
+      filterState.theme = t;
+      document.querySelectorAll('#voiceFilter .chip[data-filter="theme"]').forEach(c =>
+        c.classList.toggle('active', c.dataset.val === t));
+      applyVoiceFilter();
+    } else {
+      resetVoiceFilter();
+    }
+  }
+
+  // ============ Fallback toggle ============
+  const fb = document.getElementById('fbFooter');
+  document.getElementById('fbToggle').addEventListener('click', () => {
+    const open = fb.getAttribute('aria-expanded') === 'true';
+    fb.setAttribute('aria-expanded', open ? 'false' : 'true');
+    document.getElementById('fbToggle').textContent = open ? '展开完整线性报告 ↓' : '收起 ↑';
+  });
+
+  // ============ Print / PDF ============
+  // Auto-expand fallback before print, then trigger native print dialog.
+  document.getElementById('printBtn').addEventListener('click', () => {
+    fb.setAttribute('aria-expanded', 'true');
+    document.getElementById('fbToggle').textContent = '收起 ↑';
+    // Give layout a tick to settle before opening print dialog
+    setTimeout(() => window.print(), 100);
+  });
+  window.addEventListener('beforeprint', () => {
+    // Ensure fallback is open even if user used Cmd+P directly
+    fb.setAttribute('aria-expanded', 'true');
+  });
+
+  // Initial sync
+  syncTabs();
+
+  // ============ URL Deeplink + browser history ============
+  // Public state lives on body[data-*]. Keep URL hash in sync both ways.
+  // Format:  #lens=players&id=oura&view=split
+  //
+  // Rules:
+  //   - body → hash:  one MutationObserver covers every data-* change.
+  //   - hash → body:  on hashchange (back/forward + manual edit) restore state.
+  //   - load:         apply hash if present.
+  //   - history:      pushState on every state change so back button works.
+
+  const STATE_KEYS = ['lens', 'view', 'selectedId'];
+
+  function readBodyState() {
+    const s = {};
+    for (const k of STATE_KEYS) {
+      if (document.body.dataset[k] != null) s[k] = document.body.dataset[k];
+    }
+    return s;
+  }
+
+  function stateToHash(s) {
+    const parts = [];
+    if (s.lens && s.lens !== 'overview') parts.push('lens=' + encodeURIComponent(s.lens));
+    if (s.selectedId)                    parts.push('id='   + encodeURIComponent(s.selectedId));
+    if (s.view && s.view !== 'split')    parts.push('view=' + encodeURIComponent(s.view));
+    return parts.length ? '#' + parts.join('&') : '';
+  }
+
+  function hashToState() {
+    const h = window.location.hash.replace(/^#/, '');
+    if (!h) return { lens: 'overview', view: 'split' };
+    const s = {};
+    for (const pair of h.split('&')) {
+      const [k, v] = pair.split('=');
+      if (!k) continue;
+      const dec = decodeURIComponent(v || '');
+      if (k === 'lens')  s.lens  = dec;
+      if (k === 'id')    s.selectedId = dec;
+      if (k === 'view')  s.view  = dec;
+    }
+    if (!s.lens) s.lens = 'overview';
+    if (!s.view) s.view = 'split';
+    return s;
+  }
+
+  function applyState(s) {
+    // Validate lens
+    const validLenses = ['overview','voices','players','opportunity','strategy','risks'];
+    if (!validLenses.includes(s.lens)) s.lens = 'overview';
+    // Validate view
+    const validViews = ['graph','split','lens'];
+    if (!validViews.includes(s.view)) s.view = 'split';
+    // Validate selectedId
+    const validIds = new Set([...data.players, ...data.themes, ...data.voices].map(n => n.id));
+    if (data.opportunity) validIds.add(data.opportunity.id);
+    if (s.selectedId && !validIds.has(s.selectedId)) delete s.selectedId;
+
+    // Apply
+    document.body.dataset.lens = s.lens;
+    document.body.dataset.view = s.view;
+    if (s.selectedId) document.body.dataset.selectedId = s.selectedId;
+    else              delete document.body.dataset.selectedId;
+    syncTabs();
+    applySelection(s.selectedId || null);
+  }
+
+  // Body → URL (debounced + skip when our own popstate triggered it)
+  let suppressHashUpdate = false;
+  let hashUpdateTimer = null;
+  const observer = new MutationObserver(() => {
+    if (suppressHashUpdate) return;
+    clearTimeout(hashUpdateTimer);
+    hashUpdateTimer = setTimeout(() => {
+      const newHash = stateToHash(readBodyState());
+      const currentHash = window.location.hash;
+      if (newHash !== currentHash && newHash !== '' || (newHash === '' && currentHash !== '')) {
+        const url = newHash || window.location.pathname + window.location.search;
+        history.pushState({ s: readBodyState() }, '', url);
+      }
+    }, 80);
+  });
+  observer.observe(document.body, {
+    attributes: true,
+    attributeFilter: STATE_KEYS.map(k => 'data-' + k.replace(/([A-Z])/g, '-$1').toLowerCase()),
+  });
+
+  // URL → body
+  window.addEventListener('popstate', () => {
+    suppressHashUpdate = true;
+    applyState(hashToState());
+    setTimeout(() => { suppressHashUpdate = false; }, 30);
+  });
+
+  window.addEventListener('hashchange', () => {
+    // Only react if hash change wasn't from our own pushState
+    if (suppressHashUpdate) return;
+    suppressHashUpdate = true;
+    applyState(hashToState());
+    setTimeout(() => { suppressHashUpdate = false; }, 30);
+  });
+
+  // Initial load: apply hash if present (overrides default body state)
+  if (window.location.hash) {
+    suppressHashUpdate = true;
+    applyState(hashToState());
+    setTimeout(() => { suppressHashUpdate = false; }, 30);
+  }
+})();
+</script>
+</body>
+</html>

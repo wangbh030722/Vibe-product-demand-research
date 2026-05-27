@@ -1,0 +1,233 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vibe-research.local/schemas/report-data.schema.json",
+  "title": "Vibe Category Research · Report Data",
+  "description": "Single source of truth for one category report. Consumed by the lens-layout HTML template at runtime.",
+  "type": "object",
+  "required": ["meta", "players", "themes", "voices", "edges"],
+
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version. Bump in lockstep with breaking changes."
+    },
+
+    "meta": {
+      "type": "object",
+      "required": ["slug", "idea", "mode", "timestamp", "target_market"],
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,40}$" },
+        "idea": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "mode": { "enum": ["EXISTING", "NON_STOCK"] },
+        "timestamp": { "type": "string", "format": "date" },
+        "target_market": { "type": "string" },
+        "collection_window": {
+          "type": "object",
+          "properties": {
+            "from": { "type": "string", "format": "date" },
+            "to":   { "type": "string", "format": "date" }
+          }
+        },
+        "thesis": { "type": "string", "maxLength": 200 },
+        "deck":   { "type": "string", "maxLength": 400 }
+      },
+      "additionalProperties": false
+    },
+
+    "verdict": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["real", "partial", "insufficient"] },
+        "rationale": { "type": "string" },
+        "evidence_counts": {
+          "type": "object",
+          "properties": {
+            "raw_voices":      { "type": "integer", "minimum": 0 },
+            "marketplace":     { "type": "integer", "minimum": 0 },
+            "editorials":      { "type": "integer", "minimum": 0 },
+            "simulated":       { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "key_findings": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 8, "maxLength": 300 },
+          "minItems": 1,
+          "maxItems": 8
+        }
+      }
+    },
+
+    "players": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "color", "size", "x", "y"],
+        "properties": {
+          "id":      { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,30}$" },
+          "name":    { "type": "string" },
+          "color":   { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+          "size":    { "type": "number", "minimum": 4,  "maximum": 50 },
+          "x":       { "type": "number", "minimum": 0,  "maximum": 1 },
+          "y":       { "type": "number", "minimum": 0,  "maximum": 1 },
+          "status":  { "enum": ["live", "stagnant", "dead", "rumored"] },
+          "price":   { "type": "string" },
+          "subscription": { "type": "string" },
+          "summary": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "themes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "color", "size", "x", "y", "polarity"],
+        "properties": {
+          "id":       { "type": "string", "pattern": "^t\\.[a-z0-9][a-z0-9_-]{0,30}$" },
+          "label":    { "type": "string" },
+          "color":    { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+          "size":     { "type": "number", "minimum": 4,  "maximum": 50 },
+          "x":        { "type": "number", "minimum": 0,  "maximum": 1 },
+          "y":        { "type": "number", "minimum": 0,  "maximum": 1 },
+          "polarity": { "enum": ["win", "pain", "neutral", "pos", "neg"] },
+          "summary":  { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "voices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "player", "title", "score", "url", "sentiment", "themes"],
+        "properties": {
+          "id":     { "type": "string", "pattern": "^v[0-9a-z][0-9a-z_-]{0,30}$" },
+          "player": { "type": "string" },
+          "title":  { "type": "string" },
+          "score":  { "type": "integer" },
+          "url":    { "type": "string", "format": "uri" },
+          "sentiment": { "enum": ["pos", "neg"] },
+          "themes": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^t\\." },
+            "minItems": 1
+          },
+          "x":      { "type": "number", "minimum": 0, "maximum": 1 },
+          "y":      { "type": "number", "minimum": 0, "maximum": 1 },
+          "collected_at": { "type": "string", "format": "date" },
+          "lang":   { "enum": ["en", "zh", "ja", "es"] },
+          "excerpt_en": { "type": "string" },
+          "excerpt_cn": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "opportunity": {
+      "type": "object",
+      "required": ["id", "label", "size", "x", "y"],
+      "properties": {
+        "id":      { "type": "string", "const": "opp" },
+        "label":   { "type": "string" },
+        "color":   { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "size":    { "type": "number", "minimum": 4, "maximum": 60 },
+        "x":       { "type": "number", "minimum": 0, "maximum": 1 },
+        "y":       { "type": "number", "minimum": 0, "maximum": 1 },
+        "summary": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "edges": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "w"],
+        "properties": {
+          "from": { "type": "string" },
+          "to":   { "type": "string" },
+          "w":    { "type": "integer", "minimum": 1, "maximum": 3 }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "marketplace": {
+      "type": "array",
+      "description": "Marketplace VOC entries (Amazon, Best Buy, Trustpilot, brand communities)",
+      "items": {
+        "type": "object",
+        "required": ["player", "platform", "rating", "review_count"],
+        "properties": {
+          "player":       { "type": "string" },
+          "platform":     { "type": "string" },
+          "rating":       { "type": "number", "minimum": 0, "maximum": 5 },
+          "review_count": { "type": "integer", "minimum": 0 },
+          "top_complaints": { "type": "array", "items": { "type": "string" } },
+          "top_praises":    { "type": "array", "items": { "type": "string" } },
+          "url":          { "type": "string", "format": "uri" },
+          "collected_at": { "type": "string", "format": "date" }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "paths": {
+      "type": "array",
+      "description": "Strategic entry paths",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "core"],
+        "properties": {
+          "id":          { "type": "string" },
+          "label":       { "type": "string" },
+          "core":        { "type": "string" },
+          "description": { "type": "string" },
+          "time":        { "type": "string" },
+          "investment":  { "type": "string" },
+          "moat":        { "enum": ["low", "mid", "high", "extreme"] },
+          "recommended": { "type": "boolean" }
+        }
+      }
+    },
+
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "severity"],
+        "properties": {
+          "id":        { "type": "string", "pattern": "^R-[0-9]{2}$" },
+          "title":     { "type": "string" },
+          "scenario":  { "type": "string" },
+          "severity":  { "enum": ["low", "mid", "high"] },
+          "mitigation": { "type": "string" }
+        }
+      }
+    },
+
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "years"],
+        "properties": {
+          "name":   { "type": "string" },
+          "years":  { "type": "string" },
+          "what":   { "type": "string" },
+          "lesson": { "type": "string" }
+        }
+      }
+    }
+  },
+
+  "additionalProperties": false
+}

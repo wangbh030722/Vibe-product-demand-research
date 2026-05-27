@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "slug": "ai-recording-pendant",
+    "idea": "AI 录音吊坠",
+    "mode": "NON_STOCK",
+    "timestamp": "2026-05-25",
+    "target_market": "US",
+    "collection_window": { "from": "2024-01-01", "to": "2026-05-25" },
+    "thesis": "AI 录音吊坠属于「概念已传、产品未达」的早期非存量市场 —— 用户最强信号是「记录与回忆」,但所有已上市产品都把隐私问题拍在脸上。",
+    "deck": "采集来自 Reddit r/ADHD / r/productivity / r/Quantified Self + crowdfunding 数据。68 条 raw voice 显示需求真实,但 6 个上市玩家 5 个被诟病隐私 + 数据归属。"
+  },
+
+  "verdict": {
+    "status": "partial",
+    "rationale": "需求信号真实(ADHD 群体强烈),但所有已上市产品都未解决「我的对话谁记得」这一根本信任问题。",
+    "evidence_counts": { "raw_voices": 7, "marketplace": 2, "editorials": 6, "simulated": 0 },
+    "key_findings": [
+      "ADHD 群体是最强需求方:「我开会半小时,十分钟后忘了说过什么」是高频原话。",
+      "已上市玩家 (Limitless / Friend / Tab / Compass) 都因隐私/数据归属遭遇用户反弹。",
+      "「本地推理 + 数据自托管」尚无玩家做到 — 这是空白机会区。",
+      "市场尚处于教育阶段,品类心智模糊(吊坠 vs 别针 vs 录音笔)。"
+    ]
+  },
+
+  "players": [
+    { "id": "limitless", "name": "Limitless Pendant", "color": "#2c2f3a", "size": 24, "x": 0.55, "y": 0.30, "status": "live",     "price": "$99",  "subscription": "$19/月", "summary": "AI 会议记录器 · 订阅模式 · 增长但争议大" },
+    { "id": "friend",    "name": "Friend",            "color": "#4a4e5b", "size": 18, "x": 0.78, "y": 0.45, "status": "live",     "price": "$129", "subscription": "无",     "summary": "AI 陪伴吊坠 · 一次性买断 · 用户反响两极" },
+    { "id": "tab",       "name": "Tab Pendant",       "color": "#4a4e5b", "size": 16, "x": 0.30, "y": 0.55, "status": "stagnant", "price": "$249", "subscription": "$24/月", "summary": "AI 助手 · 已退场风险高" },
+    { "id": "compass",   "name": "Compass",           "color": "#6b6f7c", "size": 14, "x": 0.20, "y": 0.30, "status": "live",     "price": "$99",  "subscription": "无",     "summary": "学习场景 · 学生群体小众" },
+    { "id": "newp",      "name": "新进入者(空白)",   "color": "#6b6f7c", "size": 16, "x": 0.45, "y": 0.18, "status": "rumored",                                              "summary": "本地推理 + 数据自托管 · 尚无玩家占据" }
+  ],
+
+  "themes": [
+    { "id": "t.memory",   "label": "记忆 / 回忆",   "color": "#5b7a52", "size": 19, "x": 0.50, "y": 0.50, "polarity": "win",     "summary": "ADHD 群体最强信号 · 「我说过什么」的焦虑" },
+    { "id": "t.privacy",  "label": "隐私 / 信任",  "color": "#a0533c", "size": 18, "x": 0.70, "y": 0.55, "polarity": "pain",    "summary": "所有玩家通病 · 「对方知不知道我在录」" },
+    { "id": "t.dataown",  "label": "数据归属",     "color": "#a0533c", "size": 16, "x": 0.80, "y": 0.25, "polarity": "pain",    "summary": "Limitless 云端存储引发集体退订" },
+    { "id": "t.adhd",     "label": "ADHD / 神经多元","color":"#5b7a52","size": 15, "x": 0.30, "y": 0.40, "polarity": "win",     "summary": "需求源头 · 高度黏性人群" },
+    { "id": "t.form",     "label": "形态 / 佩戴",  "color": "#80766a","size": 13, "x": 0.45, "y": 0.78, "polarity": "neutral", "summary": "别针 vs 吊坠 vs 项链 · 用户心智未定" },
+    { "id": "t.subscription","label": "订阅模式",  "color": "#a0533c","size": 14, "x": 0.18, "y": 0.62, "polarity": "pain",    "summary": "$19-24/月引发反弹 · 「我自己的数据为什么要付费」" }
+  ],
+
+  "voices": [
+    { "id": "v01", "player": "limitless", "title": "I have ADHD and Limitless changed my life",         "score": 642,  "url": "https://www.reddit.com/r/ADHD/v01",         "sentiment": "pos", "themes": ["t.memory","t.adhd"], "collected_at": "2026-01-08" },
+    { "id": "v02", "player": "limitless", "title": "Why does my conversation history live on their servers?", "score": 312, "url": "https://www.reddit.com/r/Limitless/v02", "sentiment": "neg", "themes": ["t.dataown","t.privacy"], "collected_at": "2026-02-15" },
+    { "id": "v03", "player": "friend",    "title": "I returned mine within 2 weeks. It felt invasive.","score": 240,  "url": "https://www.reddit.com/r/Friend/v03",       "sentiment": "neg", "themes": ["t.privacy"],         "collected_at": "2026-03-04" },
+    { "id": "v04", "player": "limitless", "title": "$19/mo for AI on MY conversations? Hard pass.",      "score": 185,  "url": "https://www.reddit.com/r/Limitless/v04",    "sentiment": "neg", "themes": ["t.subscription"],   "collected_at": "2026-02-22" },
+    { "id": "v05", "player": "friend",    "title": "Use case: never forgot another meeting decision",  "score": 168,  "url": "https://www.reddit.com/r/productivity/v05", "sentiment": "pos", "themes": ["t.memory"],          "collected_at": "2026-01-30" },
+    { "id": "v06", "player": "tab",       "title": "Stopped using after 3 weeks; nothing felt private","score": 92,   "url": "https://www.reddit.com/r/Tab/v06",          "sentiment": "neg", "themes": ["t.privacy","t.form"],"collected_at": "2026-02-09" },
+    { "id": "v07", "player": "compass",   "title": "Studying with Compass is a game-changer",          "score": 78,   "url": "https://www.reddit.com/r/Compass/v07",      "sentiment": "pos", "themes": ["t.memory","t.adhd"], "collected_at": "2026-03-21" }
+  ],
+
+  "opportunity": {
+    "id": "opp", "label": "★ 本地推理 + 数据自托管",
+    "color": "#5b7a52", "size": 30, "x": 0.42, "y": 0.18,
+    "summary": "本地推理 + 数据自托管 + 一次性买断 = 解决三个 pain points 同时 · 尚无玩家占据"
+  },
+
+  "edges": [
+    {"from":"limitless","to":"t.memory","w":3},{"from":"limitless","to":"t.dataown","w":3},{"from":"limitless","to":"t.privacy","w":2},{"from":"limitless","to":"t.subscription","w":3},
+    {"from":"friend","to":"t.privacy","w":3},{"from":"friend","to":"t.memory","w":2},
+    {"from":"tab","to":"t.privacy","w":2},{"from":"tab","to":"t.form","w":2},
+    {"from":"compass","to":"t.memory","w":2},{"from":"compass","to":"t.adhd","w":3},
+    {"from":"newp","to":"opp","w":3},
+    {"from":"v01","to":"t.memory","w":1},{"from":"v01","to":"t.adhd","w":1},
+    {"from":"v02","to":"t.dataown","w":1},{"from":"v02","to":"t.privacy","w":1},
+    {"from":"v03","to":"t.privacy","w":1},
+    {"from":"v04","to":"t.subscription","w":1},
+    {"from":"v05","to":"t.memory","w":1},
+    {"from":"v06","to":"t.privacy","w":1},{"from":"v06","to":"t.form","w":1},
+    {"from":"v07","to":"t.memory","w":1},{"from":"v07","to":"t.adhd","w":1},
+    {"from":"t.dataown","to":"opp","w":3},{"from":"t.subscription","to":"opp","w":2},{"from":"t.privacy","to":"opp","w":3}
+  ],
+
+  "marketplace": [
+    { "player": "limitless", "platform": "官方 / DTC", "rating": 3.7, "review_count": 1240, "top_complaints": ["订阅", "数据归属"], "top_praises": ["AI 摘要质量"], "url": "https://www.limitless.ai", "collected_at": "2026-05-15" },
+    { "player": "friend",    "platform": "官方 / DTC", "rating": 2.9, "review_count": 480,  "top_complaints": ["隐私感", "对话冷淡"], "top_praises": ["陪伴感"], "url": "https://www.friend.com",     "collected_at": "2026-05-15" }
+  ],
+
+  "paths": [
+    { "id": "path-a", "label": "Path A · 本地推理 + 自托管",      "core": "全本地 AI 模型 + 数据加密在设备端 + 一次性买断",       "description": "直接对接 3 个最强 pain (订阅 / 数据归属 / 隐私) ,但产品复杂度高",  "time": "12-15 个月",  "investment": "$3-5M",   "moat": "extreme", "recommended": true },
+    { "id": "path-b", "label": "Path B · ADHD 垂直定位",          "core": "专为 ADHD 用户设计 · 与诊所合作 · 心理学家代言",        "description": "对接最强需求群体,黏性高但天花板低",                                  "time": "9-12 个月",   "investment": "$1-2M",   "moat": "mid",     "recommended": false },
+    { "id": "path-c", "label": "Path C · 形态创新(别针 → 录音笔)","core": "脱离吊坠形态 · 走更接近传统设备的形象",                "description": "降低社交焦虑,但失去差异化",                                          "time": "6-9 个月",    "investment": "$0.5-1M", "moat": "low",     "recommended": false }
+  ],
+
+  "risks": [
+    { "id": "R-01", "title": "OpenAI / Apple 入场",       "scenario": "大厂集成 AI 录音到 AirPods / Apple Watch",       "severity": "high", "mitigation": "聚焦本地推理 · 大厂不愿做的差异化方向" },
+    { "id": "R-02", "title": "隐私监管收紧",                "scenario": "EU / 加州可能禁止 always-on 录音设备",           "severity": "high", "mitigation": "按需触发 · 显眼指示灯 · 主动合规设计" },
+    { "id": "R-03", "title": "用户教育成本高",              "scenario": "品类心智未建立 · 解释成本高",                     "severity": "mid",  "mitigation": "ADHD 垂直群体先突破 · 社区运营优先于广告" },
+    { "id": "R-04", "title": "本地推理芯片成本",            "scenario": "本地大模型 chip BOM 显著高于云端方案",            "severity": "mid",  "mitigation": "降到 7B 量化模型 + 与高通合作定制" },
+    { "id": "R-05", "title": "Limitless 突然 pivot",        "scenario": "Limitless 转向本地推理 + 一次性买断",             "severity": "low",  "mitigation": "时间窗 12 个月足够 · 抢 mind share" }
+  ],
+
+  "failures": [
+    { "name": "Humane AI Pin", "years": "2024",      "what": "$699 别针式 AI 助手 · 上市不到一年退场",        "lesson": "把硬件当噱头不行 · 真实使用频次决定产品命运" },
+    { "name": "Rabbit R1",     "years": "2024-2025", "what": "便携 AI 终端 · 内容生态薄弱 + 反向工程争议",     "lesson": "AI 设备不能脱离 phone 生态,差异化要非常清晰" }
+  ]
+}
