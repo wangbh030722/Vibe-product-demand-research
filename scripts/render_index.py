@@ -104,6 +104,18 @@ def main() -> int:
     out = DIST_DIR / "index.html"
     out.write_text(html, encoding="utf-8")
     print(f"✓ {out.relative_to(ROOT)}  ({len(cards)} cards)")
+
+    # Copy assets the chat-user viewer needs:
+    #  - the report template (viewer fetches it + injects pasted JSON)
+    #  - the data JSONs (so viewer's "load sample" + ?data= work on Pages)
+    import shutil
+    tpl_src = ROOT / "templates" / "lens-report-template.html"
+    if tpl_src.exists():
+        shutil.copy(tpl_src, DIST_DIR / "_template.html")
+        print("✓ dist/_template.html (for viewer.html)")
+    for f in DATA_DIR.glob("*.json"):
+        shutil.copy(f, DIST_DIR / f.name)
+    print(f"✓ copied {len(list(DATA_DIR.glob('*.json')))} data files to dist/")
     return 0
 
 
