@@ -16,7 +16,7 @@ help:
 research:
 	@test -n "$(IDEA)" || (echo "ERROR: pass IDEA=\"...\"" && exit 1)
 	@test -n "$(SLUG)" || (echo "ERROR: pass SLUG=..." && exit 1)
-	$(PY) scripts/research.py --slug "$(SLUG)" --idea "$(IDEA)" $(if $(MARKET),--target-market "$(MARKET)",)
+	$(PY) scripts/research.py --slug "$(SLUG)" --idea "$(IDEA)" $(if $(MARKET),--target-market "$(MARKET)",) $(if $(MODE),--mode "$(MODE)",)
 
 validate:
 	$(PY) scripts/validate_data.py --all

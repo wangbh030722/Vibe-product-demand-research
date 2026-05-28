@@ -545,95 +545,350 @@
 {
   "schema_version": "1.0",
   "meta": {
-    "slug": "ai-glasses",
-    "idea": "AI 智能眼镜",
-    "mode": "EXISTING",
-    "timestamp": "2026-05-22",
+    "slug": "vibe-keyboard",
+    "idea": "Vibe Coding 键盘 (为 AI 编程定制的物理键盘 / 宏键 / 提示词快捷输入)",
+    "mode": "NON_STOCK",
+    "timestamp": "2026-05-28",
     "target_market": "US",
-    "collection_window": { "from": "2024-10-01", "to": "2026-05-22" },
-    "thesis": "AI 智能眼镜真实需求被 Ray-Ban Meta 验证,但下一波竞争不在硬件,在「环境隐私」与「无屏 AI 体验」。",
-    "deck": "172 条 raw voice + 18 篇评测显示:用户买的是\"摄录 + AI 听\",不是 AR。隐私争议是品类天花板,谁先解决谁拿下下一波。"
+    "thesis": "Vibe coding needs physical shortcuts, but token waste is a myth.",
+    "deck": "A macro keyboard for AI prompts could solve efficiency doubts, but the real pain is project failure and production unsafety, not token cost."
   },
-
   "verdict": {
-    "status": "real",
-    "rationale": "Ray-Ban Meta 单产品 200 万销量已验证消费意愿;但所有竞品都还在抄硬件,没人触及隐私层。",
-    "evidence_counts": { "raw_voices": 6, "marketplace": 3, "editorials": 18, "simulated": 0 },
+    "status": "partial",
+    "rationale": "Voices show pain but no clear demand for a dedicated keyboard; existing macro pads may suffice.",
+    "evidence_counts": {
+      "raw_voices": 6,
+      "marketplace": 0,
+      "editorials": 0,
+      "simulated": 0
+    },
     "key_findings": [
-      "Ray-Ban Meta 实际 use case 集中在「摄录朋友」+「AI 听翻译」,不是 AR navigation。",
-      "隐私指示灯是争议焦点 —— 用户 + 旁观者两边都不满意,品类天花板。",
-      "Meta 之外其他厂家都在做硬件版本,但没有差异化 USP。",
-      "Apple Vision 路径太重,反而留出了「轻 AI 眼镜」的窗口。"
+      "Token efficiency is a minor win, but not a primary driver for a new device.",
+      "Project failure and production unsafety are the biggest pains, suggesting need for guardrails.",
+      "Efficiency doubts and risk danger are significant, indicating skepticism about AI coding tools.",
+      "Existing players like Stream Deck and TourBox already serve macro needs, creating competition."
     ]
   },
-
   "players": [
-    { "id": "rbmeta",   "name": "Ray-Ban Meta",    "color": "#2c2f3a", "size": 26, "x": 0.55, "y": 0.30, "status": "live",    "price": "$299-379", "subscription": "无",       "summary": "品类定义者 · 200 万销量 · Meta AI + 摄录" },
-    { "id": "even",     "name": "Even Realities G1","color": "#4a4e5b", "size": 20, "x": 0.78, "y": 0.45, "status": "live",    "price": "$599",     "subscription": "无",       "summary": "无屏文字提示词镜 · 极简取向" },
-    { "id": "amazon",   "name": "Amazon Echo Frames","color": "#6b6f7c", "size": 16, "x": 0.20, "y": 0.30, "status": "stagnant","price": "$269",     "subscription": "Alexa Plus","summary": "Alexa 语音 · 销量不振 · 退场风险" },
-    { "id": "xreal",    "name": "Xreal Air 2",     "color": "#4a4e5b", "size": 18, "x": 0.35, "y": 0.65, "status": "live",    "price": "$399",     "subscription": "无",       "summary": "AR 显示眼镜 · 游戏 / 大屏使用场景" },
-    { "id": "apple",    "name": "Apple AI Glasses(?)","color": "#6b6f7c","size": 17, "x": 0.45, "y": 0.15, "status": "rumored", "summary": "传闻 2026-2027 · 最大未定变量" }
+    {
+      "id": "stream-deck",
+      "name": "Elgato Stream Deck",
+      "color": "#2c2f3a",
+      "size": 26,
+      "x": 0.82,
+      "y": 0.45,
+      "summary": ""
+    },
+    {
+      "id": "tourbox",
+      "name": "TourBox Elite",
+      "color": "#4a4e5b",
+      "size": 24,
+      "x": 0.599,
+      "y": 0.735,
+      "summary": ""
+    },
+    {
+      "id": "loupdeck",
+      "name": "Loupedeck Live",
+      "color": "#4a4e5b",
+      "size": 22,
+      "x": 0.241,
+      "y": 0.626,
+      "summary": ""
+    },
+    {
+      "id": "monogram",
+      "name": "Monogram Creative Console",
+      "color": "#6b6f7c",
+      "size": 20,
+      "x": 0.241,
+      "y": 0.274,
+      "summary": ""
+    },
+    {
+      "id": "custom-macro-pad",
+      "name": "Custom Macro Pads (e.g., YMDK, Keebio)",
+      "color": "#6b6f7c",
+      "size": 18,
+      "x": 0.599,
+      "y": 0.165,
+      "summary": ""
+    }
   ],
-
   "themes": [
-    { "id": "t.record",  "label": "摄录",      "color": "#5b7a52", "size": 19, "x": 0.50, "y": 0.50, "polarity": "win",     "summary": "Ray-Ban Meta 实际最常用 · 朋友视角拍摄" },
-    { "id": "t.privacy", "label": "隐私争议",  "color": "#a0533c", "size": 18, "x": 0.70, "y": 0.55, "polarity": "pain",    "summary": "指示灯太弱 · 旁观者不知情" },
-    { "id": "t.ai",      "label": "AI 听 + 翻译","color": "#5b7a52","size": 15, "x": 0.30, "y": 0.40, "polarity": "win",     "summary": "实时翻译 / Look-and-Ask 是真高频" },
-    { "id": "t.ar",      "label": "AR 体验",    "color": "#80766a","size": 12, "x": 0.45, "y": 0.78, "polarity": "neutral", "summary": "用户实际不太需要 AR · 反而是负担" },
-    { "id": "t.battery", "label": "续航",       "color": "#a0533c","size": 14, "x": 0.80, "y": 0.25, "polarity": "pain",    "summary": "重度使用 1.5-2h 见底 · 充电盒依赖" },
-    { "id": "t.style",   "label": "外观",       "color": "#5b7a52","size": 13, "x": 0.18, "y": 0.62, "polarity": "win",     "summary": "Ray-Ban 美学是关键卖点 · 别家学不来" }
+    {
+      "id": "t.token_efficiency",
+      "label": "Token节省",
+      "color": "#5b7a52",
+      "size": 12,
+      "x": 0.2,
+      "y": 0.3,
+      "polarity": "win",
+      "summary": "通过简洁提示词减少token消耗，提升效率"
+    },
+    {
+      "id": "t.project_failure",
+      "label": "项目失败",
+      "color": "#a0533c",
+      "size": 15,
+      "x": 0.8,
+      "y": 0.2,
+      "polarity": "pain",
+      "summary": "多数vibe coding项目因缺乏严谨性而失败"
+    },
+    {
+      "id": "t.efficiency_doubt",
+      "label": "效率质疑",
+      "color": "#a0533c",
+      "size": 14,
+      "x": 0.7,
+      "y": 0.5,
+      "polarity": "pain",
+      "summary": "AI辅助编程未显示效率提升，甚至降低生产力"
+    },
+    {
+      "id": "t.risk_danger",
+      "label": "风险危险",
+      "color": "#a0533c",
+      "size": 16,
+      "x": 0.5,
+      "y": 0.8,
+      "polarity": "pain",
+      "summary": "AI可能误操作导致生产数据库丢失等严重后果"
+    },
+    {
+      "id": "t.production_unsafe",
+      "label": "生产不可用",
+      "color": "#a0533c",
+      "size": 13,
+      "x": 0.3,
+      "y": 0.7,
+      "polarity": "pain",
+      "summary": "vibe coding适合原型但不适合生产环境"
+    },
+    {
+      "id": "t.slower_experienced",
+      "label": "拖慢老手",
+      "color": "#a0533c",
+      "size": 11,
+      "x": 0.6,
+      "y": 0.1,
+      "polarity": "pain",
+      "summary": "AI工具使经验丰富的程序员速度降低19%"
+    }
   ],
-
   "voices": [
-    { "id": "v01", "player": "rbmeta", "title": "I use my Ray-Bans 3 times a day to film my kids",      "score": 1842, "url": "https://www.reddit.com/r/rayban_meta/v01", "sentiment": "pos", "themes": ["t.record"],         "collected_at": "2025-12-04" },
-    { "id": "v02", "player": "rbmeta", "title": "Real-time translation actually works in Tokyo",         "score": 1245, "url": "https://www.reddit.com/r/rayban_meta/v02", "sentiment": "pos", "themes": ["t.ai"],             "collected_at": "2026-01-19" },
-    { "id": "v03", "player": "rbmeta", "title": "A stranger asked me if I was recording. Awkward.",     "score": 980,  "url": "https://www.reddit.com/r/rayban_meta/v03", "sentiment": "neg", "themes": ["t.privacy"],        "collected_at": "2025-11-12" },
-    { "id": "v04", "player": "rbmeta", "title": "Battery dies before lunch on travel days",              "score": 620,  "url": "https://www.reddit.com/r/rayban_meta/v04", "sentiment": "neg", "themes": ["t.battery"],        "collected_at": "2026-02-08" },
-    { "id": "v05", "player": "even",   "title": "G1 made me realize I don't actually want AR",          "score": 412,  "url": "https://www.reddit.com/r/EvenRealities/v05","sentiment": "pos", "themes": ["t.ar","t.style"],   "collected_at": "2026-03-15" },
-    { "id": "v06", "player": "xreal",  "title": "Xreal Air 2 is a private monitor, not a 'lifestyle'",   "score": 380,  "url": "https://www.reddit.com/r/Xreal/v06",       "sentiment": "neg", "themes": ["t.ar"],             "collected_at": "2026-04-02" }
+    {
+      "id": "v01",
+      "player": "stream-deck",
+      "title": "Taught Claude to talk like a caveman to use 75% less tokens.",
+      "score": 13211,
+      "url": "https://www.reddit.com/r/ClaudeAI/comments/1sble09/taught_claude_to_talk_like_a_caveman_to_use_75/",
+      "sentiment": "pos",
+      "themes": [
+        "t.token_efficiency"
+      ],
+      "collected_at": "2026-05-28"
+    },
+    {
+      "id": "v02",
+      "player": "stream-deck",
+      "title": "Why the majority of vibe coded projects fail",
+      "score": 8574,
+      "url": "https://www.reddit.com/r/ClaudeAI/comments/1rt31th/why_the_majority_of_vibe_coded_projects_fail/",
+      "sentiment": "neg",
+      "themes": [
+        "t.project_failure"
+      ],
+      "collected_at": "2026-05-28"
+    },
+    {
+      "id": "v03",
+      "player": "stream-deck",
+      "title": "Anthropic: AI assisted coding doesn't show efficiency gains.",
+      "score": 4008,
+      "url": "https://www.reddit.com/r/programming/comments/1qqxvlw/anthropic_ai_assisted_coding_doesnt_show/",
+      "sentiment": "neg",
+      "themes": [
+        "t.efficiency_doubt"
+      ],
+      "collected_at": "2026-05-28"
+    },
+    {
+      "id": "v04",
+      "player": "stream-deck",
+      "title": "Vibe-Coding AI \"Panicks\" and Deletes Production Database",
+      "score": 2807,
+      "url": "https://www.reddit.com/r/programming/comments/1m51vpw/vibecoding_ai_panicks_and_deletes_production/",
+      "sentiment": "neg",
+      "themes": [
+        "t.risk_danger"
+      ],
+      "collected_at": "2026-05-28"
+    },
+    {
+      "id": "v05",
+      "player": "stream-deck",
+      "title": "Linus Torvalds: Vibe coding is fine, but not for production",
+      "score": 2631,
+      "url": "https://www.reddit.com/r/programming/comments/1p1g9ni/linus_torvalds_vibe_coding_is_fine_but_not_for/",
+      "sentiment": "neg",
+      "themes": [
+        "t.production_unsafe"
+      ],
+      "collected_at": "2026-05-28"
+    },
+    {
+      "id": "v06",
+      "player": "stream-deck",
+      "title": "Study finds that AI tools make experienced programmers 19% slower.",
+      "score": 2503,
+      "url": "https://www.reddit.com/r/programming/comments/1lxh8ip/study_finds_that_ai_tools_make_experienced/",
+      "sentiment": "neg",
+      "themes": [
+        "t.slower_experienced"
+      ],
+      "collected_at": "2026-05-28"
+    }
   ],
-
   "opportunity": {
-    "id": "opp", "label": "★ 环境隐私 + 无屏 AI",
-    "color": "#5b7a52", "size": 30, "x": 0.40, "y": 0.18,
-    "summary": "可见可感的隐私指示 + 无屏的 AI 听/译/记 = 下一波切入点。没有玩家占据。"
+    "id": "opp",
+    "label": "★ AI Workflow Safety & Guardrails",
+    "color": "#5b7a52",
+    "size": 30,
+    "x": 0.42,
+    "y": 0.18,
+    "summary": "A keyboard that prevents dangerous AI actions (e.g., confirm before destructive commands) could address production unsafety."
   },
-
   "edges": [
-    {"from":"rbmeta","to":"t.record","w":3},{"from":"rbmeta","to":"t.privacy","w":3},{"from":"rbmeta","to":"t.ai","w":3},{"from":"rbmeta","to":"t.battery","w":2},{"from":"rbmeta","to":"t.style","w":3},
-    {"from":"even","to":"t.style","w":3},{"from":"even","to":"t.ar","w":2},
-    {"from":"xreal","to":"t.ar","w":3},
-    {"from":"amazon","to":"t.ai","w":1},
-    {"from":"apple","to":"opp","w":2},
-    {"from":"v01","to":"t.record","w":1},{"from":"v02","to":"t.ai","w":1},{"from":"v03","to":"t.privacy","w":1},
-    {"from":"v04","to":"t.battery","w":1},{"from":"v05","to":"t.ar","w":1},{"from":"v05","to":"t.style","w":1},
-    {"from":"v06","to":"t.ar","w":1},
-    {"from":"t.privacy","to":"opp","w":3},{"from":"t.ai","to":"opp","w":2}
+    {
+      "from": "stream-deck",
+      "to": "t.token_efficiency",
+      "w": 1
+    },
+    {
+      "from": "stream-deck",
+      "to": "t.project_failure",
+      "w": 1
+    },
+    {
+      "from": "stream-deck",
+      "to": "t.efficiency_doubt",
+      "w": 1
+    },
+    {
+      "from": "stream-deck",
+      "to": "t.risk_danger",
+      "w": 1
+    },
+    {
+      "from": "stream-deck",
+      "to": "t.production_unsafe",
+      "w": 1
+    },
+    {
+      "from": "stream-deck",
+      "to": "t.slower_experienced",
+      "w": 1
+    },
+    {
+      "from": "v01",
+      "to": "t.token_efficiency",
+      "w": 1
+    },
+    {
+      "from": "v02",
+      "to": "t.project_failure",
+      "w": 1
+    },
+    {
+      "from": "v03",
+      "to": "t.efficiency_doubt",
+      "w": 1
+    },
+    {
+      "from": "v04",
+      "to": "t.risk_danger",
+      "w": 1
+    },
+    {
+      "from": "v05",
+      "to": "t.production_unsafe",
+      "w": 1
+    },
+    {
+      "from": "v06",
+      "to": "t.slower_experienced",
+      "w": 1
+    },
+    {
+      "from": "t.token_efficiency",
+      "to": "opp",
+      "w": 2
+    }
   ],
-
-  "marketplace": [
-    { "player": "rbmeta", "platform": "Amazon US", "rating": 4.4, "review_count": 8420, "top_complaints": ["续航", "Meta AI bug"], "top_praises": ["摄录", "外观"], "url": "https://www.amazon.com/dp/B0CHX1W1HJ", "collected_at": "2026-05-18" },
-    { "player": "even",   "platform": "官方 / DTC",   "rating": 4.2, "review_count": 380,  "top_complaints": ["可读性"], "top_praises": ["设计", "重量"], "url": "https://evenrealities.com",                                                              "collected_at": "2026-05-15" },
-    { "player": "xreal",  "platform": "Amazon US", "rating": 3.9, "review_count": 2140, "top_complaints": ["软件不成熟"], "top_praises": ["大屏"], "url": "https://www.amazon.com/dp/B0CMQB9CG4",                                                  "collected_at": "2026-05-18" }
-  ],
-
   "paths": [
-    { "id": "path-a", "label": "Path A · 隐私优先 AI 听镜",  "core": "可见隐私指示 + 无屏 AI 听/译/记",          "description": "对接最强 voice (摄录 + 翻译) ,绕开隐私争议,有 Meta 不愿做的护城河", "time": "9-12 个月",  "investment": "$2-5M",   "moat": "high",   "recommended": true },
-    { "id": "path-b", "label": "Path B · 高端定制时尚向",    "core": "Even-style 极简 + 时尚品牌联名",            "description": "走 lifestyle 高端,绕开 Meta 主战场,但天花板低",                                "time": "6-9 个月",   "investment": "$1-2M",   "moat": "mid",    "recommended": false },
-    { "id": "path-c", "label": "Path C · 垂直场景 (商务/医疗)","core": "会议记录 / 看诊辅助",                     "description": "B2B 路径,绕开消费市场,但需 GTM 重做",                                          "time": "12 个月",    "investment": "$2-4M",   "moat": "high",   "recommended": false }
+    {
+      "id": "path-a",
+      "label": "Path A · Safety-First Keyboard",
+      "core": "Hardware with 'confirm' keys and safety protocols for AI coding.",
+      "description": "A macro pad with dedicated 'safe execute' and 'undo' buttons, plus visual alerts for risky actions.",
+      "time": "12 months",
+      "investment": "$1-3M",
+      "moat": "high",
+      "recommended": true
+    },
+    {
+      "id": "path-b",
+      "label": "Path B · Prompt Efficiency Pad",
+      "core": "Optimized for token-saving shortcuts and quick prompt templates.",
+      "description": "Keys for common prompts, token counter display, and context management.",
+      "time": "9 months",
+      "investment": "$0.5-1M",
+      "moat": "low",
+      "recommended": false
+    },
+    {
+      "id": "path-c",
+      "label": "Path C · Hybrid AI Companion",
+      "core": "Combines macro keys with a small screen for AI suggestions and warnings.",
+      "description": "Stream Deck-like but with AI context awareness and risk mitigation features.",
+      "time": "18 months",
+      "investment": "$2-5M",
+      "moat": "mid",
+      "recommended": false
+    }
   ],
-
   "risks": [
-    { "id": "R-01", "title": "Apple AI 眼镜入场",   "scenario": "若 2026-2027 官宣,定义新 baseline",        "severity": "high", "mitigation": "抢隐私 / 听镜定位窗口 · 与 Apple 不重叠" },
-    { "id": "R-02", "title": "隐私监管收紧",         "scenario": "EU / 加州可能立法强制视觉指示灯",          "severity": "high", "mitigation": "主动设计 over-spec 指示灯方案" },
-    { "id": "R-03", "title": "Meta 突然降价",        "scenario": "Ray-Ban Meta 降到 $199 抢平价市场",         "severity": "mid",  "mitigation": "差异化护城河 · 不做硬件 race-to-bottom" },
-    { "id": "R-04", "title": "电池技术瓶颈",         "scenario": "续航卡在 2h 无法突破",                       "severity": "mid",  "mitigation": "充电盒 + USB-C 兼容方案" },
-    { "id": "R-05", "title": "AI 翻译质量瓶颈",     "scenario": "Apple/Google 翻译免费 + 集成",              "severity": "low",  "mitigation": "聚焦 niche 语种 + 实时性优势" }
-  ],
-
-  "failures": [
-    { "name": "Google Glass",   "years": "2013-2015", "what": "面向工程师的 AR 探险 · 隐私争议 + 价格",         "lesson": "AR 眼镜如果先解决隐私,产品才能成立" },
-    { "name": "Snap Spectacles","years": "2016-2018", "what": "Snapchat 摄录眼镜 · 内容生态弱",                  "lesson": "硬件之外的内容生态决定生死" }
+    {
+      "id": "R-01",
+      "title": "Market Saturation",
+      "scenario": "Existing macro pads already serve AI coders; differentiation is hard.",
+      "severity": "high",
+      "mitigation": "Focus on unique safety features not available in competitors."
+    },
+    {
+      "id": "R-02",
+      "title": "Low Adoption",
+      "scenario": "Vibe coding community may not see value in a dedicated keyboard.",
+      "severity": "mid",
+      "mitigation": "Partner with AI coding influencers and offer early adopter discounts."
+    },
+    {
+      "id": "R-03",
+      "title": "Technical Complexity",
+      "scenario": "Integrating AI risk detection into hardware is challenging and error-prone.",
+      "severity": "mid",
+      "mitigation": "Start with simple rule-based safety (e.g., confirm before delete) and iterate."
+    },
+    {
+      "id": "R-04",
+      "title": "Token Efficiency Misalignment",
+      "scenario": "Users may not care about token savings; focus on wrong value prop.",
+      "severity": "mid",
+      "mitigation": "Emphasize safety and productivity over token cost in marketing."
+    }
   ]
 }
 </script>

@@ -57,26 +57,42 @@ def save(path: Path, obj) -> None:
 # Stage 1 · SCOPE                                                              #
 # --------------------------------------------------------------------------- #
 
-def stage_scope(idea: str, target_market: str, wd: Path, dry: bool) -> dict:
+def stage_scope(idea: str, target_market: str, wd: Path, dry: bool,
+                mode_override: str | None = None) -> dict:
     out = wd / "01-scope.json"
     if dry and out.exists():
         return cached(out)
     sys = ("You are a market-research scoping assistant. Output STRICT JSON only.")
+    if mode_override == "NON_STOCK":
+        mode_instr = (
+            '"mode": "NON_STOCK",   // FORCED: treat as new/emerging category. '
+            "Do NOT map to an adjacent mature market. Players should be early "
+            "entrants / conceptual / the closest analogues users currently hack "
+            "together. Subreddits + queries should surface PAIN POINTS, "
+            "WORKAROUNDS, and unmet-need signals, not established product reviews."
+        )
+    elif mode_override == "EXISTING":
+        mode_instr = '"mode": "EXISTING",   // FORCED'
+    else:
+        mode_instr = ('"mode": "EXISTING" | "NON_STOCK",   // EXISTING if mature '
+                      "category w/ products & reviews; NON_STOCK if new/emerging")
     user = f"""Product idea: {idea}
 Target market: {target_market}
 
 Decide research scope. Output JSON:
 {{
-  "mode": "EXISTING" | "NON_STOCK",   // EXISTING if mature category w/ products & reviews; NON_STOCK if new/emerging
-  "subreddits": ["name", ...],        // 3-6 real subreddit names (no /r/), most relevant to this idea
+  {mode_instr}
+  "subreddits": ["name", ...],        // 3-6 real subreddit names (no /r/), most relevant
   "hn_queries": ["query", ...],       // 2-4 Hacker News search phrases
-  "players": [                        // 3-6 known products/companies in this space
+  "players": [                        // 3-6 entrants/analogues in this space
     {{"id": "<lowercase_slug>", "name": "<Brand Name>"}}
   ],
   "rationale": "<one sentence why this mode>"
 }}
 Rules: subreddit names must be plausible real subs. player ids lowercase a-z0-9_-."""
     res = chat_json(sys, user, temperature=0.3)
+    if mode_override:
+        res["mode"] = mode_override   # hard-enforce even if model drifts
     save(out, res)
     return res
 
@@ -166,32 +182,73 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
         return []
 
     players = scope.get("players", [])
-    sys = "You curate raw user posts into evidence voices. Output STRICT JSON only."
-    user = f"""Product idea: {idea}
-Players: {json.dumps(players, ensure_ascii=False)}
+    sys = ("You are a strict research analyst curating evidence. You RUTHLESSLY "
+           "reject off-topic noise. Output STRICT JSON only.")
+    # Ask for a larger candidate set with relevance scores, then filter locally.
+    over = min(len(pool), max(max_voices * 2, 24))
+    user = f"""Product idea (be literal about THIS concept, not the broad category):
+  {idea}
 
-Raw pool (title / score / url):
+Players / closest analogues: {json.dumps(players, ensure_ascii=False)}
+
+Raw pool (title / score / url) — collected from broad communities so it
+contains a LOT of irrelevant chatter:
 {json.dumps(pool[:60], ensure_ascii=False, indent=1)}
 
-Select the {max_voices} most relevant + highest-signal posts. Output JSON:
+TASK: score each candidate for relevance to the SPECIFIC product idea above,
+then return the best ones. Output JSON:
 {{
   "voices": [
     {{
-      "id": "v01",                    // v01..vNN
-      "player": "<player id from Players, or best guess>",
+      "id": "v01",
+      "player": "<player id from list, or closest analogue id>",
       "title": "<concise english title, ≤80 chars>",
       "score": <int upvotes>,
       "url": "<original url>",
-      "sentiment": "pos" | "neg"
+      "sentiment": "pos" | "neg",
+      "relevance": 0 | 1 | 2 | 3,   // 3=directly about this idea's need/pain/workaround; 2=adjacent & informative; 1=loosely related; 0=noise
+      "why": "<≤12 words: why this relevance score>"
     }}
   ]
 }}
-Rules: ids v01..v{max_voices:02d}. player MUST be one of the player ids. Prefer
-diverse players + a mix of pos/neg. Drop spam/irrelevant."""
+
+RELEVANCE RUBRIC — be harsh, and anchor on the FULL concept (every noun in
+the idea matters; if the idea names a physical/hardware product, the voice
+must touch the hardware / input-device / workaround dimension — not just the
+software or topic half):
+  3 = expresses the unmet need / workaround / willingness to pay for THIS
+      product (e.g. "I rigged a Stream Deck with macros to paste my prompts",
+      "I wish my keyboard had a dedicated prompt key").
+  2 = about an analogue device used in a way that informs the concept
+      (e.g. macro pad repurposed for coding shortcuts).
+  1 = touches only ONE half of the concept (pure prompt-engineering with no
+      hardware angle, OR generic keyboard talk with no AI angle).
+  0 = NOISE: memes, theft/lost packages, shipping/logistics, unboxing,
+      "look at my setup", relationship jokes, off-topic humor. REJECT THESE.
+
+Return up to {over} candidates with honest scores. A concept that combines
+two domains MUST have voices touching the INTERSECTION for score 3 — do not
+score pure single-domain content above 1. Prefer diverse players + a mix of
+pos/neg among relevant ones. Do not inflate scores. If genuine intersection
+signal is thin, return fewer voices rather than padding with score-1 items."""
     res = chat_json(sys, user, temperature=0.2)
-    voices = res.get("voices", [])
+    candidates = res.get("voices", [])
+
+    # Local relevance gate: keep relevance >= 2, fall back to >=1 if too few.
+    def keep(min_rel):
+        return [v for v in candidates if int(v.get("relevance", 0)) >= min_rel]
+    voices = keep(2)
+    if len(voices) < max(6, max_voices // 2):
+        extra = [v for v in keep(1) if v not in voices]
+        voices += extra
+    # sort by relevance then |score|, cap, renumber ids
+    voices.sort(key=lambda v: (int(v.get("relevance", 0)), abs(int(v.get("score", 0) or 0))), reverse=True)
+    voices = voices[:max_voices]
+    for i, v in enumerate(voices, 1):
+        v["id"] = f"v{i:02d}"
+    dropped = len(candidates) - len(voices)
     save(out, voices)
-    print(f"    curated {len(voices)} voices")
+    print(f"    curated {len(voices)} voices (dropped {dropped} low-relevance/noise from {len(candidates)} candidates)")
     return voices
 
 
@@ -383,6 +440,8 @@ def main() -> int:
     ap.add_argument("--idea")
     ap.add_argument("--target-market", default="US")
     ap.add_argument("--max-voices", type=int, default=14)
+    ap.add_argument("--mode", choices=["EXISTING", "NON_STOCK"],
+                    help="Force market mode (overrides LLM auto-detection)")
     ap.add_argument("--skip-collect", action="store_true")
     ap.add_argument("--dry-run", action="store_true",
                     help="Use cached stage outputs; no LLM/network")
@@ -398,7 +457,7 @@ def main() -> int:
         ap.error("--idea required for a fresh run")
 
     print(f"▶ SCOPE  ({idea})")
-    scope = stage_scope(idea, args.target_market, wd, args.dry_run)
+    scope = stage_scope(idea, args.target_market, wd, args.dry_run, args.mode)
     scope["_idea"] = idea
     save(wd / "01-scope.json", scope)
     print(f"    mode={scope.get('mode')}  subs={scope.get('subreddits')}  players={[p['id'] for p in scope.get('players',[])]}")

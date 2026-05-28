@@ -1,0 +1,349 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "slug": "vibe-keyboard",
+    "idea": "Vibe Coding 键盘 (为 AI 编程定制的物理键盘 / 宏键 / 提示词快捷输入)",
+    "mode": "NON_STOCK",
+    "timestamp": "2026-05-28",
+    "target_market": "US",
+    "thesis": "Vibe coding needs physical shortcuts, but token waste is a myth.",
+    "deck": "A macro keyboard for AI prompts could solve efficiency doubts, but the real pain is project failure and production unsafety, not token cost."
+  },
+  "verdict": {
+    "status": "partial",
+    "rationale": "Voices show pain but no clear demand for a dedicated keyboard; existing macro pads may suffice.",
+    "evidence_counts": {
+      "raw_voices": 6,
+      "marketplace": 0,
+      "editorials": 0,
+      "simulated": 0
+    },
+    "key_findings": [
+      "Token efficiency is a minor win, but not a primary driver for a new device.",
+      "Project failure and production unsafety are the biggest pains, suggesting need for guardrails.",
+      "Efficiency doubts and risk danger are significant, indicating skepticism about AI coding tools.",
+      "Existing players like Stream Deck and TourBox already serve macro needs, creating competition."
+    ]
+  },
+  "players": [
+    {
+      "id": "stream-deck",
+      "name": "Elgato Stream Deck",
+      "color": "#2c2f3a",
+      "size": 26,
+      "x": 0.82,
+      "y": 0.45,
+      "summary": ""
+    },
+    {
+      "id": "tourbox",
+      "name": "TourBox Elite",
+      "color": "#4a4e5b",
+      "size": 24,
+      "x": 0.599,
+      "y": 0.735,
+      "summary": ""
+    },
+    {
+      "id": "loupdeck",
+      "name": "Loupedeck Live",
+      "color": "#4a4e5b",
+      "size": 22,
+      "x": 0.241,
+      "y": 0.626,
+      "summary": ""
+    },
+    {
+      "id": "monogram",
+      "name": "Monogram Creative Console",
+      "color": "#6b6f7c",
+      "size": 20,
+      "x": 0.241,
+      "y": 0.274,
+      "summary": ""
+    },
+    {
+      "id": "custom-macro-pad",
+      "name": "Custom Macro Pads (e.g., YMDK, Keebio)",
+      "color": "#6b6f7c",
+      "size": 18,
+      "x": 0.599,
+      "y": 0.165,
+      "summary": ""
+    }
+  ],
+  "themes": [
+    {
+      "id": "t.token_efficiency",
+      "label": "Token节省",
+      "color": "#5b7a52",
+      "size": 12,
+      "x": 0.2,
+      "y": 0.3,
+      "polarity": "win",
+      "summary": "通过简洁提示词减少token消耗，提升效率"
+    },
+    {
+      "id": "t.project_failure",
+      "label": "项目失败",
+      "color": "#a0533c",
+      "size": 15,
+      "x": 0.8,
+      "y": 0.2,
+      "polarity": "pain",
+      "summary": "多数vibe coding项目因缺乏严谨性而失败"
+    },
+    {
+      "id": "t.efficiency_doubt",
+      "label": "效率质疑",
+      "color": "#a0533c",
+      "size": 14,
+      "x": 0.7,
+      "y": 0.5,
+      "polarity": "pain",
+      "summary": "AI辅助编程未显示效率提升，甚至降低生产力"
+    },
+    {
+      "id": "t.risk_danger",
+      "label": "风险危险",
+      "color": "#a0533c",
+      "size": 16,
+      "x": 0.5,
+      "y": 0.8,
+      "polarity": "pain",
+      "summary": "AI可能误操作导致生产数据库丢失等严重后果"
+    },
+    {
+      "id": "t.production_unsafe",
+      "label": "生产不可用",
+      "color": "#a0533c",
+      "size": 13,
+      "x": 0.3,
+      "y": 0.7,
+      "polarity": "pain",
+      "summary": "vibe coding适合原型但不适合生产环境"
+    },
+    {
+      "id": "t.slower_experienced",
+      "label": "拖慢老手",
+      "color": "#a0533c",
+      "size": 11,
+      "x": 0.6,
+      "y": 0.1,
+      "polarity": "pain",
+      "summary": "AI工具使经验丰富的程序员速度降低19%"
+    }
+  ],
+  "voices": [
+    {
+      "id": "v01",
+      "player": "stream-deck",
+      "title": "Taught Claude to talk like a caveman to use 75% less tokens.",
+      "score": 13211,
+      "url": "https://www.reddit.com/r/ClaudeAI/comments/1sble09/taught_claude_to_talk_like_a_caveman_to_use_75/",
+      "sentiment": "pos",
+      "themes": [
+        "t.token_efficiency"
+      ],
+      "collected_at": "2026-05-28"
+    },
+    {
+      "id": "v02",
+      "player": "stream-deck",
+      "title": "Why the majority of vibe coded projects fail",
+      "score": 8574,
+      "url": "https://www.reddit.com/r/ClaudeAI/comments/1rt31th/why_the_majority_of_vibe_coded_projects_fail/",
+      "sentiment": "neg",
+      "themes": [
+        "t.project_failure"
+      ],
+      "collected_at": "2026-05-28"
+    },
+    {
+      "id": "v03",
+      "player": "stream-deck",
+      "title": "Anthropic: AI assisted coding doesn't show efficiency gains.",
+      "score": 4008,
+      "url": "https://www.reddit.com/r/programming/comments/1qqxvlw/anthropic_ai_assisted_coding_doesnt_show/",
+      "sentiment": "neg",
+      "themes": [
+        "t.efficiency_doubt"
+      ],
+      "collected_at": "2026-05-28"
+    },
+    {
+      "id": "v04",
+      "player": "stream-deck",
+      "title": "Vibe-Coding AI \"Panicks\" and Deletes Production Database",
+      "score": 2807,
+      "url": "https://www.reddit.com/r/programming/comments/1m51vpw/vibecoding_ai_panicks_and_deletes_production/",
+      "sentiment": "neg",
+      "themes": [
+        "t.risk_danger"
+      ],
+      "collected_at": "2026-05-28"
+    },
+    {
+      "id": "v05",
+      "player": "stream-deck",
+      "title": "Linus Torvalds: Vibe coding is fine, but not for production",
+      "score": 2631,
+      "url": "https://www.reddit.com/r/programming/comments/1p1g9ni/linus_torvalds_vibe_coding_is_fine_but_not_for/",
+      "sentiment": "neg",
+      "themes": [
+        "t.production_unsafe"
+      ],
+      "collected_at": "2026-05-28"
+    },
+    {
+      "id": "v06",
+      "player": "stream-deck",
+      "title": "Study finds that AI tools make experienced programmers 19% slower.",
+      "score": 2503,
+      "url": "https://www.reddit.com/r/programming/comments/1lxh8ip/study_finds_that_ai_tools_make_experienced/",
+      "sentiment": "neg",
+      "themes": [
+        "t.slower_experienced"
+      ],
+      "collected_at": "2026-05-28"
+    }
+  ],
+  "opportunity": {
+    "id": "opp",
+    "label": "★ AI Workflow Safety & Guardrails",
+    "color": "#5b7a52",
+    "size": 30,
+    "x": 0.42,
+    "y": 0.18,
+    "summary": "A keyboard that prevents dangerous AI actions (e.g., confirm before destructive commands) could address production unsafety."
+  },
+  "edges": [
+    {
+      "from": "stream-deck",
+      "to": "t.token_efficiency",
+      "w": 1
+    },
+    {
+      "from": "stream-deck",
+      "to": "t.project_failure",
+      "w": 1
+    },
+    {
+      "from": "stream-deck",
+      "to": "t.efficiency_doubt",
+      "w": 1
+    },
+    {
+      "from": "stream-deck",
+      "to": "t.risk_danger",
+      "w": 1
+    },
+    {
+      "from": "stream-deck",
+      "to": "t.production_unsafe",
+      "w": 1
+    },
+    {
+      "from": "stream-deck",
+      "to": "t.slower_experienced",
+      "w": 1
+    },
+    {
+      "from": "v01",
+      "to": "t.token_efficiency",
+      "w": 1
+    },
+    {
+      "from": "v02",
+      "to": "t.project_failure",
+      "w": 1
+    },
+    {
+      "from": "v03",
+      "to": "t.efficiency_doubt",
+      "w": 1
+    },
+    {
+      "from": "v04",
+      "to": "t.risk_danger",
+      "w": 1
+    },
+    {
+      "from": "v05",
+      "to": "t.production_unsafe",
+      "w": 1
+    },
+    {
+      "from": "v06",
+      "to": "t.slower_experienced",
+      "w": 1
+    },
+    {
+      "from": "t.token_efficiency",
+      "to": "opp",
+      "w": 2
+    }
+  ],
+  "paths": [
+    {
+      "id": "path-a",
+      "label": "Path A · Safety-First Keyboard",
+      "core": "Hardware with 'confirm' keys and safety protocols for AI coding.",
+      "description": "A macro pad with dedicated 'safe execute' and 'undo' buttons, plus visual alerts for risky actions.",
+      "time": "12 months",
+      "investment": "$1-3M",
+      "moat": "high",
+      "recommended": true
+    },
+    {
+      "id": "path-b",
+      "label": "Path B · Prompt Efficiency Pad",
+      "core": "Optimized for token-saving shortcuts and quick prompt templates.",
+      "description": "Keys for common prompts, token counter display, and context management.",
+      "time": "9 months",
+      "investment": "$0.5-1M",
+      "moat": "low",
+      "recommended": false
+    },
+    {
+      "id": "path-c",
+      "label": "Path C · Hybrid AI Companion",
+      "core": "Combines macro keys with a small screen for AI suggestions and warnings.",
+      "description": "Stream Deck-like but with AI context awareness and risk mitigation features.",
+      "time": "18 months",
+      "investment": "$2-5M",
+      "moat": "mid",
+      "recommended": false
+    }
+  ],
+  "risks": [
+    {
+      "id": "R-01",
+      "title": "Market Saturation",
+      "scenario": "Existing macro pads already serve AI coders; differentiation is hard.",
+      "severity": "high",
+      "mitigation": "Focus on unique safety features not available in competitors."
+    },
+    {
+      "id": "R-02",
+      "title": "Low Adoption",
+      "scenario": "Vibe coding community may not see value in a dedicated keyboard.",
+      "severity": "mid",
+      "mitigation": "Partner with AI coding influencers and offer early adopter discounts."
+    },
+    {
+      "id": "R-03",
+      "title": "Technical Complexity",
+      "scenario": "Integrating AI risk detection into hardware is challenging and error-prone.",
+      "severity": "mid",
+      "mitigation": "Start with simple rule-based safety (e.g., confirm before delete) and iterate."
+    },
+    {
+      "id": "R-04",
+      "title": "Token Efficiency Misalignment",
+      "scenario": "Users may not care about token savings; focus on wrong value prop.",
+      "severity": "mid",
+      "mitigation": "Emphasize safety and productivity over token cost in marketing."
+    }
+  ]
+}

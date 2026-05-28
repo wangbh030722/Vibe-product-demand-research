@@ -1397,20 +1397,20 @@
   data.voices .forEach(v => addNode(v, 'voice'));
   addNode(data.opportunity, 'opportunity');
 
-  // Use curated x/y from data (already hand-tuned for layout balance).
-  // Map [0,1] to [PAD, VW-PAD] / [PAD, VH-PAD] so nodes don't hit edges.
   const PAD_X = 80, PAD_Y = 70;
   const SX = VW - PAD_X * 2, SY = VH - PAD_Y * 2;
   const nodeArr = Object.values(nodes);
-  nodeArr.forEach(n => {
-    n.bx = PAD_X + (n.x ?? 0.5) * SX;   // base position for drift to oscillate around
-    n.by = PAD_Y + (n.y ?? 0.5) * SY;
-    n.px = n.bx; n.py = n.by;
-    n.phase = Math.random() * Math.PI * 2;
-    n.driftAmp = n.kind === 'voice' ? 6 : (n.kind === 'theme' ? 3.5 : 2);
-  });
 
-  // Build incident-edges lookup
+  // Compute radius per node FIRST (needed for collision separation).
+  function radiusOf(n) {
+    if (n.kind === 'player') return (n.size || 22);
+    if (n.kind === 'theme')  return (n.size || 16);
+    if (n.kind === 'voice')  return Math.max(7, Math.min(15, Math.log10((n.score||10)+1) * 3.6));
+    if (n.kind === 'opportunity') return (n.size || 28);
+    return 8;
+  }
+
+  // Build incident-edges lookup (needed by the layout springs)
   const neighbors = {};
   const incidentEdges = {};
   data.edges.forEach((e, i) => {
@@ -1419,6 +1419,119 @@
     (incidentEdges[e.from] = incidentEdges[e.from] || new Set()).add(i);
     (incidentEdges[e.to]   = incidentEdges[e.to]   || new Set()).add(i);
   });
+
+  // ---------------- Auto-layout (force-directed + collision) ----------------
+  // Works for ANY data — with or without curated x/y. Prevents node overlap
+  // (the bug where voices w/o coords all collapsed to center).
+  //
+  // Seeding:
+  //   - if a node has x/y in data → use it (scaled), with tiny jitter
+  //   - else → deterministic spread on a phyllotaxis spiral by index
+  // Then run repulsion + edge springs + center gravity + hard collision.
+  const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+  nodeArr.forEach((n, i) => {
+    n.r = radiusOf(n);
+    if (typeof n.x === 'number' && typeof n.y === 'number') {
+      n.px = PAD_X + n.x * SX + (Math.random() - 0.5) * 8;
+      n.py = PAD_Y + n.y * SY + (Math.random() - 0.5) * 8;
+    } else {
+      // phyllotaxis spiral → even, non-overlapping initial spread
+      const t = i / Math.max(1, nodeArr.length);
+      const rad = Math.sqrt(t) * Math.min(SX, SY) * 0.46;
+      const ang = i * GOLDEN;
+      n.px = VW / 2 + rad * Math.cos(ang);
+      n.py = VH / 2 + rad * Math.sin(ang);
+    }
+    n.vx = 0; n.vy = 0;
+    n.phase = Math.random() * Math.PI * 2;
+    n.driftAmp = n.kind === 'voice' ? 5 : (n.kind === 'theme' ? 3 : 1.6);
+  });
+
+  // Labeled nodes (players/themes/opp) need horizontal room for their text.
+  // Give them a larger effective collision radius so labels don't overlap.
+  function pad(n) {
+    if (n.kind === 'voice') return n.r + 10;        // no label
+    // estimate label half-width (mono ~6.5px/char) but cap it
+    const label = n.name || n.label || '';
+    const halfLabel = Math.min(70, label.length * 3.4);
+    return Math.max(n.r + 26, halfLabel);
+  }
+
+  function runForceLayout(iters) {
+    const REPEL = 7000;     // node-node electrostatic repulsion (spread out)
+    const SPRING = 0.05;    // edge spring stiffness
+    const GRAVITY = 0.006;  // weak center pull → fills canvas
+    const DAMP = 0.86;
+    const VMAX = 34;
+    for (let it = 0; it < iters; it++) {
+      const cooling = 1 - it / iters;
+      for (let a = 0; a < nodeArr.length; a++) {
+        const na = nodeArr[a];
+        for (let b = a + 1; b < nodeArr.length; b++) {
+          const nb = nodeArr[b];
+          let dx = na.px - nb.px, dy = na.py - nb.py;
+          let d2 = dx*dx + dy*dy;
+          if (d2 < 0.01) { dx = (Math.random()-0.5); dy = (Math.random()-0.5); d2 = dx*dx+dy*dy; }
+          const d = Math.sqrt(d2);
+          const f = (REPEL / d2) * cooling;
+          let fx = (dx / d) * f, fy = (dy / d) * f;
+          // label-aware hard collision
+          const minDist = pad(na) + pad(nb);
+          if (d < minDist) {
+            const push = (minDist - d) * 0.5;
+            fx += (dx / d) * push;
+            fy += (dy / d) * push;
+          }
+          na.vx += fx; na.vy += fy;
+          nb.vx -= fx; nb.vy -= fy;
+        }
+      }
+      data.edges.forEach(e => {
+        const a = nodes[e.from], b = nodes[e.to]; if (!a || !b) return;
+        let dx = b.px - a.px, dy = b.py - a.py;
+        const d = Math.sqrt(dx*dx + dy*dy) || 0.01;
+        const rest = (a.kind === 'voice' || b.kind === 'voice') ? 95 : 185;
+        const f = SPRING * (d - rest);
+        const fx = (dx / d) * f, fy = (dy / d) * f;
+        a.vx += fx; a.vy += fy;
+        b.vx -= fx; b.vy -= fy;
+      });
+      nodeArr.forEach(n => {
+        n.vx += (VW/2 - n.px) * GRAVITY;
+        n.vy += (VH/2 - n.py) * GRAVITY;
+        n.vx *= DAMP; n.vy *= DAMP;
+        n.vx = Math.max(-VMAX, Math.min(VMAX, n.vx));
+        n.vy = Math.max(-VMAX, Math.min(VMAX, n.vy));
+        n.px += n.vx; n.py += n.vy;
+        const m = 24;
+        n.px = Math.max(m + n.r, Math.min(VW - m - n.r, n.px));
+        n.py = Math.max(m + n.r, Math.min(VH - m - n.r, n.py));
+      });
+    }
+  }
+  runForceLayout(360);
+  // Final label-aware collision relaxation (guarantees no residual overlap)
+  for (let pass = 0; pass < 16; pass++) {
+    for (let a = 0; a < nodeArr.length; a++) {
+      for (let b = a + 1; b < nodeArr.length; b++) {
+        const na = nodeArr[a], nb = nodeArr[b];
+        let dx = na.px - nb.px, dy = na.py - nb.py;
+        let d = Math.sqrt(dx*dx + dy*dy) || 0.01;
+        const minDist = pad(na) + pad(nb);
+        if (d < minDist) {
+          const shift = (minDist - d) / 2;
+          const ux = dx / d, uy = dy / d;
+          na.px += ux * shift; na.py += uy * shift;
+          nb.px -= ux * shift; nb.py -= uy * shift;
+          const m = 24;
+          na.px = Math.max(m, Math.min(VW - m, na.px)); na.py = Math.max(m, Math.min(VH - m, na.py));
+          nb.px = Math.max(m, Math.min(VW - m, nb.px)); nb.py = Math.max(m, Math.min(VH - m, nb.py));
+        }
+      }
+    }
+  }
+  // Snapshot settled positions as drift anchors
+  nodeArr.forEach(n => { n.bx = n.px; n.by = n.py; });
 
   // ---------------- Render SVG ----------------
   const svg = document.getElementById('kgSvg');
