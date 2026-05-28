@@ -1,6 +1,6 @@
 PY := python3
 
-.PHONY: all validate render index clean serve help research
+.PHONY: all validate render index clean serve help research app
 
 help:
 	@echo "Vibe Category Research · build"
@@ -9,8 +9,13 @@ help:
 	@echo "  make render       render dist/<slug>.html for each data file"
 	@echo "  make index        build dist/index.html"
 	@echo "  make all          validate + render + index"
+	@echo "  make app          launch local web app (type idea in a box → report)"
 	@echo "  make serve        python -m http.server in repo root"
 	@echo "  make clean        rm -rf dist/"
+
+# One-click local web app: http://localhost:8200
+app:
+	$(PY) scripts/app.py
 
 # One-command research:  make research IDEA="AI 智能体记忆" SLUG=agent-memory
 research:
