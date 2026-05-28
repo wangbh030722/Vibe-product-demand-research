@@ -482,6 +482,13 @@ def main() -> int:
     data_path = ROOT / "data" / f"{args.slug}.json"
     save(data_path, data)
 
+    print("▶ TRANSLATE (EN backfill)")
+    try:
+        subprocess.run([sys_exe(), str(ROOT / "scripts/translate_data.py"), str(data_path)],
+                       check=True, timeout=180)
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+        print(f"    ! translate skipped: {e} (report still works in zh)", file=sys.stderr)
+
     print("▶ VALIDATE")
     rc = subprocess.run([sys_exe(), str(ROOT / "scripts/validate_data.py"), str(data_path)])
     if rc.returncode != 0:

@@ -7,7 +7,10 @@
     "timestamp": "2026-05-28",
     "target_market": "US",
     "thesis": "Vibe coding needs physical shortcuts, but token waste is a myth.",
-    "deck": "A macro keyboard for AI prompts could solve efficiency doubts, but the real pain is project failure and production unsafety, not token cost."
+    "deck": "A macro keyboard for AI prompts could solve efficiency doubts, but the real pain is project failure and production unsafety, not token cost.",
+    "idea_en": "Vibe Coding Keyboard (Physical keyboard customized for AI programming / macro keys / quick prompt input)",
+    "thesis_en": "Vibe coding needs physical shortcuts, but token waste is a myth.",
+    "deck_en": "A macro keyboard for AI prompts could solve efficiency doubts, but the real pain is project failure and production unsafety, not token cost."
   },
   "verdict": {
     "status": "partial",
@@ -23,6 +26,13 @@
       "Project failure and production unsafety are the biggest pains, suggesting need for guardrails.",
       "Efficiency doubts and risk danger are significant, indicating skepticism about AI coding tools.",
       "Existing players like Stream Deck and TourBox already serve macro needs, creating competition."
+    ],
+    "rationale_en": "Voices show pain but no clear demand for a dedicated keyboard; existing macro pads may suffice.",
+    "key_findings_en": [
+      "Token efficiency is a minor win, but not a primary driver for a new device.",
+      "Project failure and production unsafety are the biggest pains, suggesting need for guardrails.",
+      "Efficiency doubts and risk danger are significant, indicating skepticism about AI coding tools.",
+      "Existing players like Stream Deck and TourBox already serve macro needs, creating competition."
     ]
   },
   "players": [
@@ -33,7 +43,8 @@
       "size": 26,
       "x": 0.82,
       "y": 0.45,
-      "summary": ""
+      "summary": "",
+      "name_en": "Elgato Stream Deck"
     },
     {
       "id": "tourbox",
@@ -42,7 +53,8 @@
       "size": 24,
       "x": 0.599,
       "y": 0.735,
-      "summary": ""
+      "summary": "",
+      "name_en": "TourBox Elite"
     },
     {
       "id": "loupdeck",
@@ -51,7 +63,8 @@
       "size": 22,
       "x": 0.241,
       "y": 0.626,
-      "summary": ""
+      "summary": "",
+      "name_en": "Loupedeck Live"
     },
     {
       "id": "monogram",
@@ -60,7 +73,8 @@
       "size": 20,
       "x": 0.241,
       "y": 0.274,
-      "summary": ""
+      "summary": "",
+      "name_en": "Monogram Creative Console"
     },
     {
       "id": "custom-macro-pad",
@@ -69,7 +83,8 @@
       "size": 18,
       "x": 0.599,
       "y": 0.165,
-      "summary": ""
+      "summary": "",
+      "name_en": "Custom Macro Pads (e.g., YMDK, Keebio)"
     }
   ],
   "themes": [
@@ -81,7 +96,9 @@
       "x": 0.2,
       "y": 0.3,
       "polarity": "win",
-      "summary": "通过简洁提示词减少token消耗，提升效率"
+      "summary": "通过简洁提示词减少token消耗，提升效率",
+      "label_en": "Token Savings",
+      "summary_en": "Reduce token consumption and improve efficiency through concise prompts"
     },
     {
       "id": "t.project_failure",
@@ -91,7 +108,9 @@
       "x": 0.8,
       "y": 0.2,
       "polarity": "pain",
-      "summary": "多数vibe coding项目因缺乏严谨性而失败"
+      "summary": "多数vibe coding项目因缺乏严谨性而失败",
+      "label_en": "Project Failure",
+      "summary_en": "Most vibe coding projects fail due to lack of rigor"
     },
     {
       "id": "t.efficiency_doubt",
@@ -101,7 +120,9 @@
       "x": 0.7,
       "y": 0.5,
       "polarity": "pain",
-      "summary": "AI辅助编程未显示效率提升，甚至降低生产力"
+      "summary": "AI辅助编程未显示效率提升，甚至降低生产力",
+      "label_en": "Efficiency Doubts",
+      "summary_en": "AI-assisted programming shows no efficiency improvement, or even reduces productivity"
     },
     {
       "id": "t.risk_danger",
@@ -111,7 +132,9 @@
       "x": 0.5,
       "y": 0.8,
       "polarity": "pain",
-      "summary": "AI可能误操作导致生产数据库丢失等严重后果"
+      "summary": "AI可能误操作导致生产数据库丢失等严重后果",
+      "label_en": "Risk Danger",
+      "summary_en": "AI may cause serious consequences such as production database loss due to misoperation"
     },
     {
       "id": "t.production_unsafe",
@@ -121,7 +144,9 @@
       "x": 0.3,
       "y": 0.7,
       "polarity": "pain",
-      "summary": "vibe coding适合原型但不适合生产环境"
+      "summary": "vibe coding适合原型但不适合生产环境",
+      "label_en": "Production Unusable",
+      "summary_en": "Vibe coding is suitable for prototyping but not for production environments"
     },
     {
       "id": "t.slower_experienced",
@@ -131,7 +156,9 @@
       "x": 0.6,
       "y": 0.1,
       "polarity": "pain",
-      "summary": "AI工具使经验丰富的程序员速度降低19%"
+      "summary": "AI工具使经验丰富的程序员速度降低19%",
+      "label_en": "Slows Down Experts",
+      "summary_en": "AI tools slow down experienced programmers by 19%"
     }
   ],
   "voices": [
@@ -145,7 +172,8 @@
       "themes": [
         "t.token_efficiency"
       ],
-      "collected_at": "2026-05-28"
+      "collected_at": "2026-05-28",
+      "title_en": "Taught Claude to talk like a caveman to use 75% less tokens."
     },
     {
       "id": "v02",
@@ -157,7 +185,8 @@
       "themes": [
         "t.project_failure"
       ],
-      "collected_at": "2026-05-28"
+      "collected_at": "2026-05-28",
+      "title_en": "Why the majority of vibe coded projects fail"
     },
     {
       "id": "v03",
@@ -169,7 +198,8 @@
       "themes": [
         "t.efficiency_doubt"
       ],
-      "collected_at": "2026-05-28"
+      "collected_at": "2026-05-28",
+      "title_en": "Anthropic: AI assisted coding doesn't show efficiency gains."
     },
     {
       "id": "v04",
@@ -181,7 +211,8 @@
       "themes": [
         "t.risk_danger"
       ],
-      "collected_at": "2026-05-28"
+      "collected_at": "2026-05-28",
+      "title_en": "Vibe-Coding AI \"Panicks\" and Deletes Production Database"
     },
     {
       "id": "v05",
@@ -193,7 +224,8 @@
       "themes": [
         "t.production_unsafe"
       ],
-      "collected_at": "2026-05-28"
+      "collected_at": "2026-05-28",
+      "title_en": "Linus Torvalds: Vibe coding is fine, but not for production"
     },
     {
       "id": "v06",
@@ -205,7 +237,8 @@
       "themes": [
         "t.slower_experienced"
       ],
-      "collected_at": "2026-05-28"
+      "collected_at": "2026-05-28",
+      "title_en": "Study finds that AI tools make experienced programmers 19% slower."
     }
   ],
   "opportunity": {
@@ -215,7 +248,9 @@
     "size": 30,
     "x": 0.42,
     "y": 0.18,
-    "summary": "A keyboard that prevents dangerous AI actions (e.g., confirm before destructive commands) could address production unsafety."
+    "summary": "A keyboard that prevents dangerous AI actions (e.g., confirm before destructive commands) could address production unsafety.",
+    "label_en": "★ AI Workflow Safety & Guardrails",
+    "summary_en": "A keyboard that prevents dangerous AI actions (e.g., confirm before destructive commands) could address production unsafety."
   },
   "edges": [
     {
@@ -293,7 +328,10 @@
       "time": "12 months",
       "investment": "$1-3M",
       "moat": "high",
-      "recommended": true
+      "recommended": true,
+      "label_en": "Path A · Safety-First Keyboard",
+      "core_en": "Hardware with 'confirm' keys and safety protocols for AI coding.",
+      "description_en": "A macro pad with dedicated 'safe execute' and 'undo' buttons, plus visual alerts for risky actions."
     },
     {
       "id": "path-b",
@@ -303,7 +341,10 @@
       "time": "9 months",
       "investment": "$0.5-1M",
       "moat": "low",
-      "recommended": false
+      "recommended": false,
+      "label_en": "Path B · Prompt Efficiency Pad",
+      "core_en": "Optimized for token-saving shortcuts and quick prompt templates.",
+      "description_en": "Keys for common prompts, token counter display, and context management."
     },
     {
       "id": "path-c",
@@ -313,7 +354,10 @@
       "time": "18 months",
       "investment": "$2-5M",
       "moat": "mid",
-      "recommended": false
+      "recommended": false,
+      "label_en": "Path C · Hybrid AI Companion",
+      "core_en": "Combines macro keys with a small screen for AI suggestions and warnings.",
+      "description_en": "Stream Deck-like but with AI context awareness and risk mitigation features."
     }
   ],
   "risks": [
@@ -322,28 +366,40 @@
       "title": "Market Saturation",
       "scenario": "Existing macro pads already serve AI coders; differentiation is hard.",
       "severity": "high",
-      "mitigation": "Focus on unique safety features not available in competitors."
+      "mitigation": "Focus on unique safety features not available in competitors.",
+      "title_en": "Market Saturation",
+      "scenario_en": "Existing macro pads already serve AI coders; differentiation is hard.",
+      "mitigation_en": "Focus on unique safety features not available in competitors."
     },
     {
       "id": "R-02",
       "title": "Low Adoption",
       "scenario": "Vibe coding community may not see value in a dedicated keyboard.",
       "severity": "mid",
-      "mitigation": "Partner with AI coding influencers and offer early adopter discounts."
+      "mitigation": "Partner with AI coding influencers and offer early adopter discounts.",
+      "title_en": "Low Adoption",
+      "scenario_en": "Vibe coding community may not see value in a dedicated keyboard.",
+      "mitigation_en": "Partner with AI coding influencers and offer early adopter discounts."
     },
     {
       "id": "R-03",
       "title": "Technical Complexity",
       "scenario": "Integrating AI risk detection into hardware is challenging and error-prone.",
       "severity": "mid",
-      "mitigation": "Start with simple rule-based safety (e.g., confirm before delete) and iterate."
+      "mitigation": "Start with simple rule-based safety (e.g., confirm before delete) and iterate.",
+      "title_en": "Technical Complexity",
+      "scenario_en": "Integrating AI risk detection into hardware is challenging and error-prone.",
+      "mitigation_en": "Start with simple rule-based safety (e.g., confirm before delete) and iterate."
     },
     {
       "id": "R-04",
       "title": "Token Efficiency Misalignment",
       "scenario": "Users may not care about token savings; focus on wrong value prop.",
       "severity": "mid",
-      "mitigation": "Emphasize safety and productivity over token cost in marketing."
+      "mitigation": "Emphasize safety and productivity over token cost in marketing.",
+      "title_en": "Token Efficiency Misalignment",
+      "scenario_en": "Users may not care about token savings; focus on wrong value prop.",
+      "mitigation_en": "Emphasize safety and productivity over token cost in marketing."
     }
   ]
 }

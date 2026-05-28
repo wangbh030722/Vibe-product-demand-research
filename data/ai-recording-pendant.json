@@ -6,93 +6,561 @@
     "mode": "NON_STOCK",
     "timestamp": "2026-05-25",
     "target_market": "US",
-    "collection_window": { "from": "2024-01-01", "to": "2026-05-25" },
+    "collection_window": {
+      "from": "2024-01-01",
+      "to": "2026-05-25"
+    },
     "thesis": "AI 录音吊坠属于「概念已传、产品未达」的早期非存量市场 —— 用户最强信号是「记录与回忆」,但所有已上市产品都把隐私问题拍在脸上。",
-    "deck": "采集来自 Reddit r/ADHD / r/productivity / r/Quantified Self + crowdfunding 数据。68 条 raw voice 显示需求真实,但 6 个上市玩家 5 个被诟病隐私 + 数据归属。"
+    "deck": "采集来自 Reddit r/ADHD / r/productivity / r/Quantified Self + crowdfunding 数据。68 条 raw voice 显示需求真实,但 6 个上市玩家 5 个被诟病隐私 + 数据归属。",
+    "idea_en": "AI Recording Pendant",
+    "thesis_en": "AI Recording Pendant belongs to an early non-stock market where 'concept has spread but product has not arrived' — the strongest user signal is 'recording and recall', but all launched products have privacy issues slapped in the face.",
+    "deck_en": "Data collected from Reddit r/ADHD / r/productivity / r/Quantified Self + crowdfunding. 68 raw voices show real demand, but 5 out of 6 launched players are criticized for privacy + data ownership."
   },
-
   "verdict": {
     "status": "partial",
     "rationale": "需求信号真实(ADHD 群体强烈),但所有已上市产品都未解决「我的对话谁记得」这一根本信任问题。",
-    "evidence_counts": { "raw_voices": 7, "marketplace": 2, "editorials": 6, "simulated": 0 },
+    "evidence_counts": {
+      "raw_voices": 7,
+      "marketplace": 2,
+      "editorials": 6,
+      "simulated": 0
+    },
     "key_findings": [
       "ADHD 群体是最强需求方:「我开会半小时,十分钟后忘了说过什么」是高频原话。",
       "已上市玩家 (Limitless / Friend / Tab / Compass) 都因隐私/数据归属遭遇用户反弹。",
       "「本地推理 + 数据自托管」尚无玩家做到 — 这是空白机会区。",
       "市场尚处于教育阶段,品类心智模糊(吊坠 vs 别针 vs 录音笔)。"
+    ],
+    "rationale_en": "Demand signal is real (strong from ADHD group), but all launched products fail to solve the fundamental trust issue of 'who remembers my conversations'.",
+    "key_findings_en": [
+      "ADHD group is the strongest demand side: 'I had a meeting for half an hour, ten minutes later I forgot what I said' is a frequent quote.",
+      "Launched players (Limitless / Friend / Tab / Compass) all face user backlash over privacy/data ownership.",
+      "'Local inference + self-hosted data' is not yet achieved by any player — this is a blank opportunity zone.",
+      "Market is still in education phase, category mindshare is vague (pendant vs pin vs voice recorder)."
     ]
   },
-
   "players": [
-    { "id": "limitless", "name": "Limitless Pendant", "color": "#2c2f3a", "size": 24, "x": 0.55, "y": 0.30, "status": "live",     "price": "$99",  "subscription": "$19/月", "summary": "AI 会议记录器 · 订阅模式 · 增长但争议大" },
-    { "id": "friend",    "name": "Friend",            "color": "#4a4e5b", "size": 18, "x": 0.78, "y": 0.45, "status": "live",     "price": "$129", "subscription": "无",     "summary": "AI 陪伴吊坠 · 一次性买断 · 用户反响两极" },
-    { "id": "tab",       "name": "Tab Pendant",       "color": "#4a4e5b", "size": 16, "x": 0.30, "y": 0.55, "status": "stagnant", "price": "$249", "subscription": "$24/月", "summary": "AI 助手 · 已退场风险高" },
-    { "id": "compass",   "name": "Compass",           "color": "#6b6f7c", "size": 14, "x": 0.20, "y": 0.30, "status": "live",     "price": "$99",  "subscription": "无",     "summary": "学习场景 · 学生群体小众" },
-    { "id": "newp",      "name": "新进入者(空白)",   "color": "#6b6f7c", "size": 16, "x": 0.45, "y": 0.18, "status": "rumored",                                              "summary": "本地推理 + 数据自托管 · 尚无玩家占据" }
+    {
+      "id": "limitless",
+      "name": "Limitless Pendant",
+      "color": "#2c2f3a",
+      "size": 24,
+      "x": 0.55,
+      "y": 0.3,
+      "status": "live",
+      "price": "$99",
+      "subscription": "$19/月",
+      "summary": "AI 会议记录器 · 订阅模式 · 增长但争议大",
+      "name_en": "Limitless Pendant",
+      "summary_en": "AI meeting recorder · subscription model · growing but controversial"
+    },
+    {
+      "id": "friend",
+      "name": "Friend",
+      "color": "#4a4e5b",
+      "size": 18,
+      "x": 0.78,
+      "y": 0.45,
+      "status": "live",
+      "price": "$129",
+      "subscription": "无",
+      "summary": "AI 陪伴吊坠 · 一次性买断 · 用户反响两极",
+      "name_en": "Friend",
+      "summary_en": "AI companion pendant · one-time purchase · polarized user feedback"
+    },
+    {
+      "id": "tab",
+      "name": "Tab Pendant",
+      "color": "#4a4e5b",
+      "size": 16,
+      "x": 0.3,
+      "y": 0.55,
+      "status": "stagnant",
+      "price": "$249",
+      "subscription": "$24/月",
+      "summary": "AI 助手 · 已退场风险高",
+      "name_en": "Tab Pendant",
+      "summary_en": "AI assistant · high risk of exit"
+    },
+    {
+      "id": "compass",
+      "name": "Compass",
+      "color": "#6b6f7c",
+      "size": 14,
+      "x": 0.2,
+      "y": 0.3,
+      "status": "live",
+      "price": "$99",
+      "subscription": "无",
+      "summary": "学习场景 · 学生群体小众",
+      "name_en": "Compass",
+      "summary_en": "Learning scenario · niche student group"
+    },
+    {
+      "id": "newp",
+      "name": "新进入者(空白)",
+      "color": "#6b6f7c",
+      "size": 16,
+      "x": 0.45,
+      "y": 0.18,
+      "status": "rumored",
+      "summary": "本地推理 + 数据自托管 · 尚无玩家占据",
+      "name_en": "New entrant (blank)",
+      "summary_en": "Local inference + self-hosted data · no player occupies yet"
+    }
   ],
-
   "themes": [
-    { "id": "t.memory",   "label": "记忆 / 回忆",   "color": "#5b7a52", "size": 19, "x": 0.50, "y": 0.50, "polarity": "win",     "summary": "ADHD 群体最强信号 · 「我说过什么」的焦虑" },
-    { "id": "t.privacy",  "label": "隐私 / 信任",  "color": "#a0533c", "size": 18, "x": 0.70, "y": 0.55, "polarity": "pain",    "summary": "所有玩家通病 · 「对方知不知道我在录」" },
-    { "id": "t.dataown",  "label": "数据归属",     "color": "#a0533c", "size": 16, "x": 0.80, "y": 0.25, "polarity": "pain",    "summary": "Limitless 云端存储引发集体退订" },
-    { "id": "t.adhd",     "label": "ADHD / 神经多元","color":"#5b7a52","size": 15, "x": 0.30, "y": 0.40, "polarity": "win",     "summary": "需求源头 · 高度黏性人群" },
-    { "id": "t.form",     "label": "形态 / 佩戴",  "color": "#80766a","size": 13, "x": 0.45, "y": 0.78, "polarity": "neutral", "summary": "别针 vs 吊坠 vs 项链 · 用户心智未定" },
-    { "id": "t.subscription","label": "订阅模式",  "color": "#a0533c","size": 14, "x": 0.18, "y": 0.62, "polarity": "pain",    "summary": "$19-24/月引发反弹 · 「我自己的数据为什么要付费」" }
+    {
+      "id": "t.memory",
+      "label": "记忆 / 回忆",
+      "color": "#5b7a52",
+      "size": 19,
+      "x": 0.5,
+      "y": 0.5,
+      "polarity": "win",
+      "summary": "ADHD 群体最强信号 · 「我说过什么」的焦虑",
+      "label_en": "Memory / Recall",
+      "summary_en": "Strongest signal from ADHD group · anxiety of 'what did I say'"
+    },
+    {
+      "id": "t.privacy",
+      "label": "隐私 / 信任",
+      "color": "#a0533c",
+      "size": 18,
+      "x": 0.7,
+      "y": 0.55,
+      "polarity": "pain",
+      "summary": "所有玩家通病 · 「对方知不知道我在录」",
+      "label_en": "Privacy / Trust",
+      "summary_en": "Common problem among all players · 'does the other person know I'm recording'"
+    },
+    {
+      "id": "t.dataown",
+      "label": "数据归属",
+      "color": "#a0533c",
+      "size": 16,
+      "x": 0.8,
+      "y": 0.25,
+      "polarity": "pain",
+      "summary": "Limitless 云端存储引发集体退订",
+      "label_en": "Data Ownership",
+      "summary_en": "Limitless cloud storage caused mass cancellations"
+    },
+    {
+      "id": "t.adhd",
+      "label": "ADHD / 神经多元",
+      "color": "#5b7a52",
+      "size": 15,
+      "x": 0.3,
+      "y": 0.4,
+      "polarity": "win",
+      "summary": "需求源头 · 高度黏性人群",
+      "label_en": "ADHD / Neurodiversity",
+      "summary_en": "Source of demand · highly sticky group"
+    },
+    {
+      "id": "t.form",
+      "label": "形态 / 佩戴",
+      "color": "#80766a",
+      "size": 13,
+      "x": 0.45,
+      "y": 0.78,
+      "polarity": "neutral",
+      "summary": "别针 vs 吊坠 vs 项链 · 用户心智未定",
+      "label_en": "Form / Wear",
+      "summary_en": "Pin vs pendant vs necklace · user mindshare not settled"
+    },
+    {
+      "id": "t.subscription",
+      "label": "订阅模式",
+      "color": "#a0533c",
+      "size": 14,
+      "x": 0.18,
+      "y": 0.62,
+      "polarity": "pain",
+      "summary": "$19-24/月引发反弹 · 「我自己的数据为什么要付费」",
+      "label_en": "Subscription Model",
+      "summary_en": "$19-24/month triggers backlash · 'why pay for my own data'"
+    }
   ],
-
   "voices": [
-    { "id": "v01", "player": "limitless", "title": "I have ADHD and Limitless changed my life",         "score": 642,  "url": "https://www.reddit.com/r/ADHD/v01",         "sentiment": "pos", "themes": ["t.memory","t.adhd"], "collected_at": "2026-01-08" },
-    { "id": "v02", "player": "limitless", "title": "Why does my conversation history live on their servers?", "score": 312, "url": "https://www.reddit.com/r/Limitless/v02", "sentiment": "neg", "themes": ["t.dataown","t.privacy"], "collected_at": "2026-02-15" },
-    { "id": "v03", "player": "friend",    "title": "I returned mine within 2 weeks. It felt invasive.","score": 240,  "url": "https://www.reddit.com/r/Friend/v03",       "sentiment": "neg", "themes": ["t.privacy"],         "collected_at": "2026-03-04" },
-    { "id": "v04", "player": "limitless", "title": "$19/mo for AI on MY conversations? Hard pass.",      "score": 185,  "url": "https://www.reddit.com/r/Limitless/v04",    "sentiment": "neg", "themes": ["t.subscription"],   "collected_at": "2026-02-22" },
-    { "id": "v05", "player": "friend",    "title": "Use case: never forgot another meeting decision",  "score": 168,  "url": "https://www.reddit.com/r/productivity/v05", "sentiment": "pos", "themes": ["t.memory"],          "collected_at": "2026-01-30" },
-    { "id": "v06", "player": "tab",       "title": "Stopped using after 3 weeks; nothing felt private","score": 92,   "url": "https://www.reddit.com/r/Tab/v06",          "sentiment": "neg", "themes": ["t.privacy","t.form"],"collected_at": "2026-02-09" },
-    { "id": "v07", "player": "compass",   "title": "Studying with Compass is a game-changer",          "score": 78,   "url": "https://www.reddit.com/r/Compass/v07",      "sentiment": "pos", "themes": ["t.memory","t.adhd"], "collected_at": "2026-03-21" }
+    {
+      "id": "v01",
+      "player": "limitless",
+      "title": "I have ADHD and Limitless changed my life",
+      "score": 642,
+      "url": "https://www.reddit.com/r/ADHD/v01",
+      "sentiment": "pos",
+      "themes": [
+        "t.memory",
+        "t.adhd"
+      ],
+      "collected_at": "2026-01-08",
+      "title_en": "I have ADHD and Limitless changed my life"
+    },
+    {
+      "id": "v02",
+      "player": "limitless",
+      "title": "Why does my conversation history live on their servers?",
+      "score": 312,
+      "url": "https://www.reddit.com/r/Limitless/v02",
+      "sentiment": "neg",
+      "themes": [
+        "t.dataown",
+        "t.privacy"
+      ],
+      "collected_at": "2026-02-15",
+      "title_en": "Why does my conversation history live on their servers?"
+    },
+    {
+      "id": "v03",
+      "player": "friend",
+      "title": "I returned mine within 2 weeks. It felt invasive.",
+      "score": 240,
+      "url": "https://www.reddit.com/r/Friend/v03",
+      "sentiment": "neg",
+      "themes": [
+        "t.privacy"
+      ],
+      "collected_at": "2026-03-04",
+      "title_en": "I returned mine within 2 weeks. It felt invasive."
+    },
+    {
+      "id": "v04",
+      "player": "limitless",
+      "title": "$19/mo for AI on MY conversations? Hard pass.",
+      "score": 185,
+      "url": "https://www.reddit.com/r/Limitless/v04",
+      "sentiment": "neg",
+      "themes": [
+        "t.subscription"
+      ],
+      "collected_at": "2026-02-22",
+      "title_en": "$19/mo for AI on MY conversations? Hard pass."
+    },
+    {
+      "id": "v05",
+      "player": "friend",
+      "title": "Use case: never forgot another meeting decision",
+      "score": 168,
+      "url": "https://www.reddit.com/r/productivity/v05",
+      "sentiment": "pos",
+      "themes": [
+        "t.memory"
+      ],
+      "collected_at": "2026-01-30",
+      "title_en": "Use case: never forgot another meeting decision"
+    },
+    {
+      "id": "v06",
+      "player": "tab",
+      "title": "Stopped using after 3 weeks; nothing felt private",
+      "score": 92,
+      "url": "https://www.reddit.com/r/Tab/v06",
+      "sentiment": "neg",
+      "themes": [
+        "t.privacy",
+        "t.form"
+      ],
+      "collected_at": "2026-02-09",
+      "title_en": "Stopped using after 3 weeks; nothing felt private"
+    },
+    {
+      "id": "v07",
+      "player": "compass",
+      "title": "Studying with Compass is a game-changer",
+      "score": 78,
+      "url": "https://www.reddit.com/r/Compass/v07",
+      "sentiment": "pos",
+      "themes": [
+        "t.memory",
+        "t.adhd"
+      ],
+      "collected_at": "2026-03-21",
+      "title_en": "Studying with Compass is a game-changer"
+    }
   ],
-
   "opportunity": {
-    "id": "opp", "label": "★ 本地推理 + 数据自托管",
-    "color": "#5b7a52", "size": 30, "x": 0.42, "y": 0.18,
-    "summary": "本地推理 + 数据自托管 + 一次性买断 = 解决三个 pain points 同时 · 尚无玩家占据"
+    "id": "opp",
+    "label": "★ 本地推理 + 数据自托管",
+    "color": "#5b7a52",
+    "size": 30,
+    "x": 0.42,
+    "y": 0.18,
+    "summary": "本地推理 + 数据自托管 + 一次性买断 = 解决三个 pain points 同时 · 尚无玩家占据",
+    "label_en": "★ Local inference + self-hosted data",
+    "summary_en": "Local inference + self-hosted data + one-time purchase = solves three pain points simultaneously · no player occupies yet"
   },
-
   "edges": [
-    {"from":"limitless","to":"t.memory","w":3},{"from":"limitless","to":"t.dataown","w":3},{"from":"limitless","to":"t.privacy","w":2},{"from":"limitless","to":"t.subscription","w":3},
-    {"from":"friend","to":"t.privacy","w":3},{"from":"friend","to":"t.memory","w":2},
-    {"from":"tab","to":"t.privacy","w":2},{"from":"tab","to":"t.form","w":2},
-    {"from":"compass","to":"t.memory","w":2},{"from":"compass","to":"t.adhd","w":3},
-    {"from":"newp","to":"opp","w":3},
-    {"from":"v01","to":"t.memory","w":1},{"from":"v01","to":"t.adhd","w":1},
-    {"from":"v02","to":"t.dataown","w":1},{"from":"v02","to":"t.privacy","w":1},
-    {"from":"v03","to":"t.privacy","w":1},
-    {"from":"v04","to":"t.subscription","w":1},
-    {"from":"v05","to":"t.memory","w":1},
-    {"from":"v06","to":"t.privacy","w":1},{"from":"v06","to":"t.form","w":1},
-    {"from":"v07","to":"t.memory","w":1},{"from":"v07","to":"t.adhd","w":1},
-    {"from":"t.dataown","to":"opp","w":3},{"from":"t.subscription","to":"opp","w":2},{"from":"t.privacy","to":"opp","w":3}
+    {
+      "from": "limitless",
+      "to": "t.memory",
+      "w": 3
+    },
+    {
+      "from": "limitless",
+      "to": "t.dataown",
+      "w": 3
+    },
+    {
+      "from": "limitless",
+      "to": "t.privacy",
+      "w": 2
+    },
+    {
+      "from": "limitless",
+      "to": "t.subscription",
+      "w": 3
+    },
+    {
+      "from": "friend",
+      "to": "t.privacy",
+      "w": 3
+    },
+    {
+      "from": "friend",
+      "to": "t.memory",
+      "w": 2
+    },
+    {
+      "from": "tab",
+      "to": "t.privacy",
+      "w": 2
+    },
+    {
+      "from": "tab",
+      "to": "t.form",
+      "w": 2
+    },
+    {
+      "from": "compass",
+      "to": "t.memory",
+      "w": 2
+    },
+    {
+      "from": "compass",
+      "to": "t.adhd",
+      "w": 3
+    },
+    {
+      "from": "newp",
+      "to": "opp",
+      "w": 3
+    },
+    {
+      "from": "v01",
+      "to": "t.memory",
+      "w": 1
+    },
+    {
+      "from": "v01",
+      "to": "t.adhd",
+      "w": 1
+    },
+    {
+      "from": "v02",
+      "to": "t.dataown",
+      "w": 1
+    },
+    {
+      "from": "v02",
+      "to": "t.privacy",
+      "w": 1
+    },
+    {
+      "from": "v03",
+      "to": "t.privacy",
+      "w": 1
+    },
+    {
+      "from": "v04",
+      "to": "t.subscription",
+      "w": 1
+    },
+    {
+      "from": "v05",
+      "to": "t.memory",
+      "w": 1
+    },
+    {
+      "from": "v06",
+      "to": "t.privacy",
+      "w": 1
+    },
+    {
+      "from": "v06",
+      "to": "t.form",
+      "w": 1
+    },
+    {
+      "from": "v07",
+      "to": "t.memory",
+      "w": 1
+    },
+    {
+      "from": "v07",
+      "to": "t.adhd",
+      "w": 1
+    },
+    {
+      "from": "t.dataown",
+      "to": "opp",
+      "w": 3
+    },
+    {
+      "from": "t.subscription",
+      "to": "opp",
+      "w": 2
+    },
+    {
+      "from": "t.privacy",
+      "to": "opp",
+      "w": 3
+    }
   ],
-
   "marketplace": [
-    { "player": "limitless", "platform": "官方 / DTC", "rating": 3.7, "review_count": 1240, "top_complaints": ["订阅", "数据归属"], "top_praises": ["AI 摘要质量"], "url": "https://www.limitless.ai", "collected_at": "2026-05-15" },
-    { "player": "friend",    "platform": "官方 / DTC", "rating": 2.9, "review_count": 480,  "top_complaints": ["隐私感", "对话冷淡"], "top_praises": ["陪伴感"], "url": "https://www.friend.com",     "collected_at": "2026-05-15" }
+    {
+      "player": "limitless",
+      "platform": "官方 / DTC",
+      "rating": 3.7,
+      "review_count": 1240,
+      "top_complaints": [
+        "订阅",
+        "数据归属"
+      ],
+      "top_praises": [
+        "AI 摘要质量"
+      ],
+      "url": "https://www.limitless.ai",
+      "collected_at": "2026-05-15"
+    },
+    {
+      "player": "friend",
+      "platform": "官方 / DTC",
+      "rating": 2.9,
+      "review_count": 480,
+      "top_complaints": [
+        "隐私感",
+        "对话冷淡"
+      ],
+      "top_praises": [
+        "陪伴感"
+      ],
+      "url": "https://www.friend.com",
+      "collected_at": "2026-05-15"
+    }
   ],
-
   "paths": [
-    { "id": "path-a", "label": "Path A · 本地推理 + 自托管",      "core": "全本地 AI 模型 + 数据加密在设备端 + 一次性买断",       "description": "直接对接 3 个最强 pain (订阅 / 数据归属 / 隐私) ,但产品复杂度高",  "time": "12-15 个月",  "investment": "$3-5M",   "moat": "extreme", "recommended": true },
-    { "id": "path-b", "label": "Path B · ADHD 垂直定位",          "core": "专为 ADHD 用户设计 · 与诊所合作 · 心理学家代言",        "description": "对接最强需求群体,黏性高但天花板低",                                  "time": "9-12 个月",   "investment": "$1-2M",   "moat": "mid",     "recommended": false },
-    { "id": "path-c", "label": "Path C · 形态创新(别针 → 录音笔)","core": "脱离吊坠形态 · 走更接近传统设备的形象",                "description": "降低社交焦虑,但失去差异化",                                          "time": "6-9 个月",    "investment": "$0.5-1M", "moat": "low",     "recommended": false }
+    {
+      "id": "path-a",
+      "label": "Path A · 本地推理 + 自托管",
+      "core": "全本地 AI 模型 + 数据加密在设备端 + 一次性买断",
+      "description": "直接对接 3 个最强 pain (订阅 / 数据归属 / 隐私) ,但产品复杂度高",
+      "time": "12-15 个月",
+      "investment": "$3-5M",
+      "moat": "extreme",
+      "recommended": true,
+      "label_en": "Path A · Local inference + self-hosted",
+      "core_en": "Fully local AI model + data encrypted on device + one-time purchase",
+      "description_en": "Directly addresses 3 strongest pains (subscription / data ownership / privacy), but product complexity is high"
+    },
+    {
+      "id": "path-b",
+      "label": "Path B · ADHD 垂直定位",
+      "core": "专为 ADHD 用户设计 · 与诊所合作 · 心理学家代言",
+      "description": "对接最强需求群体,黏性高但天花板低",
+      "time": "9-12 个月",
+      "investment": "$1-2M",
+      "moat": "mid",
+      "recommended": false,
+      "label_en": "Path B · ADHD vertical positioning",
+      "core_en": "Designed specifically for ADHD users · partnership with clinics · endorsed by psychologists",
+      "description_en": "Targets strongest demand group, high stickiness but low ceiling"
+    },
+    {
+      "id": "path-c",
+      "label": "Path C · 形态创新(别针 → 录音笔)",
+      "core": "脱离吊坠形态 · 走更接近传统设备的形象",
+      "description": "降低社交焦虑,但失去差异化",
+      "time": "6-9 个月",
+      "investment": "$0.5-1M",
+      "moat": "low",
+      "recommended": false,
+      "label_en": "Path C · Form innovation (pin → voice recorder)",
+      "core_en": "Move away from pendant form · adopt image closer to traditional devices",
+      "description_en": "Reduces social anxiety, but loses differentiation"
+    }
   ],
-
   "risks": [
-    { "id": "R-01", "title": "OpenAI / Apple 入场",       "scenario": "大厂集成 AI 录音到 AirPods / Apple Watch",       "severity": "high", "mitigation": "聚焦本地推理 · 大厂不愿做的差异化方向" },
-    { "id": "R-02", "title": "隐私监管收紧",                "scenario": "EU / 加州可能禁止 always-on 录音设备",           "severity": "high", "mitigation": "按需触发 · 显眼指示灯 · 主动合规设计" },
-    { "id": "R-03", "title": "用户教育成本高",              "scenario": "品类心智未建立 · 解释成本高",                     "severity": "mid",  "mitigation": "ADHD 垂直群体先突破 · 社区运营优先于广告" },
-    { "id": "R-04", "title": "本地推理芯片成本",            "scenario": "本地大模型 chip BOM 显著高于云端方案",            "severity": "mid",  "mitigation": "降到 7B 量化模型 + 与高通合作定制" },
-    { "id": "R-05", "title": "Limitless 突然 pivot",        "scenario": "Limitless 转向本地推理 + 一次性买断",             "severity": "low",  "mitigation": "时间窗 12 个月足够 · 抢 mind share" }
+    {
+      "id": "R-01",
+      "title": "OpenAI / Apple 入场",
+      "scenario": "大厂集成 AI 录音到 AirPods / Apple Watch",
+      "severity": "high",
+      "mitigation": "聚焦本地推理 · 大厂不愿做的差异化方向",
+      "title_en": "OpenAI / Apple entry",
+      "scenario_en": "Big tech integrates AI recording into AirPods / Apple Watch",
+      "mitigation_en": "Focus on local inference · differentiation direction big tech is unwilling to pursue"
+    },
+    {
+      "id": "R-02",
+      "title": "隐私监管收紧",
+      "scenario": "EU / 加州可能禁止 always-on 录音设备",
+      "severity": "high",
+      "mitigation": "按需触发 · 显眼指示灯 · 主动合规设计",
+      "title_en": "Privacy regulation tightening",
+      "scenario_en": "EU / California may ban always-on recording devices",
+      "mitigation_en": "On-demand trigger · conspicuous indicator light · proactive compliance design"
+    },
+    {
+      "id": "R-03",
+      "title": "用户教育成本高",
+      "scenario": "品类心智未建立 · 解释成本高",
+      "severity": "mid",
+      "mitigation": "ADHD 垂直群体先突破 · 社区运营优先于广告",
+      "title_en": "High user education cost",
+      "scenario_en": "Category mindshare not established · high explanation cost",
+      "mitigation_en": "Break through with ADHD vertical group first · community operations over advertising"
+    },
+    {
+      "id": "R-04",
+      "title": "本地推理芯片成本",
+      "scenario": "本地大模型 chip BOM 显著高于云端方案",
+      "severity": "mid",
+      "mitigation": "降到 7B 量化模型 + 与高通合作定制",
+      "title_en": "Local inference chip cost",
+      "scenario_en": "Local large model chip BOM significantly higher than cloud solution",
+      "mitigation_en": "Reduce to 7B quantized model + custom partnership with Qualcomm"
+    },
+    {
+      "id": "R-05",
+      "title": "Limitless 突然 pivot",
+      "scenario": "Limitless 转向本地推理 + 一次性买断",
+      "severity": "low",
+      "mitigation": "时间窗 12 个月足够 · 抢 mind share",
+      "title_en": "Limitless sudden pivot",
+      "scenario_en": "Limitless pivots to local inference + one-time purchase",
+      "mitigation_en": "12-month time window sufficient · grab mind share"
+    }
   ],
-
   "failures": [
-    { "name": "Humane AI Pin", "years": "2024",      "what": "$699 别针式 AI 助手 · 上市不到一年退场",        "lesson": "把硬件当噱头不行 · 真实使用频次决定产品命运" },
-    { "name": "Rabbit R1",     "years": "2024-2025", "what": "便携 AI 终端 · 内容生态薄弱 + 反向工程争议",     "lesson": "AI 设备不能脱离 phone 生态,差异化要非常清晰" }
+    {
+      "name": "Humane AI Pin",
+      "years": "2024",
+      "what": "$699 别针式 AI 助手 · 上市不到一年退场",
+      "lesson": "把硬件当噱头不行 · 真实使用频次决定产品命运",
+      "name_en": "Humane AI Pin",
+      "what_en": "$699 pin-style AI assistant · exited less than a year after launch",
+      "lesson_en": "Hardware as gimmick doesn't work · real usage frequency determines product fate"
+    },
+    {
+      "name": "Rabbit R1",
+      "years": "2024-2025",
+      "what": "便携 AI 终端 · 内容生态薄弱 + 反向工程争议",
+      "lesson": "AI 设备不能脱离 phone 生态,差异化要非常清晰",
+      "name_en": "Rabbit R1",
+      "what_en": "Portable AI terminal · weak content ecosystem + reverse engineering controversy",
+      "lesson_en": "AI device cannot be detached from phone ecosystem, differentiation must be very clear"
+    }
   ]
 }

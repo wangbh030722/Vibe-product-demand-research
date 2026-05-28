@@ -65,9 +65,20 @@ def load_schema() -> dict[str, Any]:
     return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
+def _strip_en(obj: Any) -> Any:
+    """Deep-copy with all *_en translation keys removed, so the base schema
+    (additionalProperties:false) validates without needing to declare them."""
+    if isinstance(obj, dict):
+        return {k: _strip_en(v) for k, v in obj.items() if not k.endswith("_en")}
+    if isinstance(obj, list):
+        return [_strip_en(v) for v in obj]
+    return obj
+
+
 def validate_schema(data: dict[str, Any], schema: dict[str, Any]) -> list[str]:
     validator = Draft7Validator(schema)
-    errors = sorted(validator.iter_errors(data), key=lambda e: list(e.absolute_path))
+    # Validate the *_en-stripped view (translations are optional add-ons).
+    errors = sorted(validator.iter_errors(_strip_en(data)), key=lambda e: list(e.absolute_path))
     out = []
     for e in errors:
         path = "/".join(str(p) for p in e.absolute_path) or "(root)"

@@ -6,89 +6,530 @@
     "mode": "EXISTING",
     "timestamp": "2026-05-22",
     "target_market": "US",
-    "collection_window": { "from": "2024-10-01", "to": "2026-05-22" },
+    "collection_window": {
+      "from": "2024-10-01",
+      "to": "2026-05-22"
+    },
     "thesis": "AI 智能眼镜真实需求被 Ray-Ban Meta 验证,但下一波竞争不在硬件,在「环境隐私」与「无屏 AI 体验」。",
-    "deck": "172 条 raw voice + 18 篇评测显示:用户买的是\"摄录 + AI 听\",不是 AR。隐私争议是品类天花板,谁先解决谁拿下下一波。"
+    "deck": "172 条 raw voice + 18 篇评测显示:用户买的是\"摄录 + AI 听\",不是 AR。隐私争议是品类天花板,谁先解决谁拿下下一波。",
+    "idea_en": "AI Smart Glasses",
+    "thesis_en": "Ray-Ban Meta validates real demand for AI smart glasses, but the next wave of competition is not about hardware, but 'ambient privacy' and 'screenless AI experience'.",
+    "deck_en": "172 raw voice clips + 18 reviews show: users buy for 'recording + AI listening', not AR. Privacy controversy is the category ceiling; whoever solves it first wins the next wave."
   },
-
   "verdict": {
     "status": "real",
     "rationale": "Ray-Ban Meta 单产品 200 万销量已验证消费意愿;但所有竞品都还在抄硬件,没人触及隐私层。",
-    "evidence_counts": { "raw_voices": 6, "marketplace": 3, "editorials": 18, "simulated": 0 },
+    "evidence_counts": {
+      "raw_voices": 6,
+      "marketplace": 3,
+      "editorials": 18,
+      "simulated": 0
+    },
     "key_findings": [
       "Ray-Ban Meta 实际 use case 集中在「摄录朋友」+「AI 听翻译」,不是 AR navigation。",
       "隐私指示灯是争议焦点 —— 用户 + 旁观者两边都不满意,品类天花板。",
       "Meta 之外其他厂家都在做硬件版本,但没有差异化 USP。",
       "Apple Vision 路径太重,反而留出了「轻 AI 眼镜」的窗口。"
+    ],
+    "rationale_en": "Ray-Ban Meta's 2 million unit sales confirm consumer willingness; but all competitors are still copying hardware, none addressing the privacy layer.",
+    "key_findings_en": [
+      "Ray-Ban Meta's actual use cases center on 'recording friends' + 'AI listening/translation', not AR navigation.",
+      "Privacy indicator light is a flashpoint — both users and bystanders are dissatisfied, capping the category.",
+      "Other manufacturers beyond Meta are making hardware versions, but lack differentiated USP.",
+      "Apple Vision's heavy path leaves a window for 'light AI glasses'."
     ]
   },
-
   "players": [
-    { "id": "rbmeta",   "name": "Ray-Ban Meta",    "color": "#2c2f3a", "size": 26, "x": 0.55, "y": 0.30, "status": "live",    "price": "$299-379", "subscription": "无",       "summary": "品类定义者 · 200 万销量 · Meta AI + 摄录" },
-    { "id": "even",     "name": "Even Realities G1","color": "#4a4e5b", "size": 20, "x": 0.78, "y": 0.45, "status": "live",    "price": "$599",     "subscription": "无",       "summary": "无屏文字提示词镜 · 极简取向" },
-    { "id": "amazon",   "name": "Amazon Echo Frames","color": "#6b6f7c", "size": 16, "x": 0.20, "y": 0.30, "status": "stagnant","price": "$269",     "subscription": "Alexa Plus","summary": "Alexa 语音 · 销量不振 · 退场风险" },
-    { "id": "xreal",    "name": "Xreal Air 2",     "color": "#4a4e5b", "size": 18, "x": 0.35, "y": 0.65, "status": "live",    "price": "$399",     "subscription": "无",       "summary": "AR 显示眼镜 · 游戏 / 大屏使用场景" },
-    { "id": "apple",    "name": "Apple AI Glasses(?)","color": "#6b6f7c","size": 17, "x": 0.45, "y": 0.15, "status": "rumored", "summary": "传闻 2026-2027 · 最大未定变量" }
+    {
+      "id": "rbmeta",
+      "name": "Ray-Ban Meta",
+      "color": "#2c2f3a",
+      "size": 26,
+      "x": 0.55,
+      "y": 0.3,
+      "status": "live",
+      "price": "$299-379",
+      "subscription": "无",
+      "summary": "品类定义者 · 200 万销量 · Meta AI + 摄录",
+      "name_en": "Ray-Ban Meta",
+      "summary_en": "Category definer · 2M sales · Meta AI + recording"
+    },
+    {
+      "id": "even",
+      "name": "Even Realities G1",
+      "color": "#4a4e5b",
+      "size": 20,
+      "x": 0.78,
+      "y": 0.45,
+      "status": "live",
+      "price": "$599",
+      "subscription": "无",
+      "summary": "无屏文字提示词镜 · 极简取向",
+      "name_en": "Even Realities G1",
+      "summary_en": "Screenless text prompt glasses · minimalist approach"
+    },
+    {
+      "id": "amazon",
+      "name": "Amazon Echo Frames",
+      "color": "#6b6f7c",
+      "size": 16,
+      "x": 0.2,
+      "y": 0.3,
+      "status": "stagnant",
+      "price": "$269",
+      "subscription": "Alexa Plus",
+      "summary": "Alexa 语音 · 销量不振 · 退场风险",
+      "name_en": "Amazon Echo Frames",
+      "summary_en": "Alexa voice · sluggish sales · exit risk"
+    },
+    {
+      "id": "xreal",
+      "name": "Xreal Air 2",
+      "color": "#4a4e5b",
+      "size": 18,
+      "x": 0.35,
+      "y": 0.65,
+      "status": "live",
+      "price": "$399",
+      "subscription": "无",
+      "summary": "AR 显示眼镜 · 游戏 / 大屏使用场景",
+      "name_en": "Xreal Air 2",
+      "summary_en": "AR display glasses · gaming/large screen use cases"
+    },
+    {
+      "id": "apple",
+      "name": "Apple AI Glasses(?)",
+      "color": "#6b6f7c",
+      "size": 17,
+      "x": 0.45,
+      "y": 0.15,
+      "status": "rumored",
+      "summary": "传闻 2026-2027 · 最大未定变量",
+      "name_en": "Apple AI Glasses(?)",
+      "summary_en": "Rumored 2026-2027 · biggest unknown variable"
+    }
   ],
-
   "themes": [
-    { "id": "t.record",  "label": "摄录",      "color": "#5b7a52", "size": 19, "x": 0.50, "y": 0.50, "polarity": "win",     "summary": "Ray-Ban Meta 实际最常用 · 朋友视角拍摄" },
-    { "id": "t.privacy", "label": "隐私争议",  "color": "#a0533c", "size": 18, "x": 0.70, "y": 0.55, "polarity": "pain",    "summary": "指示灯太弱 · 旁观者不知情" },
-    { "id": "t.ai",      "label": "AI 听 + 翻译","color": "#5b7a52","size": 15, "x": 0.30, "y": 0.40, "polarity": "win",     "summary": "实时翻译 / Look-and-Ask 是真高频" },
-    { "id": "t.ar",      "label": "AR 体验",    "color": "#80766a","size": 12, "x": 0.45, "y": 0.78, "polarity": "neutral", "summary": "用户实际不太需要 AR · 反而是负担" },
-    { "id": "t.battery", "label": "续航",       "color": "#a0533c","size": 14, "x": 0.80, "y": 0.25, "polarity": "pain",    "summary": "重度使用 1.5-2h 见底 · 充电盒依赖" },
-    { "id": "t.style",   "label": "外观",       "color": "#5b7a52","size": 13, "x": 0.18, "y": 0.62, "polarity": "win",     "summary": "Ray-Ban 美学是关键卖点 · 别家学不来" }
+    {
+      "id": "t.record",
+      "label": "摄录",
+      "color": "#5b7a52",
+      "size": 19,
+      "x": 0.5,
+      "y": 0.5,
+      "polarity": "win",
+      "summary": "Ray-Ban Meta 实际最常用 · 朋友视角拍摄",
+      "label_en": "Recording",
+      "summary_en": "Ray-Ban Meta's most common actual use · first-person perspective filming"
+    },
+    {
+      "id": "t.privacy",
+      "label": "隐私争议",
+      "color": "#a0533c",
+      "size": 18,
+      "x": 0.7,
+      "y": 0.55,
+      "polarity": "pain",
+      "summary": "指示灯太弱 · 旁观者不知情",
+      "label_en": "Privacy Controversy",
+      "summary_en": "Indicator light too weak · bystanders unaware"
+    },
+    {
+      "id": "t.ai",
+      "label": "AI 听 + 翻译",
+      "color": "#5b7a52",
+      "size": 15,
+      "x": 0.3,
+      "y": 0.4,
+      "polarity": "win",
+      "summary": "实时翻译 / Look-and-Ask 是真高频",
+      "label_en": "AI Listening + Translation",
+      "summary_en": "Real-time translation / Look-and-Ask is truly high-frequency"
+    },
+    {
+      "id": "t.ar",
+      "label": "AR 体验",
+      "color": "#80766a",
+      "size": 12,
+      "x": 0.45,
+      "y": 0.78,
+      "polarity": "neutral",
+      "summary": "用户实际不太需要 AR · 反而是负担",
+      "label_en": "AR Experience",
+      "summary_en": "Users don't really need AR · it's a burden"
+    },
+    {
+      "id": "t.battery",
+      "label": "续航",
+      "color": "#a0533c",
+      "size": 14,
+      "x": 0.8,
+      "y": 0.25,
+      "polarity": "pain",
+      "summary": "重度使用 1.5-2h 见底 · 充电盒依赖",
+      "label_en": "Battery Life",
+      "summary_en": "Heavy use 1.5-2h to empty · charging case dependency"
+    },
+    {
+      "id": "t.style",
+      "label": "外观",
+      "color": "#5b7a52",
+      "size": 13,
+      "x": 0.18,
+      "y": 0.62,
+      "polarity": "win",
+      "summary": "Ray-Ban 美学是关键卖点 · 别家学不来",
+      "label_en": "Design",
+      "summary_en": "Ray-Ban aesthetics are key selling point · others can't replicate"
+    }
   ],
-
   "voices": [
-    { "id": "v01", "player": "rbmeta", "title": "I use my Ray-Bans 3 times a day to film my kids",      "score": 1842, "url": "https://www.reddit.com/r/rayban_meta/v01", "sentiment": "pos", "themes": ["t.record"],         "collected_at": "2025-12-04" },
-    { "id": "v02", "player": "rbmeta", "title": "Real-time translation actually works in Tokyo",         "score": 1245, "url": "https://www.reddit.com/r/rayban_meta/v02", "sentiment": "pos", "themes": ["t.ai"],             "collected_at": "2026-01-19" },
-    { "id": "v03", "player": "rbmeta", "title": "A stranger asked me if I was recording. Awkward.",     "score": 980,  "url": "https://www.reddit.com/r/rayban_meta/v03", "sentiment": "neg", "themes": ["t.privacy"],        "collected_at": "2025-11-12" },
-    { "id": "v04", "player": "rbmeta", "title": "Battery dies before lunch on travel days",              "score": 620,  "url": "https://www.reddit.com/r/rayban_meta/v04", "sentiment": "neg", "themes": ["t.battery"],        "collected_at": "2026-02-08" },
-    { "id": "v05", "player": "even",   "title": "G1 made me realize I don't actually want AR",          "score": 412,  "url": "https://www.reddit.com/r/EvenRealities/v05","sentiment": "pos", "themes": ["t.ar","t.style"],   "collected_at": "2026-03-15" },
-    { "id": "v06", "player": "xreal",  "title": "Xreal Air 2 is a private monitor, not a 'lifestyle'",   "score": 380,  "url": "https://www.reddit.com/r/Xreal/v06",       "sentiment": "neg", "themes": ["t.ar"],             "collected_at": "2026-04-02" }
+    {
+      "id": "v01",
+      "player": "rbmeta",
+      "title": "I use my Ray-Bans 3 times a day to film my kids",
+      "score": 1842,
+      "url": "https://www.reddit.com/r/rayban_meta/v01",
+      "sentiment": "pos",
+      "themes": [
+        "t.record"
+      ],
+      "collected_at": "2025-12-04",
+      "title_en": "I use my Ray-Bans 3 times a day to film my kids"
+    },
+    {
+      "id": "v02",
+      "player": "rbmeta",
+      "title": "Real-time translation actually works in Tokyo",
+      "score": 1245,
+      "url": "https://www.reddit.com/r/rayban_meta/v02",
+      "sentiment": "pos",
+      "themes": [
+        "t.ai"
+      ],
+      "collected_at": "2026-01-19",
+      "title_en": "Real-time translation actually works in Tokyo"
+    },
+    {
+      "id": "v03",
+      "player": "rbmeta",
+      "title": "A stranger asked me if I was recording. Awkward.",
+      "score": 980,
+      "url": "https://www.reddit.com/r/rayban_meta/v03",
+      "sentiment": "neg",
+      "themes": [
+        "t.privacy"
+      ],
+      "collected_at": "2025-11-12",
+      "title_en": "A stranger asked me if I was recording. Awkward."
+    },
+    {
+      "id": "v04",
+      "player": "rbmeta",
+      "title": "Battery dies before lunch on travel days",
+      "score": 620,
+      "url": "https://www.reddit.com/r/rayban_meta/v04",
+      "sentiment": "neg",
+      "themes": [
+        "t.battery"
+      ],
+      "collected_at": "2026-02-08",
+      "title_en": "Battery dies before lunch on travel days"
+    },
+    {
+      "id": "v05",
+      "player": "even",
+      "title": "G1 made me realize I don't actually want AR",
+      "score": 412,
+      "url": "https://www.reddit.com/r/EvenRealities/v05",
+      "sentiment": "pos",
+      "themes": [
+        "t.ar",
+        "t.style"
+      ],
+      "collected_at": "2026-03-15",
+      "title_en": "G1 made me realize I don't actually want AR"
+    },
+    {
+      "id": "v06",
+      "player": "xreal",
+      "title": "Xreal Air 2 is a private monitor, not a 'lifestyle'",
+      "score": 380,
+      "url": "https://www.reddit.com/r/Xreal/v06",
+      "sentiment": "neg",
+      "themes": [
+        "t.ar"
+      ],
+      "collected_at": "2026-04-02",
+      "title_en": "Xreal Air 2 is a private monitor, not a 'lifestyle'"
+    }
   ],
-
   "opportunity": {
-    "id": "opp", "label": "★ 环境隐私 + 无屏 AI",
-    "color": "#5b7a52", "size": 30, "x": 0.40, "y": 0.18,
-    "summary": "可见可感的隐私指示 + 无屏的 AI 听/译/记 = 下一波切入点。没有玩家占据。"
+    "id": "opp",
+    "label": "★ 环境隐私 + 无屏 AI",
+    "color": "#5b7a52",
+    "size": 30,
+    "x": 0.4,
+    "y": 0.18,
+    "summary": "可见可感的隐私指示 + 无屏的 AI 听/译/记 = 下一波切入点。没有玩家占据。",
+    "label_en": "★ Ambient Privacy + Screenless AI",
+    "summary_en": "Visible and perceptible privacy indication + screenless AI listening/translation/recording = next entry point. No player occupies it."
   },
-
   "edges": [
-    {"from":"rbmeta","to":"t.record","w":3},{"from":"rbmeta","to":"t.privacy","w":3},{"from":"rbmeta","to":"t.ai","w":3},{"from":"rbmeta","to":"t.battery","w":2},{"from":"rbmeta","to":"t.style","w":3},
-    {"from":"even","to":"t.style","w":3},{"from":"even","to":"t.ar","w":2},
-    {"from":"xreal","to":"t.ar","w":3},
-    {"from":"amazon","to":"t.ai","w":1},
-    {"from":"apple","to":"opp","w":2},
-    {"from":"v01","to":"t.record","w":1},{"from":"v02","to":"t.ai","w":1},{"from":"v03","to":"t.privacy","w":1},
-    {"from":"v04","to":"t.battery","w":1},{"from":"v05","to":"t.ar","w":1},{"from":"v05","to":"t.style","w":1},
-    {"from":"v06","to":"t.ar","w":1},
-    {"from":"t.privacy","to":"opp","w":3},{"from":"t.ai","to":"opp","w":2}
+    {
+      "from": "rbmeta",
+      "to": "t.record",
+      "w": 3
+    },
+    {
+      "from": "rbmeta",
+      "to": "t.privacy",
+      "w": 3
+    },
+    {
+      "from": "rbmeta",
+      "to": "t.ai",
+      "w": 3
+    },
+    {
+      "from": "rbmeta",
+      "to": "t.battery",
+      "w": 2
+    },
+    {
+      "from": "rbmeta",
+      "to": "t.style",
+      "w": 3
+    },
+    {
+      "from": "even",
+      "to": "t.style",
+      "w": 3
+    },
+    {
+      "from": "even",
+      "to": "t.ar",
+      "w": 2
+    },
+    {
+      "from": "xreal",
+      "to": "t.ar",
+      "w": 3
+    },
+    {
+      "from": "amazon",
+      "to": "t.ai",
+      "w": 1
+    },
+    {
+      "from": "apple",
+      "to": "opp",
+      "w": 2
+    },
+    {
+      "from": "v01",
+      "to": "t.record",
+      "w": 1
+    },
+    {
+      "from": "v02",
+      "to": "t.ai",
+      "w": 1
+    },
+    {
+      "from": "v03",
+      "to": "t.privacy",
+      "w": 1
+    },
+    {
+      "from": "v04",
+      "to": "t.battery",
+      "w": 1
+    },
+    {
+      "from": "v05",
+      "to": "t.ar",
+      "w": 1
+    },
+    {
+      "from": "v05",
+      "to": "t.style",
+      "w": 1
+    },
+    {
+      "from": "v06",
+      "to": "t.ar",
+      "w": 1
+    },
+    {
+      "from": "t.privacy",
+      "to": "opp",
+      "w": 3
+    },
+    {
+      "from": "t.ai",
+      "to": "opp",
+      "w": 2
+    }
   ],
-
   "marketplace": [
-    { "player": "rbmeta", "platform": "Amazon US", "rating": 4.4, "review_count": 8420, "top_complaints": ["续航", "Meta AI bug"], "top_praises": ["摄录", "外观"], "url": "https://www.amazon.com/dp/B0CHX1W1HJ", "collected_at": "2026-05-18" },
-    { "player": "even",   "platform": "官方 / DTC",   "rating": 4.2, "review_count": 380,  "top_complaints": ["可读性"], "top_praises": ["设计", "重量"], "url": "https://evenrealities.com",                                                              "collected_at": "2026-05-15" },
-    { "player": "xreal",  "platform": "Amazon US", "rating": 3.9, "review_count": 2140, "top_complaints": ["软件不成熟"], "top_praises": ["大屏"], "url": "https://www.amazon.com/dp/B0CMQB9CG4",                                                  "collected_at": "2026-05-18" }
+    {
+      "player": "rbmeta",
+      "platform": "Amazon US",
+      "rating": 4.4,
+      "review_count": 8420,
+      "top_complaints": [
+        "续航",
+        "Meta AI bug"
+      ],
+      "top_praises": [
+        "摄录",
+        "外观"
+      ],
+      "url": "https://www.amazon.com/dp/B0CHX1W1HJ",
+      "collected_at": "2026-05-18"
+    },
+    {
+      "player": "even",
+      "platform": "官方 / DTC",
+      "rating": 4.2,
+      "review_count": 380,
+      "top_complaints": [
+        "可读性"
+      ],
+      "top_praises": [
+        "设计",
+        "重量"
+      ],
+      "url": "https://evenrealities.com",
+      "collected_at": "2026-05-15"
+    },
+    {
+      "player": "xreal",
+      "platform": "Amazon US",
+      "rating": 3.9,
+      "review_count": 2140,
+      "top_complaints": [
+        "软件不成熟"
+      ],
+      "top_praises": [
+        "大屏"
+      ],
+      "url": "https://www.amazon.com/dp/B0CMQB9CG4",
+      "collected_at": "2026-05-18"
+    }
   ],
-
   "paths": [
-    { "id": "path-a", "label": "Path A · 隐私优先 AI 听镜",  "core": "可见隐私指示 + 无屏 AI 听/译/记",          "description": "对接最强 voice (摄录 + 翻译) ,绕开隐私争议,有 Meta 不愿做的护城河", "time": "9-12 个月",  "investment": "$2-5M",   "moat": "high",   "recommended": true },
-    { "id": "path-b", "label": "Path B · 高端定制时尚向",    "core": "Even-style 极简 + 时尚品牌联名",            "description": "走 lifestyle 高端,绕开 Meta 主战场,但天花板低",                                "time": "6-9 个月",   "investment": "$1-2M",   "moat": "mid",    "recommended": false },
-    { "id": "path-c", "label": "Path C · 垂直场景 (商务/医疗)","core": "会议记录 / 看诊辅助",                     "description": "B2B 路径,绕开消费市场,但需 GTM 重做",                                          "time": "12 个月",    "investment": "$2-4M",   "moat": "high",   "recommended": false }
+    {
+      "id": "path-a",
+      "label": "Path A · 隐私优先 AI 听镜",
+      "core": "可见隐私指示 + 无屏 AI 听/译/记",
+      "description": "对接最强 voice (摄录 + 翻译) ,绕开隐私争议,有 Meta 不愿做的护城河",
+      "time": "9-12 个月",
+      "investment": "$2-5M",
+      "moat": "high",
+      "recommended": true,
+      "label_en": "Path A · Privacy-First AI Listening Glasses",
+      "core_en": "Visible privacy indication + screenless AI listening/translation/recording",
+      "description_en": "Leverage strongest voice (recording + translation), bypass privacy controversy, create moat Meta is unwilling to build"
+    },
+    {
+      "id": "path-b",
+      "label": "Path B · 高端定制时尚向",
+      "core": "Even-style 极简 + 时尚品牌联名",
+      "description": "走 lifestyle 高端,绕开 Meta 主战场,但天花板低",
+      "time": "6-9 个月",
+      "investment": "$1-2M",
+      "moat": "mid",
+      "recommended": false,
+      "label_en": "Path B · High-End Custom Fashion",
+      "core_en": "Even-style minimalism + fashion brand collaboration",
+      "description_en": "Go lifestyle high-end, bypass Meta's main battlefield, but low ceiling"
+    },
+    {
+      "id": "path-c",
+      "label": "Path C · 垂直场景 (商务/医疗)",
+      "core": "会议记录 / 看诊辅助",
+      "description": "B2B 路径,绕开消费市场,但需 GTM 重做",
+      "time": "12 个月",
+      "investment": "$2-4M",
+      "moat": "high",
+      "recommended": false,
+      "label_en": "Path C · Vertical Scenarios (Business/Medical)",
+      "core_en": "Meeting notes / medical assistance",
+      "description_en": "B2B path, bypass consumer market, but requires GTM rework"
+    }
   ],
-
   "risks": [
-    { "id": "R-01", "title": "Apple AI 眼镜入场",   "scenario": "若 2026-2027 官宣,定义新 baseline",        "severity": "high", "mitigation": "抢隐私 / 听镜定位窗口 · 与 Apple 不重叠" },
-    { "id": "R-02", "title": "隐私监管收紧",         "scenario": "EU / 加州可能立法强制视觉指示灯",          "severity": "high", "mitigation": "主动设计 over-spec 指示灯方案" },
-    { "id": "R-03", "title": "Meta 突然降价",        "scenario": "Ray-Ban Meta 降到 $199 抢平价市场",         "severity": "mid",  "mitigation": "差异化护城河 · 不做硬件 race-to-bottom" },
-    { "id": "R-04", "title": "电池技术瓶颈",         "scenario": "续航卡在 2h 无法突破",                       "severity": "mid",  "mitigation": "充电盒 + USB-C 兼容方案" },
-    { "id": "R-05", "title": "AI 翻译质量瓶颈",     "scenario": "Apple/Google 翻译免费 + 集成",              "severity": "low",  "mitigation": "聚焦 niche 语种 + 实时性优势" }
+    {
+      "id": "R-01",
+      "title": "Apple AI 眼镜入场",
+      "scenario": "若 2026-2027 官宣,定义新 baseline",
+      "severity": "high",
+      "mitigation": "抢隐私 / 听镜定位窗口 · 与 Apple 不重叠",
+      "title_en": "Apple AI Glasses Entry",
+      "scenario_en": "If announced 2026-2027, defines new baseline",
+      "mitigation_en": "Seize privacy/listening glasses positioning window · non-overlapping with Apple"
+    },
+    {
+      "id": "R-02",
+      "title": "隐私监管收紧",
+      "scenario": "EU / 加州可能立法强制视觉指示灯",
+      "severity": "high",
+      "mitigation": "主动设计 over-spec 指示灯方案",
+      "title_en": "Privacy Regulation Tightening",
+      "scenario_en": "EU/California may mandate visual indicator lights",
+      "mitigation_en": "Proactively design over-spec indicator light solution"
+    },
+    {
+      "id": "R-03",
+      "title": "Meta 突然降价",
+      "scenario": "Ray-Ban Meta 降到 $199 抢平价市场",
+      "severity": "mid",
+      "mitigation": "差异化护城河 · 不做硬件 race-to-bottom",
+      "title_en": "Meta Sudden Price Drop",
+      "scenario_en": "Ray-Ban Meta drops to $199 to capture budget market",
+      "mitigation_en": "Differentiated moat · no hardware race-to-bottom"
+    },
+    {
+      "id": "R-04",
+      "title": "电池技术瓶颈",
+      "scenario": "续航卡在 2h 无法突破",
+      "severity": "mid",
+      "mitigation": "充电盒 + USB-C 兼容方案",
+      "title_en": "Battery Technology Bottleneck",
+      "scenario_en": "Battery life stuck at 2h, cannot break through",
+      "mitigation_en": "Charging case + USB-C compatible solution"
+    },
+    {
+      "id": "R-05",
+      "title": "AI 翻译质量瓶颈",
+      "scenario": "Apple/Google 翻译免费 + 集成",
+      "severity": "low",
+      "mitigation": "聚焦 niche 语种 + 实时性优势",
+      "title_en": "AI Translation Quality Bottleneck",
+      "scenario_en": "Apple/Google translation free + integrated",
+      "mitigation_en": "Focus on niche languages + real-time advantage"
+    }
   ],
-
   "failures": [
-    { "name": "Google Glass",   "years": "2013-2015", "what": "面向工程师的 AR 探险 · 隐私争议 + 价格",         "lesson": "AR 眼镜如果先解决隐私,产品才能成立" },
-    { "name": "Snap Spectacles","years": "2016-2018", "what": "Snapchat 摄录眼镜 · 内容生态弱",                  "lesson": "硬件之外的内容生态决定生死" }
+    {
+      "name": "Google Glass",
+      "years": "2013-2015",
+      "what": "面向工程师的 AR 探险 · 隐私争议 + 价格",
+      "lesson": "AR 眼镜如果先解决隐私,产品才能成立",
+      "name_en": "Google Glass",
+      "what_en": "AR expedition for engineers · privacy controversy + price",
+      "lesson_en": "AR glasses must solve privacy first to be viable"
+    },
+    {
+      "name": "Snap Spectacles",
+      "years": "2016-2018",
+      "what": "Snapchat 摄录眼镜 · 内容生态弱",
+      "lesson": "硬件之外的内容生态决定生死",
+      "name_en": "Snap Spectacles",
+      "what_en": "Snapchat recording glasses · weak content ecosystem",
+      "lesson_en": "Beyond hardware, content ecosystem determines survival"
+    }
   ]
 }

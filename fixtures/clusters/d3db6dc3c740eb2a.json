@@ -1,0 +1,202 @@
+{
+  "themes": [
+    {
+      "id": "t.health_safety",
+      "label": "健康安全",
+      "polarity": "win",
+      "size": 18,
+      "x": 0.2,
+      "y": 0.8,
+      "color": "#5b7a52",
+      "summary": "Ring data helps detect serious health issues early."
+    },
+    {
+      "id": "t.physical_safety",
+      "label": "物理安全",
+      "polarity": "pain",
+      "size": 17,
+      "x": 0.8,
+      "y": 0.8,
+      "color": "#a0533c",
+      "summary": "Rings exploding, swelling, or getting stuck on finger."
+    },
+    {
+      "id": "t.subscription",
+      "label": "订阅费用",
+      "polarity": "pain",
+      "size": 15,
+      "x": 0.5,
+      "y": 0.7,
+      "color": "#a0533c",
+      "summary": "Subscription cost is considered not worth it."
+    },
+    {
+      "id": "t.data_accuracy",
+      "label": "数据准确性",
+      "polarity": "pain",
+      "size": 14,
+      "x": 0.3,
+      "y": 0.3,
+      "color": "#a0533c",
+      "summary": "Activity misclassification (e.g., crying as biking)."
+    },
+    {
+      "id": "t.feature_request",
+      "label": "功能需求",
+      "polarity": "neutral",
+      "size": 13,
+      "x": 0.7,
+      "y": 0.3,
+      "color": "#80766a",
+      "summary": "Users request new features like sick mode or tone toggle."
+    },
+    {
+      "id": "t.brand_loyalty",
+      "label": "品牌忠诚",
+      "polarity": "neutral",
+      "size": 12,
+      "x": 0.5,
+      "y": 0.5,
+      "color": "#80766a",
+      "summary": "Users switch between brands based on experience."
+    },
+    {
+      "id": "t.charging",
+      "label": "充电体验",
+      "polarity": "neutral",
+      "size": 11,
+      "x": 0.2,
+      "y": 0.5,
+      "color": "#80766a",
+      "summary": "Charging workarounds and battery life concerns."
+    },
+    {
+      "id": "t.other",
+      "label": "其他",
+      "polarity": "neutral",
+      "size": 9,
+      "x": 0.8,
+      "y": 0.5,
+      "color": "#80766a",
+      "summary": "Miscellaneous feedback not fitting other themes."
+    }
+  ],
+  "voice_themes": {
+    "v01": [
+      "t.health_safety"
+    ],
+    "v02": [
+      "t.health_safety"
+    ],
+    "v03": [
+      "t.brand_loyalty",
+      "t.subscription"
+    ],
+    "v04": [
+      "t.physical_safety"
+    ],
+    "v05": [
+      "t.physical_safety"
+    ],
+    "v06": [
+      "t.brand_loyalty"
+    ],
+    "v07": [
+      "t.brand_loyalty"
+    ],
+    "v08": [
+      "t.feature_request"
+    ],
+    "v09": [
+      "t.data_accuracy"
+    ],
+    "v10": [
+      "t.physical_safety"
+    ],
+    "v11": [
+      "t.charging"
+    ],
+    "v12": [
+      "t.feature_request"
+    ],
+    "v13": [
+      "t.subscription"
+    ],
+    "v14": [
+      "t.physical_safety",
+      "t.brand_loyalty"
+    ]
+  },
+  "edges": [
+    {
+      "from": "oura",
+      "to": "t.health_safety",
+      "w": 3
+    },
+    {
+      "from": "oura",
+      "to": "t.physical_safety",
+      "w": 2
+    },
+    {
+      "from": "oura",
+      "to": "t.subscription",
+      "w": 2
+    },
+    {
+      "from": "oura",
+      "to": "t.feature_request",
+      "w": 2
+    },
+    {
+      "from": "oura",
+      "to": "t.charging",
+      "w": 1
+    },
+    {
+      "from": "oura",
+      "to": "t.brand_loyalty",
+      "w": 1
+    },
+    {
+      "from": "samsung",
+      "to": "t.physical_safety",
+      "w": 2
+    },
+    {
+      "from": "samsung",
+      "to": "t.brand_loyalty",
+      "w": 1
+    },
+    {
+      "from": "ringconn",
+      "to": "t.physical_safety",
+      "w": 2
+    },
+    {
+      "from": "ringconn",
+      "to": "t.brand_loyalty",
+      "w": 2
+    },
+    {
+      "from": "ringconn",
+      "to": "t.data_accuracy",
+      "w": 1
+    },
+    {
+      "from": "ringconn",
+      "to": "t.feature_request",
+      "w": 1
+    },
+    {
+      "from": "ultrahuman",
+      "to": "t.other",
+      "w": 1
+    },
+    {
+      "from": "apple",
+      "to": "t.other",
+      "w": 1
+    }
+  ]
+}
