@@ -58,13 +58,24 @@ def _get_oauth_token():
     if not cid or not secret or not shutil.which("curl"):
         return None
     auth = base64.b64encode(f"{cid}:{secret}".encode()).decode()
+    user = os.environ.get("REDDIT_USERNAME")
+    pw = os.environ.get("REDDIT_PASSWORD")
+    # "script" apps are officially password-grant; if username/password are
+    # provided use that (most reliable). Otherwise fall back to app-only
+    # client_credentials (works for web/script apps with a secret, read-only).
+    if user and pw:
+        grant = ["--data-urlencode", "grant_type=password",
+                 "--data-urlencode", f"username={user}",
+                 "--data-urlencode", f"password={pw}"]
+    else:
+        grant = ["--data-urlencode", "grant_type=client_credentials"]
     try:
         out = subprocess.run(
             ["curl", "-s", "-m", "20",
              "-X", "POST", "https://www.reddit.com/api/v1/access_token",
              "-H", f"Authorization: Basic {auth}",
              "-H", f"User-Agent: {UA}",
-             "--data-urlencode", "grant_type=client_credentials"],
+             *grant],
             capture_output=True, timeout=25,
         )
         if out.returncode == 0 and out.stdout:
