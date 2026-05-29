@@ -115,10 +115,12 @@ def stage_collect(scope: dict, wd: Path, skip: bool) -> list[dict]:
     subs = scope.get("subreddits", [])
     if subs:
         cmd = [sys_exe(), str(ROOT / "core/collect/reddit.py"),
-               "--subs", *subs, "--limit", "20", "--out", str(reddit_jsonl)]
+               "--subs", *subs, "--limit", "30",
+               "--with-comments", "--comments-per-post", "4",
+               "--out", str(reddit_jsonl)]
         print(f"    reddit: {' '.join(subs)}")
         try:
-            subprocess.run(cmd, check=True, capture_output=True, timeout=180)
+            subprocess.run(cmd, check=True, capture_output=True, timeout=240)
             pool += read_jsonl(reddit_jsonl, source="reddit")
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
             print(f"    ! reddit collect partial/failed: {e}", file=sys.stderr)
@@ -127,17 +129,17 @@ def stage_collect(scope: dict, wd: Path, skip: bool) -> list[dict]:
     queries = scope.get("hn_queries", [])
     if queries:
         cmd = [sys_exe(), str(ROOT / "core/collect/hn.py"),
-               "--query", *queries, "--hits", "25", "--out", str(hn_jsonl)]
+               "--query", *queries, "--hits", "40", "--out", str(hn_jsonl)]
         print(f"    hn: {queries}")
         try:
-            subprocess.run(cmd, check=True, capture_output=True, timeout=120)
+            subprocess.run(cmd, check=True, capture_output=True, timeout=150)
             pool += read_jsonl(hn_jsonl, source="hn")
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
             print(f"    ! hn collect partial/failed: {e}", file=sys.stderr)
 
-    # Keep highest-score records (cap to keep LLM curate prompt small)
+    # Keep highest-score records (cap to keep LLM curate prompt manageable)
     pool.sort(key=lambda r: abs(r.get("score") or 0), reverse=True)
-    pool = pool[:80]
+    pool = pool[:140]
     save(out, pool)
     print(f"    collected {len(pool)} raw records")
     return pool
@@ -439,7 +441,7 @@ def main() -> int:
     ap.add_argument("--slug", required=True)
     ap.add_argument("--idea")
     ap.add_argument("--target-market", default="US")
-    ap.add_argument("--max-voices", type=int, default=14)
+    ap.add_argument("--max-voices", type=int, default=24)
     ap.add_argument("--mode", choices=["EXISTING", "NON_STOCK"],
                     help="Force market mode (overrides LLM auto-detection)")
     ap.add_argument("--skip-collect", action="store_true")

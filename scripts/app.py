@@ -68,7 +68,7 @@ def run_pipeline(idea: str, target_market: str, mode: str | None,
         )
 
     log("CURATE", "筛选相关用户声音(剔除噪声)…")
-    voices = research.stage_curate(idea, scope, pool, wd, 14, False)
+    voices = research.stage_curate(idea, scope, pool, wd, 24, False)
     if not voices:
         raise RuntimeError(
             f"收集到 {len(pool)} 条原始内容,但没有一条与「{idea}」强相关 "

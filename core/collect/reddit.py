@@ -23,21 +23,85 @@ from pathlib import Path
 UA = "Vibe-Demand-Research/0.1 (+https://github.com/wangbh030722/Vibe-product-demand-research)"
 
 
+def _load_dotenv():
+    """Read repo-root .env (this script runs as a subprocess, so it must load
+    REDDIT_* itself). Existing env wins."""
+    import os
+    p = Path(__file__).resolve().parent.parent.parent / ".env"
+    if not p.exists():
+        return
+    for line in p.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, _, v = line.partition("=")
+        k, v = k.strip(), v.strip().strip('"').strip("'")
+        if k and k not in os.environ:
+            os.environ[k] = v
+
+
+_load_dotenv()
+
+# OAuth token cache. When REDDIT_CLIENT_ID/SECRET are set, we use the official
+# API (oauth.reddit.com) which is NOT subject to the anti-scraping IP bans on
+# the www.reddit.com web frontend, and has far higher rate limits.
+_OAUTH = {"token": None, "tried": False}
+
+
+def _get_oauth_token():
+    import os, base64, shutil, subprocess
+    if _OAUTH["tried"]:
+        return _OAUTH["token"]
+    _OAUTH["tried"] = True
+    cid = os.environ.get("REDDIT_CLIENT_ID")
+    secret = os.environ.get("REDDIT_CLIENT_SECRET")
+    if not cid or not secret or not shutil.which("curl"):
+        return None
+    auth = base64.b64encode(f"{cid}:{secret}".encode()).decode()
+    try:
+        out = subprocess.run(
+            ["curl", "-s", "-m", "20",
+             "-X", "POST", "https://www.reddit.com/api/v1/access_token",
+             "-H", f"Authorization: Basic {auth}",
+             "-H", f"User-Agent: {UA}",
+             "--data-urlencode", "grant_type=client_credentials"],
+            capture_output=True, timeout=25,
+        )
+        if out.returncode == 0 and out.stdout:
+            tok = json.loads(out.stdout).get("access_token")
+            if tok:
+                _OAUTH["token"] = tok
+                sys.stderr.write("[reddit] OAuth token acquired (official API)\n")
+                return tok
+        sys.stderr.write(f"[reddit] OAuth token failed: {out.stdout[:200]!r}\n")
+    except Exception as e:
+        sys.stderr.write(f"[reddit] OAuth token error: {e}\n")
+    return None
+
+
+def _api_base_and_headers():
+    """Return (base_url, extra_headers). Prefer official OAuth API if available."""
+    tok = _get_oauth_token()
+    if tok:
+        return "https://oauth.reddit.com", {"Authorization": f"Bearer {tok}"}
+    return "https://www.reddit.com", {}
+
+
 BROWSER_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 
 
-def _curl_get(url: str):
+def _curl_get(url: str, extra_headers=None):
     """Fallback via curl (handles proxy/TLS where urllib fails)."""
     import shutil, subprocess
     if not shutil.which("curl"):
         return None
+    cmd = ["curl", "-s", "-m", "25", "-A", BROWSER_UA, "-H", "Accept: application/json"]
+    for k, v in (extra_headers or {}).items():
+        cmd += ["-H", f"{k}: {v}"]
+    cmd.append(url)
     try:
-        out = subprocess.run(
-            ["curl", "-s", "-m", "25", "-A", BROWSER_UA,
-             "-H", "Accept: application/json", url],
-            capture_output=True, timeout=30,
-        )
+        out = subprocess.run(cmd, capture_output=True, timeout=30)
         if out.returncode == 0 and out.stdout:
             return json.loads(out.stdout.decode("utf-8"))
     except Exception:
@@ -45,11 +109,14 @@ def _curl_get(url: str):
     return None
 
 
-def fetch(url: str, retries: int = 3, backoff: float = 1.5):
+def fetch(url: str, retries: int = 3, backoff: float = 1.5, headers=None):
     last_err = None
+    base_headers = {"User-Agent": UA, "Accept": "application/json"}
+    if headers:
+        base_headers.update(headers)
     for attempt in range(retries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"})
+            req = urllib.request.Request(url, headers=base_headers)
             with urllib.request.urlopen(req, timeout=20) as r:
                 return json.loads(r.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
@@ -57,14 +124,13 @@ def fetch(url: str, retries: int = 3, backoff: float = 1.5):
             if e.code in (429, 503):
                 time.sleep(backoff * (attempt + 1))
                 continue
-            # 403 etc → try curl once before giving up
-            data = _curl_get(url)
+            data = _curl_get(url, headers)
             if data is not None:
                 return data
             raise
         except Exception as e:
             last_err = e
-            data = _curl_get(url)
+            data = _curl_get(url, headers)
             if data is not None:
                 return data
             time.sleep(backoff * (attempt + 1))
@@ -73,9 +139,10 @@ def fetch(url: str, retries: int = 3, backoff: float = 1.5):
 
 def collect_subreddit(sub: str, limit: int, sort: str = "top", t: str = "year"):
     """Yield post records from a subreddit."""
-    url = f"https://www.reddit.com/r/{sub}/{sort}.json?limit={limit}&t={t}"
+    base, hdrs = _api_base_and_headers()
+    url = f"{base}/r/{sub}/{sort}.json?limit={limit}&t={t}"
     sys.stderr.write(f"[reddit] GET {url}\n")
-    data = fetch(url)
+    data = fetch(url, headers=hdrs)
     posts = data.get("data", {}).get("children", [])
     for p in posts:
         d = p.get("data", {})
@@ -104,9 +171,11 @@ def collect_subreddit(sub: str, limit: int, sort: str = "top", t: str = "year"):
 
 def collect_comments(permalink_url: str, top_n: int = 8):
     """Fetch top comments for a post. permalink_url ends without trailing slash already."""
-    url = permalink_url.rstrip("/") + ".json?limit=" + str(top_n) + "&sort=top"
+    base, hdrs = _api_base_and_headers()
+    path = permalink_url.rstrip("/").replace("https://www.reddit.com", "").replace("https://oauth.reddit.com", "")
+    url = base + path + ".json?limit=" + str(top_n) + "&sort=top"
     try:
-        data = fetch(url)
+        data = fetch(url, headers=hdrs)
     except Exception as e:
         sys.stderr.write(f"[reddit] comment fetch failed for {permalink_url}: {e}\n")
         return
