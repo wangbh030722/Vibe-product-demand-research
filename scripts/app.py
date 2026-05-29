@@ -45,8 +45,35 @@ def slugify(idea: str) -> str:
 # Pipeline in-process (mirrors research.py main, returns data dict)           #
 # --------------------------------------------------------------------------- #
 
+import os
+import threading
+
+# Only one research at a time (we override process-global env per request).
+# Fine for friend-testing scale; serializes concurrent submits.
+_PIPELINE_LOCK = threading.Lock()
+
+
 def run_pipeline(idea: str, target_market: str, mode: str | None,
-                 log) -> dict:
+                 log, creds: dict | None = None) -> dict:
+    creds = creds or {}
+    with _PIPELINE_LOCK:
+        # Apply per-request key override (falls back to .env default), restore after.
+        saved = {k: os.environ.get(k) for k in ("OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_MODEL")}
+        try:
+            if creds.get("api_key"):    os.environ["OPENAI_API_KEY"]  = creds["api_key"]
+            if creds.get("base_url"):   os.environ["OPENAI_BASE_URL"] = creds["base_url"]
+            if creds.get("model"):      os.environ["OPENAI_MODEL"]    = creds["model"]
+            return _run_pipeline_inner(idea, target_market, mode, log)
+        finally:
+            for k, v in saved.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+
+
+def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
+                        log) -> dict:
     slug = slugify(idea)
     wd = research.work_dir(slug)
 
@@ -138,6 +165,13 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   .samples{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
   .samples button{width:auto;margin:0;background:#fff;border:1px solid var(--line);color:var(--ink-2);font-size:11px;padding:6px 11px}
   .samples button:hover{border-color:var(--ink-3);background:#fff;color:var(--ink)}
+  .adv{margin-top:18px;border:1px solid var(--line);border-radius:8px;padding:0 14px;background:#fff}
+  .adv summary{cursor:pointer;padding:12px 0;font-family:var(--mono);font-size:12px;color:var(--ink-2);list-style:none}
+  .adv summary::-webkit-details-marker{display:none}
+  .adv summary:before{content:'▸ ';color:var(--ink-3)}
+  .adv[open] summary:before{content:'▾ '}
+  .adv[open]{padding-bottom:14px}
+  .adv-note{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:10px;line-height:1.6}
 </style></head><body>
 <div class="wrap">
   <div class="brand">VIBE · CATEGORY DEEP DIVE</div>
@@ -159,10 +193,21 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     </div>
   </div>
 
+  <details class="adv">
+    <summary>高级:用自己的 API key(可选,留空走默认)</summary>
+    <label>API Key</label>
+    <input id="apiKey" placeholder="sk-... 留空则用站点默认 key" autocomplete="off">
+    <div class="two">
+      <div><label>Base URL</label><input id="baseUrl" placeholder="https://api.deepseek.com/v1"></div>
+      <div><label>Model</label><input id="model" placeholder="deepseek-chat"></div>
+    </div>
+    <div class="adv-note">支持任意 OpenAI 兼容 API(DeepSeek / 通义 / Kimi / OpenAI / 本地 Ollama)。key 只在本次请求用,不保存。</div>
+  </details>
+
   <button id="go">开始研究 →</button>
   <div class="log" id="log"></div>
 
-  <div class="hint">本地运行,用你的 .env LLM key · 生成的数据存到 data/&lt;slug&gt;.json · 报告渲染后右上角可切中英文 / 下载 PDF</div>
+  <div class="hint">默认用站点配置的 key · 生成的数据存到 data/&lt;slug&gt;.json · 报告渲染后右上角可切中英文 / 下载 PDF</div>
 </div>
 
 <script>
@@ -186,7 +231,8 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     try {
       const r = await fetch('/api/research', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ idea, market: $('market').value, mode: $('mode').value })
+        body: JSON.stringify({ idea, market: $('market').value, mode: $('mode').value,
+          api_key: $('apiKey').value.trim(), base_url: $('baseUrl').value.trim(), model: $('model').value.trim() })
       });
       const out = await r.json();
       if (!out.ok){ addLog('ERROR', out.error || '失败', true); $('go').disabled=false; $('go').textContent='重试 →'; return; }
@@ -243,9 +289,17 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(400, json.dumps({"ok": False, "error": "missing idea"}), "application/json")
         market = (req.get("market") or "US").strip()
         mode = (req.get("mode") or "").strip() or None
-        print(f"\n▶ research: {idea}  (market={market}, mode={mode or 'auto'})", flush=True)
+        creds = {
+            "api_key": (req.get("api_key") or "").strip(),
+            "base_url": (req.get("base_url") or "").strip(),
+            "model": (req.get("model") or "").strip(),
+        }
+        custom = "custom-key" if creds["api_key"] else "default-key"
+        print(f"\n▶ research: {idea}  (market={market}, mode={mode or 'auto'}, {custom})", flush=True)
         try:
-            data = run_pipeline(idea, market, mode, log=lambda t, m: print(f"  {t}: {m}", flush=True))
+            data = run_pipeline(idea, market, mode,
+                                log=lambda t, m: print(f"  {t}: {m}", flush=True),
+                                creds=creds)
             return self._send(200, json.dumps({"ok": True, "data": data}, ensure_ascii=False), "application/json")
         except Exception as e:
             print(f"  ✗ {e}", flush=True)
