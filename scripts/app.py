@@ -184,7 +184,10 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
       const filled = tpl.replace('{{REPORT_DATA_JSON}}', () => JSON.stringify(out.data));
       document.open(); document.write(filled); document.close();
     } catch(e){
-      addLog('ERROR', e.message, true); $('go').disabled=false; $('go').textContent='重试 →';
+      const hint = /fetch/i.test(e.message)
+        ? '连不上后端 — 请确认终端里 `make app` 还在运行(那个窗口别关),然后重试。'
+        : e.message;
+      addLog('ERROR', hint, true); $('go').disabled=false; $('go').textContent='重试 →';
     }
   };
 </script>
