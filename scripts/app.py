@@ -58,10 +58,22 @@ def run_pipeline(idea: str, target_market: str, mode: str | None,
     log("COLLECT", f"联网抓取 {scope.get('subreddits')} + HN…")
     pool = research.stage_collect(scope, wd, False)
 
+    log("COLLECT", f"原始池 {len(pool)} 条")
+    if len(pool) < 3:
+        raise RuntimeError(
+            f"数据源几乎没抓到内容(原始池仅 {len(pool)} 条)。"
+            "常见原因:① Reddit 封了你代理出口 IP(403)② HN/网络 TLS 不稳。"
+            "解决:换一个 Clash 节点(住宅 IP)再试,或用「聊天指令包」路径"
+            "(让 Claude/ChatGPT 联网收集,比本地抓取稳)。"
+        )
+
     log("CURATE", "筛选相关用户声音(剔除噪声)…")
     voices = research.stage_curate(idea, scope, pool, wd, 14, False)
     if not voices:
-        raise RuntimeError("没有收集到相关声音 — 可能数据源被限流,或该想法信号太稀薄。")
+        raise RuntimeError(
+            f"收集到 {len(pool)} 条原始内容,但没有一条与「{idea}」强相关 "
+            "(可能抓到的多是邻近噪声)。换更聚焦的措辞、或换数据源节点再试。"
+        )
 
     log("CLUSTER", "聚类主题…")
     cluster = research.stage_cluster(idea, target_market, scope, voices, wd, False)

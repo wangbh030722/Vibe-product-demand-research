@@ -23,6 +23,28 @@ from pathlib import Path
 UA = "Vibe-Demand-Research/0.1 (+https://github.com/wangbh030722/Vibe-product-demand-research)"
 
 
+BROWSER_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+              "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+
+
+def _curl_get(url: str):
+    """Fallback via curl (handles proxy/TLS where urllib fails)."""
+    import shutil, subprocess
+    if not shutil.which("curl"):
+        return None
+    try:
+        out = subprocess.run(
+            ["curl", "-s", "-m", "25", "-A", BROWSER_UA,
+             "-H", "Accept: application/json", url],
+            capture_output=True, timeout=30,
+        )
+        if out.returncode == 0 and out.stdout:
+            return json.loads(out.stdout.decode("utf-8"))
+    except Exception:
+        return None
+    return None
+
+
 def fetch(url: str, retries: int = 3, backoff: float = 1.5):
     last_err = None
     for attempt in range(retries):
@@ -35,9 +57,16 @@ def fetch(url: str, retries: int = 3, backoff: float = 1.5):
             if e.code in (429, 503):
                 time.sleep(backoff * (attempt + 1))
                 continue
+            # 403 etc → try curl once before giving up
+            data = _curl_get(url)
+            if data is not None:
+                return data
             raise
         except Exception as e:
             last_err = e
+            data = _curl_get(url)
+            if data is not None:
+                return data
             time.sleep(backoff * (attempt + 1))
     raise RuntimeError(f"fetch failed after {retries}: {last_err}")
 

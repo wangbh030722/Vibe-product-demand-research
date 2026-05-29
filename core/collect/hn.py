@@ -20,9 +20,26 @@ UA = "Vibe-Demand-Research/0.1"
 
 
 def fetch(url):
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=20) as r:
-        return json.loads(r.read().decode("utf-8"))
+    # Try urllib first; fall back to curl (handles proxy/TLS quirks where
+    # Python's urllib fails with 'EOF occurred in violation of protocol').
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except Exception as e:
+        import shutil, subprocess
+        if not shutil.which("curl"):
+            raise
+        try:
+            out = subprocess.run(
+                ["curl", "-s", "-m", "25", "-A", UA, url],
+                capture_output=True, timeout=30,
+            )
+            if out.returncode == 0 and out.stdout:
+                return json.loads(out.stdout.decode("utf-8"))
+        except Exception:
+            pass
+        raise e
 
 
 def search(query: str, tags: str = "story", hits: int = 30):

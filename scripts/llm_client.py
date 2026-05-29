@@ -57,17 +57,50 @@ def chat_json(system: str, user: str, *, temperature: float = 0.3,
         "response_format": {"type": "json_object"},
     }).encode("utf-8")
 
-    req = urllib.request.Request(
-        f"{base_url}/chat/completions",
-        data=body,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-    )
+    endpoint = f"{base_url}/chat/completions"
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     print(f"    → LLM {base_url} model={model} ...", file=sys.stderr)
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        payload = json.loads(resp.read())
+
+    import shutil, subprocess
+    have_curl = bool(shutil.which("curl"))
+
+    def via_curl(direct: bool):
+        # Clash/proxy + Python urllib HTTPS is flaky ('EOF in violation of
+        # protocol'). curl is reliable. Domestic APIs (DeepSeek) need NO proxy
+        # (--noproxy '*'); foreign APIs (OpenAI) need the proxy. Try both.
+        if not have_curl:
+            return None
+        cmd = ["curl", "-s", "-m", str(timeout), "-X", "POST", endpoint]
+        if direct:
+            cmd += ["--noproxy", "*"]
+        for k, v in headers.items():
+            cmd += ["-H", f"{k}: {v}"]
+        cmd += ["--data-binary", "@-"]
+        try:
+            out = subprocess.run(cmd, input=body, capture_output=True, timeout=timeout + 10)
+            if out.returncode == 0 and out.stdout:
+                return json.loads(out.stdout)
+        except Exception:
+            return None
+        return None
+
+    def via_urllib():
+        req = urllib.request.Request(endpoint, data=body, headers=headers)
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read())
+
+    # Order: direct curl (domestic LLM) → proxied curl (foreign LLM) → urllib.
+    payload = via_curl(direct=True) or via_curl(direct=False)
+    if payload is None:
+        try:
+            payload = via_urllib()
+        except Exception as e:
+            raise RuntimeError(
+                f"LLM 请求失败(curl 直连/代理 + urllib 都不通): {e}. "
+                f"检查 {base_url} 是否可达、key 是否有效、代理设置。"
+            ) from e
+    if "choices" not in payload:
+        raise RuntimeError(f"LLM 返回异常: {json.dumps(payload)[:300]}")
     text = payload["choices"][0]["message"]["content"]
     # Some providers wrap JSON in ```json fences despite response_format
     text = text.strip()
