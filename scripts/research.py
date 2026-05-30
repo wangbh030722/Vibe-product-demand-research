@@ -110,6 +110,24 @@ def stage_collect(scope: dict, wd: Path, skip: bool) -> list[dict]:
     pool: list[dict] = []
     reddit_jsonl = wd / "reddit.jsonl"
     hn_jsonl = wd / "hn.jsonl"
+    pullpush_jsonl = wd / "pullpush.jsonl"
+
+    # pullpush.io — real Reddit posts/comments via a non-reddit.com domain,
+    # so it works even when reddit.com 403s the proxy IP. Primary Reddit source.
+    subs = scope.get("subreddits", [])
+    pp_queries = scope.get("hn_queries") or [scope.get("_idea", "")]
+    if pp_queries:
+        cmd = [sys_exe(), str(ROOT / "core/collect/pullpush.py"),
+               "--queries", *[q for q in pp_queries if q],
+               "--size", "40", "--out", str(pullpush_jsonl)]
+        if subs:
+            cmd += ["--subs", *subs]
+        print(f"    pullpush: {subs or '*'}")
+        try:
+            subprocess.run(cmd, check=True, capture_output=True, timeout=180)
+            pool += read_jsonl(pullpush_jsonl, source="reddit")
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            print(f"    ! pullpush partial/failed: {e}", file=sys.stderr)
 
     # Reddit
     subs = scope.get("subreddits", [])
@@ -137,9 +155,16 @@ def stage_collect(scope: dict, wd: Path, skip: bool) -> list[dict]:
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
             print(f"    ! hn collect partial/failed: {e}", file=sys.stderr)
 
-    # Keep highest-score records (cap to keep LLM curate prompt manageable)
-    pool.sort(key=lambda r: abs(r.get("score") or 0), reverse=True)
-    pool = pool[:140]
+    # Dedup by url (pullpush + reddit can overlap), keep highest-score, cap.
+    seen, deduped = set(), []
+    for r in sorted(pool, key=lambda r: abs(r.get("score") or 0), reverse=True):
+        u = r.get("url")
+        if u and u in seen:
+            continue
+        if u:
+            seen.add(u)
+        deduped.append(r)
+    pool = deduped[:140]
     save(out, pool)
     print(f"    collected {len(pool)} raw records")
     return pool
@@ -186,19 +211,18 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
     players = scope.get("players", [])
     sys = ("You are a strict research analyst curating evidence. You RUTHLESSLY "
            "reject off-topic noise. Output STRICT JSON only.")
-    # Ask for a larger candidate set with relevance scores, then filter locally.
-    over = min(len(pool), max(max_voices * 2, 24))
-    user = f"""Product idea (be literal about THIS concept, not the broad category):
-  {idea}
+    # Send a generous candidate window so the LLM has enough relevant items to find.
+    over = min(len(pool), max(max_voices * 3, 60))
+    user = f"""Product idea: {idea}
 
 Players / closest analogues: {json.dumps(players, ensure_ascii=False)}
 
-Raw pool (title / score / url) — collected from broad communities so it
-contains a LOT of irrelevant chatter:
-{json.dumps(pool[:60], ensure_ascii=False, indent=1)}
+Raw pool (title / score / url) — collected from broad communities, so it
+contains some irrelevant chatter mixed with relevant signal:
+{json.dumps(pool[:over], ensure_ascii=False, indent=1)}
 
-TASK: score each candidate for relevance to the SPECIFIC product idea above,
-then return the best ones. Output JSON:
+TASK: score each candidate for relevance to the product idea, then return the
+best ones. Output JSON:
 {{
   "voices": [
     {{
@@ -208,31 +232,30 @@ then return the best ones. Output JSON:
       "score": <int upvotes>,
       "url": "<original url>",
       "sentiment": "pos" | "neg",
-      "relevance": 0 | 1 | 2 | 3,   // 3=directly about this idea's need/pain/workaround; 2=adjacent & informative; 1=loosely related; 0=noise
-      "why": "<≤12 words: why this relevance score>"
+      "relevance": 0 | 1 | 2 | 3,
+      "why": "<≤12 words>"
     }}
   ]
 }}
 
-RELEVANCE RUBRIC — be harsh, and anchor on the FULL concept (every noun in
-the idea matters; if the idea names a physical/hardware product, the voice
-must touch the hardware / input-device / workaround dimension — not just the
-software or topic half):
-  3 = expresses the unmet need / workaround / willingness to pay for THIS
-      product (e.g. "I rigged a Stream Deck with macros to paste my prompts",
-      "I wish my keyboard had a dedicated prompt key").
-  2 = about an analogue device used in a way that informs the concept
-      (e.g. macro pad repurposed for coding shortcuts).
-  1 = touches only ONE half of the concept (pure prompt-engineering with no
-      hardware angle, OR generic keyboard talk with no AI angle).
-  0 = NOISE: memes, theft/lost packages, shipping/logistics, unboxing,
-      "look at my setup", relationship jokes, off-topic humor. REJECT THESE.
+RELEVANCE RUBRIC:
+  3 = directly about this product's need / pain / workaround / experience
+      (e.g. for a pet feeder: "my auto feeder jammed", "I want timed feeding").
+  2 = adjacent & informative — about the use-case, the buyers, an analogue
+      device, or a related sub-problem this product touches.
+  1 = same broad area but not about this product's job (generic chatter).
+  0 = NOISE: memes, theft/lost packages, shipping rants, unboxing, jokes,
+      unrelated off-topic. REJECT these.
 
-Return up to {over} candidates with honest scores. A concept that combines
-two domains MUST have voices touching the INTERSECTION for score 3 — do not
-score pure single-domain content above 1. Prefer diverse players + a mix of
-pos/neg among relevant ones. Do not inflate scores. If genuine intersection
-signal is thin, return fewer voices rather than padding with score-1 items."""
+SPECIAL CASE — only if the idea EXPLICITLY combines two distinct domains
+(e.g. "physical keyboard FOR AI prompts" = hardware × AI): then a voice must
+touch BOTH domains' intersection for a 3, and pure single-domain content caps
+at 1. For ordinary single-concept products (a pet feeder, sleep earbuds,
+a coffee maker), DO NOT apply this — score normally per the rubric above.
+
+Return up to {over} scored candidates. Prefer diverse players + a mix of
+pos/neg among the relevant ones. Be fair, not stingy: real on-topic voices
+should land at 2-3."""
     res = chat_json(sys, user, temperature=0.2)
     candidates = res.get("voices", [])
 
