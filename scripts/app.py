@@ -156,11 +156,31 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   .two{display:flex;gap:12px}.two>div{flex:1}
   button{appearance:none;border:0;background:var(--ink);color:#fff;cursor:pointer;font-family:var(--mono);font-size:14px;letter-spacing:.04em;padding:14px 26px;border-radius:7px;margin-top:24px;width:100%}
   button:hover{background:#000}button:disabled{opacity:.5;cursor:not-allowed}
-  .log{margin-top:24px;font-family:var(--mono);font-size:12px;color:var(--ink-2);line-height:1.9;display:none}
-  .log.show{display:block}
-  .log .step{display:flex;gap:10px;align-items:baseline}
-  .log .step .tag{color:var(--sage);min-width:96px}
-  .log .step.err .tag{color:var(--rust)}
+  /* progress stepper */
+  .prog{margin-top:26px;display:none}
+  .prog.show{display:block}
+  .prog-bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:18px}
+  .prog-bar i{display:block;height:100%;width:0;background:var(--sage);transition:width .5s ease}
+  .step{display:flex;gap:12px;align-items:flex-start;padding:7px 0;opacity:.4;transition:opacity .3s}
+  .step.active,.step.done{opacity:1}
+  .step .dot{flex-shrink:0;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink-3);margin-top:1px;
+    font-family:var(--mono);background:#fff;transition:all .3s}
+  .step.done .dot{background:var(--sage);border-color:var(--sage);color:#fff}
+  .step.active .dot{border-color:var(--sage);border-style:solid;animation:spin 1s linear infinite;border-top-color:transparent;color:transparent}
+  .step.err .dot{background:var(--rust);border-color:var(--rust);color:#fff}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .step .st-body{flex:1;min-width:0}
+  .step .st-name{font-family:var(--mono);font-size:12px;color:var(--ink);letter-spacing:.02em}
+  .step.active .st-name{font-weight:600}
+  .step .st-msg{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:2px;min-height:13px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .step.active .st-msg{color:var(--sage)}
+  .step.err .st-msg{color:var(--rust);white-space:normal}
+  /* breathing pulse on the whole active row */
+  .step.active{animation:breathe 1.8s ease-in-out infinite}
+  @keyframes breathe{0%,100%{opacity:1}50%{opacity:.72}}
+  .prog-elapsed{font-family:var(--mono);font-size:10px;color:var(--ink-3);text-align:right;margin-top:10px;letter-spacing:.06em}
   .hint{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:26px;line-height:1.7;border-top:1px solid var(--line);padding-top:18px}
   .samples{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
   .samples button{width:auto;margin:0;background:#fff;border:1px solid var(--line);color:var(--ink-2);font-size:11px;padding:6px 11px}
@@ -205,7 +225,12 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   </details>
 
   <button id="go">开始研究 →</button>
-  <div class="log" id="log"></div>
+
+  <div class="prog" id="prog">
+    <div class="prog-bar"><i id="progBar"></i></div>
+    <div id="steps"></div>
+    <div class="prog-elapsed" id="elapsed"></div>
+  </div>
 
   <div class="hint">默认用站点配置的 key · 生成的数据存到 data/&lt;slug&gt;.json · 报告渲染后右上角可切中英文 / 下载 PDF</div>
 </div>
@@ -214,19 +239,56 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   const $ = id => document.getElementById(id);
   document.querySelectorAll('.samples button').forEach(b => b.onclick = () => $('idea').value = b.dataset.s);
 
-  function addLog(tag, msg, err){
-    const d = document.createElement('div');
-    d.className = 'step' + (err?' err':'');
-    d.innerHTML = `<span class="tag">${tag}</span><span>${msg}</span>`;
-    $('log').appendChild(d);
+  // ordered stepper: backend stage tag → {label}. RENDER is added by the frontend.
+  const STEPS = [
+    ['SCOPE',      '判断市场类型 + 找数据源'],
+    ['COLLECT',    '联网抓取真实用户声音'],
+    ['CURATE',     '筛选相关声音(剔除噪声)'],
+    ['CLUSTER',    '聚类成主题'],
+    ['SYNTHESIZE', '综合 thesis / 策略 / 风险'],
+    ['ASSEMBLE',   '组装 + 校验'],
+    ['TRANSLATE',  '回填英文(中英可切)'],
+    ['RENDER',     '渲染交互报告'],
+  ];
+  const stepIndex = {}; STEPS.forEach((s,i) => stepIndex[s[0]] = i);
+
+  function buildSteps(){
+    $('steps').innerHTML = STEPS.map(([tag,label],i) =>
+      `<div class="step" id="step-${tag}">
+         <div class="dot">${i+1}</div>
+         <div class="st-body"><div class="st-name">${label}</div><div class="st-msg" id="msg-${tag}"></div></div>
+       </div>`).join('');
+  }
+  function setActive(tag, msg){
+    const idx = stepIndex[tag]; if (idx == null) return;
+    STEPS.forEach(([t],i) => {
+      const el = $('step-'+t); if (!el) return;
+      el.classList.remove('active','done','err');
+      if (i < idx) el.classList.add('done');
+      else if (i === idx) el.classList.add('active');
+    });
+    if (msg) { const m = $('msg-'+tag); if (m) m.textContent = msg; }
+    $('progBar').style.width = Math.round((idx) / (STEPS.length-1) * 100) + '%';
+  }
+  function allDone(){
+    STEPS.forEach(([t]) => { const el=$('step-'+t); if(el){ el.classList.remove('active','err'); el.classList.add('done'); } });
+    $('progBar').style.width = '100%';
+  }
+  function setError(tag, msg){
+    const el = $('step-'+(tag||'SCOPE'));
+    if (el){ el.classList.remove('active','done'); el.classList.add('err'); const m=$('msg-'+(tag||'SCOPE')); if(m) m.textContent = msg; }
   }
 
+  let elapsedTimer = null, lastTag = 'SCOPE';
   $('go').onclick = async () => {
     const idea = $('idea').value.trim();
     if (!idea){ $('idea').focus(); return; }
-    $('go').disabled = true; $('go').textContent = '研究中… 约 40-60 秒,请勿关闭';
-    $('log').className = 'log show'; $('log').innerHTML = '';
-    addLog('START', '提交:' + idea);
+    $('go').disabled = true; $('go').textContent = '研究中…(可看下方进度)';
+    $('prog').className = 'prog show'; buildSteps(); setActive('SCOPE','提交:'+idea);
+
+    const t0 = Date.now();
+    clearInterval(elapsedTimer);
+    elapsedTimer = setInterval(() => { $('elapsed').textContent = '已用时 ' + Math.round((Date.now()-t0)/1000) + ' 秒'; }, 500);
 
     try {
       const r = await fetch('/api/research', {
@@ -234,18 +296,45 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
         body: JSON.stringify({ idea, market: $('market').value, mode: $('mode').value,
           api_key: $('apiKey').value.trim(), base_url: $('baseUrl').value.trim(), model: $('model').value.trim() })
       });
-      const out = await r.json();
-      if (!out.ok){ addLog('ERROR', out.error || '失败', true); $('go').disabled=false; $('go').textContent='重试 →'; return; }
-      addLog('DONE', '渲染报告…');
-      // fetch template, inject, swap document
+      if (!r.ok || !r.body) throw new Error('连不上后端');
+
+      // parse Server-Sent Events from the stream
+      const reader = r.body.getReader();
+      const dec = new TextDecoder();
+      let buf = '', finalData = null, errMsg = null;
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let sep;
+        while ((sep = buf.indexOf('\\n\\n')) >= 0) {
+          const chunk = buf.slice(0, sep); buf = buf.slice(sep + 2);
+          const ev = (chunk.match(/^event: (.+)$/m) || [])[1];
+          const dm = (chunk.match(/^data: (.+)$/m) || [])[1];
+          if (!dm) continue;
+          let payload; try { payload = JSON.parse(dm); } catch { continue; }
+          if (ev === 'progress') { lastTag = payload.stage; setActive(payload.stage, payload.msg); }
+          else if (ev === 'done') { finalData = payload.data; }
+          else if (ev === 'error') { errMsg = payload.error; }
+        }
+      }
+      clearInterval(elapsedTimer);
+
+      if (errMsg) { setError(lastTag, errMsg); $('go').disabled=false; $('go').textContent='重试 →'; return; }
+      if (!finalData) { setError(lastTag, '未收到结果,请重试'); $('go').disabled=false; $('go').textContent='重试 →'; return; }
+
+      // RENDER step (frontend)
+      setActive('RENDER', '加载模板…');
       const tpl = await fetch('/dist/_template.html').then(x=>x.text());
-      const filled = tpl.replace('{{REPORT_DATA_JSON}}', () => JSON.stringify(out.data));
+      allDone();
+      const filled = tpl.replace('{{REPORT_DATA_JSON}}', () => JSON.stringify(finalData));
       document.open(); document.write(filled); document.close();
     } catch(e){
-      const hint = /fetch/i.test(e.message)
-        ? '连不上后端 — 请确认终端里 `make app` 还在运行(那个窗口别关),然后重试。'
+      clearInterval(elapsedTimer);
+      const hint = /fetch|后端/i.test(e.message)
+        ? '连不上后端 — 请确认终端里 make app 还在运行(那个窗口别关),然后重试。'
         : e.message;
-      addLog('ERROR', hint, true); $('go').disabled=false; $('go').textContent='重试 →';
+      setError(lastTag, hint); $('go').disabled=false; $('go').textContent='重试 →';
     }
   };
 </script>
@@ -296,14 +385,31 @@ class Handler(BaseHTTPRequestHandler):
         }
         custom = "custom-key" if creds["api_key"] else "default-key"
         print(f"\n▶ research: {idea}  (market={market}, mode={mode or 'auto'}, {custom})", flush=True)
+
+        # Stream progress as Server-Sent Events so the UI shows live stages.
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("X-Accel-Buffering", "no")
+        self.end_headers()
+
+        def sse(event, payload):
+            try:
+                self.wfile.write(f"event: {event}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n".encode("utf-8"))
+                self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+
+        def log(stage, msg):
+            print(f"  {stage}: {msg}", flush=True)
+            sse("progress", {"stage": stage, "msg": msg})
+
         try:
-            data = run_pipeline(idea, market, mode,
-                                log=lambda t, m: print(f"  {t}: {m}", flush=True),
-                                creds=creds)
-            return self._send(200, json.dumps({"ok": True, "data": data}, ensure_ascii=False), "application/json")
+            data = run_pipeline(idea, market, mode, log=log, creds=creds)
+            sse("done", {"ok": True, "data": data})
         except Exception as e:
             print(f"  ✗ {e}", flush=True)
-            return self._send(200, json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False), "application/json")
+            sse("error", {"ok": False, "error": str(e)})
 
 
 def main():
