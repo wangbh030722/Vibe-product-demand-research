@@ -109,21 +109,26 @@ def main():
     ap.add_argument("--sleep", type=float, default=0.6)
     args = ap.parse_args()
 
-    # pullpush.io is slow per request (~20-30s). Fire all searches CONCURRENTLY
-    # so total time ≈ the slowest request, not the sum.
+    # pullpush.io is slow per request (~20-30s) AND its global full-text search
+    # is noisy. Improve precision by ALSO searching inside the product-relevant
+    # subreddits. Fire everything CONCURRENTLY so total ≈ slowest request.
     from concurrent.futures import ThreadPoolExecutor
     tasks = []
-    for q in args.queries[:4]:
-        tasks.append(("comment", q))
-        tasks.append(("submission", q))
+    for q in args.queries[:5]:
+        tasks.append(("comment", q, None))         # global comment search
+        tasks.append(("submission", q, None))      # global submission search
+    # sub-scoped submission searches (precise): each query × each sub
+    for sub in (args.subs or [])[:5]:
+        for q in args.queries[:3]:
+            tasks.append(("submission", q, sub))
 
     def run(t):
-        kind, q = t
-        return search_comments(q, None, args.size) if kind == "comment" \
-            else search_submissions(q, None, args.size)
+        kind, q, sub = t
+        return search_comments(q, sub, args.size) if kind == "comment" \
+            else search_submissions(q, sub, args.size)
 
     seen, n = set(), 0
-    with ThreadPoolExecutor(max_workers=min(8, len(tasks) or 1)) as ex, \
+    with ThreadPoolExecutor(max_workers=min(16, len(tasks) or 1)) as ex, \
          open(args.out, "w", encoding="utf-8") as f:
         for batch in ex.map(run, tasks):
             for rec in batch:

@@ -114,8 +114,16 @@ def stage_collect(scope: dict, wd: Path, skip: bool) -> list[dict]:
 
     # pullpush.io — real Reddit posts/comments via a non-reddit.com domain,
     # so it works even when reddit.com 403s the proxy IP. Primary Reddit source.
+    # Use PRODUCT-SPECIFIC queries (player names + idea phrases), not broad
+    # category words, so results are about the product not the whole category.
     subs = scope.get("subreddits", [])
-    pp_queries = scope.get("hn_queries") or [scope.get("_idea", "")]
+    player_names = [p.get("name", "") for p in scope.get("players", []) if p.get("name")]
+    pp_queries = []
+    for q in (scope.get("hn_queries") or []):
+        pp_queries.append(q)
+    for nm in player_names[:5]:
+        pp_queries.append(nm)
+    pp_queries = [q for q in pp_queries if q] or [scope.get("_idea", "")]
     if pp_queries:
         cmd = [sys_exe(), str(ROOT / "core/collect/pullpush.py"),
                "--queries", *[q for q in pp_queries if q],
@@ -157,16 +165,34 @@ def stage_collect(scope: dict, wd: Path, skip: bool) -> list[dict]:
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
             print(f"    ! hn collect partial/failed: {e}", file=sys.stderr)
 
-    # Dedup by url (pullpush + reddit can overlap), keep highest-score, cap.
+    # Rank by PRODUCT-KEYWORD relevance first, then score, before the cap —
+    # otherwise low-score-but-on-product posts (e.g. a niche brand thread) get
+    # culled by viral off-topic category posts.
+    import re as _re
+    kw = set()
+    for src in [scope.get("_idea", ""),
+                *(p.get("name", "") for p in scope.get("players", [])),
+                *(p.get("id", "") for p in scope.get("players", [])),
+                *(scope.get("hn_queries") or [])]:
+        for w in _re.findall(r"[a-z0-9]+", str(src).lower()):
+            if len(w) >= 3 and w not in ("the", "and", "for", "with", "smart"):
+                kw.add(w)
+
+    def kw_hits(r):
+        t = (str(r.get("title", "")) + " " + str(r.get("text", ""))).lower()
+        return sum(1 for k in kw if k in t)
+
+    # Dedup by url, then rank by (keyword hits, score), cap.
     seen, deduped = set(), []
-    for r in sorted(pool, key=lambda r: abs(r.get("score") or 0), reverse=True):
+    for r in pool:
         u = r.get("url")
         if u and u in seen:
             continue
         if u:
             seen.add(u)
         deduped.append(r)
-    pool = deduped[:140]
+    deduped.sort(key=lambda r: (kw_hits(r), abs(r.get("score") or 0)), reverse=True)
+    pool = deduped[:160]
     save(out, pool)
     print(f"    collected {len(pool)} raw records")
     return pool
@@ -214,12 +240,29 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
     player_ids = [p["id"] for p in players]
     sys = ("You are a strict research analyst curating evidence. You RUTHLESSLY "
            "reject off-topic noise. Output STRICT JSON only.")
-    # Send a generous candidate window. To keep OUTPUT tiny (avoid truncation),
-    # the model returns only an INDEX + a few tags per kept item — it does NOT
-    # re-type titles/urls (we look those up from the pool by index).
-    over = min(len(pool), max(max_voices * 3, 60))
+
+    # Build a product-keyword set from idea + player names/ids + scope queries,
+    # then RANK the pool by keyword relevance (not just upvotes) so the few
+    # genuinely on-product items aren't buried under viral category noise.
+    import re as _re
+    kw = set()
+    for src in [scope.get("_idea", ""), *(p.get("name", "") for p in players),
+                *player_ids, *(scope.get("hn_queries") or [])]:
+        for w in _re.findall(r"[a-z0-9]+", str(src).lower()):
+            if len(w) >= 3 and w not in ("the", "and", "for", "with", "ai", "smart"):
+                kw.add(w)
+
+    def kw_hits(r):
+        text = (str(r.get("title", "")) + " " + str(r.get("text", ""))).lower()
+        return sum(1 for k in kw if k in text)
+
+    # rank: keyword hits first, then score
+    ranked = sorted(pool, key=lambda r: (kw_hits(r), abs(r.get("score") or 0)), reverse=True)
+    # Output is index-only (tiny) so we can afford a big candidate window.
+    over = min(len(ranked), 120)
     indexed = [{"i": i, "t": (r.get("title") or "")[:120], "s": r.get("score") or 0,
-                "sub": r.get("subreddit", "")} for i, r in enumerate(pool[:over])]
+                "sub": r.get("subreddit", "")} for i, r in enumerate(ranked[:over])]
+    pool = ranked  # reconstruct voices from this same ranked order
     user = f"""Product idea: {idea}
 Player ids: {json.dumps(player_ids, ensure_ascii=False)}
 
