@@ -33,10 +33,12 @@ def load_dotenv() -> None:
 
 
 def chat_json(system: str, user: str, *, temperature: float = 0.3,
-              model: str | None = None, timeout: int = 120) -> dict:
+              model: str | None = None, timeout: int = 120,
+              max_tokens: int = 8000) -> dict:
     """
     Call an OpenAI-compatible /chat/completions endpoint, force JSON output,
     return the parsed dict. Raises RuntimeError on missing key / bad JSON.
+    max_tokens defaults high so long JSON outputs aren't truncated mid-string.
     """
     load_dotenv()
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -54,6 +56,7 @@ def chat_json(system: str, user: str, *, temperature: float = 0.3,
             {"role": "user", "content": user},
         ],
         "temperature": temperature,
+        "max_tokens": max_tokens,
         "response_format": {"type": "json_object"},
     }).encode("utf-8")
 

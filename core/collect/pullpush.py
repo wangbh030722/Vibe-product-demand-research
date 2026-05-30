@@ -109,23 +109,29 @@ def main():
     ap.add_argument("--sleep", type=float, default=0.6)
     args = ap.parse_args()
 
-    seen = set()
-    n = 0
-    with open(args.out, "w", encoding="utf-8") as f:
-        for q in args.queries:
-            # global comment search (best signal) + per-sub submissions
-            batches = [search_comments(q, None, args.size)]
-            for sub in (args.subs or [None]):
-                batches.append(search_submissions(q, sub, args.size))
-                time.sleep(args.sleep)
-            for batch in batches:
-                for rec in batch:
-                    if rec["url"] in seen:
-                        continue
-                    seen.add(rec["url"])
-                    f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-                    n += 1
-            time.sleep(args.sleep)
+    # pullpush.io is slow per request (~20-30s). Fire all searches CONCURRENTLY
+    # so total time ≈ the slowest request, not the sum.
+    from concurrent.futures import ThreadPoolExecutor
+    tasks = []
+    for q in args.queries[:4]:
+        tasks.append(("comment", q))
+        tasks.append(("submission", q))
+
+    def run(t):
+        kind, q = t
+        return search_comments(q, None, args.size) if kind == "comment" \
+            else search_submissions(q, None, args.size)
+
+    seen, n = set(), 0
+    with ThreadPoolExecutor(max_workers=min(8, len(tasks) or 1)) as ex, \
+         open(args.out, "w", encoding="utf-8") as f:
+        for batch in ex.map(run, tasks):
+            for rec in batch:
+                if rec["url"] in seen:
+                    continue
+                seen.add(rec["url"])
+                f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                n += 1
     sys.stderr.write(f"[pullpush] done. {n} unique records -> {args.out}\n")
 
 

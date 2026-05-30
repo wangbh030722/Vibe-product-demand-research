@@ -119,15 +119,17 @@ def stage_collect(scope: dict, wd: Path, skip: bool) -> list[dict]:
     if pp_queries:
         cmd = [sys_exe(), str(ROOT / "core/collect/pullpush.py"),
                "--queries", *[q for q in pp_queries if q],
-               "--size", "40", "--out", str(pullpush_jsonl)]
+               "--size", "100", "--out", str(pullpush_jsonl)]
         if subs:
             cmd += ["--subs", *subs]
         print(f"    pullpush: {subs or '*'}")
         try:
-            subprocess.run(cmd, check=True, capture_output=True, timeout=180)
+            subprocess.run(cmd, check=True, capture_output=True, timeout=120)
             pool += read_jsonl(pullpush_jsonl, source="reddit")
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
-            print(f"    ! pullpush partial/failed: {e}", file=sys.stderr)
+            # timeout → still use whatever was written before the cutoff
+            pool += read_jsonl(pullpush_jsonl, source="reddit")
+            print(f"    ! pullpush slow/partial (used partial): {e}", file=sys.stderr)
 
     # Reddit
     subs = scope.get("subreddits", [])
@@ -209,71 +211,77 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
         return []
 
     players = scope.get("players", [])
+    player_ids = [p["id"] for p in players]
     sys = ("You are a strict research analyst curating evidence. You RUTHLESSLY "
            "reject off-topic noise. Output STRICT JSON only.")
-    # Send a generous candidate window so the LLM has enough relevant items to find.
+    # Send a generous candidate window. To keep OUTPUT tiny (avoid truncation),
+    # the model returns only an INDEX + a few tags per kept item — it does NOT
+    # re-type titles/urls (we look those up from the pool by index).
     over = min(len(pool), max(max_voices * 3, 60))
+    indexed = [{"i": i, "t": (r.get("title") or "")[:120], "s": r.get("score") or 0,
+                "sub": r.get("subreddit", "")} for i, r in enumerate(pool[:over])]
     user = f"""Product idea: {idea}
+Player ids: {json.dumps(player_ids, ensure_ascii=False)}
 
-Players / closest analogues: {json.dumps(players, ensure_ascii=False)}
+Candidate pool (i = index, t = title, s = score, sub = subreddit):
+{json.dumps(indexed, ensure_ascii=False)}
 
-Raw pool (title / score / url) — collected from broad communities, so it
-contains some irrelevant chatter mixed with relevant signal:
-{json.dumps(pool[:over], ensure_ascii=False, indent=1)}
-
-TASK: score each candidate for relevance to the product idea, then return the
-best ones. Output JSON:
+TASK: score each candidate's relevance to the product idea. Return ONLY the
+ones worth keeping, as compact JSON (NO titles/urls — just the index):
 {{
-  "voices": [
-    {{
-      "id": "v01",
-      "player": "<player id from list, or closest analogue id>",
-      "title": "<concise english title, ≤80 chars>",
-      "score": <int upvotes>,
-      "url": "<original url>",
-      "sentiment": "pos" | "neg",
-      "relevance": 0 | 1 | 2 | 3,
-      "why": "<≤12 words>"
-    }}
+  "keep": [
+    {{ "i": <index>, "player": "<a player id, or 'other'>", "sentiment": "pos"|"neg", "relevance": 1|2|3 }}
   ]
 }}
 
-RELEVANCE RUBRIC:
-  3 = directly about this product's need / pain / workaround / experience
-      (e.g. for a pet feeder: "my auto feeder jammed", "I want timed feeding").
-  2 = adjacent & informative — about the use-case, the buyers, an analogue
-      device, or a related sub-problem this product touches.
-  1 = same broad area but not about this product's job (generic chatter).
-  0 = NOISE: memes, theft/lost packages, shipping rants, unboxing, jokes,
-      unrelated off-topic. REJECT these.
+RELEVANCE:
+  3 = directly about this product's need / pain / workaround / experience.
+  2 = adjacent & informative (use-case, buyers, analogue device, sub-problem).
+  1 = same broad area but not about this product's job.
+  (omit anything that's noise: memes, theft, shipping rants, unboxing, jokes,
+   unrelated off-topic — just don't include them.)
 
 SPECIAL CASE — only if the idea EXPLICITLY combines two distinct domains
-(e.g. "physical keyboard FOR AI prompts" = hardware × AI): then a voice must
-touch BOTH domains' intersection for a 3, and pure single-domain content caps
-at 1. For ordinary single-concept products (a pet feeder, sleep earbuds,
-a coffee maker), DO NOT apply this — score normally per the rubric above.
+(e.g. "keyboard FOR AI prompts" = hardware × AI): require both-domain
+intersection for a 3, single-domain caps at 1. For ordinary single-concept
+products, score normally.
 
-Return up to {over} scored candidates. Prefer diverse players + a mix of
-pos/neg among the relevant ones. Be fair, not stingy: real on-topic voices
-should land at 2-3."""
-    res = chat_json(sys, user, temperature=0.2)
-    candidates = res.get("voices", [])
+Keep up to {max_voices*2} items, fair not stingy — real on-topic items are 2-3."""
+    res = chat_json(sys, user, temperature=0.2, max_tokens=4000)
+    keep = res.get("keep", [])
 
-    # Local relevance gate: keep relevance >= 2, fall back to >=1 if too few.
-    def keep(min_rel):
-        return [v for v in candidates if int(v.get("relevance", 0)) >= min_rel]
-    voices = keep(2)
+    # Reconstruct voices from the pool by index (titles/urls never altered by LLM).
+    recon = []
+    for k in keep:
+        try:
+            idx = int(k.get("i"))
+        except (TypeError, ValueError):
+            continue
+        if not (0 <= idx < len(pool)):
+            continue
+        r = pool[idx]
+        rel = int(k.get("relevance", 1) or 1)
+        player = k.get("player") if k.get("player") in player_ids else (player_ids[0] if player_ids else "other")
+        recon.append({
+            "id": "", "player": player,
+            "title": (r.get("title") or "")[:120],
+            "score": int(r.get("score") or 0),
+            "url": r.get("url", ""),
+            "sentiment": "neg" if k.get("sentiment") == "neg" else "pos",
+            "themes": [], "relevance": rel,
+        })
+
+    # gate: relevance>=2, fall back to >=1 if too few
+    voices = [v for v in recon if v["relevance"] >= 2]
     if len(voices) < max(6, max_voices // 2):
-        extra = [v for v in keep(1) if v not in voices]
-        voices += extra
-    # sort by relevance then |score|, cap, renumber ids
-    voices.sort(key=lambda v: (int(v.get("relevance", 0)), abs(int(v.get("score", 0) or 0))), reverse=True)
+        voices += [v for v in recon if v["relevance"] == 1 and v not in voices]
+    voices.sort(key=lambda v: (v["relevance"], abs(v["score"])), reverse=True)
     voices = voices[:max_voices]
     for i, v in enumerate(voices, 1):
         v["id"] = f"v{i:02d}"
-    dropped = len(candidates) - len(voices)
+        v.pop("relevance", None)
     save(out, voices)
-    print(f"    curated {len(voices)} voices (dropped {dropped} low-relevance/noise from {len(candidates)} candidates)")
+    print(f"    curated {len(voices)} voices (from {len(keep)} kept of {len(indexed)} candidates)")
     return voices
 
 
