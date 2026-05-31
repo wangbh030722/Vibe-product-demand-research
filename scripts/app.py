@@ -27,7 +27,11 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import research  # the pipeline stages
 from validate_data import load_schema, validate_schema, check_cross_refs  # type: ignore
 
-PORT = 8200
+# Port/host are env-driven so the same app runs locally AND on a cloud host
+# (Render/Railway/Fly set $PORT). Bind 0.0.0.0 when hosted so the platform can reach it.
+import os as _os_cfg
+PORT = int(_os_cfg.environ.get("PORT", "8200"))
+HOST = _os_cfg.environ.get("HOST") or ("0.0.0.0" if _os_cfg.environ.get("PORT") else "127.0.0.1")
 
 
 def slugify(idea: str) -> str:
@@ -559,11 +563,13 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
-    srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
+    srv = ThreadingHTTPServer((HOST, PORT), Handler)
+    hosted = bool(_os_cfg.environ.get("PORT"))   # running on a cloud platform
     url = f"http://localhost:{PORT}"
-    print(f"\n  VIBE 品类研究 · 本地 Web App")
+    print(f"\n  VIBE 品类研究 · Web App  (host={HOST} port={PORT})")
     print(f"  → {url}\n  (Ctrl+C 退出)\n")
-    threading.Timer(0.8, lambda: webbrowser.open(url)).start()
+    if not hosted:                                # only pop a browser when local
+        threading.Timer(0.8, lambda: webbrowser.open(url)).start()
     try:
         srv.serve_forever()
     except KeyboardInterrupt:
