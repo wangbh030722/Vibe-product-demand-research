@@ -3998,23 +3998,23 @@
   "trend": [
     {
       "period": "2022",
-      "count": 125
+      "count": 5
     },
     {
       "period": "2023",
-      "count": 164
+      "count": 4
     },
     {
       "period": "2024",
-      "count": 274
+      "count": 19
     },
     {
       "period": "2025",
-      "count": 191
+      "count": 64
     },
     {
       "period": "2026",
-      "count": 0
+      "count": 18
     }
   ],
   "trend_source": "reddit",

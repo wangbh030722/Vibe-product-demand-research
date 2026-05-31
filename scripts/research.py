@@ -270,14 +270,27 @@ def stage_collect(scope: dict, wd: Path, skip: bool, log=None) -> list[dict]:
         t = (str(r.get("title", "")) + " " + str(r.get("text", ""))).lower()
         return sum(1 for k in kw if k in t)
 
-    # Dedup by url, then rank by (keyword hits, score).
+    # Dedup across ALL sources by a CANONICAL identity, then rank by
+    # (keyword hits, score). The same Reddit post can come back from Arctic Shift,
+    # pullpush AND reddit.py with cosmetically different URLs (trailing slash,
+    # different slug); keying on the post/comment id (not the raw URL) guarantees
+    # the multi-method pool never double-counts the same voice — so every derived
+    # metric (counts, trend, share-of-voice) stays consistent no matter which
+    # collectors ran. Non-Reddit (HN) falls back to a normalized URL.
+    def _canon_key(r):
+        u = (r.get("url") or "").strip()
+        m = _re.search(r"/comments/([a-z0-9]+)(?:/[^/]*/([a-z0-9]+))?", u)
+        if m:
+            return "rid:" + (m.group(2) or m.group(1))   # comment id if present, else post id
+        return "url:" + u.rstrip("/").lower()
     seen, deduped = set(), []
     for r in pool:
-        u = r.get("url")
-        if u and u in seen:
+        k = _canon_key(r)
+        if not r.get("url"):
+            deduped.append(r); continue
+        if k in seen:
             continue
-        if u:
-            seen.add(u)
+        seen.add(k)
         deduped.append(r)
     deduped.sort(key=lambda r: (kw_hits(r), abs(r.get("score") or 0)), reverse=True)
 
@@ -319,10 +332,12 @@ def sys_exe() -> str:
 
 
 def collect_reddit_trend(query: str, years_back: int = 5, max_pages: int = 4) -> list[dict]:
-    """Reddit discussion volume per YEAR for a query, paginating within each year
-    window to count beyond pullpush's 100-per-request cap. Returns [{period,count}].
-    (Used because Google Trends is IP-blocked in many environments; this is the
-    best honest volume signal available — caveat: pullpush archive completeness.)"""
+    """DEPRECATED — do not wire into the pipeline. This ran a SEPARATE pullpush
+    query independent of the main collected pool, whose ~12-month archive lag made
+    the latest year read 0 and CONTRADICTED the corpus (e.g. trend showed 2026=0
+    while 18 collected voices were from 2026). The trend now derives from the
+    unified pool via corpus_yearly_trend() so every source stays consistent.
+    Kept only for reference / manual diagnostics."""
     import datetime, urllib.parse, time as _t
     sys.path.insert(0, str(ROOT / "core/collect"))
     try:
@@ -358,6 +373,33 @@ def collect_reddit_trend(query: str, years_back: int = 5, max_pages: int = 4) ->
         out.append({"period": str(yr), "count": len(seen)})
     # drop leading empty years (archive may not cover them)
     while out and out[0]["count"] == 0:
+        out.pop(0)
+    # NOTE: we intentionally keep the trailing current year even if it's low/0.
+    # The template renders it as a "year-to-date (as of generation date)" partial
+    # point (dashed + cutoff label), rather than dropping it.
+    return out if sum(o["count"] for o in out) >= 10 else []
+
+
+def corpus_yearly_trend(records: list[dict], years_back: int = 5) -> list[dict]:
+    """Yearly post-count distribution of the ACTUAL collected records (Arctic Shift
+    pool / kept voices), by created_utc. Preferred over collect_reddit_trend()
+    because pullpush's archive lags ~12 months (recent years read 0 there) while
+    Arctic Shift is current — and this is self-consistent with the voices the report
+    actually displays, so it can never contradict them. The current year is partial
+    (the template renders it as 'year-to-date as of the generation date')."""
+    import datetime
+    this_year = datetime.date.today().year
+    counts: dict[int, int] = {}
+    for r in records:
+        ts = r.get("created_utc")
+        try:
+            y = datetime.datetime.utcfromtimestamp(int(ts)).year
+        except (TypeError, ValueError):
+            continue
+        counts[y] = counts.get(y, 0) + 1
+    lo = this_year - years_back + 1
+    out = [{"period": str(y), "count": counts.get(y, 0)} for y in range(lo, this_year + 1)]
+    while out and out[0]["count"] == 0:   # trim leading empty years
         out.pop(0)
     return out if sum(o["count"] for o in out) >= 10 else []
 

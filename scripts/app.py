@@ -118,10 +118,15 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
 
     log("ASSEMBLE", "组装 + 校验…")
     data = research.stage_assemble(slug, idea, target_market, scope, voices, cluster, synth, demand=demand)
-    # Discussion-trend chart: yearly Reddit volume (Google Trends is usually
-    # IP-blocked). Falls back to the pool's own date histogram.
-    log("ASSEMBLE", "统计讨论热度趋势(按年)…")
-    trend = research.collect_reddit_trend(scope.get("search_idea") or idea) \
+    # Discussion-trend chart: derived ONLY from the unified collected pool — the
+    # SAME deduped Reddit data (Arctic Shift + pullpush + reddit.py, merged) that
+    # produces the voices/counts/share-of-voice. We deliberately do NOT run a
+    # separate pullpush trend query: its archive lags ~12 months and would
+    # contradict the rest of the report (the bug that showed 2026 = 0). Yearly,
+    # self-consistent with the displayed voices; quarterly histogram as a fallback.
+    log("ASSEMBLE", "统计讨论热度趋势(按年,与语料同源)…")
+    trend = research.corpus_yearly_trend(data.get("voices") or []) \
+            or research.corpus_yearly_trend(pool) \
             or research.compute_trend(pool)
     if trend:
         data["trend"] = trend
