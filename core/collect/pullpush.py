@@ -28,17 +28,27 @@ UA = "vibe-research/0.1"
 
 
 def _get(url):
-    if shutil.which("curl"):
+    # pullpush.io is a community service and gets slow/rate-limited under load.
+    # Retry a few times with backoff before giving up, so a transient timeout
+    # doesn't collapse the whole pool to a few records.
+    have_curl = bool(shutil.which("curl"))
+    for attempt in range(3):
+        if have_curl:
+            try:
+                out = subprocess.run(["curl", "-s", "-m", "30", "-A", UA, url],
+                                     capture_output=True, timeout=35)
+                if out.returncode == 0 and out.stdout:
+                    return json.loads(out.stdout.decode("utf-8", "replace"))
+            except Exception:
+                pass
         try:
-            out = subprocess.run(["curl", "-s", "-m", "25", "-A", UA, url],
-                                 capture_output=True, timeout=30)
-            if out.returncode == 0 and out.stdout:
-                return json.loads(out.stdout.decode("utf-8", "replace"))
+            req = urllib.request.Request(url, headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read().decode("utf-8", "replace"))
         except Exception:
             pass
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=25) as r:
-        return json.loads(r.read().decode("utf-8", "replace"))
+        time.sleep(1.5 * (attempt + 1))   # backoff: 1.5s, 3s
+    return {}
 
 
 def _permalink(d):
@@ -48,10 +58,12 @@ def _permalink(d):
     return d.get("full_link") or d.get("url") or ("https://www.reddit.com/r/" + str(d.get("subreddit", "")))
 
 
-def search_submissions(query, subreddit=None, size=40):
-    params = {"q": query, "size": size, "sort": "desc", "sort_type": "score"}
+def search_submissions(query, subreddit=None, size=40, before=None):
+    params = {"q": query, "size": size, "sort": "desc", "sort_type": "created_utc"}
     if subreddit:
         params["subreddit"] = subreddit
+    if before:
+        params["before"] = int(before)
     url = f"{BASE}/submission/?{urllib.parse.urlencode(params)}"
     sys.stderr.write(f"[pullpush] sub {subreddit or '*'} q={query!r}\n")
     try:
@@ -74,10 +86,12 @@ def search_submissions(query, subreddit=None, size=40):
     return out
 
 
-def search_comments(query, subreddit=None, size=40):
-    params = {"q": query, "size": size, "sort": "desc", "sort_type": "score"}
+def search_comments(query, subreddit=None, size=40, before=None):
+    params = {"q": query, "size": size, "sort": "desc", "sort_type": "created_utc"}
     if subreddit:
         params["subreddit"] = subreddit
+    if before:
+        params["before"] = int(before)
     url = f"{BASE}/comment/?{urllib.parse.urlencode(params)}"
     sys.stderr.write(f"[pullpush] comment q={query!r}\n")
     try:
@@ -107,28 +121,52 @@ def main():
     ap.add_argument("--size", type=int, default=40)
     ap.add_argument("--out", required=True)
     ap.add_argument("--sleep", type=float, default=0.6)
+    ap.add_argument("--target", type=int, default=0,
+                    help="stop early once this many unique records are written")
     args = ap.parse_args()
 
     # pullpush.io is slow per request (~20-30s) AND its global full-text search
     # is noisy. Improve precision by ALSO searching inside the product-relevant
     # subreddits. Fire everything CONCURRENTLY so total ≈ slowest request.
+    # Fan out widely (many query × sub combos) so we can accumulate ~1000 unique
+    # relevant records for the "999 real comments" base.
     from concurrent.futures import ThreadPoolExecutor
     tasks = []
-    for q in args.queries[:5]:
+    for q in args.queries[:8]:
         tasks.append(("comment", q, None))         # global comment search
         tasks.append(("submission", q, None))      # global submission search
-    # sub-scoped submission searches (precise): each query × each sub
-    for sub in (args.subs or [])[:5]:
-        for q in args.queries[:3]:
+    # sub-scoped searches (precise): each query × each sub, posts + comments.
+    # Each task paginates back in time, so this fans out to thousands. Cover up
+    # to 10 communities for breadth.
+    for sub in (args.subs or [])[:10]:
+        for q in args.queries[:2]:
             tasks.append(("submission", q, sub))
+            tasks.append(("comment", q, sub))
 
     def run(t):
+        # Paginate back through time (sort by created_utc desc + `before`) so each
+        # query yields far more than one page — key to reaching ~999 unique.
         kind, q, sub = t
-        return search_comments(q, sub, args.size) if kind == "comment" \
-            else search_submissions(q, sub, args.size)
+        fn = search_comments if kind == "comment" else search_submissions
+        acc, before, PAGES = [], None, 6
+        for _ in range(PAGES):
+            batch = fn(q, sub, args.size, before)
+            if not batch:
+                break
+            acc += batch
+            cutoffs = [b.get("created_utc") for b in batch if b.get("created_utc")]
+            if not cutoffs:
+                break
+            nb = min(cutoffs)
+            if before is not None and nb >= before:
+                break
+            before = nb - 1
+        return acc
 
     seen, n = set(), 0
-    with ThreadPoolExecutor(max_workers=min(16, len(tasks) or 1)) as ex, \
+    # Gentler concurrency: pullpush rate-limits bursts (429). Fewer workers +
+    # the per-request retry/backoff in _get keeps the collection from collapsing.
+    with ThreadPoolExecutor(max_workers=min(6, len(tasks) or 1)) as ex, \
          open(args.out, "w", encoding="utf-8") as f:
         for batch in ex.map(run, tasks):
             for rec in batch:
@@ -137,6 +175,11 @@ def main():
                 seen.add(rec["url"])
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 n += 1
+                if n % 25 == 0:
+                    sys.stderr.write(f"[pullpush] {n} unique so far…\n")
+                    sys.stderr.flush()
+            if args.target and n >= args.target:
+                break
     sys.stderr.write(f"[pullpush] done. {n} unique records -> {args.out}\n")
 
 

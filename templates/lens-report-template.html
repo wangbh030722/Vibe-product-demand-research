@@ -66,6 +66,163 @@
   /* ============ Center panel (Always-On graph) ============ */
   .center-panel{position:relative;background:radial-gradient(ellipse at 50% 45%,#fdfbf5 0%,#f3eedf 90%);overflow:hidden;cursor:grab}
   .center-panel.is-panning{cursor:grabbing}
+  /* ---- Demand-signal radar ---- */
+  .radar-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .radar-hud{position:absolute;top:34px;left:18px;z-index:6;font-size:11px;color:#6b6f7c;
+    line-height:1.7;letter-spacing:.3px;pointer-events:none;font-variant-numeric:tabular-nums}
+  .radar-hud b{color:#5b7a52;font-weight:700}
+  .radar-controls{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);z-index:7;
+    display:flex;gap:9px}
+  .radar-btn{background:rgba(91,122,82,.10);border:1px solid #5b7a52;color:#4a6043;
+    padding:7px 15px;border-radius:20px;font-size:12px;cursor:pointer;letter-spacing:.3px;
+    transition:.16s;font-family:inherit}
+  .radar-btn:hover{background:rgba(91,122,82,.22);box-shadow:0 0 14px rgba(91,122,82,.25)}
+  .radar-btn:active{transform:scale(.96)}
+  .radar-btn.ghost{border-color:#cdc8b8;color:#8a8678;background:rgba(0,0,0,.02)}
+  .radar-scanmsg{position:absolute;bottom:92px;left:50%;transform:translateX(-50%);z-index:7;
+    font-size:11.5px;color:#5b7a52;letter-spacing:.5px;opacity:0;transition:.35s;pointer-events:none;
+    background:rgba(253,251,245,.85);padding:3px 10px;border-radius:12px}
+  .radar-scanmsg.show{opacity:1}
+  .radar-scanmsg b{font-weight:700}
+  /* ---- detailed-report insight visuals ---- */
+  .ins-mode{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;
+    color:#fff;background:#4a4e5b;padding:3px 10px;border-radius:11px;margin-bottom:10px}
+  .ins-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px;margin:12px 0 6px}
+  .ins-card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fff}
+  .ins-card h4{margin:0 0 11px;font-size:11px;letter-spacing:.05em;color:var(--ink-3);
+    text-transform:uppercase;font-family:var(--mono)}
+  .ins-stat-row{display:flex;gap:22px;margin:0 0 13px}
+  .ins-stat b{display:block;font-size:21px;font-family:var(--serif);color:var(--ink);line-height:1.1}
+  .ins-stat span{font-size:11px;color:var(--ink-3)}
+  .ins-bar{display:flex;height:24px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+  .ins-bar .seg{display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;
+    font-family:var(--mono);min-width:42px;white-space:nowrap}
+  .ins-bar .seg.pos{background:#7d9970}.ins-bar .seg.neg{background:#bc7459}
+  .ins-trow{display:grid;grid-template-columns:104px 1fr 26px;align-items:center;gap:10px;margin:7px 0}
+  .ins-tlabel{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ins-tbar{height:9px;background:#f0ebdd;border-radius:5px;overflow:hidden}
+  .ins-tbar i{display:block;height:100%}
+  .ins-tbar i.pos{background:#7d9970}.ins-tbar i.neg{background:#bc7459}.ins-tbar i.neu{background:#b6ac9a}
+  .ins-tcount{font-size:11px;color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+  .ins-quotes{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+  .ins-qcol h4{display:flex;align-items:center;gap:7px;margin:0 0 4px;font-size:12.5px;color:var(--ink)}
+  .ins-qcol .qdot{width:9px;height:9px;border-radius:50%;flex:none}
+  .ins-qcol.pos .qdot{background:#7d9970}.ins-qcol.neg .qdot{background:#bc7459}
+  .ins-q{border-left:2px solid var(--line);padding:4px 0 4px 11px;margin:9px 0;font-size:13px;
+    line-height:1.55;color:var(--ink-2)}
+  .ins-q.pos{border-left-color:#7d9970}.ins-q.neg{border-left-color:#bc7459}
+  .ins-q .qsrc{display:block;margin-top:3px;font-size:11px;color:var(--ink-3);font-family:var(--mono)}
+  @media(max-width:720px){.ins-grid,.ins-quotes{grid-template-columns:1fr}}
+  /* subtle Chinese translation under an English voice (zh mode only) */
+  .v-zh{font-size:11px;color:var(--ink-3);line-height:1.4;margin-top:1px;opacity:.85}
+  /* user & demand decomposition */
+  .ud-jtbd{background:rgba(91,122,82,.08);border:1px solid rgba(91,122,82,.28);border-radius:9px;
+    padding:11px 14px;margin:8px 0 4px;font-size:14px;line-height:1.55;color:var(--ink)}
+  .ud-jtbd .ud-jtbd-lbl{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;
+    color:#4a6043;background:rgba(91,122,82,.16);padding:2px 8px;border-radius:9px;margin-right:8px}
+  .ud-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 4px}
+  @media(max-width:720px){.ud-grid{grid-template-columns:1fr}}
+  .ud-card{border:1px solid var(--line);border-left:3px solid #80766a;border-radius:8px;padding:10px 13px;background:#fff}
+  .ud-card.sc{border-left-color:#5b7a52}.ud-card.pe{border-left-color:#4a4e5b}
+  .ud-card.un{border-left-color:#bc7459}.ud-card.wa{border-left-color:#c9a14a}
+  .ud-card .ud-name{font-weight:600;font-size:13.5px;color:var(--ink);margin-bottom:3px}
+  .ud-card .ud-sum{font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+  .ev-link{text-decoration:none;color:#5b7a52;font-size:12px;margin-left:3px}
+  .ev-link:hover{color:#3f5a39}
+  /* advisory entry directions */
+  .fb-path.adv .fp-row{font-size:13px;line-height:1.55;color:var(--ink-2);margin:6px 0}
+  .fb-path.adv .fp-row b{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:#4a6043;
+    background:rgba(91,122,82,.12);padding:1px 7px;border-radius:8px;margin-right:7px;text-transform:uppercase}
+  .fb-path.adv .fp-row.risk b{color:#8a6d1e;background:rgba(201,161,74,.16)}
+  .fb-path.adv .fp-oq{margin:5px 0 0 0;padding-left:18px}
+  .fb-path.adv .fp-oq li{font-size:12.5px;line-height:1.5;color:var(--ink-2);margin:2px 0}
+  /* demand map / opportunity matrix */
+  .dm-chart{display:block;width:100%;height:400px;margin:10px 0 2px}
+  /* usage-scenario share bars */
+  .sc-list{margin:8px 0 2px}
+  .sc-row{display:grid;grid-template-columns:140px 1fr 40px;align-items:center;gap:6px 14px;padding:9px 0;border-bottom:1px solid #efe9da}
+  .sc-row:last-child{border-bottom:0}
+  .sc-name{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sc-bar{height:10px;background:#f0ebdd;border-radius:5px;overflow:hidden}
+  .sc-bar i{display:block;height:100%;background:linear-gradient(90deg,#7d9970,#5b7a52);border-radius:5px}
+  .sc-pct{font-size:12px;color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+  .sc-sum{grid-column:1 / -1;font-size:12.5px;line-height:1.5;color:var(--ink-3);margin:-3px 0 0}
+  /* persona chips */
+  .pchip-row{display:flex;flex-wrap:wrap;gap:9px;margin:8px 0 2px}
+  .pchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:20px;
+    padding:7px 14px;background:#fff;font-size:13px;color:var(--ink);cursor:default;
+    box-shadow:0 1px 2px rgba(40,35,20,.04)}
+  .pchip:hover{border-color:var(--charcoal-3)}
+  .pchip-dot{width:9px;height:9px;border-radius:50%;background:#4a4e5b;flex:none}
+  .pchip-pct{font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  /* ---- aesthetic polish: softer cards + lighter read-notes + rhythm ---- */
+  .ins-card,.ud-card{border-color:#ece4d3;box-shadow:0 1px 3px rgba(40,35,20,.045)}
+  .ins-card{padding:16px 18px}
+  .read-note{font-style:italic;color:var(--ink-3);opacity:.92;border-left-color:#e2dac8}
+  .fb-body h3{margin:24px 0 8px}
+  .fb-body h2 + .sec-summary{margin-top:8px}
+  .sec-summary{max-width:720px}
+  /* sticky one-click report nav (TOC) */
+  .fb-nav{position:sticky;top:49px;z-index:20;display:flex;align-items:center;gap:12px;
+    margin:0 0 18px;padding:9px 0;background:rgba(251,248,238,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line)}
+  .fb-nav .fbn-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-3);white-space:nowrap;flex:none}
+  .fb-nav .fbn-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+  .fb-nav .fbn-links::-webkit-scrollbar{display:none}
+  .fbn-link{white-space:nowrap;font-size:12px;color:var(--ink-2);text-decoration:none;padding:5px 11px;
+    border-radius:16px;transition:background .15s,color .15s}
+  .fbn-link:hover{background:rgba(91,122,82,.1);color:var(--ink)}
+  .fbn-link.active{background:#5b7a52;color:#fff}
+  @media print{.fb-nav{display:none}}
+  /* ---- professional report modules (borrowed contract: R2/R4/R5) ---- */
+  .read-note{font-size:11px;color:var(--ink-3);line-height:1.55;margin:8px 0 2px;
+    padding-left:10px;border-left:2px solid var(--line)}
+  .read-note b{color:var(--ink-2);font-weight:600}
+  .kicker{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
+    text-transform:uppercase;padding:2px 8px;border-radius:10px;margin-bottom:9px}
+  .kicker.measured{background:rgba(91,122,82,.13);color:#4a6043}
+  .kicker.judgment{background:rgba(201,161,74,.18);color:#8a6d1e}
+  .secnum + .kicker, h2 .kicker{margin-left:8px;vertical-align:middle}
+  /* brand comparison table */
+  .bt{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+  .bt th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-3);padding:7px 10px;border-bottom:1px solid var(--line)}
+  .bt td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .bt tr:hover td{background:rgba(0,0,0,.02)}
+  .bt .bt-name{font-weight:600;color:var(--ink)}
+  .bt .bt-link{font-size:10.5px;color:var(--ink-3);text-decoration:none;border-bottom:1px dotted var(--ink-3)}
+  .bt .bt-link:hover{color:#5b7a52;border-color:#5b7a52}
+  .bt-mini{display:inline-flex;height:8px;width:96px;border-radius:4px;overflow:hidden;
+    border:1px solid var(--line);vertical-align:middle}
+  .bt-mini i{display:block;height:100%}.bt-mini i.pos{background:#7d9970}.bt-mini i.neg{background:#bc7459}
+  .bt-num{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+  .bt-sent{margin-left:8px;font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  .bt-sent .p{color:#5f7a52}.bt-sent .n{color:#b06343}
+  /* theme × sentiment heatmap (full report width, label column flexes) */
+  .hm{width:100%;border-collapse:separate;border-spacing:6px;font-size:12px;margin:10px 0;table-layout:fixed}
+  .hm th{font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--ink-3);
+    text-transform:uppercase;padding:4px 10px 8px;text-align:center;width:120px}
+  .hm th:first-child{width:auto}
+  .hm td.hm-th{width:auto;text-align:left;color:var(--ink);padding:6px 18px 6px 2px;font-size:13.5px;white-space:nowrap;font-weight:500}
+  .hm td.cell{width:120px;height:40px;text-align:center;color:#fff;font-variant-numeric:tabular-nums;
+    font-size:12.5px;border-radius:6px;font-weight:600}
+  /* quote wall */
+  .qw{columns:2;column-gap:16px;margin:10px 0 2px}
+  @media(max-width:720px){.qw{columns:1}}
+  .qw .tile{break-inside:avoid;border:1px solid var(--line);border-left:3px solid #7d9970;
+    border-radius:8px;padding:10px 12px;margin:0 0 12px;font-size:13px;line-height:1.5;background:#fff;color:var(--ink-2)}
+  .qw .tile.neg{border-left-color:#bc7459}
+  .qw .tile .qw-src{display:block;margin-top:6px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+  .qw .tile .qw-src a{color:var(--ink-3)}
+  /* discussion-trend line chart (full report width) */
+  .trend-chart{display:block;width:100%;height:150px;margin:8px 0 2px;overflow:visible}
+  /* methodology footer */
+  .meth{border-top:1px solid var(--line);margin-top:14px;padding-top:14px;font-size:12.5px;
+    color:var(--ink-2);line-height:1.7}
+  .meth .meth-src{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:8px;word-break:break-word}
+  .meth .meth-gaps{background:rgba(201,161,74,.08);border:1px solid rgba(201,161,74,.3);
+    border-radius:8px;padding:10px 13px;margin-top:10px;font-size:12px;color:#6b5418;line-height:1.6}
   .kg-zoom-controls{
     position:absolute;top:46px;left:18px;display:flex;flex-direction:column;gap:1px;z-index:6;
     background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:5px;overflow:hidden;backdrop-filter:blur(4px);
@@ -277,9 +434,13 @@
   .fb-body{display:block;padding:24px 0 56px;text-align:left;color:var(--ink);max-width:820px;margin:0 auto}
   .fb-body h1{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
   .fb-body .fb-deck{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink-2);margin-bottom:24px}
-  .fb-body h2{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase;margin:32px 0 4px;border-top:1px solid var(--line);padding-top:18px}
-  .fb-body h2 .secnum{display:inline-block;margin-right:8px;color:var(--charcoal-3)}
-  .fb-body h3{font-family:var(--serif);font-size:17px;font-weight:600;margin:18px 0 6px;color:var(--ink)}
+  .fb-body h2{font-family:var(--serif);font-size:25px;font-weight:600;letter-spacing:-.01em;color:var(--ink);
+    margin:46px 0 4px;border-top:2px solid var(--ink);padding-top:16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .fb-body h2 .secnum{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--charcoal-3);font-weight:400}
+  .fb-body h2 .fb-icon{width:18px;height:18px;color:var(--ink-3);align-self:center}
+  .sec-summary{font-family:var(--serif);font-size:15px;font-style:italic;line-height:1.6;color:var(--ink-2);
+    margin:2px 0 16px;max-width:760px}
+  .fb-body h3{font-family:var(--serif);font-size:17px;font-weight:600;margin:22px 0 6px;color:var(--ink)}
   .fb-body p{font-family:var(--serif);font-size:14.5px;line-height:1.65;color:var(--ink-2);margin:6px 0 10px}
   .fb-body ul{font-family:var(--serif);font-size:14.5px;line-height:1.65;color:var(--ink-2);margin:6px 0 14px;padding-left:22px}
   .fb-body ul li{margin-bottom:4px}
@@ -445,15 +606,28 @@
   @media print { .print-btn { display: none !important; } }
 
   /* ============ Header buttons (lang + download) ============ */
-  .lang-toggle, .dl-btn {
+  .dl-btn {
     appearance:none; border:1px solid var(--line); background:#fff; cursor:pointer;
     font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; color:var(--ink-2);
     padding:5px 10px; border-radius:5px;
   }
-  .lang-toggle:hover, .dl-btn:hover { border-color:var(--charcoal-3); color:var(--ink); }
-  .lang-toggle { min-width:34px; font-weight:600; }
+  .dl-btn:hover { border-color:var(--charcoal-3); color:var(--ink); }
   .dl-btn { white-space:nowrap; }
-  @media print { .lang-toggle, .dl-btn { display:none !important; } }
+  /* CN | EN sliding switch */
+  .lang-switch {
+    position:relative; display:inline-flex; align-items:center; padding:2px; height:24px;
+    border:1px solid var(--line); background:#fff; border-radius:999px; cursor:pointer;
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; appearance:none;
+  }
+  .lang-switch .ls-opt { position:relative; z-index:1; width:30px; text-align:center;
+    line-height:20px; color:var(--ink-3); transition:color .2s; }
+  .lang-switch .ls-thumb { position:absolute; z-index:0; top:2px; left:2px; width:30px; height:20px;
+    border-radius:999px; background:#5b7a52; transition:transform .22s cubic-bezier(.4,0,.2,1); }
+  body[data-lang="en"] .lang-switch .ls-thumb { transform:translateX(30px); }
+  body[data-lang="zh"] .lang-switch .ls-opt[data-l="zh"],
+  body[data-lang="en"] .lang-switch .ls-opt[data-l="en"] { color:#fff; }
+  .lang-switch:hover { border-color:var(--charcoal-3); }
+  @media print { .lang-switch, .dl-btn { display:none !important; } }
 
   /* ============ Filter bar v2 — tidy wrapped groups ============ */
   .filter-bar { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; align-items:stretch; }
@@ -546,7 +720,11 @@
   </div>
   <div class="header-right">
     <span class="verdict-pill" id="verdictPill"></span>
-    <button class="lang-toggle" id="langToggle" title="中 / EN">EN</button>
+    <button class="lang-switch" id="langToggle" title="中 / EN" aria-label="切换中英文">
+      <span class="ls-opt" data-l="zh">中</span>
+      <span class="ls-opt" data-l="en">EN</span>
+      <span class="ls-thumb"></span>
+    </button>
     <button class="dl-btn" id="dlBtn" data-i18n="btn.download">⎙ 下载 PDF</button>
   </div>
 </header>
@@ -557,25 +735,22 @@
   <!-- LEFT: Always-On knowledge graph -->
   <aside class="center-panel">
     <div class="evidence-counter" id="evidenceCounter"></div>
-    <svg class="kg-svg" id="kgSvg" viewBox="0 0 960 700" preserveAspectRatio="xMidYMid meet">
-      <g class="kg-content" id="kgContent"></g>
-    </svg>
-    <div class="kg-zoom-controls">
-      <button id="zoomIn"  title="放大">+</button>
-      <button id="zoomOut" title="缩小">−</button>
-      <button id="zoomReset" title="重置">⊙</button>
+    <canvas class="radar-canvas" id="radarCanvas"></canvas>
+    <div class="radar-hud" id="radarHud">
+      <div class="rh-line"><span data-i18n="radar.signals">有效信号</span> · <b id="rhN">0</b>　<span data-i18n="radar.sectors">扇区</span> · <b id="rhSec">0</b></div>
+      <div class="rh-line"><span data-i18n="radar.range">量程</span> · <b id="rhRange">1</b> · <span id="rhConf" data-i18n="radar.core">核心需求层</span></div>
     </div>
-    <div class="zoom-level" id="zoomLevel">100%</div>
     <div class="kg-tooltip" id="kgTip"></div>
-    <div class="center-hint" data-i18n="graph.hint">悬停查看 · 点击切到对应视角 · 滚轮缩放 · 拖拽平移</div>
+    <div class="radar-scanmsg" id="radarScan"></div>
+    <div class="radar-controls">
+      <button class="radar-btn" id="radarExpand"><span data-i18n="radar.expand">⊕ 扩大扫描范围</span></button>
+      <button class="radar-btn ghost" id="radarPause"><span data-i18n="radar.pause">⏸ 暂停</span></button>
+    </div>
+    <div class="center-hint" data-i18n="graph.hint">悬停看原话 · 点击扇区切到对应视角 · ⊕ 扩大量程探测更多信号</div>
     <div class="legend">
-      <div class="lg-row"><span class="lg-dot" style="background:#2c2f3a"></span><span data-i18n="legend.player">玩家</span></div>
-      <div class="lg-row"><span class="lg-dot" style="background:#5b7a52"></span><span data-i18n="legend.themeWin">主题(正面)</span></div>
-      <div class="lg-row"><span class="lg-dot" style="background:#a0533c"></span><span data-i18n="legend.themePain">主题(痛点)</span></div>
-      <div class="lg-row"><span class="lg-dot" style="background:#80766a"></span><span data-i18n="legend.neutral">中性 / 退场</span></div>
-      <div class="lg-row"><span class="lg-dot" style="background:transparent;border:1.5px dashed #5b7a52"></span><span data-i18n="legend.opp">机会区</span></div>
       <div class="lg-row"><span class="lg-dot" style="background:#7d9970"></span><span data-i18n="legend.voicePos">原话(正面)</span></div>
       <div class="lg-row"><span class="lg-dot" style="background:#bc7459"></span><span data-i18n="legend.voiceNeg">原话(负面)</span></div>
+      <div class="lg-row"><span class="lg-dot" style="background:transparent;border:1.5px solid #c9a14a"></span><span data-i18n="legend.opp">机会缝隙(空白扇区)</span></div>
     </div>
   </aside>
 
@@ -668,17 +843,46 @@
       'lens.opportunity':'机会缝隙','lens.strategy':'切入策略','lens.risks':'风险',
       'legend.player':'玩家','legend.themeWin':'主题(正面)','legend.themePain':'主题(痛点)',
       'legend.neutral':'中性 / 退场','legend.opp':'机会区','legend.voicePos':'原话(正面)','legend.voiceNeg':'原话(负面)',
-      'graph.hint':'悬停查看 · 点击切到对应视角 · 滚轮缩放 · 拖拽平移',
+      'graph.hint':'悬停看原话 · 点击扇区切到对应视角 · ⊕ 扩大量程探测更多信号',
+      'radar.signals':'有效信号','radar.sectors':'扇区','radar.range':'量程','radar.core':'核心需求层',
+      'radar.expand':'⊕ 扩大扫描范围','radar.pause':'⏸ 暂停',
+      'radar.ext':'扩展需求层','radar.outer':'外圈探测层',
+      'radar.axisCore':'核心 · 高赞','radar.axisTail':'长尾 · 新声',
+      'sent.praise':'好评','sent.complaint':'差评','sent.demand':'需求信号','sent.gap':'痛点/缺口',
+      'ins.market':'市场洞察','ins.user':'用户洞察','ins.product':'产品洞察',
+      'ins.split':'口碑结构','ins.demandSplit':'需求信号结构','ins.themeDist':'需求主题分布',
+      'ins.upvotes':'累计赞同','ins.avgScore':'平均热度','ins.discussed':'被讨论',
+      'ins.topPraise':'高频好评 · 用户认可','ins.topComplaint':'高频差评 · 用户不满',
+      'ins.topDemand':'强需求信号 · 用户在求','ins.topGap':'未满足的缺口 · 现有方案不够',
+      'mode.existing':'存量市场 · 已有产品在售','mode.nonstock':'非存量市场 · 需求验证',
+      'ins.communities':'社区','ins.shareOfVoice':'声量占比','ins.heatmap':'主题 × 情绪 · 痛点图',
+      'ins.brandTable':'玩家对比','ins.mentions':'被提及','ins.quoteWall':'真实原声墙','ins.deepdive':'主题深潜',
+      'ins.measured':'实测数据','ins.judgment':'分析判断',
+      'ins.btBrand':'玩家','ins.btShare':'声量','ins.btSent':'口碑(好 / 差)','ins.btMeta':'价格 / 状态','ins.btSite':'官网搜索',
+      'ins.rnSplit':'读法:按真实原声<b>条数</b>统计的正负向占比;数字为条数,不是赞数累加。',
+      'ins.rnTheme':'读法:每个需求主题被多少条真实原声提及(占总数的百分比)。条越长 = 讨论越集中。',
+      'ins.rnHeat':'读法:颜色越深 = 该主题下该情绪的原声越多。<b>颜色是信号,数字是次要标注</b>。',
+      'ins.rnBrand':'读法:全部为真实原声的客观统计 —— 被提及条数、声量占比、好评 / 差评结构。官网为搜索链接。',
+      'ins.rnSov':'读法:每个玩家占据了多少比例的讨论声量(占总原声的百分比)。',
+      'ins.rnDeep':'读法:讨论量最高的三个主题,每个附最高赞真实原声 + 一行客观结论。',
+      'ins.method':'方法与数据来源','ins.methodBody':'数据来自 Reddit(经 pullpush.io 归档)+ Hacker News 的真实公开讨论。每条原声可点击回到原帖。',
+      'ins.gaps':'已知盲区','ins.gapsBody':'数据为 Reddit 真实公开讨论(经 Arctic Shift / pullpush 归档),赞数为摄取时刻快照、非实时,部分时段 / 社区可能不全。结论用于判断需求真伪,不构成投资建议。',
+      'ud.section':'用户与需求拆解','ud.jtbd':'核心任务 JTBD','ud.scenarios':'使用场景','ud.personas':'用户画像',
+      'ud.needs':'未被满足的需求','ud.workarounds':'替代方案 / Workaround','ud.wtp':'支付意愿 / 价格带',
+      'ud.rnDemand':'读法:从真实原声拆出的场景 / 人群 / 需求,每条带 <b>▸</b> 链接回支撑它的真实帖子。',
+      'ud.matrix':'需求地图 · 机会矩阵',
+      'st.dirs':'可能的切入方向','st.bet':'赌的假设','st.evidence':'支撑证据','st.openq':'待验证问题','st.risk':'不确定性',
+      'st.dirsNote':'这些是「方向 + 待验证假设」,不是拍板的推荐 —— 判断权留给你。',
       'sel.current':'当前选中','sel.clear':'清除选择',
       'report.divider':'完整报告',
       'verdict.real':'✓ 真实需求','verdict.partial':'◐ 部分支持','verdict.insufficient':'⚠ 证据不足',
-      'ov.findings':'核心发现','ov.counts.raw':'真实原话','ov.counts.mkt':'电商评论','ov.counts.ed':'媒体测评','ov.counts.players':'玩家',
+      'ov.findings':'核心发现','ov.counts.raw':'真实原话','ov.counts.themes':'需求主题','ov.counts.mkt':'电商评论','ov.counts.ed':'媒体测评','ov.counts.players':'玩家',
       'pl.topVoices':'高赞原话','pl.mkt':'电商口碑','pl.smallSample':'本玩家社区规模较小,样本不足以形成主题级证据。',
       'vo.sentiment':'情绪','vo.theme':'主题','vo.all':'全部','vo.pos':'● 正面','vo.neg':'● 负面',
       'vo.count':'条原话(共','vo.count2':')',
       'op.who':'谁最可能占据','st.recommend':'推荐','st.time':'时间','st.invest':'投入','st.moat':'护城河',
       'rk.sevHigh':'高','rk.sevMid':'中','rk.sevLow':'低',
-      'fb.s1':'品类拆解','fb.s2':'用户洞察','fb.s3':'竞品全景','fb.s4':'机会缝隙','fb.s5':'入场能力栈','fb.s6':'风险与挑战',
+      'fb.s1':'市场与品类洞察','fb.s2':'用户声音洞察','fb.s3':'竞品全景','fb.s4':'机会缝隙','fb.s5':'入场能力栈','fb.s6':'风险与挑战',
       'fb.themeDist':'主题分布','fb.voiceSel':'代表性原话','fb.players':'玩家速览','fb.mkt':'电商口碑','fb.failures':'失败案例',
       'fb.paths':'切入策略','fb.s5note':'本节由用户根据具体策略路径填写。',
       'tt.player':'玩家','tt.theme':'主题','tt.voicesOn':'条原话讨论','tt.clickPlayer':'点击 → 看该玩家档案',
@@ -692,17 +896,46 @@
       'lens.opportunity':'Opportunity','lens.strategy':'Strategy','lens.risks':'Risks',
       'legend.player':'Player','legend.themeWin':'Theme (win)','legend.themePain':'Theme (pain)',
       'legend.neutral':'Neutral / exited','legend.opp':'Opportunity','legend.voicePos':'Voice (pos)','legend.voiceNeg':'Voice (neg)',
-      'graph.hint':'Hover to inspect · click to switch lens · scroll to zoom · drag to pan',
+      'graph.hint':'Hover to read a voice · click a sector to switch lens · ⊕ widen range for more signals',
+      'radar.signals':'Signals','radar.sectors':'Sectors','radar.range':'Range','radar.core':'Core demand layer',
+      'radar.expand':'⊕ Widen scan range','radar.pause':'⏸ Pause',
+      'radar.ext':'Extended layer','radar.outer':'Outer probe layer',
+      'radar.axisCore':'Core · top-voted','radar.axisTail':'Long tail',
+      'sent.praise':'Praise','sent.complaint':'Complaint','sent.demand':'Demand signal','sent.gap':'Unmet gap',
+      'ins.market':'Market insight','ins.user':'User insight','ins.product':'Product insight',
+      'ins.split':'Sentiment split','ins.demandSplit':'Demand signal split','ins.themeDist':'Demand theme distribution',
+      'ins.upvotes':'Total upvotes','ins.avgScore':'Avg heat','ins.discussed':'discussed',
+      'ins.topPraise':'Top praise · what users love','ins.topComplaint':'Top complaints · what frustrates',
+      'ins.topDemand':'Strong demand signals · what users want','ins.topGap':'Unmet gaps · current options fall short',
+      'mode.existing':'Existing market · products on sale','mode.nonstock':'Non-stock market · demand validation',
+      'ins.communities':'communities','ins.shareOfVoice':'Share of voice','ins.heatmap':'Theme × sentiment · pain map',
+      'ins.brandTable':'Brand comparison','ins.mentions':'mentions','ins.quoteWall':'Voice wall','ins.deepdive':'Theme deep-dive',
+      'ins.measured':'measured data','ins.judgment':'analyst judgment',
+      'ins.btBrand':'Brand','ins.btShare':'Share','ins.btSent':'Sentiment (pos / neg)','ins.btMeta':'Price / status','ins.btSite':'Find site',
+      'ins.rnSplit':'How to read: positive/negative split by <b>number of real voices</b> — counts, not summed upvotes.',
+      'ins.rnTheme':'How to read: how many real voices mention each demand theme (% of total). Longer = more concentrated.',
+      'ins.rnHeat':'How to read: darker = more voices for that theme×sentiment. <b>Color is the signal; the number is secondary</b>.',
+      'ins.rnBrand':'How to read: objective counts from real voices — mentions, share of voice, pos/neg split. Site = search link.',
+      'ins.rnSov':'How to read: what share of the conversation each player holds (% of total voices).',
+      'ins.rnDeep':'How to read: the three most-discussed themes, each with top-voted real voices + one objective takeaway.',
+      'ins.method':'Method & sources','ins.methodBody':'Data is real public discussion from Reddit (via the pullpush.io archive) + Hacker News. Every voice links back to its source post.',
+      'ins.gaps':'Known gaps','ins.gapsBody':'Data is real public Reddit discussion (via the Arctic Shift / pullpush archives); upvotes are a snapshot at ingest, not live; some periods/communities may be incomplete. Findings judge demand reality — not investment advice.',
+      'ud.section':'User & Demand Decomposition','ud.jtbd':'Core JTBD','ud.scenarios':'Usage scenarios','ud.personas':'Personas',
+      'ud.needs':'Unmet needs','ud.workarounds':'Workarounds','ud.wtp':'Willingness to pay',
+      'ud.rnDemand':'How to read: scenarios / personas / needs decomposed from real voices; each <b>▸</b> links back to the supporting post.',
+      'ud.matrix':'Demand map · opportunity matrix',
+      'st.dirs':'Possible directions','st.bet':'Hypothesis','st.evidence':'Evidence','st.openq':'Open questions','st.risk':'Risk',
+      'st.dirsNote':'These are directions + assumptions to validate, not a definitive recommendation — the call is yours.',
       'sel.current':'Selected','sel.clear':'Clear',
       'report.divider':'Full Report',
       'verdict.real':'✓ Real demand','verdict.partial':'◐ Partial','verdict.insufficient':'⚠ Insufficient',
-      'ov.findings':'Key Findings','ov.counts.raw':'raw voices','ov.counts.mkt':'marketplace','ov.counts.ed':'editorials','ov.counts.players':'players',
+      'ov.findings':'Key Findings','ov.counts.raw':'raw voices','ov.counts.themes':'demand themes','ov.counts.mkt':'marketplace','ov.counts.ed':'editorials','ov.counts.players':'players',
       'pl.topVoices':'Top Voices','pl.mkt':'Marketplace VOC','pl.smallSample':'Community too small for theme-level evidence.',
       'vo.sentiment':'Sentiment','vo.theme':'Theme','vo.all':'All','vo.pos':'● Positive','vo.neg':'● Negative',
       'vo.count':'voices (of','vo.count2':')',
       'op.who':'Who could occupy it','st.recommend':'recommended','st.time':'Time','st.invest':'Invest','st.moat':'Moat',
       'rk.sevHigh':'High','rk.sevMid':'Mid','rk.sevLow':'Low',
-      'fb.s1':'Category Breakdown','fb.s2':'User Insight','fb.s3':'Competitive Landscape','fb.s4':'Opportunity Gap','fb.s5':'Capability Stack','fb.s6':'Risks & Challenges',
+      'fb.s1':'Market & Category Insight','fb.s2':'User Voice Insight','fb.s3':'Competitive Landscape','fb.s4':'Opportunity Gap','fb.s5':'Capability Stack','fb.s6':'Risks & Challenges',
       'fb.themeDist':'Theme Distribution','fb.voiceSel':'Representative Voices','fb.players':'Players','fb.mkt':'Marketplace VOC','fb.failures':'Failure Cases',
       'fb.paths':'Entry Paths','fb.s5note':'Filled in per chosen strategy path.',
       'tt.player':'Player','tt.theme':'Theme','tt.voicesOn':'voices discuss this','tt.clickPlayer':'Click → player profile',
@@ -718,6 +951,15 @@
     if (LANG() === 'en' && obj[field + '_en']) return obj[field + '_en'];
     return obj[field] ?? '';
   };
+  // Voice titles are the original English Reddit text. In zh mode, show a subtle
+  // Chinese translation under the English original (title_zh, produced by the
+  // pipeline). In en mode, no subtitle.
+  const voiceZh = v => (LANG() === 'zh' && v && v.title_zh) ? v.title_zh : '';
+  const zhLine = v => { const z = voiceZh(v); return z ? `<div class="v-zh">${esc(z)}</div>` : ''; };
+  // Parse the source subreddit ("r/xxx") from a voice url, for source tags.
+  const subOf = url => { const m = /reddit\.com\/r\/([A-Za-z0-9_]+)/.exec(url || ''); return m ? 'r/' + m[1] : (/(news\.)?ycombinator/.test(url||'') ? 'HN' : 'web'); };
+  // Brand official-site SEARCH link (no LLM-emitted URLs → zero dead links).
+  const brandSearch = name => 'https://duckduckgo.com/?q=' + encodeURIComponent((name || '') + ' official site');
   function applyI18n(){
     document.querySelectorAll('[data-i18n]').forEach(el => {
       el.textContent = T(el.dataset.i18n);
@@ -737,8 +979,12 @@
     const pill = document.getElementById('verdictPill');
     pill.dataset.status = verdictStatus;
     pill.textContent = T('verdict.' + verdictStatus);
-    document.getElementById('langToggle').textContent = LANG() === 'zh' ? 'EN' : '中';
     applyI18n();
+    // mode-aware radar legend (override the static i18n labels)
+    const lp = document.querySelector('[data-i18n="legend.voicePos"]');
+    const ln = document.querySelector('[data-i18n="legend.voiceNeg"]');
+    if (lp) lp.textContent = sentLabel('pos');
+    if (ln) ln.textContent = sentLabel('neg');
   }
   document.body.dataset.mode   = data.meta.mode || 'EXISTING';
   document.body.dataset.status = verdictStatus;
@@ -757,14 +1003,20 @@
   const polCls   = p => ({ win:'pos', pain:'neg', neutral:'neu', pos:'pos', neg:'neg' }[p] || 'neu');
   const polLabel = p => ({ win:'win', pain:'pain', neutral:'·', pos:'pos', neg:'neg' }[p] || p);
 
+  // ---- Mode-aware framing ----
+  // EXISTING market → voices read as product reviews (好评 / 差评).
+  // NON_STOCK market → voices read as demand validation (需求信号 / 痛点缺口).
+  const isNonStock = () => (data.meta.mode || 'EXISTING') === 'NON_STOCK';
+  const sentLabel  = sent => sent === 'pos'
+      ? (isNonStock() ? T('sent.demand') : T('sent.praise'))
+      : (isNonStock() ? T('sent.gap')    : T('sent.complaint'));
+
   // ---- Render evidence counter strip (top-left of graph) ----
   function renderEvidenceCounter(){
     const c = (data.verdict && data.verdict.evidence_counts) || {};
     document.getElementById('evidenceCounter').innerHTML = `
-      <span><b>${c.raw_voices  || 0}</b> ${T('ov.counts.raw')}</span>
-      <span><b>${c.marketplace || 0}</b> ${T('ov.counts.mkt')}</span>
-      <span><b>${c.editorials  || 0}</b> ${T('ov.counts.ed')}</span>
-      <span><b>${c.simulated   || 0}</b> simulated</span>`;
+      <span><b>${(data.voices||[]).length || c.raw_voices || 0}</b> ${T('ov.counts.raw')}</span>
+      <span><b>${(data.themes||[]).length}</b> ${T('ov.counts.themes')}</span>`;
   }
 
   // ---- Render OVERVIEW lens ----
@@ -778,10 +1030,8 @@
         <div class="pc-meta">VERDICT · ${esc(data.meta.timestamp)}</div>
         <div class="v-title">${esc(tf(data.meta,'thesis'))}</div>
         <div class="v-counts">
-          <div><b>${counts.raw_voices || 0}</b> ${T('ov.counts.raw')}</div>
-          <div><b>${counts.marketplace || 0}</b> ${T('ov.counts.mkt')}</div>
-          <div><b>${counts.editorials || 0}</b> ${T('ov.counts.ed')}</div>
-          <div><b>${data.players.length}</b> ${T('ov.counts.players')}</div>
+          <div><b>${(data.voices||[]).length || counts.raw_voices || 0}</b> ${T('ov.counts.raw')}</div>
+          <div><b>${(data.themes||[]).length}</b> ${T('ov.counts.themes')}</div>
         </div>
       </div>
       <h4>${T('ov.findings')}</h4>
@@ -802,7 +1052,7 @@
         const themes = v.themes.map(themeLabel).join(' · ');
         return `<div class="voice-row ${esc(v.sentiment)}">
             <span class="dot">●</span>
-            <div><div class="vt"><a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(tf(v,'title'))}</a></div>
+            <div><div class="vt"><a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(tf(v,'title'))}</a></div>${zhLine(v)}
               <div class="vm">${esc(themes)}</div></div>
             <span class="vs">↑${fmtNum(Math.abs(v.score))}</span>
           </div>`;
@@ -831,8 +1081,8 @@
       <div class="fb-group">
         <span class="fb-lbl">${T('vo.sentiment')}</span>
         <button class="chip active" data-filter="sent" data-val="all">${T('vo.all')}</button>
-        <button class="chip" data-filter="sent" data-val="pos">${T('vo.pos')}</button>
-        <button class="chip" data-filter="sent" data-val="neg">${T('vo.neg')}</button>
+        <button class="chip" data-filter="sent" data-val="pos">● ${sentLabel('pos')}</button>
+        <button class="chip" data-filter="sent" data-val="neg">● ${sentLabel('neg')}</button>
       </div>
       <div class="fb-group">
         <span class="fb-lbl">${T('vo.theme')}</span>
@@ -888,31 +1138,164 @@
     const counts = v.evidence_counts || {};
     const sevLabel = { high:T('rk.sevHigh'), mid:T('rk.sevMid'), low:T('rk.sevLow') };
 
-    // §2 themes table
-    const themes = data.themes.map(t => {
-      const vc = data.voices.filter(v => v.themes.includes(t.id)).length;
-      return `<tr><td>${esc(tf(t,'label'))}</td><td><span class="${polCls(t.polarity)}">${polLabel(t.polarity)}</span></td><td>${vc}</td><td>${esc(tf(t,'summary'))}</td></tr>`;
-    }).join('');
-    const quotes = data.voices.slice(0,4).map(v => {
-      const cls = v.sentiment === 'neg' ? 'fb-quote neg' : 'fb-quote';
-      return `<blockquote class="${cls}">"${esc(tf(v,'title'))}"
-        <span class="src">● ${esc(playerName(v.player))} · ↑${fmtNum(Math.abs(v.score))} · <a href="${esc(v.url)}" target="_blank">link</a></span>
-      </blockquote>`;
-    }).join('');
-    // §3 players as mini-card grid
-    const playerCards = data.players.map(p => `
-      <div class="fb-player-card">
-        <div class="pcc-name">${esc(tf(p,'name'))}</div>
-        <div class="pcc-meta">${[p.price, p.subscription].filter(Boolean).map(esc).join(' · ')}</div>
-        <span class="pcc-status ${esc(p.status||'')}">${esc(p.status || '—')}</span>
-        <p style="margin:8px 0 0;font-size:12.5px;color:var(--ink-2)">${esc(tf(p,'summary'))}</p>
-      </div>`).join('');
-    const mkt = (data.marketplace || []).map(m => `<tr>
-        <td>${esc(playerName(m.player))}</td><td>⭐ ${m.rating}</td><td>${fmtNum(m.review_count)}</td><td>${(m.top_complaints||[]).map(esc).join(' / ')}</td>
-      </tr>`).join('');
-    const failures = (data.failures || []).map(f => `<li><b>${esc(tf(f,'name'))}</b> (${esc(f.years)}) — ${esc(tf(f,'what'))}${tf(f,'lesson') ? ' — <i>'+esc(tf(f,'lesson'))+'</i>':''}</li>`).join('');
-    // §4 paths as cards
+    // ---- objective aggregates: mentions / % of corpus (R2/R3) ----
+    const allV   = data.voices || [];
+    const N      = allV.length || 1;
+    const pct    = n => Math.round(n / N * 100);
+    const posV   = allV.filter(x => x.sentiment === 'pos').sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+    const negV   = allV.filter(x => x.sentiment !== 'pos').sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+    const posPct = pct(posV.length);
+    const modeLabel = isNonStock() ? T('mode.nonstock') : T('mode.existing');
+    const themeCounts = data.themes.map(t => ({ t, n: allV.filter(x=>x.themes.includes(t.id)).length }))
+                                   .filter(x => x.n > 0)   // drop themes no voice maps to
+                                   .sort((a,b)=>b.n-a.n);
+    const maxTN = Math.max(1, ...themeCounts.map(x=>x.n));
+    const playerStats = data.players.map(p => {
+      const pv = allV.filter(x => x.player === p.id);
+      const pos = pv.filter(x=>x.sentiment==='pos').length;
+      return { p, n: pv.length, pos, neg: pv.length - pos };
+    }).sort((a,b)=>b.n-a.n);
+    const maxPN = Math.max(1, ...playerStats.map(s=>s.n));
+    const commMap = {}; allV.forEach(x => { const s = subOf(x.url); commMap[s] = (commMap[s]||0)+1; });
+    const comms = Object.entries(commMap).sort((a,b)=>b[1]-a[1]);
+
+    // Section conclusions: prefer the LLM's core-insight paragraph
+    // (data.section_insights, language-aware); fall back to an objective
+    // data-derived one-liner when an insight isn't available.
+    const L = (zh,en) => LANG()==='zh' ? zh : en;
+    const SI = data.section_insights || {};
+    const insight = (key, fb) => { const t = tf(SI, key); return t ? esc(t) : fb; };
+    const topTheme = themeCounts[0] ? esc(tf(themeCounts[0].t,'label')) : '—';
+    const topThemePct = themeCounts[0] ? pct(themeCounts[0].n) : 0;
+    const negByTheme = data.themes.map(t => ({ t, n: allV.filter(x=>x.themes.includes(t.id) && x.sentiment!=='pos').length })).sort((a,b)=>b.n-a.n);
+    const topNegTheme = (negByTheme[0] && negByTheme[0].n) ? esc(tf(negByTheme[0].t,'label')) : '';
+    const leader = playerStats[0];
+    const oppLabel = esc(tf(data.opportunity||{},'label'));
+    const _rk = data.risks || [];
+    const topSev = _rk.some(r=>r.severity==='high')?L('高','high'):(_rk.some(r=>r.severity==='mid')?L('中','mid'):L('低','low'));
+    const secSum = txt => txt ? `<p class="sec-summary">${txt}</p>` : '';
+    const s1sum = insight('market', L(`已采集 <b>${N}</b> 条真实讨论,覆盖 <b>${comms.length}</b> 个社区;整体 <b>${posPct}%</b> 正向,讨论最集中在「${topTheme}」。`,
+                    `<b>${N}</b> real discussions across <b>${comms.length}</b> communities; <b>${posPct}%</b> positive overall, most concentrated on “${topTheme}”.`));
+    const s2sum = insight('user', L(`用户最在意「${topTheme}」(<b>${topThemePct}%</b> 提及)。${topNegTheme?`不满主要集中在「${topNegTheme}」。`:`负面声音很少。`}`,
+                    `Users care most about “${topTheme}” (<b>${topThemePct}%</b> of mentions).${topNegTheme?` Complaints cluster on “${topNegTheme}”.`:` Few negatives.`}`));
+    const s3sum = insight('competitive', leader ? L(`<b>${esc(tf(leader.p,'name'))}</b> 占据 <b>${pct(leader.n)}%</b> 声量、领先;共 ${data.players.length} 个玩家被讨论。`,
+                             `<b>${esc(tf(leader.p,'name'))}</b> leads with <b>${pct(leader.n)}%</b> share of voice; ${data.players.length} players discussed.`) : '');
+    const s4sum = L(`讨论量前三的真实需求:${themeCounts.slice(0,3).map(x=>esc(tf(x.t,'label'))).join(' · ')}。`,
+                    `Top-3 most-discussed real needs: ${themeCounts.slice(0,3).map(x=>esc(tf(x.t,'label'))).join(' · ')}.`);
+    const s7sum = L(`按赞数排序的 ${Math.min(10,N)} 条代表性真实原声。`, `${Math.min(10,N)} representative real voices, ranked by upvotes.`);
+    const s5sum = insight('opportunity', oppLabel ? L(`关键空白机会:${oppLabel};下方为可选的切入策略路径。`,
+                               `Key white-space: ${oppLabel}; candidate entry-strategy paths below.`) : '');
+    const s6sum = insight('risk', _rk.length ? L(`共识别 ${_rk.length} 项主要风险,最高级别:${topSev}。`,
+                                 `${_rk.length} key risks identified; highest severity: ${topSev}.`) : '');
+
+    const measured = `<span class="kicker measured">${T('ins.measured')}</span>`;
+    const judgment = `<span class="kicker judgment">${T('ins.judgment')}</span>`;
+    const rnote = txt => `<div class="read-note">${txt}</div>`;
+
+    const splitBar = `<div class="ins-bar">
+      ${posV.length?`<span class="seg pos" style="width:${Math.max(posPct,12)}%">${sentLabel('pos')} ${posPct}%</span>`:''}
+      ${negV.length?`<span class="seg neg" style="width:${Math.max(100-posPct,12)}%">${sentLabel('neg')} ${100-posPct}%</span>`:''}
+    </div>`;
+    const themeBars = themeCounts.map(({t,n})=>`<div class="ins-trow">
+        <span class="ins-tlabel">${esc(tf(t,'label'))}</span>
+        <span class="ins-tbar"><i class="${polCls(t.polarity)}" style="width:${Math.round(n/maxTN*100)}%"></i></span>
+        <span class="ins-tcount">${pct(n)}%</span></div>`).join('');
+    const sovBars = playerStats.filter(s=>s.n>0).map(s=>`<div class="ins-trow">
+        <span class="ins-tlabel">${esc(tf(s.p,'name'))}</span>
+        <span class="ins-tbar"><i class="pos" style="width:${Math.round(s.n/maxPN*100)}%"></i></span>
+        <span class="ins-tcount">${pct(s.n)}%</span></div>`).join('') || '<p class="meta">—</p>';
+    const marketCards = `<div class="ins-grid">
+      <div class="ins-card">${measured}
+        <h4>${isNonStock()?T('ins.demandSplit'):T('ins.split')}</h4>
+        <div class="ins-stat-row">
+          <div class="ins-stat"><b>${allV.length}</b><span>${T('ov.counts.raw')}</span></div>
+          <div class="ins-stat"><b>${comms.length}</b><span>${T('ins.communities')}</span></div>
+          <div class="ins-stat"><b>${data.players.length}</b><span>${T('ov.counts.players')}</span></div>
+        </div>
+        ${splitBar}${rnote(T('ins.rnSplit'))}
+      </div>
+      <div class="ins-card">${measured}<h4>${T('ins.themeDist')}</h4>${themeBars}${rnote(T('ins.rnTheme'))}</div>
+    </div>`;
+
+    // theme × sentiment heatmap (color is the signal)
+    const hmRows = themeCounts.map(({t}) => {
+      const tv = allV.filter(x=>x.themes.includes(t.id));
+      const pos = tv.filter(x=>x.sentiment==='pos').length;
+      return { t, pos, neg: tv.length - pos };
+    });
+    const hmMax = Math.max(1, ...hmRows.flatMap(r=>[r.pos,r.neg]));
+    const hmCell = (val,kind) => { if(!val) return 'background:#efe9db;color:#c7c0ad';
+      const a = (0.20 + (val/hmMax)*0.80).toFixed(2);
+      return `background:rgba(${kind==='pos'?'125,153,112':'188,116,89'},${a})`; };
+    const heatmap = `<table class="hm"><thead><tr><th></th><th>${sentLabel('pos')}</th><th>${sentLabel('neg')}</th></tr></thead><tbody>
+      ${hmRows.map(r=>`<tr><td class="hm-th">${esc(tf(r.t,'label'))}</td>
+        <td class="cell" style="${hmCell(r.pos,'pos')}">${r.pos||''}</td>
+        <td class="cell" style="${hmCell(r.neg,'neg')}">${r.neg||''}</td></tr>`).join('')}
+    </tbody></table>`;
+
+    const qcol = (arr,cls,title)=>`<div class="ins-qcol ${cls}"><h4><span class="qdot"></span>${title}</h4>
+      ${arr.slice(0,4).map(x=>`<div class="ins-q ${cls}">"${esc(tf(x,'title'))}"${zhLine(x)}
+        <span class="qsrc">${esc(subOf(x.url))} · ↑${fmtNum(Math.abs(x.score))} · <a href="${esc(x.url)}" target="_blank" rel="noopener">link</a></span>
+      </div>`).join('') || '<p class="meta">—</p>'}</div>`;
+    const groupedQuotes = `<div class="ins-quotes">
+      ${qcol(posV,'pos', isNonStock()?T('ins.topDemand'):T('ins.topPraise'))}
+      ${qcol(negV,'neg', isNonStock()?T('ins.topGap'):T('ins.topComplaint'))}
+    </div>`;
+
+    // brand comparison table (objective: mentions, share, sentiment, site search)
+    const brandTable = `<table class="bt"><thead><tr>
+        <th>${T('ins.btBrand')}</th><th>${T('ins.mentions')}</th><th>${T('ins.btShare')}</th>
+        <th>${T('ins.btSent')}</th><th>${T('ins.btMeta')}</th></tr></thead><tbody>
+      ${playerStats.map(s=>{ const tot=s.n||1;
+        const meta=[s.p.price,s.p.subscription,s.p.status].filter(Boolean).map(esc).join(' · ');
+        return `<tr>
+          <td><span class="bt-name">${esc(tf(s.p,'name'))}</span><br>
+            <a class="bt-link" href="${brandSearch(tf(s.p,'name'))}" target="_blank" rel="noopener">${T('ins.btSite')} ↗</a></td>
+          <td class="bt-num">${s.n}</td><td class="bt-num">${pct(s.n)}%</td>
+          <td><span class="bt-mini"><i class="pos" style="width:${Math.round(s.pos/tot*100)}%"></i><i class="neg" style="width:${Math.round(s.neg/tot*100)}%"></i></span><span class="bt-sent"><span class="p">${s.pos}</span> / <span class="n">${s.neg}</span></span></td>
+          <td style="font-size:12.5px;color:var(--ink-2)">${esc(s.p.price||'')||'—'}${s.p.status?` · ${esc(s.p.status)}`:''}</td></tr>`; }).join('')}
+    </tbody></table>`;
+
+    // deep-dive trio (top 3 themes, each with linked stories + objective takeaway)
+    const deepDive = `<div class="ins-grid" style="grid-template-columns:repeat(3,1fr)">
+      ${themeCounts.slice(0,3).map(({t,n})=>{
+        const tv = allV.filter(x=>x.themes.includes(t.id)).sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+        const pos = tv.filter(x=>x.sentiment==='pos').length;
+        const stories = tv.slice(0,2).map(x=>`<div class="ins-q ${x.sentiment==='pos'?'pos':'neg'}">"${esc(tf(x,'title'))}"${zhLine(x)}
+          <span class="qsrc">${esc(subOf(x.url))} · ↑${fmtNum(Math.abs(x.score))} · <a href="${esc(x.url)}" target="_blank" rel="noopener">link</a></span></div>`).join('');
+        return `<div class="ins-card"><h4 style="color:${t.color}">${esc(tf(t,'label'))}</h4>
+          ${stories || '<p class="meta">—</p>'}
+          <div class="read-note"><b>${pct(n)}%</b> ${T('ins.discussed')} · <b>${tv.length?Math.round(pos/tv.length*100):0}%</b> ${sentLabel('pos')}</div></div>`;
+      }).join('')}
+    </div>`;
+
+    // quote wall (verbatim, source-tagged)
+    const wall = [...allV].sort((a,b)=>Math.abs(b.score)-Math.abs(a.score)).slice(0,10).map(x=>`
+      <div class="tile ${x.sentiment==='pos'?'':'neg'}">"${esc(tf(x,'title'))}"${zhLine(x)}
+        <span class="qw-src">${esc(subOf(x.url))} · ↑${fmtNum(Math.abs(x.score))} · <a href="${esc(x.url)}" target="_blank" rel="noopener">link</a></span></div>`).join('');
+
+    // language-aware array getter (for open_questions / open_questions_en)
+    const tfArr = (o,f) => { if(!o) return []; if(LANG()==='en' && Array.isArray(o[f+'_en'])) return o[f+'_en']; return Array.isArray(o[f])?o[f]:[]; };
+    // voice lookup for evidence links (▸ back to the real supporting post)
+    const vById = {}; (data.voices||[]).forEach(v => vById[v.id] = v);
+    const evLinks = ids => (ids||[]).map(id => { const v = vById[id]; return v
+        ? `<a class="ev-link" href="${esc(v.url)}" target="_blank" rel="noopener" title="${esc(tf(v,'title'))}">▸</a>` : ''; }).join('');
+
+    // ENTRY DIRECTIONS — advisory (hypothesis + evidence + open questions + risk),
+    // not a definitive recommendation. Falls back to old path fields for old data.
     const pathCards = (data.paths || []).map(p => {
+      const adv = tf(p,'hypothesis') || tf(p,'evidence') || tfArr(p,'open_questions').length || tf(p,'risk');
+      if (adv) {
+        const oq = tfArr(p,'open_questions');
+        return `<div class="fb-path adv">
+          <div class="fp-head"><span class="fp-name">${esc(tf(p,'label'))}</span></div>
+          <div class="fp-core">${esc(tf(p,'core'))}</div>
+          ${tf(p,'hypothesis')?`<div class="fp-row"><b>${T('st.bet')}</b>${esc(tf(p,'hypothesis'))}</div>`:''}
+          ${tf(p,'evidence')?`<div class="fp-row"><b>${T('st.evidence')}</b>${esc(tf(p,'evidence'))}</div>`:''}
+          ${oq.length?`<div class="fp-row"><b>${T('st.openq')}</b><ul class="fp-oq">${oq.map(q=>`<li>${esc(q)}</li>`).join('')}</ul></div>`:''}
+          ${tf(p,'risk')?`<div class="fp-row risk"><b>${T('st.risk')}</b>${esc(tf(p,'risk'))}</div>`:''}
+        </div>`;
+      }
       const stats = [p.time && `${T('st.time')} <b>${esc(p.time)}</b>`,
                      p.investment && `${T('st.invest')} <b>${esc(p.investment)}</b>`,
                      p.moat && `${T('st.moat')} <b>${T('moat.'+p.moat) || esc(p.moat)}</b>`].filter(Boolean).join('');
@@ -920,16 +1303,109 @@
           <div class="fp-head"><span class="fp-name">${esc(tf(p,'label'))}</span>${p.recommended?`<span class="fp-badge">${T('st.recommend')}</span>`:''}</div>
           <div class="fp-core">${esc(tf(p,'core'))}</div>
           <p style="margin:0;font-size:13px;color:var(--ink-2)">${esc(tf(p,'description'))}</p>
-          ${stats?`<div class="fp-stats">${stats}</div>`:''}
-        </div>`;
-    }).join('');
-    // §6 risks as severity rows
+          ${stats?`<div class="fp-stats">${stats}</div>`:''}</div>`; }).join('');
+
+    // USER & DEMAND DECOMPOSITION (VOC-style; each item ▸ links to real voices)
+    const UD = data.user_demand || {};
+    const udCards = (arr, nameK, cls) => (arr||[]).map(x => `
+      <div class="ud-card ${cls}">
+        <div class="ud-name">${esc(tf(x,nameK))} ${evLinks(x.evidence)}</div>
+        <div class="ud-sum">${esc(tf(x,'summary'))}</div>
+      </div>`).join('') || '<p class="meta">—</p>';
+    // Usage scenarios → ranked share bars (more scannable than card paragraphs)
+    const scen = UD.scenarios || [];
+    const maxSh = Math.max(1, ...scen.map(s => s.share || 0));
+    const scenarioBars = scen.length ? scen.slice().sort((a,b)=>(b.share||0)-(a.share||0)).map(s => `
+      <div class="sc-row">
+        <span class="sc-name">${esc(tf(s,'name'))} ${evLinks(s.evidence)}</span>
+        <span class="sc-bar"><i style="width:${Math.round((s.share||0)/maxSh*100)}%"></i></span>
+        <span class="sc-pct">${s.share!=null?s.share+'%':'·'}</span>
+        <span class="sc-sum">${esc(tf(s,'summary'))}</span>
+      </div>`).join('') : '<p class="meta">—</p>';
+    // Personas → compact chips (summary on hover)
+    const personaChips = (UD.personas||[]).length ? `<div class="pchip-row">${(UD.personas).map(p => `
+      <div class="pchip" title="${esc(tf(p,'summary'))}"><span class="pchip-dot"></span><b>${esc(tf(p,'name'))}</b>${p.share!=null?`<span class="pchip-pct">${p.share}%</span>`:''} ${evLinks(p.evidence)}</div>`).join('')}</div>` : '<p class="meta">—</p>';
+    const hasUD = tf(UD,'jtbd') || scen.length || (UD.unmet_needs||[]).length;
+    const demandSection = hasUD ? `
+      ${tf(UD,'jtbd')?`<div class="ud-jtbd"><span class="ud-jtbd-lbl">${T('ud.jtbd')}</span>${esc(tf(UD,'jtbd'))}</div>`:''}
+      <h3>${T('ud.scenarios')}</h3><div class="sc-list">${scenarioBars}</div>
+      <h3>${T('ud.personas')}</h3>${personaChips}
+      <h3>${T('ud.needs')}</h3><div class="ud-grid">${udCards(UD.unmet_needs,'need','un')}</div>
+      <h3>${T('ud.workarounds')}</h3><div class="ud-grid">${udCards(UD.workarounds,'approach','wa')}</div>
+      ${tf(UD,'wtp')?`<h3>${T('ud.wtp')}</h3><p>${esc(tf(UD,'wtp'))}</p>`:''}
+      ${rnote(T('ud.rnDemand'))}` : '';
+
+    // 需求地图 / 机会矩阵 — X=讨论热度, Y=满足度; 右下角(高需求×低满足)=空白机会
+    const mThemes = themeCounts.map(({t,n}) => {
+      const tv = allV.filter(x=>x.themes.includes(t.id));
+      const pos = tv.filter(x=>x.sentiment==='pos').length;
+      return { t, n, demand: pct(n), satis: tv.length ? Math.round(pos/tv.length*100) : 50 };
+    });
+    const demandMatrix = mThemes.length ? (() => {
+      const W=760,H=400,padL=46,padR=18,padT=22,padB=46;
+      const iW=W-padL-padR, iH=H-padT-padB;
+      const maxD = Math.max(1, ...mThemes.map(m=>m.demand));
+      const maxN = Math.max(1, ...mThemes.map(m=>m.n));
+      const xAt = d => padL + (d/maxD)*iW;
+      const yAt = s => padT + (1 - s/100)*iH;            // low satisfaction → bottom
+      const midX = padL + iW*0.5, midY = padT + iH*0.5;
+      const grid = `
+        <rect x="${midX.toFixed(1)}" y="${midY.toFixed(1)}" width="${(padL+iW-midX).toFixed(1)}" height="${(padT+iH-midY).toFixed(1)}" fill="rgba(201,161,74,0.12)"/>
+        <line x1="${midX.toFixed(1)}" y1="${padT}" x2="${midX.toFixed(1)}" y2="${padT+iH}" stroke="#e7e0d0" stroke-width="1"/>
+        <line x1="${padL}" y1="${midY.toFixed(1)}" x2="${padL+iW}" y2="${midY.toFixed(1)}" stroke="#e7e0d0" stroke-width="1"/>
+        <text x="${(padL+iW-8).toFixed(1)}" y="${(padT+iH-8).toFixed(1)}" font-size="11" fill="#9a7b2e" text-anchor="end" font-weight="600">★ ${L('空白机会','White space')}</text>`;
+      const bubbles = mThemes.map(m => {
+        const r = 6 + (m.n/maxN)*16, x=xAt(m.demand), y=yAt(m.satis);
+        const col = m.t.polarity==='pain' ? '188,116,89' : (m.t.polarity==='win' ? '125,153,112' : '128,118,106');
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="rgba(${col},0.5)" stroke="rgba(${col},0.95)" stroke-width="1.5"/>
+          <text x="${x.toFixed(1)}" y="${(y - r - 4).toFixed(1)}" font-size="11" fill="#3d3e44" text-anchor="middle">${esc(tf(m.t,'label'))}</text>`;
+      }).join('');
+      const axes = `
+        <text x="${padL}" y="${(padT+iH+30).toFixed(1)}" font-size="11" fill="#737277">${L('讨论热度 →','Discussion volume →')}</text>
+        <text x="14" y="${(padT+10).toFixed(1)}" font-size="11" fill="#737277" transform="rotate(-90 14 ${(padT+iH/2).toFixed(1)})">${L('满足度 ↑','Satisfaction ↑')}</text>`;
+      return `<svg class="dm-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grid}${bubbles}${axes}</svg>
+        ${rnote(L('读法:每个气泡是一个需求主题,横轴=讨论热度、纵轴=满足度、大小=被提及量。<b>右下角(高需求×低满足)= 最该切的空白机会</b>。','How to read: each bubble is a demand theme — x=volume, y=satisfaction, size=mentions. <b>Bottom-right (high demand × low satisfaction) = the white space to target.</b>'))}`;
+    })() : '';
     const risks = (data.risks || []).map(r => `
-      <div class="fb-risk">
-        <span class="fr-id">${esc(r.id)}</span>
+      <div class="fb-risk"><span class="fr-id">${esc(r.id)}</span>
         <div><div class="fr-title">${esc(tf(r,'title'))}</div><div class="fr-scenario">${esc(tf(r,'scenario'))} → <i>${esc(tf(r,'mitigation'))}</i></div></div>
         <div class="fb-sev" data-sev="${esc(r.severity)}"><span class="fs-lbl">${sevLabel[r.severity]||r.severity}</span><span class="fs-bar"><i></i><i></i><i></i></span></div>
       </div>`).join('');
+    const failures = (data.failures || []).map(f => `<li><b>${esc(tf(f,'name'))}</b> (${esc(f.years)}) — ${esc(tf(f,'what'))}${tf(f,'lesson') ? ' — <i>'+esc(tf(f,'lesson'))+'</i>':''}</li>`).join('');
+
+    // discussion-trend chart (Reddit yearly volume, or Google interest if available)
+    const trend = data.trend || [];
+    const trendChart = trend.length >= 3 ? (() => {
+      const vals = trend.map(t => t.count != null ? t.count : (t.value || 0));
+      const mx = Math.max(1, ...vals);
+      const W = 760, H = 150, padL = 8, padR = 12, padT = 22, padB = 26;
+      const iW = W - padL - padR, iH = H - padT - padB;
+      const xAt = i => padL + (trend.length === 1 ? iW/2 : (i/(trend.length-1))*iW);
+      const yAt = val => padT + iH - (val/mx)*iH;
+      const line = vals.map((v,i)=>`${xAt(i).toFixed(1)},${yAt(v).toFixed(1)}`).join(' ');
+      const area = `${padL.toFixed(1)},${(padT+iH).toFixed(1)} ${line} ${(padL+iW).toFixed(1)},${(padT+iH).toFixed(1)}`;
+      const grid = [0,0.5,1].map(f=>`<line x1="${padL}" y1="${(padT+iH-f*iH).toFixed(1)}" x2="${(padL+iW).toFixed(1)}" y2="${(padT+iH-f*iH).toFixed(1)}" stroke="#e7e0d0" stroke-width="1"/>`).join('');
+      const dots = vals.map((v,i)=>`<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(v).toFixed(1)}" r="3.2" fill="#5b7a52"/>
+        <text x="${xAt(i).toFixed(1)}" y="${(yAt(v)-8).toFixed(1)}" font-size="10" fill="#4a6043" text-anchor="middle">${v}</text>
+        <text x="${xAt(i).toFixed(1)}" y="${H-8}" font-size="10" fill="#9a978f" text-anchor="middle">${esc(trend[i].period)}</text>`).join('');
+      const srcLabel = data.trend_source === 'google'
+        ? L('Google 搜索热度','Google search interest')
+        : L('Reddit 讨论量 · pullpush 归档','Reddit discussion volume · pullpush archive');
+      const rn = data.trend_source === 'google'
+        ? L('读法:Google 搜索兴趣指数(0-100,峰值=100),反映需求关注度趋势。','How to read: Google search-interest index (0-100, peak=100) — attention/demand over time.')
+        : L('读法:按年统计的真实贴文量趋势线;受 pullpush 归档完整度影响,作量级参考,非精确总量。','How to read: yearly real-post-count trend line; affected by archive completeness — a magnitude trend, not exact totals.');
+      return `<h3>${L('讨论热度趋势','Discussion trend')} · <span style="font-size:12px;color:var(--ink-3);font-weight:400">${srcLabel}</span></h3>
+        <svg class="trend-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+          ${grid}
+          <polygon points="${area}" fill="rgba(125,153,112,0.13)"/>
+          <polyline points="${line}" fill="none" stroke="#5b7a52" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+          ${dots}
+        </svg>${rnote(rn)}`;
+    })() : '';
+
+    const methodology = `<div class="meth">${T('ins.methodBody')}
+      <div class="meth-src">${T('ins.communities')}: ${comms.slice(0,10).map(c=>esc(c[0])+' ('+c[1]+')').join(' · ')||'—'}</div>
+      <div class="meth-gaps"><b>${T('ins.gaps')}:</b> ${T('ins.gapsBody')}</div></div>`;
 
     const cw = data.meta.collection_window;
     document.getElementById('fbBody').innerHTML = `
@@ -942,40 +1418,98 @@
         <div class="vv-body">
           <div class="vv-rationale">${esc(tf(v,'rationale'))}</div>
           <div class="fb-counts-row">
-            <div class="fc"><b>${counts.raw_voices||0}</b><span>${T('ov.counts.raw')}</span></div>
-            <div class="fc"><b>${counts.marketplace||0}</b><span>${T('ov.counts.mkt')}</span></div>
-            <div class="fc"><b>${counts.editorials||0}</b><span>${T('ov.counts.ed')}</span></div>
-            <div class="fc"><b>${data.players.length}</b><span>${T('ov.counts.players')}</span></div>
+            <div class="fc"><b>${allV.length}</b><span>${T('ov.counts.raw')}</span></div>
+            <div class="fc"><b>${(data.themes||[]).length}</b><span>${T('ov.counts.themes')}</span></div>
+            <div class="fc"><b>${comms.length}</b><span>${T('ins.communities')}</span></div>
           </div>
         </div>
       </div>
 
-      <h2>${IC.category}<span class="secnum">§1</span>${T('fb.s1')}</h2>
-      <p><b>${esc(tf(data.meta,'idea'))}</b> · ${esc(data.meta.target_market)} · ${esc(data.meta.mode)}${cw?` · ${esc(cw.from)} → ${esc(cw.to)}`:''}</p>
+      <h2>${IC.category}<span class="secnum">§1</span>${T('fb.s1')}${measured}</h2>
+      ${secSum(s1sum)}
+      <div class="ins-mode">${esc(modeLabel)}</div>
+      ${marketCards}
+      ${trendChart}
+      <h3>${T('ins.shareOfVoice')}</h3>${sovBars}${rnote(T('ins.rnSov'))}
 
-      <h2>${IC.users}<span class="secnum">§2</span>${T('fb.s2')}</h2>
-      <h3>${T('fb.themeDist')}</h3>
-      <table class="fb-table"><tbody>${themes}</tbody></table>
-      <h3>${T('fb.voiceSel')}</h3>
-      ${quotes}
+      <h2>${IC.users}<span class="secnum">§2</span>${T('fb.s2')}${measured}</h2>
+      ${secSum(s2sum)}
+      <h3>${T('ins.heatmap')}</h3>${heatmap}${rnote(T('ins.rnHeat'))}
+      ${groupedQuotes}
 
-      <h2>${IC.grid}<span class="secnum">§3</span>${T('fb.s3')}</h2>
-      <h3>${T('fb.players')}</h3>
-      <div class="fb-player-grid">${playerCards}</div>
-      ${mkt ? `<h3>${T('fb.mkt')}</h3><table class="fb-table"><tbody>${mkt}</tbody></table>` : ''}
+      ${hasUD ? `<h2>${IC.users}<span class="secnum">§3</span>${T('ud.section')}${measured}</h2>
+      ${demandSection}` : ''}
+
+      <h2>${IC.grid}<span class="secnum">${hasUD?'§4':'§3'}</span>${T('fb.s3')}${measured}</h2>
+      ${secSum(s3sum)}
+      <h3>${T('ins.brandTable')}</h3>${brandTable}${rnote(T('ins.rnBrand'))}
       ${failures ? `<h3>${T('fb.failures')}</h3><ul>${failures}</ul>` : ''}
 
-      <h2>${IC.target}<span class="secnum">§4</span>${T('fb.s4')}</h2>
+      <h2>${IC.stack}<span class="secnum">${hasUD?'§5':'§4'}</span>${T('ins.deepdive')}${measured}</h2>
+      ${secSum(s4sum)}
+      ${deepDive}${rnote(T('ins.rnDeep'))}
+
+      <h2>${IC.target}<span class="secnum">${hasUD?'§6':'§5'}</span>${T('fb.s4')}${judgment}</h2>
+      ${secSum(s5sum)}
+      ${demandMatrix ? `<h3>${T('ud.matrix')}${measured}</h3>${demandMatrix}` : ''}
       <p><b>${esc(tf(data.opportunity||{},'label'))}</b> · ${esc(tf(data.opportunity||{},'summary'))}</p>
-      ${pathCards ? `<h3>${T('fb.paths')}</h3>${pathCards}` : ''}
+      ${pathCards ? `<h3>${T('st.dirs')}</h3><p class="sec-summary">${T('st.dirsNote')}</p>${pathCards}` : ''}
 
-      <h2>${IC.stack}<span class="secnum">§5</span>${T('fb.s5')}</h2>
-      <p class="meta">${T('fb.s5note')}</p>
-
-      <h2>${IC.warn}<span class="secnum">§6</span>${T('fb.s6')}</h2>
+      <h2>${IC.warn}<span class="secnum">${hasUD?'§7':'§6'}</span>${T('fb.s6')}${judgment}</h2>
+      ${secSum(s6sum)}
       ${risks || '<p>—</p>'}
 
-      <p class="meta" style="margin-top:40px">schema v${esc(data.schema_version || '1.0')}${cw?` · ${esc(cw.from)} – ${esc(cw.to)}`:''}</p>`;
+      <h2>${IC.users}<span class="secnum">${hasUD?'§8':'§7'}</span>${T('ins.quoteWall')}${measured}</h2>
+      ${secSum(s7sum)}
+      <div class="qw">${wall}</div>
+
+      <h2>${IC.section}<span class="secnum">${hasUD?'§9':'§8'}</span>${T('ins.method')}</h2>
+      ${methodology}
+
+      <p class="meta" style="margin-top:30px">schema v${esc(data.schema_version || '1.0')}${cw?` · ${esc(cw.from)} – ${esc(cw.to)}`:''}</p>`;
+    buildReportNav();
+  }
+
+  // ---- Sticky section nav for the full report (one-click jump + scroll-spy) ----
+  let _navObs = null;
+  function buildReportNav(){
+    const fb = document.getElementById('fbBody');
+    if (!fb) return;
+    const old = fb.querySelector('.fb-nav'); if (old) old.remove();
+    const h2s = [...fb.querySelectorAll('h2')];
+    if (h2s.length < 2) return;
+    h2s.forEach((h, i) => { h.id = 'fbsec-' + i; });
+    const links = h2s.map((h, i) => {
+      const clone = h.cloneNode(true);
+      clone.querySelectorAll('.kicker, .fb-icon, svg').forEach(e => e.remove());
+      const num = (clone.querySelector('.secnum') || {}).textContent || ('§' + (i + 1));
+      const sn = clone.querySelector('.secnum'); if (sn) sn.remove();
+      const title = clone.textContent.trim();
+      return `<a class="fbn-link" href="#fbsec-${i}" data-i="${i}">${esc(num)} ${esc(title)}</a>`;
+    }).join('');
+    const nav = document.createElement('nav');
+    nav.className = 'fb-nav';
+    nav.innerHTML = `<span class="fbn-label">${esc(T('report.divider'))}</span><div class="fbn-links">${links}</div>`;
+    fb.insertBefore(nav, fb.firstChild);
+    nav.addEventListener('click', (ev) => {
+      const a = ev.target.closest('.fbn-link'); if (!a) return;
+      ev.preventDefault();
+      const el = document.getElementById('fbsec-' + a.dataset.i);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    // scroll-spy: highlight the section currently in view
+    if (_navObs) _navObs.disconnect();
+    const linkEls = [...nav.querySelectorAll('.fbn-link')];
+    _navObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const i = h2s.indexOf(e.target);
+          linkEls.forEach(l => l.classList.toggle('active', +l.dataset.i === i));
+          const al = linkEls[i]; if (al && al.scrollIntoView) al.scrollIntoView({ block: 'nearest', inline: 'center' });
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    h2s.forEach(h => _navObs.observe(h));
   }
 
   // ---- Master render (re-runnable for lang switch) ----
@@ -1138,245 +1672,251 @@
   // Snapshot settled positions as drift anchors
   nodeArr.forEach(n => { n.bx = n.px; n.by = n.py; });
 
-  // ---------------- Render SVG ----------------
-  const svg = document.getElementById('kgSvg');
-  const content = document.getElementById('kgContent');     // zoom/pan wrapper
-  const SVGNS = 'http://www.w3.org/2000/svg';
+  // ============ Demand-signal radar (replaces force-graph centerpiece) ============
+  // A dark sonar scope embedded in the light report panel. Each real voice is a
+  // blip; the sweep lights it as it passes. Themes = sectors, the least-discussed
+  // sector is flagged as the white-space opportunity. "Widen range" grows the
+  // scope and surfaces outer weak signals — the radar-expanding-its-reach gesture.
+  const cv = document.getElementById('radarCanvas');
+  const rctx = cv.getContext('2d');
+  const RDPR = Math.min(2, window.devicePixelRatio || 1);
+  let RW = 0, RH = 0, RCX = 0, RCY = 0, RR = 0;
 
-  // Edges (curved a little for organic feel)
-  const edgeEls = [];
-  data.edges.forEach((e, i) => {
-    const a = nodes[e.from], b = nodes[e.to]; if (!a || !b) return;
-    const path = document.createElementNS(SVGNS, 'path');
-    path.setAttribute('class','edge');
-    path.setAttribute('stroke-width', 0.55 + e.w * 0.5);
-    path.style.animationDelay = (0.25 + Math.random()*0.6) + 's';
-    path.dataset.edgeIdx = i;
-    path.dataset.from = e.from; path.dataset.to = e.to;
-    content.appendChild(path);
-    edgeEls.push({el: path, a, b});
-  });
+  // Radar sectors = only themes that actually have voices, so there are no empty
+  // labelled dimensions (a 0-voice theme is a cluster artifact, not a wedge).
+  const rThemes = (() => {
+    const pop = data.themes.filter(t => (data.voices||[]).some(v => v.themes && v.themes.includes(t.id)));
+    return pop.length >= 2 ? pop : data.themes;
+  })();
+  const NSEC = Math.max(1, rThemes.length);
+  const SECTOR = (Math.PI * 2) / NSEC;
+  const secOf = {}; rThemes.forEach((t, i) => secOf[t.id] = i);
+  function hashf(s){ let h = 2166136261; for (const c of (s||'')) h = ((h ^ c.charCodeAt(0)) * 16777619) >>> 0; return (h % 1000) / 1000; }
 
-  // Nodes (stagger fade-in by kind)
-  const kindDelay = { player: 0, theme: 0.25, opportunity: 0.45, voice: 0.6 };
-  const nodeEls = [];
-  nodeArr.forEach(n => {
-    const g = document.createElementNS(SVGNS, 'g');
-    g.setAttribute('class', 'node node-' + n.kind);
-    g.dataset.id = n.id;
-    g.dataset.kind = n.kind;
-    g.style.animationDelay = (kindDelay[n.kind] + Math.random()*0.3) + 's';
-    g.style.setProperty('--target-op', 1);
+  let blips = [], ghosts = [], rangeLevel = 1, rMaxScore = 1, oppSec = 0;
+  let selVoiceIds = new Set();     // mutated by applySelection() to highlight blips
+  let radarPaused = false;
 
-    if (n.kind === 'voice') {
-      const ringColor = n.sentiment === 'pos' ? '#5b7a52' : '#a0533c';
-      const r1 = document.createElementNS(SVGNS, 'circle');
-      r1.setAttribute('class','ring');
-      r1.setAttribute('r', (n.size || 6));
-      r1.style.color = ringColor;
-      g.appendChild(r1);
-      const r2 = document.createElementNS(SVGNS, 'circle');
-      r2.setAttribute('class','ring delayed');
-      r2.setAttribute('r', (n.size || 6));
-      r2.style.color = ringColor;
-      g.appendChild(r2);
-    }
-
-    const c = document.createElementNS(SVGNS, 'circle');
-    c.setAttribute('class','core');
-    // dynamic radius — bigger overall so voices are easier to click
-    let r = 8;
-    if (n.kind === 'player') r = (n.size || 22);
-    else if (n.kind === 'theme') r = (n.size || 16);
-    else if (n.kind === 'voice') r = Math.max(7, Math.min(15, Math.log10((n.score||10)+1) * 3.6));
-    else if (n.kind === 'opportunity') r = (n.size || 28);
-    c.setAttribute('r', r);
-    n.r = r;
-    if (n.kind === 'opportunity') {
-      c.setAttribute('fill','transparent');
-      c.setAttribute('stroke', n.color || '#15803d');
-      c.setAttribute('stroke-width', 2);
-      c.setAttribute('stroke-dasharray', '5 3');
-    } else if (n.kind === 'voice') {
-      // sage-family for positive, rust-family for negative
-      c.setAttribute('fill', n.sentiment === 'pos' ? '#7d9970' : '#bc7459');
-      c.setAttribute('opacity', 0.85);
-    } else {
-      c.setAttribute('fill', n.color || '#888');
-      c.setAttribute('opacity', 0.94);
-    }
-    g.appendChild(c);
-
-    if (n.kind !== 'voice') {
-      const t = document.createElementNS(SVGNS, 'text');
-      t.setAttribute('y', r + 14);
-      t.classList.add('node-label');
-      t.textContent = tf(n, 'name') || tf(n, 'label');
-      g.appendChild(t);
-    }
-
-    g.addEventListener('click',     (ev) => { ev.stopPropagation(); onNodeClick(n); });
-    g.addEventListener('mouseenter', () => onNodeHover(n));
-    g.addEventListener('mouseleave', () => onNodeLeave(n));
-    content.appendChild(g);
-    nodeEls.push({el: g, n});
-  });
-
-  // ---------------- Zoom & Pan ----------------
-  const view = { scale: 1, tx: 0, ty: 0 };
-  const MIN_SCALE = 0.5, MAX_SCALE = 3.0;
-  const zoomLevelEl = document.getElementById('zoomLevel');
-  function applyTransform() {
-    content.setAttribute('transform', `translate(${view.tx} ${view.ty}) scale(${view.scale})`);
-    zoomLevelEl.textContent = Math.round(view.scale * 100) + '%';
-  }
-  applyTransform();
-
-  function zoomTo(newScale, originX, originY) {
-    newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
-    // Convert origin (client coords) to SVG viewBox coords
-    const pt = svg.createSVGPoint();
-    pt.x = originX; pt.y = originY;
-    const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
-    // Solve so the world point under cursor stays under cursor:
-    //   svgPt = (worldX * oldScale + tx_old) → worldX = (svgPt - tx_old) / oldScale
-    //   newTx = svgPt - worldX * newScale
-    const worldX = (svgPt.x - view.tx) / view.scale;
-    const worldY = (svgPt.y - view.ty) / view.scale;
-    view.tx = svgPt.x - worldX * newScale;
-    view.ty = svgPt.y - worldY * newScale;
-    view.scale = newScale;
-    applyTransform();
-  }
-
-  svg.addEventListener('wheel', (ev) => {
-    ev.preventDefault();
-    const factor = ev.deltaY < 0 ? 1.1 : 1/1.1;
-    zoomTo(view.scale * factor, ev.clientX, ev.clientY);
-  }, { passive: false });
-
-  // Drag pan (on SVG empty area or on .kg-svg when not on a node)
-  let dragging = null;
-  svg.addEventListener('mousedown', (ev) => {
-    if (ev.button !== 0) return;
-    // ignore if click started on a node
-    if (ev.target.closest('.node')) return;
-    dragging = { x: ev.clientX, y: ev.clientY, tx0: view.tx, ty0: view.ty };
-    document.querySelector('.center-panel').classList.add('is-panning');
-  });
-  window.addEventListener('mousemove', (ev) => {
-    if (!dragging) return;
-    const ctm = svg.getScreenCTM();
-    // dx/dy in screen px → convert to SVG units via 1/ctm.a (uniform scale assumed)
-    const k = 1 / ctm.a;
-    view.tx = dragging.tx0 + (ev.clientX - dragging.x) * k;
-    view.ty = dragging.ty0 + (ev.clientY - dragging.y) * k;
-    applyTransform();
-  });
-  window.addEventListener('mouseup', () => {
-    if (dragging) {
-      dragging = null;
-      document.querySelector('.center-panel').classList.remove('is-panning');
-    }
-  });
-
-  // ============ Touch: pinch zoom + 1-finger drag pan + tap to select ============
-  // Two-finger pinch = zoom; one-finger drag = pan (on empty area).
-  // Tap node = select (replaces click on touch); the node's existing click
-  // handler still fires from synthetic click after touchend.
-  const touchState = { active: false, startDist: 0, startScale: 1, midX: 0, midY: 0,
-                        panStart: null };
-  function midpoint(touches) {
-    return {
-      x: (touches[0].clientX + touches[1].clientX) / 2,
-      y: (touches[0].clientY + touches[1].clientY) / 2,
-    };
-  }
-  function dist(touches) {
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
-    return Math.hypot(dx, dy);
-  }
-  svg.addEventListener('touchstart', (ev) => {
-    if (ev.touches.length === 2) {
-      ev.preventDefault();
-      touchState.active = true;
-      touchState.startDist = dist(ev.touches);
-      touchState.startScale = view.scale;
-      const m = midpoint(ev.touches);
-      touchState.midX = m.x; touchState.midY = m.y;
-    } else if (ev.touches.length === 1 && !ev.target.closest('.node')) {
-      touchState.panStart = {
-        x: ev.touches[0].clientX, y: ev.touches[0].clientY,
-        tx0: view.tx, ty0: view.ty,
-      };
-    }
-  }, { passive: false });
-  svg.addEventListener('touchmove', (ev) => {
-    if (ev.touches.length === 2 && touchState.active) {
-      ev.preventDefault();
-      const newDist = dist(ev.touches);
-      const newScale = touchState.startScale * (newDist / touchState.startDist);
-      zoomTo(newScale, touchState.midX, touchState.midY);
-    } else if (ev.touches.length === 1 && touchState.panStart) {
-      const ctm = svg.getScreenCTM();
-      const k = 1 / ctm.a;
-      view.tx = touchState.panStart.tx0 + (ev.touches[0].clientX - touchState.panStart.x) * k;
-      view.ty = touchState.panStart.ty0 + (ev.touches[0].clientY - touchState.panStart.y) * k;
-      applyTransform();
-    }
-  }, { passive: false });
-  svg.addEventListener('touchend', () => {
-    touchState.active = false;
-    touchState.panStart = null;
-  });
-
-  // Zoom buttons
-  document.getElementById('zoomIn').addEventListener('click', () => {
-    const r = svg.getBoundingClientRect();
-    zoomTo(view.scale * 1.2, r.left + r.width/2, r.top + r.height/2);
-  });
-  document.getElementById('zoomOut').addEventListener('click', () => {
-    const r = svg.getBoundingClientRect();
-    zoomTo(view.scale / 1.2, r.left + r.width/2, r.top + r.height/2);
-  });
-  document.getElementById('zoomReset').addEventListener('click', () => {
-    view.scale = 1; view.tx = 0; view.ty = 0; applyTransform();
-  });
-
-  // Click empty area → clear selection
-  svg.addEventListener('click', () => {
-    delete document.body.dataset.selectedId;
-    applySelection(null);
-  });
-
-  // ---------------- Idle drift loop ----------------
-  // Each node oscillates around its settled position with small amplitude.
-  // Voices breathe more, themes a bit, players almost still.
-  let t0 = performance.now();
-  function tick(now) {
-    const t = (now - t0) / 1000;
-    nodeEls.forEach(({el, n}) => {
-      const a = n.driftAmp;
-      const dx = Math.sin(t * 0.55 + n.phase) * a;
-      const dy = Math.cos(t * 0.43 + n.phase * 1.3) * a * 0.7;
-      n.px = n.bx + dx; n.py = n.by + dy;
-      el.setAttribute('transform', `translate(${n.px.toFixed(2)},${n.py.toFixed(2)})`);
+  function buildBlips(){
+    rMaxScore = Math.max(1, ...data.voices.map(v => v.score || 1));
+    // RANK-based radius: spread voices evenly from the high-upvote core (center)
+    // to the long tail (rim), regardless of absolute scores.
+    const N = data.voices.length;
+    const order = data.voices.map(v => ({ v, s: Math.abs(v.score || 0) }))
+                            .sort((a, b) => b.s - a.s);   // highest score first
+    const rankOf = {};
+    order.forEach((o, i) => { rankOf[o.v.id] = i; });
+    // ONE blip per (voice × theme): every labelled theme wedge then contains
+    // EXACTLY its own voices — no empty dimensions, and no blip lands in a wedge
+    // it doesn't belong to. A multi-theme voice shows a dot in each wedge.
+    blips = [];
+    data.voices.forEach((v, k) => {
+      const rankFrac = N > 1 ? (rankOf[v.id] / (N - 1)) : 0; // 0 = top upvotes, 1 = long tail
+      const rr = 0.18 + rankFrac * 0.74;                     // even spread 0.18 → 0.92
+      const themeIds = (v.themes && v.themes.length) ? v.themes : [null];
+      themeIds.forEach((tid, ti) => {
+        const sec = (tid != null && secOf[tid] != null) ? secOf[tid] : (k % NSEC);
+        const frac = hashf(v.id + ':' + (tid != null ? tid : ti)) * 0.7 + 0.15; // angle in wedge
+        const ang = sec * SECTOR + frac * SECTOR - Math.PI / 2;                  // sector 0 at top
+        blips.push({ v, id: v.id, sec, ang, rr, rankFrac, lit: 0, neg: v.sentiment !== 'pos' });
+      });
     });
-    edgeEls.forEach(({el, a, b}) => {
-      // gentle curve via quadratic with midpoint slight offset perpendicular
-      const mx = (a.px + b.px) / 2;
-      const my = (a.py + b.py) / 2;
-      const dx = b.px - a.px, dy = b.py - a.py;
-      const len = Math.sqrt(dx*dx + dy*dy) || 1;
-      const nx = -dy / len, ny = dx / len;
-      const off = Math.min(18, len * 0.06);
-      const cx = mx + nx * off, cy = my + ny * off;
-      el.setAttribute('d', `M ${a.px.toFixed(1)} ${a.py.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${b.px.toFixed(1)} ${b.py.toFixed(1)}`);
-    });
-    requestAnimationFrame(tick);
   }
-  requestAnimationFrame(tick);
+  function secCounts(){ const c = new Array(NSEC).fill(0); blips.forEach(b => c[b.sec]++); return c; }
+  function pickOpp(){ const c = secCounts(); let m = 1e9; c.forEach((n, i) => { if (n < m){ m = n; oppSec = i; } }); }
+
+  function layoutRadar(){
+    const rect = cv.parentElement.getBoundingClientRect();
+    RW = rect.width; RH = rect.height;
+    cv.width = RW * RDPR; cv.height = RH * RDPR;
+    rctx.setTransform(RDPR, 0, 0, RDPR, 0, 0);
+    RCX = RW / 2; RCY = RH / 2 - 12;     // lift slightly so bottom labels clear the controls
+    RR = Math.min(RW, RH) * 0.38;
+  }
+  function angDiff(a, b){ return Math.abs(((a - b + Math.PI) % (Math.PI*2)) - Math.PI); }
+  function blipXY(b){ const rad = RR * b.rr; return { x: RCX + Math.cos(b.ang)*rad, y: RCY + Math.sin(b.ang)*rad }; }
+
+  let sweep = 0, rLast = performance.now();
+  function radarFrame(now){
+    const dt = Math.min(50, now - rLast); rLast = now;
+    if (!radarPaused) sweep = (sweep + dt * 0.0011) % (Math.PI*2);
+    drawRadar();
+    requestAnimationFrame(radarFrame);
+  }
+  function drawRadar(){
+    if (!RW) layoutRadar();
+    rctx.clearRect(0, 0, RW, RH);
+    const disc = rctx.createRadialGradient(RCX, RCY, 0, RCX, RCY, RR);
+    disc.addColorStop(0, '#141821'); disc.addColorStop(1, '#0e1117');
+    rctx.beginPath(); rctx.arc(RCX, RCY, RR, 0, Math.PI*2); rctx.fillStyle = disc; rctx.fill();
+    rctx.save(); rctx.beginPath(); rctx.arc(RCX, RCY, RR, 0, Math.PI*2); rctx.clip();
+
+    const rings = 3 + rangeLevel;
+    for (let i = 1; i <= rings; i++){
+      rctx.beginPath(); rctx.arc(RCX, RCY, RR*i/rings, 0, Math.PI*2);
+      rctx.strokeStyle = `rgba(123,153,112,${i===rings?0.34:0.13})`; rctx.lineWidth = 1; rctx.stroke();
+    }
+    for (let s = 0; s < NSEC; s++){
+      const a = s*SECTOR - Math.PI/2;
+      rctx.beginPath(); rctx.moveTo(RCX, RCY); rctx.lineTo(RCX+Math.cos(a)*RR, RCY+Math.sin(a)*RR);
+      rctx.strokeStyle = 'rgba(123,153,112,0.09)'; rctx.lineWidth = 1; rctx.stroke();
+    }
+    const oa = oppSec*SECTOR - Math.PI/2;        // opportunity (white-space) wedge
+    rctx.beginPath(); rctx.moveTo(RCX, RCY); rctx.arc(RCX, RCY, RR, oa, oa+SECTOR); rctx.closePath();
+    const og = rctx.createRadialGradient(RCX, RCY, 0, RCX, RCY, RR);
+    og.addColorStop(0,'rgba(201,161,74,0)'); og.addColorStop(1,'rgba(201,161,74,0.16)');
+    rctx.fillStyle = og; rctx.fill();
+    for (let k = 0; k < 26; k++){                 // sweep afterglow trail
+      const a = sweep - k*0.03, alpha = 0.10*(1 - k/26);
+      rctx.beginPath(); rctx.moveTo(RCX, RCY); rctx.arc(RCX, RCY, RR, a-0.04, a); rctx.closePath();
+      rctx.fillStyle = `rgba(125,153,112,${alpha})`; rctx.fill();
+    }
+    rctx.beginPath(); rctx.moveTo(RCX, RCY);      // sweep line
+    rctx.lineTo(RCX+Math.cos(sweep-Math.PI/2)*RR, RCY+Math.sin(sweep-Math.PI/2)*RR);
+    rctx.strokeStyle = 'rgba(159,199,143,0.9)'; rctx.lineWidth = 2; rctx.stroke();
+
+    // radial axis labels (radius = engagement: core high-upvote → long tail)
+    rctx.font = '500 9px -apple-system,"PingFang SC",sans-serif';
+    rctx.textAlign = 'left'; rctx.textBaseline = 'middle';
+    rctx.fillStyle = 'rgba(159,199,143,0.55)';
+    rctx.fillText(T('radar.axisCore'), RCX + 6, RCY + RR*0.16);
+    rctx.fillStyle = 'rgba(159,199,143,0.40)';
+    rctx.fillText(T('radar.axisTail'), RCX + 6, RCY + RR*0.90);
+    rctx.restore();
+
+    const hasSel = selVoiceIds.size > 0;
+    ghosts.forEach(g => drawBlip(g, true, hasSel));
+    blips.forEach(b => drawBlip(b, false, hasSel));
+    rctx.beginPath(); rctx.arc(RCX, RCY, 3, 0, Math.PI*2); rctx.fillStyle = 'rgba(159,199,143,.95)'; rctx.fill();
+
+    rctx.font = '600 11px -apple-system,"PingFang SC",sans-serif';
+    rctx.textAlign = 'center'; rctx.textBaseline = 'middle';
+    rThemes.forEach((t, s) => {                   // theme labels outside the disc
+      const a = (s+0.5)*SECTOR - Math.PI/2;
+      const lx = RCX + Math.cos(a)*(RR+20), ly = RCY + Math.sin(a)*(RR+20);
+      rctx.fillStyle = s===oppSec ? 'rgba(154,123,46,.95)' : 'rgba(74,78,91,.78)';
+      rctx.fillText((s===oppSec?'★ ':'') + (tf(t,'label')||''), lx, ly);
+    });
+  }
+  function drawBlip(b, ghost, hasSel){
+    const p = blipXY(b); b._x = p.x; b._y = p.y;
+    const sa = sweep % (Math.PI*2), ba = (b.ang + Math.PI/2) % (Math.PI*2);
+    if (angDiff(sa, ba) < 0.05) b.lit = 1;
+    b.lit *= 0.975;
+    const base = ghost ? 2.4 : (3 + (1 - b.rr)*4);
+    const litR = base + b.lit*5;
+    const dim = hasSel && !selVoiceIds.has(b.id) ? 0.28 : 1;
+    const col = b.neg ? '230,154,126' : '159,199,143';
+    if (b.lit > 0.05){
+      rctx.beginPath(); rctx.arc(b._x, b._y, litR+6, 0, Math.PI*2);
+      rctx.fillStyle = `rgba(${col},${0.18*b.lit*dim})`; rctx.fill();
+    }
+    rctx.beginPath(); rctx.arc(b._x, b._y, litR, 0, Math.PI*2);
+    const aMin = (ghost?0.30:0.6) * dim;
+    rctx.fillStyle = `rgba(${col},${aMin + b.lit*0.4*dim})`; rctx.fill();
+    if (selVoiceIds.has(b.id)){
+      rctx.beginPath(); rctx.arc(b._x, b._y, litR+3, 0, Math.PI*2);
+      rctx.strokeStyle = `rgba(${col},.9)`; rctx.lineWidth = 1.5; rctx.stroke();
+    }
+  }
+
+  // hover → tooltip (reuses tooltipFor + nodes lookup defined below)
+  const rTip = document.getElementById('kgTip');
+  cv.addEventListener('mousemove', (e) => {
+    const r = cv.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    let hit = null, bd = 14;
+    for (const b of blips.concat(ghosts)){ const d = Math.hypot(b._x-mx, b._y-my); if (d < bd){ bd = d; hit = b; } }
+    if (hit){
+      const v = hit.v;
+      if (v.synthetic){
+        rTip.innerHTML = `<div class="tt-title">弱信号 · 待二次验证</div>
+          <div class="tt-meta">外圈探测 · 扩大量程捕获<span class="tt-score">↑${v.score}</span></div>`;
+      } else {
+        rTip.innerHTML = tooltipFor(nodes[hit.id]);
+      }
+      rTip.style.left = Math.min(RW-20, mx+14) + 'px';
+      rTip.style.top  = Math.max(8, my-8) + 'px';
+      rTip.classList.add('show');
+      cv.style.cursor = 'pointer';
+    } else { rTip.classList.remove('show'); cv.style.cursor = 'default'; }
+  });
+  cv.addEventListener('mouseleave', () => rTip.classList.remove('show'));
+
+  // click → blip switches to that voice's theme; empty sector switches by bearing
+  cv.addEventListener('click', (e) => {
+    const r = cv.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    let hit = null, bd = 16;
+    for (const b of blips){ const d = Math.hypot(b._x-mx, b._y-my); if (d < bd){ bd = d; hit = b; } }
+    if (hit){ onNodeClick(nodes[hit.id]); return; }
+    const dx = mx - RCX, dy = my - RCY;
+    if (Math.hypot(dx, dy) > RR){ delete document.body.dataset.selectedId; applySelection(null); return; }
+    let a = Math.atan2(dy, dx) + Math.PI/2; a = (a + Math.PI*2) % (Math.PI*2);
+    const sec = Math.floor(a / SECTOR) % NSEC;
+    if (sec === oppSec && data.opportunity){ onNodeClick(Object.assign({kind:'opportunity'}, data.opportunity)); return; }
+    const theme = rThemes[sec];
+    if (theme) onNodeClick(nodes[theme.id]);
+  });
+
+  // widen range → grow rings + surface outer weak signals
+  function flashScan(html){
+    const el = document.getElementById('radarScan');
+    el.innerHTML = html; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+  // Widen range = real deeper online search via the local app backend.
+  // Appends NEW real voices (no synthetic blips). Static/downloaded reports have
+  // no backend → we say so honestly instead of faking data.
+  let expanding = false;
+  document.getElementById('radarExpand').addEventListener('click', async () => {
+    if (expanding) return;
+    const meta = data.meta || {};
+    if (!meta.slug){ flashScan('无法定位报告(缺 slug),无法深搜'); return; }
+    const btn = document.getElementById('radarExpand');
+    const span = btn.querySelector('span'); const orig = span.textContent;
+    expanding = true; btn.disabled = true; span.textContent = '● 深度搜索中…';
+    flashScan('继续联网深搜真实信号 · 约 30–60s…');
+    try {
+      const seen = (data.voices || []).map(v => v.url).filter(Boolean);
+      const r = await fetch('/api/expand', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ slug: meta.slug, idea: meta.idea, market: meta.target_market,
+          mode: meta.mode, seen_urls: seen }) });
+      if (!r.ok) throw new Error('backend');
+      const res = await r.json();
+      const nv = (res && res.new_voices) || [];
+      if (!nv.length){ flashScan('本轮没有捕获到新的强相关信号 · 可再试一次或换措辞'); return; }
+      nv.forEach(v => { data.voices.push(v); nodes[v.id] = Object.assign({ kind:'voice' }, v); });
+      if (data.verdict && data.verdict.evidence_counts) data.verdict.evidence_counts.raw_voices = data.voices.length;
+      buildBlips(); pickOpp();
+      rangeLevel = Math.min(4, rangeLevel + 1);
+      updateRadarHud();
+      renderEvidenceCounter(); renderOverview(); renderVoicesScaffold(); renderVoices(); renderFallback();
+      flashScan(`⊕ 深搜完成 · 新增 <b>${nv.length}</b> 条真实原声 · 现共 <b>${data.voices.length}</b> 条`);
+    } catch (e) {
+      flashScan('扩大量程需在本地 app 内运行(下载的静态报告无法联网深搜)');
+    } finally {
+      expanding = false; btn.disabled = false; span.textContent = orig;
+    }
+  });
+  document.getElementById('radarPause').addEventListener('click', function(){
+    radarPaused = !radarPaused;
+    this.querySelector('span').textContent = radarPaused ? '▶ 继续' : '⏸ 暂停';
+  });
+
+  function updateRadarHud(){
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('rhN', (data.voices||[]).length + ghosts.length); set('rhSec', NSEC); set('rhRange', rangeLevel);
+    const conf = document.getElementById('rhConf');
+    if (conf) conf.textContent = rangeLevel<=1 ? T('radar.core') : (rangeLevel<=2 ? T('radar.ext') : T('radar.outer'));
+  }
+
+  buildBlips(); pickOpp(); layoutRadar(); updateRadarHud();
+  if (window.ResizeObserver){ new ResizeObserver(() => layoutRadar()).observe(cv.parentElement); }
+  window.addEventListener('resize', layoutRadar);
+  requestAnimationFrame(radarFrame);
+
+  // (zoom/pan/drift loop removed — the radar canvas owns its own animation)
 
   // ---------------- Hover ----------------
   const tipEl = document.getElementById('kgTip');
@@ -1387,7 +1927,7 @@
       const sent = n.sentiment === 'pos' ? '正面' : '负面';
       const player = (nodes[n.player] && nodes[n.player].name) || n.player;
       const theme = n.themes.map(t => (nodes[t] && nodes[t].label) || t).join(' · ');
-      return `<div class="tt-title">${n.title}</div>
+      return `<div class="tt-title">${esc(n.title || '')}</div>${zhLine(n)}
               <div class="tt-meta">${sent} · ${player} · ${theme}<span class="tt-score">↑${n.score.toLocaleString()}</span></div>
               <div class="tt-hint">点击 → 切到「用户声音」并锁定该主题</div>`;
     }
@@ -1411,16 +1951,6 @@
     return '';
   }
 
-  function positionTooltip(n) {
-    // Use the node's actual rendered position (works with zoom/pan + drift)
-    const el = content.querySelector(`.node[data-id="${n.id}"]`);
-    if (!el) return;
-    const nodeRect = el.getBoundingClientRect();
-    const panelRect = centerPanel.getBoundingClientRect();
-    tipEl.style.left = (nodeRect.left + nodeRect.width/2 - panelRect.left) + 'px';
-    tipEl.style.top  = (nodeRect.top - panelRect.top) + 'px';
-  }
-
   // Compute which voices a non-voice node "owns" semantically (not just 1-hop).
   // Player → all voices where voice.player == player.id
   // Theme  → all voices where voice.themes includes theme.id
@@ -1436,81 +1966,18 @@
     return [];
   }
 
-  function onNodeHover(n) {
-    // Don't override if there's an active selection lock
-    if (document.body.dataset.selectedId === n.id) {
-      tipEl.innerHTML = tooltipFor(n);
-      positionTooltip(n);
-      tipEl.classList.add('show');
-      return;
-    }
-    // Visual highlight
-    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-hover','is-hover-neighbor'));
-    svg.querySelectorAll('.edge').forEach(l => l.classList.remove('is-hover-incident'));
-    const sel = svg.querySelector(`.node[data-id="${n.id}"]`);
-    if (sel) sel.classList.add('is-hover');
-    // Light up 1-hop neighbors (themes/players/etc)
-    (neighbors[n.id] || new Set()).forEach(nid => {
-      const nb = svg.querySelector(`.node[data-id="${nid}"]`);
-      if (!nb) return;
-      nb.classList.add('is-hover-neighbor');
-      if (nb.classList.contains('node-voice')) nb.classList.add('is-related');
-    });
-    // Reveal semantically-related voices (2-hop for players, 1-hop for themes)
-    relatedVoicesFor(n).forEach(vid => {
-      const vn = svg.querySelector(`.node[data-id="${vid}"]`);
-      if (vn) { vn.classList.add('is-related'); vn.classList.add('is-hover-neighbor'); }
-    });
-    (incidentEdges[n.id] || new Set()).forEach(idx => {
-      const ln = svg.querySelector(`.edge[data-edge-idx="${idx}"]`);
-      if (ln) ln.classList.add('is-hover-incident');
-    });
-    // Tooltip
-    tipEl.innerHTML = tooltipFor(n);
-    positionTooltip(n);
-    tipEl.classList.add('show');
-  }
-
-  function onNodeLeave(n) {
-    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-hover','is-hover-neighbor'));
-    svg.querySelectorAll('.edge').forEach(l => l.classList.remove('is-hover-incident'));
-    tipEl.classList.remove('show');
-    // Hide voice nodes that we revealed via hover (unless they're related to current selection)
-    const selId = document.body.dataset.selectedId;
-    const selRelated = selId ? new Set([selId, ...(neighbors[selId] || new Set())]) : new Set();
-    svg.querySelectorAll('.node-voice.is-related').forEach(g => {
-      if (!selRelated.has(g.dataset.id)) g.classList.remove('is-related');
-    });
-  }
-
-  // Selection
+  // Selection — drives radar blip highlight (selVoiceIds) + the selection strip
   function applySelection(id) {
-    // Clear
-    svg.querySelectorAll('.node').forEach(g => g.classList.remove('is-selected','is-neighbor','is-related'));
-    svg.querySelectorAll('.edge').forEach(l => l.classList.remove('is-incident'));
-    if (!id) return;
-    const sel = svg.querySelector(`.node[data-id="${id}"]`);
-    if (sel) sel.classList.add('is-selected');
-    (neighbors[id] || new Set()).forEach(nid => {
-      const nb = svg.querySelector(`.node[data-id="${nid}"]`);
-      if (!nb) return;
-      nb.classList.add('is-neighbor');
-      if (nb.classList.contains('node-voice')) nb.classList.add('is-related');
-    });
-    // Surface semantically-related voices (2-hop for players)
-    const n = nodes[id];
-    if (n) relatedVoicesFor(n).forEach(vid => {
-      const vn = svg.querySelector(`.node[data-id="${vid}"]`);
-      if (vn) { vn.classList.add('is-related'); vn.classList.add('is-neighbor'); }
-    });
-    (incidentEdges[id] || new Set()).forEach(idx => {
-      const ln = svg.querySelector(`.edge[data-edge-idx="${idx}"]`);
-      if (ln) ln.classList.add('is-incident');
-    });
-    // selection strip
+    selVoiceIds = new Set();
+    const sl = document.getElementById('selLabel');
+    if (!id) { if (sl) sl.textContent = '—'; return; }
     const node = nodes[id];
-    const label = node ? (node.name || node.label || node.title || id) : id;
-    document.getElementById('selLabel').textContent = `${node.kind} · ${label}`;
+    if (node) {
+      if (node.kind === 'voice') selVoiceIds.add(id);
+      else (relatedVoicesFor(node) || []).forEach(vid => selVoiceIds.add(vid));
+      const label = tf(node, 'name') || tf(node, 'label') || node.title || id;
+      if (sl) sl.textContent = `${node.kind} · ${label}`;
+    }
   }
 
   function onNodeClick(node) {
@@ -1586,7 +2053,7 @@
       row.innerHTML = `
         <span class="dot">●</span>
         <div>
-          <div class="vt"><a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(tf(v,'title'))}</a></div>
+          <div class="vt"><a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(tf(v,'title'))}</a></div>${zhLine(v)}
           <div class="vm">${esc(playerName(v.player))} · ${esc(themeLabels)}</div>
         </div>
         <span class="vs">↑${fmtNum(Math.abs(v.score))}</span>
@@ -1647,12 +2114,8 @@
   document.getElementById('langToggle').addEventListener('click', () => {
     document.body.dataset.lang = LANG() === 'zh' ? 'en' : 'zh';
     renderAll();              // re-render everything in the new language
-    // refresh graph node labels (built once, need manual update)
-    nodeArr.forEach(n => {
-      const el = content.querySelector(`.node[data-id="${n.id}"] .node-label`);
-      if (el) el.textContent = tf(n, 'name') || tf(n, 'label');
-    });
-    applySelection(document.body.dataset.selectedId || null);  // keep graph selection visuals
+    updateRadarHud();         // radar redraws theme labels every frame via tf()
+    applySelection(document.body.dataset.selectedId || null);  // keep blip highlight
   });
 
   // ============ Initial render ============

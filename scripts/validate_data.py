@@ -66,10 +66,11 @@ def load_schema() -> dict[str, Any]:
 
 
 def _strip_en(obj: Any) -> Any:
-    """Deep-copy with all *_en translation keys removed, so the base schema
-    (additionalProperties:false) validates without needing to declare them."""
+    """Deep-copy with all translation keys (*_en, *_zh) removed, so the base
+    schema (additionalProperties:false) validates without declaring them."""
     if isinstance(obj, dict):
-        return {k: _strip_en(v) for k, v in obj.items() if not k.endswith("_en")}
+        return {k: _strip_en(v) for k, v in obj.items()
+                if not (k.endswith("_en") or k.endswith("_zh"))}
     if isinstance(obj, list):
         return [_strip_en(v) for v in obj]
     return obj

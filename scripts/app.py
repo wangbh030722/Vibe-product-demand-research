@@ -82,10 +82,10 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
     scope["_idea"] = idea
     research.save(wd / "01-scope.json", scope)
 
-    log("COLLECT", f"联网抓取 {scope.get('subreddits')} + HN…")
-    pool = research.stage_collect(scope, wd, False)
+    log("COLLECT", f"联网搜索 {scope.get('subreddits')} + HN…")
+    pool = research.stage_collect(scope, wd, False, log=log)
 
-    log("COLLECT", f"原始池 {len(pool)} 条")
+    log("COLLECT", f"已锁定 {len(pool)} 条相关 Reddit 真实评论")
     if len(pool) < 3:
         raise RuntimeError(
             f"数据源几乎没抓到内容(原始池仅 {len(pool)} 条)。"
@@ -94,8 +94,13 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
             "(让 Claude/ChatGPT 联网收集,比本地抓取稳)。"
         )
 
-    log("CURATE", "筛选相关用户声音(剔除噪声)…")
-    voices = research.stage_curate(idea, scope, pool, wd, 24, False)
+    log("CURATE", f"从 {len(pool)} 条相关评论里筛选强相关原声…")
+    # Floor of 99 real voices (padded from the most keyword-relevant pool items
+    # if the LLM keeps fewer), ceiling 150, scaling with pool size. Bounded by
+    # what the pool actually contains.
+    max_voices = max(99, min(150, len(pool) // 2))
+    voices = research.stage_curate(idea, scope, pool, wd, max_voices, False, min_voices=99)
+    log("CURATE", f"保留 {len(voices)} 条真实原声(从 {len(pool)} 条池子)")
     if not voices:
         raise RuntimeError(
             f"收集到 {len(pool)} 条原始内容,但没有一条与「{idea}」强相关 "
@@ -105,11 +110,22 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
     log("CLUSTER", "聚类主题…")
     cluster = research.stage_cluster(idea, target_market, scope, voices, wd, False)
 
+    log("CLUSTER", "拆解用户场景 / 需求 / 替代方案…")
+    demand = research.stage_decompose(idea, target_market, scope, voices, cluster, wd, False)
+
     log("SYNTHESIZE", "综合 thesis / verdict / 策略 / 风险…")
     synth = research.stage_synth(idea, target_market, scope, voices, cluster, wd, False)
 
     log("ASSEMBLE", "组装 + 校验…")
-    data = research.stage_assemble(slug, idea, target_market, scope, voices, cluster, synth)
+    data = research.stage_assemble(slug, idea, target_market, scope, voices, cluster, synth, demand=demand)
+    # Discussion-trend chart: yearly Reddit volume (Google Trends is usually
+    # IP-blocked). Falls back to the pool's own date histogram.
+    log("ASSEMBLE", "统计讨论热度趋势(按年)…")
+    trend = research.collect_reddit_trend(scope.get("search_idea") or idea) \
+            or research.compute_trend(pool)
+    if trend:
+        data["trend"] = trend
+        data["trend_source"] = "reddit"
 
     # validate
     schema = load_schema()
@@ -128,11 +144,57 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
         for v in data.get("voices", []):
             if v.get("title") and "title_en" not in v:
                 v["title_en"] = v["title"]
+        translate_data.translate_voice_titles(data)   # title_zh: subtle CN subtitle
         data_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     except Exception as e:
         log("TRANSLATE", f"跳过英文回填:{e}")
 
     return data
+
+
+def expand_pipeline(slug: str, idea: str, market: str, mode: str | None,
+                    creds: dict | None = None) -> dict:
+    """Live deeper search for an already-generated report. Appends new real
+    voices to data/<slug>.json and returns {new_voices, total}."""
+    creds = creds or {}
+    data_path = ROOT / "data" / f"{slug}.json"
+    if not data_path.exists():
+        raise RuntimeError(f"找不到报告数据 data/{slug}.json(请先生成报告再深搜)")
+    data = json.loads(data_path.read_text(encoding="utf-8"))
+    idea = idea or data.get("meta", {}).get("idea", "")
+    market = market or data.get("meta", {}).get("target_market", "US")
+
+    wd = research.work_dir(slug)
+    scope_path = wd / "01-scope.json"
+    if scope_path.exists():
+        scope = json.loads(scope_path.read_text(encoding="utf-8"))
+    else:
+        scope = {"subreddits": [], "players": data.get("players", []),
+                 "hn_queries": [idea]}
+    scope["_idea"] = idea
+
+    with _PIPELINE_LOCK:
+        saved = {k: os.environ.get(k) for k in ("OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_MODEL")}
+        try:
+            if creds.get("api_key"):  os.environ["OPENAI_API_KEY"]  = creds["api_key"]
+            if creds.get("base_url"): os.environ["OPENAI_BASE_URL"] = creds["base_url"]
+            if creds.get("model"):    os.environ["OPENAI_MODEL"]    = creds["model"]
+            new = research.stage_expand(idea, market, scope, data.get("voices", []),
+                                        data.get("themes", []), wd, log=None, depth=1)
+        finally:
+            for k, v in saved.items():
+                if v is None: os.environ.pop(k, None)
+                else:         os.environ[k] = v
+
+    if new:
+        data.setdefault("voices", []).extend(new)
+        # voice→theme edges so the graph/lens stay consistent
+        for v in new:
+            for tid in v.get("themes", []):
+                data.setdefault("edges", []).append({"from": v["id"], "to": tid, "w": 1})
+        data.setdefault("verdict", {}).setdefault("evidence_counts", {})["raw_voices"] = len(data["voices"])
+        data_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    return {"new_voices": new, "total": len(data.get("voices", []))}
 
 
 # --------------------------------------------------------------------------- #
@@ -194,9 +256,10 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   .adv-note{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:10px;line-height:1.6}
 </style></head><body>
 <div class="wrap">
-  <div class="brand">VIBE · CATEGORY DEEP DIVE</div>
-  <h1>品类需求研究</h1>
-  <p class="deck">输入一个产品想法,自动联网调研 → 出可交互报告。约 40-60 秒。</p>
+  <div class="brand">VIBE · 产品需求研究 AGENT</div>
+  <h1>产品需求研究 Agent</h1>
+  <p class="deck">基于 999 条 Reddit 真实评论,判断你的产品需求是否真实。<br>
+    输入一个产品想法 → 自动联网深搜 → 出可交互报告。约 1–2 分钟。</p>
 
   <label>产品想法</label>
   <input id="idea" placeholder="例如:AI 睡眠耳塞 / 智能宠物喂食器 / ..." autofocus>
@@ -225,6 +288,7 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   </details>
 
   <button id="go">开始研究 →</button>
+  <button id="stop" style="display:none;margin-top:10px;background:#a0533c">■ 停止研究</button>
 
   <div class="prog" id="prog">
     <div class="prog-bar"><i id="progBar"></i></div>
@@ -242,7 +306,7 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   // ordered stepper: backend stage tag → {label}. RENDER is added by the frontend.
   const STEPS = [
     ['SCOPE',      '判断市场类型 + 找数据源'],
-    ['COLLECT',    '联网抓取真实用户声音'],
+    ['COLLECT',    '联网搜索真实用户声音(目标 999 条)'],
     ['CURATE',     '筛选相关声音(剔除噪声)'],
     ['CLUSTER',    '聚类成主题'],
     ['SYNTHESIZE', '综合 thesis / 策略 / 风险'],
@@ -279,11 +343,14 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     if (el){ el.classList.remove('active','done'); el.classList.add('err'); const m=$('msg-'+(tag||'SCOPE')); if(m) m.textContent = msg; }
   }
 
-  let elapsedTimer = null, lastTag = 'SCOPE';
+  let elapsedTimer = null, lastTag = 'SCOPE', abortCtl = null;
+  $('stop').onclick = () => { if (abortCtl) abortCtl.abort(); };
   $('go').onclick = async () => {
     const idea = $('idea').value.trim();
     if (!idea){ $('idea').focus(); return; }
+    abortCtl = new AbortController();
     $('go').disabled = true; $('go').textContent = '研究中…(可看下方进度)';
+    $('stop').style.display = 'block';
     $('prog').className = 'prog show'; buildSteps(); setActive('SCOPE','提交:'+idea);
 
     const t0 = Date.now();
@@ -292,7 +359,7 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
 
     try {
       const r = await fetch('/api/research', {
-        method:'POST', headers:{'Content-Type':'application/json'},
+        method:'POST', headers:{'Content-Type':'application/json'}, signal: abortCtl.signal,
         body: JSON.stringify({ idea, market: $('market').value, mode: $('mode').value,
           api_key: $('apiKey').value.trim(), base_url: $('baseUrl').value.trim(), model: $('model').value.trim() })
       });
@@ -319,18 +386,25 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
         }
       }
       clearInterval(elapsedTimer);
+      $('stop').style.display = 'none';
 
       if (errMsg) { setError(lastTag, errMsg); $('go').disabled=false; $('go').textContent='重试 →'; return; }
       if (!finalData) { setError(lastTag, '未收到结果,请重试'); $('go').disabled=false; $('go').textContent='重试 →'; return; }
 
       // RENDER step (frontend)
       setActive('RENDER', '加载模板…');
-      const tpl = await fetch('/dist/_template.html').then(x=>x.text());
+      const tpl = await fetch('/templates/lens-report-template.html').then(x=>x.text());
       allDone();
       const filled = tpl.replace('{{REPORT_DATA_JSON}}', () => JSON.stringify(finalData));
       document.open(); document.write(filled); document.close();
     } catch(e){
       clearInterval(elapsedTimer);
+      $('stop').style.display = 'none';
+      if (e.name === 'AbortError'){
+        setError(lastTag, '已停止 —— 后台可能仍在跑完这一轮,稍候再重新开始');
+        $('go').disabled=false; $('go').textContent='重新开始 →';
+        return;
+      }
       const hint = /fetch|后端/i.test(e.message)
         ? '连不上后端 — 请确认终端里 make app 还在运行(那个窗口别关),然后重试。'
         : e.message;
@@ -365,8 +439,36 @@ class Handler(BaseHTTPRequestHandler):
                     return self._send(200, f.read_bytes(), ctype)
         return self._send(404, "not found")
 
+    def _do_expand(self):
+        length = int(self.headers.get("Content-Length", 0))
+        try:
+            req = json.loads(self.rfile.read(length) or b"{}")
+        except json.JSONDecodeError:
+            return self._send(400, json.dumps({"ok": False, "error": "bad request"}), "application/json")
+        slug = (req.get("slug") or "").strip()
+        if not slug:
+            return self._send(400, json.dumps({"ok": False, "error": "missing slug"}), "application/json")
+        creds = {
+            "api_key": (req.get("api_key") or "").strip(),
+            "base_url": (req.get("base_url") or "").strip(),
+            "model": (req.get("model") or "").strip(),
+        }
+        print(f"\n⊕ expand: {slug}", flush=True)
+        try:
+            res = expand_pipeline(slug, (req.get("idea") or "").strip(),
+                                  (req.get("market") or "").strip(),
+                                  (req.get("mode") or "").strip() or None, creds)
+            print(f"  + {len(res['new_voices'])} new voices (total {res['total']})", flush=True)
+            return self._send(200, json.dumps({"ok": True, **res}, ensure_ascii=False), "application/json")
+        except Exception as e:
+            print(f"  ✗ expand {e}", flush=True)
+            return self._send(500, json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False), "application/json")
+
     def do_POST(self):
-        if urlparse(self.path).path != "/api/research":
+        path = urlparse(self.path).path
+        if path == "/api/expand":
+            return self._do_expand()
+        if path != "/api/research":
             return self._send(404, "not found")
         length = int(self.headers.get("Content-Length", 0))
         try:

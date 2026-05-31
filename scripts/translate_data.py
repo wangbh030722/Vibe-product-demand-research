@@ -46,9 +46,22 @@ def collect_strings(data: dict) -> dict[str, str]:
     o = data.get("opportunity", {})
     if o.get("label"): out["opportunity.label"] = o["label"]
     if o.get("summary"): out["opportunity.summary"] = o["summary"]
+    si = data.get("section_insights", {})
+    for k in ("market", "user", "competitive", "opportunity", "risk"):
+        if si.get(k): out[f"section_insights.{k}"] = si[k]
     for i, p in enumerate(data.get("paths", [])):
-        for f in ("label", "core", "description"):
+        for f in ("label", "core", "description", "hypothesis", "evidence", "risk"):
             if p.get(f): out[f"paths.{i}.{f}"] = p[f]
+        for j, q in enumerate(p.get("open_questions", []) or []):
+            if q: out[f"paths.{i}.open_questions.{j}"] = q
+    ud = data.get("user_demand", {})
+    if ud.get("jtbd"): out["user_demand.jtbd"] = ud["jtbd"]
+    if ud.get("wtp"):  out["user_demand.wtp"] = ud["wtp"]
+    for grp, fields in (("scenarios", ("name", "summary")), ("personas", ("name", "summary")),
+                        ("unmet_needs", ("need", "summary")), ("workarounds", ("approach", "summary"))):
+        for i, item in enumerate(ud.get(grp, []) or []):
+            for f in fields:
+                if item.get(f): out[f"user_demand.{grp}.{i}.{f}"] = item[f]
     for i, r in enumerate(data.get("risks", [])):
         for f in ("title", "scenario", "mitigation"):
             if r.get(f): out[f"risks.{i}.{f}"] = r[f]
@@ -74,6 +87,20 @@ def apply_translations(data: dict, tr: dict[str, str]) -> None:
             kf[idx] = val
         elif parts[0] == "opportunity":
             data["opportunity"][parts[1] + "_en"] = val
+        elif parts[0] == "section_insights":
+            data.setdefault("section_insights", {})[parts[1] + "_en"] = val
+        elif parts[0] == "paths" and len(parts) == 4 and parts[2] == "open_questions":
+            p = data["paths"][int(parts[1])]; p.setdefault("open_questions_en", [])
+            j = int(parts[3]); oq = p["open_questions_en"]
+            while len(oq) <= j: oq.append("")
+            oq[j] = val
+        elif parts[0] == "user_demand":
+            ud = data.setdefault("user_demand", {})
+            if len(parts) == 2:
+                ud[parts[1] + "_en"] = val
+            elif len(parts) == 4:
+                arr = ud.get(parts[1], []); idx = int(parts[2])
+                if idx < len(arr): arr[idx][parts[3] + "_en"] = val
         elif parts[0] in ("players", "themes", "paths", "risks", "failures"):
             arr = data[parts[0]]; idx = int(parts[1]); field = parts[2]
             if idx < len(arr): arr[idx][field + "_en"] = val
@@ -97,6 +124,37 @@ def translate(data: dict) -> dict:
     return res
 
 
+def translate_voice_titles(data: dict) -> None:
+    """Add title_zh (Chinese) to each voice — the subtle subtitle shown under the
+    English original when the report is in zh mode. Batched, best-effort."""
+    voices = data.get("voices", [])
+    todo = [(i, v["title"]) for i, v in enumerate(voices)
+            if v.get("title") and not v.get("title_zh")]
+    if not todo:
+        return
+    sys_msg = ("You translate short English Reddit post titles into natural, "
+               "concise 简体中文. Keep brand/product names in English. Do not add "
+               "quotes or commentary. Output STRICT JSON only: same keys, Chinese "
+               "string values.")
+    CHUNK = 60
+    for s in range(0, len(todo), CHUNK):
+        part = {str(i): t for i, t in todo[s:s + CHUNK]}
+        user = ("Translate each English title to Chinese. Return a JSON object "
+                "with the SAME keys:\n\n" + json.dumps(part, ensure_ascii=False))
+        try:
+            res = chat_json(sys_msg, user, temperature=0.2, max_tokens=6000)
+        except Exception as e:
+            print(f"  ! voice-title zh translate skipped: {e}", file=sys.stderr)
+            continue
+        for k, zh in (res or {}).items():
+            try:
+                idx = int(k)
+            except (TypeError, ValueError):
+                continue
+            if 0 <= idx < len(voices) and zh:
+                voices[idx]["title_zh"] = str(zh).strip()
+
+
 def process(path: Path, dry: bool) -> None:
     data = json.loads(path.read_text(encoding="utf-8"))
     print(f"translating {path.name} ...")
@@ -105,10 +163,12 @@ def process(path: Path, dry: bool) -> None:
         print("  (nothing to translate)")
         return
     apply_translations(data, tr)
-    # voice titles are already English
+    # voice titles are already English (title_en = title), and we add a Chinese
+    # subtitle (title_zh) for the zh-mode subtitle under each voice.
     for v in data.get("voices", []):
         if v.get("title") and "title_en" not in v:
             v["title_en"] = v["title"]
+    translate_voice_titles(data)
     if dry:
         print(json.dumps(data["meta"], ensure_ascii=False, indent=2))
         return
