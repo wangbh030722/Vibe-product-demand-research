@@ -562,7 +562,7 @@
     .brand { font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
     .view-switcher { display: none }  /* mobile uses tap-tab nav, not split modes */
     .header-right { gap: 8px }
-    .verdict-pill { font-size: 9.5px; padding: 4px 9px }
+    .lang-select { font-size: 10px; padding: 5px 22px 5px 9px }
 
     .workbench {
       flex-direction: column;
@@ -578,8 +578,10 @@
     .center-panel { height: 38vh; min-height: 280px; border-right: 0 !important; border-bottom: 1px solid var(--line) }
     .lens-panel { flex: 1; min-height: 0 }
 
-    /* Smaller overlay strips */
-    .evidence-counter { gap: 10px; font-size: 9.5px; top: 8px; left: 10px; right: 10px }
+    /* Hide the top overlay strips on the small radar — both are redundant with the
+       verdict card right below, and they collided with the top sector labels. */
+    .evidence-counter { display: none }
+    .radar-hud { display: none }
     .center-hint { font-size: 9px; bottom: 8px; left: 10px; padding: 4px 8px }
     .legend { font-size: 9px; bottom: 8px; right: 10px; padding: 6px 9px; line-height: 1.5 }
     .kg-zoom-controls { top: 30px; left: 10px }
@@ -613,13 +615,18 @@
     /* Print button: smaller, less obtrusive */
     .print-btn { bottom: 12px; right: 12px; padding: 7px 11px; font-size: 10px }
 
-    /* Fallback: tighter padding */
+    /* Fallback: tighter padding + readable headings (no font-chaos) */
     .report-fallback { padding: 12px 14px }
     .fb-body { padding: 18px 0 30px }
     .fb-body h1 { font-size: 22px }
-    .fb-body h2 { font-size: 10px }
-    .fb-body .fb-table { font-size: 10.5px }
-    .fb-body .fb-table th, .fb-body .fb-table td { padding: 6px 7px }
+    .fb-body h2 { font-size: 17px; margin-top: 40px; padding-top: 18px }
+    .fb-body h2 .secnum { font-size: 11px }
+    .sec-summary { font-size: 14.5px }
+    /* data tables: tighter cells so they never overflow a phone */
+    .bt { font-size: 12px }
+    .bt th, .bt td { padding: 8px 6px }
+    .hm td.cell { height: 34px; font-size: 11.5px }
+    .va-row { font-size: 12px; gap: 8px }
   }
 
   /* ============ PRINT / PDF ============ */

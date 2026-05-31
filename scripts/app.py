@@ -285,6 +285,15 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   .adv[open] summary:before{content:'▾ '}
   .adv[open]{padding-bottom:14px}
   .adv-note{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:10px;line-height:1.6}
+  /* phones: tighter margins, stack the two-up row, keep type readable */
+  @media (max-width:560px){
+    .wrap{padding:40px 18px 64px}
+    h1{font-size:25px}
+    .basis{font-size:14.5px}
+    .two{flex-direction:column;gap:0}
+    input,select{font-size:16px}   /* >=16px stops iOS auto-zoom on focus */
+    button{font-size:16px}
+  }
 </style></head><body>
 <div class="wrap">
   <div class="brand">VIBE · 产品需求研究 AGENT</div>
