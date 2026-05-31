@@ -54,7 +54,7 @@ _PIPELINE_LOCK = threading.Lock()
 
 
 def run_pipeline(idea: str, target_market: str, mode: str | None,
-                 log, creds: dict | None = None) -> dict:
+                 log, creds: dict | None = None, target_lang: str = "zh") -> dict:
     creds = creds or {}
     with _PIPELINE_LOCK:
         # Apply per-request key override (falls back to .env default), restore after.
@@ -63,7 +63,7 @@ def run_pipeline(idea: str, target_market: str, mode: str | None,
             if creds.get("api_key"):    os.environ["OPENAI_API_KEY"]  = creds["api_key"]
             if creds.get("base_url"):   os.environ["OPENAI_BASE_URL"] = creds["base_url"]
             if creds.get("model"):      os.environ["OPENAI_MODEL"]    = creds["model"]
-            return _run_pipeline_inner(idea, target_market, mode, log)
+            return _run_pipeline_inner(idea, target_market, mode, log, target_lang=target_lang)
         finally:
             for k, v in saved.items():
                 if v is None:
@@ -73,7 +73,7 @@ def run_pipeline(idea: str, target_market: str, mode: str | None,
 
 
 def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
-                        log) -> dict:
+                        log, target_lang: str = "zh") -> dict:
     slug = slugify(idea)
     wd = research.work_dir(slug)
 
@@ -118,6 +118,8 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
 
     log("ASSEMBLE", "组装 + 校验…")
     data = research.stage_assemble(slug, idea, target_market, scope, voices, cluster, synth, demand=demand)
+    # record the chosen report language so the template opens in it (voices stay original)
+    data.setdefault("meta", {})["target_lang"] = target_lang
     # Discussion-trend chart: derived ONLY from the unified collected pool — the
     # SAME deduped Reddit data (Arctic Shift + pullpush + reddit.py, merged) that
     # produces the voices/counts/share-of-voice. We deliberately do NOT run a
@@ -150,6 +152,11 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
             if v.get("title") and "title_en" not in v:
                 v["title_en"] = v["title"]
         translate_data.translate_voice_titles(data)   # title_zh: subtle CN subtitle
+        # If the user picked a non-zh/en report language, also localise the whole
+        # report into it (<field>_<code> + title_<code>); voices stay original.
+        if target_lang not in ("zh", "en"):
+            log("TRANSLATE", f"翻译为目标语言 {target_lang}…")
+            translate_data.localize(data, target_lang)
         data_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     except Exception as e:
         log("TRANSLATE", f"跳过英文回填:{e}")
@@ -208,51 +215,66 @@ def expand_pipeline(slug: str, idea: str, market: str, mode: str | None,
 
 FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VIBE · 品类研究</title>
+<title>VIBE · 产品需求研究 Agent</title>
 <style>
-  :root{--bg:#faf8f4;--ink:#1c1d20;--ink-2:#3d3e44;--ink-3:#737277;--line:#e3ddcf;
-    --mono:'SF Mono',Menlo,Monaco,monospace;--serif:'Iowan Old Style',Cambria,serif;--sage:#5b7a52;--rust:#a0533c;}
-  *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,system-ui,sans-serif}
-  .wrap{max-width:680px;margin:0 auto;padding:64px 24px}
-  .brand{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase}
-  h1{font-family:var(--serif);font-size:32px;font-weight:600;margin:8px 0 6px}
-  .deck{font-family:var(--serif);font-style:italic;color:var(--ink-2);margin:0 0 30px}
-  label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase;margin:18px 0 6px}
-  input,select{width:100%;border:1px solid var(--line);border-radius:7px;padding:12px 14px;font-size:15px;background:#fff;color:var(--ink);font-family:inherit}
-  input:focus,select:focus{outline:none;border-color:var(--ink-3)}
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+  :root{
+    --bg:#ffffff;--surface:#f7f7f4;--ink:#191815;--ink-2:#56564e;--ink-3:#8c8b80;
+    --line:#e8e7e1;--line-2:#dcdbd4;--accent:#0a6b43;--accent-soft:#ecf3ef;--accent-line:#cde0d6;--neg:#a8362a;
+    --sans:'Inter','Noto Sans SC',-apple-system,system-ui,sans-serif;
+    --display:'Plus Jakarta Sans','Inter','Noto Sans SC',sans-serif;
+    --mono:'Inter','Noto Sans SC',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+  .wrap{max-width:820px;margin:0 auto;padding:84px 40px 110px}
+  .brand{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase}
+  h1{font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-.02em;margin:10px 0 10px;line-height:1.12}
+  /* 999 evidence subtitle — emphasised inline, not a dominating block */
+  .basis{font-size:15.5px;color:var(--ink-2);margin:0 0 6px;line-height:1.55}
+  .basis .n{font-family:var(--display);font-weight:800;font-size:1.4em;color:var(--accent);letter-spacing:-.01em}
+  .deck{font-size:14.5px;color:var(--ink-3);margin:0 0 16px;line-height:1.6}
+  .topline{display:flex;gap:14px;align-items:center;margin:0 0 34px;flex-wrap:wrap}
+  .case-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--accent);
+    text-decoration:none;border-bottom:1px solid var(--accent-line);padding-bottom:1px;transition:border-color .15s}
+  .case-link:hover{border-bottom-color:var(--accent)}
+  label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase;margin:18px 0 6px}
+  input,select{width:100%;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:15px;background:#fff;color:var(--ink);font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   .two{display:flex;gap:12px}.two>div{flex:1}
-  button{appearance:none;border:0;background:var(--ink);color:#fff;cursor:pointer;font-family:var(--mono);font-size:14px;letter-spacing:.04em;padding:14px 26px;border-radius:7px;margin-top:24px;width:100%}
-  button:hover{background:#000}button:disabled{opacity:.5;cursor:not-allowed}
+  .field-note{font-size:11.5px;color:var(--ink-3);margin-top:6px;line-height:1.5}
+  button{appearance:none;border:0;background:var(--accent);color:#fff;cursor:pointer;font-family:var(--display);
+    font-weight:700;font-size:15px;letter-spacing:.01em;padding:14px 26px;border-radius:9px;margin-top:26px;width:100%}
+  button:hover{background:#085536}button:disabled{opacity:.5;cursor:not-allowed}
   /* progress stepper */
   .prog{margin-top:26px;display:none}
   .prog.show{display:block}
   .prog-bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:18px}
-  .prog-bar i{display:block;height:100%;width:0;background:var(--sage);transition:width .5s ease}
+  .prog-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .5s ease}
   .step{display:flex;gap:12px;align-items:flex-start;padding:7px 0;opacity:.4;transition:opacity .3s}
   .step.active,.step.done{opacity:1}
   .step .dot{flex-shrink:0;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);
     display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink-3);margin-top:1px;
     font-family:var(--mono);background:#fff;transition:all .3s}
-  .step.done .dot{background:var(--sage);border-color:var(--sage);color:#fff}
-  .step.active .dot{border-color:var(--sage);border-style:solid;animation:spin 1s linear infinite;border-top-color:transparent;color:transparent}
-  .step.err .dot{background:var(--rust);border-color:var(--rust);color:#fff}
+  .step.done .dot{background:var(--accent);border-color:var(--accent);color:#fff}
+  .step.active .dot{border-color:var(--accent);border-style:solid;animation:spin 1s linear infinite;border-top-color:transparent;color:transparent}
+  .step.err .dot{background:var(--neg);border-color:var(--neg);color:#fff}
   @keyframes spin{to{transform:rotate(360deg)}}
   .step .st-body{flex:1;min-width:0}
   .step .st-name{font-family:var(--mono);font-size:12px;color:var(--ink);letter-spacing:.02em}
   .step.active .st-name{font-weight:600}
   .step .st-msg{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:2px;min-height:13px;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .step.active .st-msg{color:var(--sage)}
-  .step.err .st-msg{color:var(--rust);white-space:normal}
-  /* breathing pulse on the whole active row */
+  .step.active .st-msg{color:var(--accent)}
+  .step.err .st-msg{color:var(--neg);white-space:normal}
   .step.active{animation:breathe 1.8s ease-in-out infinite}
   @keyframes breathe{0%,100%{opacity:1}50%{opacity:.72}}
   .prog-elapsed{font-family:var(--mono);font-size:10px;color:var(--ink-3);text-align:right;margin-top:10px;letter-spacing:.06em}
   .hint{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:26px;line-height:1.7;border-top:1px solid var(--line);padding-top:18px}
   .samples{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
-  .samples button{width:auto;margin:0;background:#fff;border:1px solid var(--line);color:var(--ink-2);font-size:11px;padding:6px 11px}
-  .samples button:hover{border-color:var(--ink-3);background:#fff;color:var(--ink)}
-  .adv{margin-top:18px;border:1px solid var(--line);border-radius:8px;padding:0 14px;background:#fff}
+  .samples button{width:auto;margin:0;background:#fff;border:1px solid var(--line);color:var(--ink-2);font-size:12px;padding:6px 12px;border-radius:999px;font-family:var(--sans);font-weight:500}
+  .samples button:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+  .adv{margin-top:18px;border:1px solid var(--line);border-radius:9px;padding:0 14px;background:#fff}
   .adv summary{cursor:pointer;padding:12px 0;font-family:var(--mono);font-size:12px;color:var(--ink-2);list-style:none}
   .adv summary::-webkit-details-marker{display:none}
   .adv summary:before{content:'▸ ';color:var(--ink-3)}
@@ -263,8 +285,12 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
 <div class="wrap">
   <div class="brand">VIBE · 产品需求研究 AGENT</div>
   <h1>产品需求研究 Agent</h1>
-  <p class="deck">基于 999 条 Reddit 真实评论,判断你的产品需求是否真实。<br>
-    输入一个产品想法 → 自动联网深搜 → 出可交互报告。约 1–2 分钟。</p>
+
+  <p class="basis">以 <span class="n">999</span> 条 Reddit 真实用户原声为依据 · 每个结论都可溯源到原帖</p>
+  <p class="deck">输入一个产品想法 → 自动联网深搜真实用户原声 → 出一份可交互的洞察报告。约 1–2 分钟。</p>
+  <div class="topline">
+    <a class="case-link" href="/dist/portable-espresso-maker.html" target="_blank" rel="noopener">◧ 查看案例:便携咖啡机 →</a>
+  </div>
 
   <label>产品想法</label>
   <input id="idea" placeholder="例如:AI 睡眠耳塞 / 智能宠物喂食器 / ..." autofocus>
@@ -281,6 +307,17 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     </div>
   </div>
 
+  <label>报告语言 / Report language</label>
+  <select id="lang">
+    <option value="zh">简体中文(默认)</option>
+    <option value="en">English</option>
+    <option value="ja">日本語</option>
+    <option value="es">Español</option>
+    <option value="fr">Français</option>
+    <option value="de">Deutsch</option>
+  </select>
+  <div class="field-note">报告正文与用户原声的译文将使用此语言;Reddit 原声始终保留英文原文。</div>
+
   <details class="adv">
     <summary>高级:用自己的 API key(可选,留空走默认)</summary>
     <label>API Key</label>
@@ -293,7 +330,7 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   </details>
 
   <button id="go">开始研究 →</button>
-  <button id="stop" style="display:none;margin-top:10px;background:#a0533c">■ 停止研究</button>
+  <button id="stop" style="display:none;margin-top:10px;background:var(--neg)">■ 停止研究</button>
 
   <div class="prog" id="prog">
     <div class="prog-bar"><i id="progBar"></i></div>
@@ -301,7 +338,7 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     <div class="prog-elapsed" id="elapsed"></div>
   </div>
 
-  <div class="hint">默认用站点配置的 key · 生成的数据存到 data/&lt;slug&gt;.json · 报告渲染后右上角可切中英文 / 下载 PDF</div>
+  <div class="hint">默认用站点配置的 key · 生成的数据存到 data/&lt;slug&gt;.json · 报告内可切换语言 / 导出 PDF / 导出原文</div>
 </div>
 
 <script>
@@ -366,6 +403,7 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
       const r = await fetch('/api/research', {
         method:'POST', headers:{'Content-Type':'application/json'}, signal: abortCtl.signal,
         body: JSON.stringify({ idea, market: $('market').value, mode: $('mode').value,
+          target_lang: $('lang').value,
           api_key: $('apiKey').value.trim(), base_url: $('baseUrl').value.trim(), model: $('model').value.trim() })
       });
       if (!r.ok || !r.body) throw new Error('连不上后端');
@@ -485,6 +523,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(400, json.dumps({"ok": False, "error": "missing idea"}), "application/json")
         market = (req.get("market") or "US").strip()
         mode = (req.get("mode") or "").strip() or None
+        target_lang = (req.get("target_lang") or "zh").strip().lower() or "zh"
         creds = {
             "api_key": (req.get("api_key") or "").strip(),
             "base_url": (req.get("base_url") or "").strip(),
@@ -512,7 +551,7 @@ class Handler(BaseHTTPRequestHandler):
             sse("progress", {"stage": stage, "msg": msg})
 
         try:
-            data = run_pipeline(idea, market, mode, log=log, creds=creds)
+            data = run_pipeline(idea, market, mode, log=log, creds=creds, target_lang=target_lang)
             sse("done", {"ok": True, "data": data})
         except Exception as e:
             print(f"  ✗ {e}", flush=True)

@@ -30,7 +30,8 @@
           }
         },
         "thesis": { "type": "string", "maxLength": 200 },
-        "deck":   { "type": "string", "maxLength": 400 }
+        "deck":   { "type": "string", "maxLength": 400 },
+        "target_lang": { "type": "string", "description": "Report display language chosen at generation (zh|en|ja|es|fr|de). Reddit voices keep their original text." }
       },
       "additionalProperties": false
     },

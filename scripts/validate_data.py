@@ -65,12 +65,17 @@ def load_schema() -> dict[str, Any]:
     return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
+# translation-suffix languages backfilled onto base fields (<field>_<code>)
+_TR_SUFFIXES = ("_en", "_zh", "_ja", "_es", "_fr", "_de")
+
+
 def _strip_en(obj: Any) -> Any:
-    """Deep-copy with all translation keys (*_en, *_zh) removed, so the base
-    schema (additionalProperties:false) validates without declaring them."""
+    """Deep-copy with all translation keys (*_en, *_zh, *_ja, …) removed, so the
+    base schema (additionalProperties:false) validates without declaring them.
+    Note: meta.target_lang is a real schema field and is intentionally NOT stripped."""
     if isinstance(obj, dict):
         return {k: _strip_en(v) for k, v in obj.items()
-                if not (k.endswith("_en") or k.endswith("_zh"))}
+                if not any(k.endswith(s) for s in _TR_SUFFIXES)}
     if isinstance(obj, list):
         return [_strip_en(v) for v in obj]
     return obj

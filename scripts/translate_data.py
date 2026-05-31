@@ -71,88 +71,122 @@ def collect_strings(data: dict) -> dict[str, str]:
     return out
 
 
-def apply_translations(data: dict, tr: dict[str, str]) -> None:
+# Supported report languages: code → (suffix, human name for the LLM prompt).
+# The base content is Chinese (zh, no suffix). Every other language is backfilled
+# into <field>_<code> so the report can display in it while keeping voices original.
+LANG_NAMES = {
+    "en": ("_en", "English"),
+    "ja": ("_ja", "Japanese (日本語)"),
+    "es": ("_es", "Spanish (Español)"),
+    "fr": ("_fr", "French (Français)"),
+    "de": ("_de", "German (Deutsch)"),
+    "zh": ("", "简体中文"),
+}
+
+
+def apply_translations(data: dict, tr: dict[str, str], suffix: str = "_en") -> None:
+    kf_key = "key_findings" + suffix
+    oq_key = "open_questions" + suffix
     def setp(path: str, val: str):
         parts = path.split(".")
         # locate
         if parts[0] == "meta":
-            data["meta"][parts[1] + "_en"] = val
+            data["meta"][parts[1] + suffix] = val
         elif parts[0] == "verdict" and parts[1] == "rationale":
-            data["verdict"]["rationale_en"] = val
+            data["verdict"]["rationale" + suffix] = val
         elif parts[0] == "verdict" and parts[1] == "key_findings":
-            data["verdict"].setdefault("key_findings_en", [])
+            data["verdict"].setdefault(kf_key, [])
             idx = int(parts[2])
-            kf = data["verdict"]["key_findings_en"]
+            kf = data["verdict"][kf_key]
             while len(kf) <= idx: kf.append("")
             kf[idx] = val
         elif parts[0] == "opportunity":
-            data["opportunity"][parts[1] + "_en"] = val
+            data["opportunity"][parts[1] + suffix] = val
         elif parts[0] == "section_insights":
-            data.setdefault("section_insights", {})[parts[1] + "_en"] = val
+            data.setdefault("section_insights", {})[parts[1] + suffix] = val
         elif parts[0] == "paths" and len(parts) == 4 and parts[2] == "open_questions":
-            p = data["paths"][int(parts[1])]; p.setdefault("open_questions_en", [])
-            j = int(parts[3]); oq = p["open_questions_en"]
+            p = data["paths"][int(parts[1])]; p.setdefault(oq_key, [])
+            j = int(parts[3]); oq = p[oq_key]
             while len(oq) <= j: oq.append("")
             oq[j] = val
         elif parts[0] == "user_demand":
             ud = data.setdefault("user_demand", {})
             if len(parts) == 2:
-                ud[parts[1] + "_en"] = val
+                ud[parts[1] + suffix] = val
             elif len(parts) == 4:
                 arr = ud.get(parts[1], []); idx = int(parts[2])
-                if idx < len(arr): arr[idx][parts[3] + "_en"] = val
+                if idx < len(arr): arr[idx][parts[3] + suffix] = val
         elif parts[0] in ("players", "themes", "paths", "risks", "failures"):
             arr = data[parts[0]]; idx = int(parts[1]); field = parts[2]
-            if idx < len(arr): arr[idx][field + "_en"] = val
+            if idx < len(arr): arr[idx][field + suffix] = val
     for path, val in tr.items():
         if val: setp(path, val)
 
 
-def translate(data: dict) -> dict:
+def translate(data: dict, lang_name: str = "English") -> dict:
     strings = collect_strings(data)
     if not strings:
         return {}
-    sys_msg = ("You are a professional EN translator for market-research reports. "
-               "Translate each Chinese value to natural, concise English. "
+    sys_msg = (f"You are a professional translator for market-research reports. "
+               f"Translate each Chinese value to natural, concise {lang_name}. "
                "Keep product/brand names as-is. Keep technical terms (FDA, RAG, "
                "prompt, token) untranslated. Output STRICT JSON only: same keys, "
-               "English values.")
-    user = ("Translate the values of this JSON map to English. Return a JSON "
+               f"{lang_name} values.")
+    user = (f"Translate the values of this JSON map to {lang_name}. Return a JSON "
             "object with the SAME keys and translated string values:\n\n"
             + json.dumps(strings, ensure_ascii=False, indent=1))
     res = chat_json(sys_msg, user, temperature=0.2)
     return res
 
 
-def translate_voice_titles(data: dict) -> None:
-    """Add title_zh (Chinese) to each voice — the subtle subtitle shown under the
-    English original when the report is in zh mode. Batched, best-effort."""
+def translate_voice_titles(data: dict, lang_code: str = "zh",
+                           lang_name: str = "简体中文") -> None:
+    """Add title_<lang_code> to each voice — the subtle translated subtitle shown
+    under the English original. Default zh (the CN subtitle). Batched, best-effort."""
     voices = data.get("voices", [])
+    key = "title_" + lang_code
     todo = [(i, v["title"]) for i, v in enumerate(voices)
-            if v.get("title") and not v.get("title_zh")]
+            if v.get("title") and not v.get(key)]
     if not todo:
         return
-    sys_msg = ("You translate short English Reddit post titles into natural, "
-               "concise 简体中文. Keep brand/product names in English. Do not add "
-               "quotes or commentary. Output STRICT JSON only: same keys, Chinese "
-               "string values.")
+    sys_msg = (f"You translate short English Reddit post titles into natural, "
+               f"concise {lang_name}. Keep brand/product names in English. Do not "
+               "add quotes or commentary. Output STRICT JSON only: same keys, "
+               f"{lang_name} string values.")
     CHUNK = 60
     for s in range(0, len(todo), CHUNK):
         part = {str(i): t for i, t in todo[s:s + CHUNK]}
-        user = ("Translate each English title to Chinese. Return a JSON object "
+        user = (f"Translate each English title to {lang_name}. Return a JSON object "
                 "with the SAME keys:\n\n" + json.dumps(part, ensure_ascii=False))
         try:
             res = chat_json(sys_msg, user, temperature=0.2, max_tokens=6000)
         except Exception as e:
-            print(f"  ! voice-title zh translate skipped: {e}", file=sys.stderr)
+            print(f"  ! voice-title {lang_code} translate skipped: {e}", file=sys.stderr)
             continue
-        for k, zh in (res or {}).items():
+        for k, tx in (res or {}).items():
             try:
                 idx = int(k)
             except (TypeError, ValueError):
                 continue
-            if 0 <= idx < len(voices) and zh:
-                voices[idx]["title_zh"] = str(zh).strip()
+            if 0 <= idx < len(voices) and tx:
+                voices[idx][key] = str(tx).strip()
+
+
+def localize(data: dict, lang_code: str) -> None:
+    """Backfill the whole report into one target language (<field>_<code>) plus a
+    translated voice-title subtitle (title_<code>). zh is the base (no-op); en is
+    handled by the default translate()/_en path. Best-effort; skips on failure."""
+    lang_code = (lang_code or "").lower()
+    if lang_code in ("", "zh"):
+        return
+    suffix, name = LANG_NAMES.get(lang_code, ("_" + lang_code, lang_code))
+    try:
+        tr = translate(data, lang_name=name)
+        if tr:
+            apply_translations(data, tr, suffix=suffix)
+    except Exception as e:
+        print(f"  ! localize {lang_code} skipped: {e}", file=sys.stderr)
+    translate_voice_titles(data, lang_code=lang_code, lang_name=name)
 
 
 def process(path: Path, dry: bool) -> None:

@@ -704,7 +704,13 @@
   body[data-lang="zh"] .lang-switch .ls-opt[data-l="zh"],
   body[data-lang="en"] .lang-switch .ls-opt[data-l="en"] { color:#fff; }
   .lang-switch:hover { border-color:var(--charcoal-3); }
-  @media print { .lang-switch, .dl-btn, .export-wrap { display:none !important; } }
+  /* multi-language dropdown (replaces the slider when 3+ languages exist) */
+  .lang-select{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink-2);cursor:pointer;
+    font-family:var(--mono);font-size:11px;letter-spacing:.02em;padding:5px 26px 5px 12px;border-radius:999px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M2 3.5L5 6.5L8 3.5' stroke='%238c8b80' fill='none' stroke-width='1.4'/></svg>");
+    background-repeat:no-repeat;background-position:right 9px center}
+  .lang-select:hover{border-color:var(--accent)}
+  @media print { .lang-switch, .lang-select, .dl-btn, .export-wrap { display:none !important; } }
 
   /* ============ Filter bar v2 — tidy wrapped groups ============ */
   .filter-bar { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; align-items:stretch; }
@@ -5265,17 +5271,24 @@
     },
   };
   const LANG = () => document.body.dataset.lang || 'zh';
-  const T = key => (I18N[LANG()] || I18N.zh)[key] ?? (I18N.zh[key] ?? key);
-  // data field: prefer <field>_en in EN mode, fall back to base
+  // UI strings exist for zh + en; any other language falls back to en chrome.
+  const T = key => { const l = LANG(); const dict = I18N[l] || (l === 'zh' ? I18N.zh : I18N.en) || I18N.zh;
+    return dict[key] ?? (I18N.en && I18N.en[key]) ?? I18N.zh[key] ?? key; };
+  // data field (multi-language): zh is the base; any other language prefers
+  // <field>_<lang>, then <field>_en (international fallback), then the base.
   const tf = (obj, field) => {
     if (!obj) return '';
-    if (LANG() === 'en' && obj[field + '_en']) return obj[field + '_en'];
+    const l = LANG();
+    if (l !== 'zh') {
+      const k = obj[field + '_' + l]; if (k != null && k !== '') return k;
+      const e = obj[field + '_en'];   if (e != null && e !== '') return e;
+    }
     return obj[field] ?? '';
   };
-  // Voice titles are the original English Reddit text. In zh mode, show a subtle
-  // Chinese translation under the English original (title_zh, produced by the
-  // pipeline). In en mode, no subtitle.
-  const voiceZh = v => (LANG() === 'zh' && v && v.title_zh) ? v.title_zh : '';
+  // Voice titles stay the original English Reddit text. Under each, show a subtle
+  // translation in the current language (title_<lang>, produced by the pipeline).
+  // In en mode there's no subtitle (the title is already English).
+  const voiceZh = v => { const l = LANG(); if (l === 'en' || !v) return ''; return v['title_' + l] || ''; };
   const zhLine = v => { const z = voiceZh(v); return z ? `<div class="v-zh">${esc(z)}</div>` : ''; };
   // Parse the source subreddit ("r/xxx") from a voice url, for source tags.
   const subOf = url => { const m = /reddit\.com\/r\/([A-Za-z0-9_]+)/.exec(url || ''); return m ? 'r/' + m[1] : (/(news\.)?ycombinator/.test(url||'') ? 'HN' : 'web'); };
@@ -5632,7 +5645,9 @@
       <p class="va-count" data-total="${allV.length}">${T('va.showing')} <b>${allV.length}</b> / ${allV.length}</p>`;
 
     // language-aware array getter (for open_questions / open_questions_en)
-    const tfArr = (o,f) => { if(!o) return []; if(LANG()==='en' && Array.isArray(o[f+'_en'])) return o[f+'_en']; return Array.isArray(o[f])?o[f]:[]; };
+    const tfArr = (o,f) => { if(!o) return []; const l=LANG();
+      if(l!=='zh'){ const k=o[f+'_'+l]; if(Array.isArray(k)) return k; const e=o[f+'_en']; if(Array.isArray(e)) return e; }
+      return Array.isArray(o[f])?o[f]:[]; };
     // voice lookup for evidence links (▸ back to the real supporting post)
     const vById = {}; (data.voices||[]).forEach(v => vById[v.id] = v);
     const evLinks = ids => (ids||[]).map(id => { const v = vById[id]; return v
@@ -6538,7 +6553,9 @@
   }
   const _slug = (data.meta && data.meta.slug) || 'report';
   const _mdClean = s => String(s == null ? '' : s).replace(/\r?\n+/g, ' ').replace(/\|/g, '/').trim();
-  const _arrL = (o, f) => { if (!o) return []; if (LANG() === 'en' && Array.isArray(o[f+'_en'])) return o[f+'_en']; return Array.isArray(o[f]) ? o[f] : []; };
+  const _arrL = (o, f) => { if (!o) return []; const l = LANG();
+    if (l !== 'zh') { const k = o[f+'_'+l]; if (Array.isArray(k)) return k; const e = o[f+'_en']; if (Array.isArray(e)) return e; }
+    return Array.isArray(o[f]) ? o[f] : []; };
 
   // text-only Markdown of the whole report — charts re-expressed as tables/lists
   function buildReportMarkdown(){
@@ -6583,7 +6600,7 @@
     themeCounts.forEach(({t}) => { const tv = allV.filter(x=>x.themes.includes(t.id));
       const pos = tv.filter(x=>x.sentiment==='pos').length; P(`| ${_mdClean(tf(t,'label'))} | ${pos} | ${tv.length-pos} |`); });
     const quoteLines = (arr,label) => { P(`\n### ${label} · Top 5`);
-      arr.slice(0,5).forEach((x,i)=>{ P(`${i+1}. "${_mdClean(tf(x,'title'))}"${zh&&x.title_zh?` — ${_mdClean(x.title_zh)}`:''}`);
+      arr.slice(0,5).forEach((x,i)=>{ const sub=voiceZh(x); P(`${i+1}. "${_mdClean(tf(x,'title'))}"${sub?` — ${_mdClean(sub)}`:''}`);
         P(`   ${subOf(x.url)} · ↑${fmtNum(Math.abs(x.score))} · ${x.url}`); }); };
     quoteLines(posV, isNonStock()?L('真实需求信号','Demand signals'):L('好评','Praise'));
     quoteLines(negV, isNonStock()?L('缺口/不满','Gaps'):L('差评','Complaints'));
@@ -6649,7 +6666,7 @@
     o.push(`> ${_mdClean((data.meta||{}).timestamp)} · ${L('按赞数排序','ranked by upvotes')}\n`);
     allV.forEach((x,i) => {
       o.push(`${i+1}. **[${sentLabel(x.sentiment==='pos'?'pos':'neg')}]** "${_mdClean(tf(x,'title'))}"`);
-      if (zh && x.title_zh) o.push(`   - ${_mdClean(x.title_zh)}`);
+      const sub = voiceZh(x); if (sub) o.push(`   - ${_mdClean(sub)}`);
       o.push(`   - ${subOf(x.url)} · ↑${fmtNum(Math.abs(x.score))} · ${x.url}`);
     });
     return o.join('\n') + '\n';
@@ -6671,15 +6688,45 @@
   document.addEventListener('click', e => { if (!e.target.closest('#exportWrap')) _exToggle(false); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') _exToggle(false); });
 
-  // ============ Language toggle ============
-  document.getElementById('langToggle').addEventListener('click', () => {
-    document.body.dataset.lang = LANG() === 'zh' ? 'en' : 'zh';
+  // ============ Language switcher (multi-language) ============
+  // Base content is zh; the pipeline always backfills en, and optionally the
+  // generation target language (meta.target_lang) into <field>_<code>. The report
+  // can display in any language that's present.
+  const LANG_LABEL = { zh:'中文', en:'English', ja:'日本語', es:'Español', fr:'Français', de:'Deutsch' };
+  function availableLangs(){
+    const out = ['zh', 'en'];
+    const tl = (data.meta && data.meta.target_lang) || 'zh';
+    if (tl && !out.includes(tl)) out.push(tl);
+    return out;
+  }
+  function switchLang(code){
+    document.body.dataset.lang = code;
     renderAll();              // re-render everything in the new language
     updateRadarHud();         // radar redraws theme labels every frame via tf()
     applySelection(document.body.dataset.selectedId || null);  // keep blip highlight
-  });
+  }
+  // set the initial language (from meta.target_lang) BEFORE building the switcher
+  // so the slider/dropdown reflects it; tf() falls back to en/base if untranslated.
+  document.body.dataset.lang = (data.meta && data.meta.target_lang) || 'zh';
+  (function initLangSwitcher(){
+    const langs = availableLangs();
+    const slider = document.getElementById('langToggle');
+    if (!slider) return;
+    if (langs.length <= 2){   // common case: CN | EN sliding toggle
+      slider.addEventListener('click', () => switchLang(LANG() === 'zh' ? 'en' : 'zh'));
+      return;
+    }
+    // 3+ languages → swap the slider for a compact dropdown
+    const sel = document.createElement('select');
+    sel.id = 'langSelect'; sel.className = 'lang-select';
+    sel.innerHTML = langs.map(c => `<option value="${c}">${LANG_LABEL[c] || c}</option>`).join('');
+    sel.value = LANG();
+    sel.addEventListener('change', () => switchLang(sel.value));
+    slider.replaceWith(sel);
+  })();
 
   // ============ Initial render ============
+  // (initial language already set above, before the switcher was built)
   renderAll();
   syncTabs();
 
