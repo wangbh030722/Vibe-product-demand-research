@@ -1,0 +1,767 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "slug": "health-ring",
+    "idea": "智能戒指",
+    "mode": "EXISTING",
+    "timestamp": "2026-05-19",
+    "target_market": "US + CN",
+    "collection_window": {
+      "from": "2025-08-01",
+      "to": "2026-05-19"
+    },
+    "thesis": "智能戒指品类已脱离 hype,进入医疗化 vs. 生态化双轨竞争 —— 真实需求底盘扎实,但头部失血,新进入者还有窗口。",
+    "deck": "真实需求底盘扎实,但 Oura 正在失血,新进入者还有 18-24 个月的 FDA 窗口。本报告基于 172 条 raw voice + 38 条 marketplace 评论 + 12 篇媒体测评,跨 5 个玩家。",
+    "idea_en": "Smart Ring",
+    "thesis_en": "The smart ring category has moved beyond hype into a dual-track competition of medicalization vs. ecosystem — real demand is solid, but the leader is bleeding, and new entrants still have a window.",
+    "deck_en": "Real demand is solid, but Oura is bleeding, and new entrants have an 18-24 month FDA window. This report is based on 172 raw voice posts + 38 marketplace reviews + 12 media reviews across 5 players."
+  },
+  "verdict": {
+    "status": "real",
+    "rationale": "L1 jobs-to-be-done (医疗预警) 信号强,单帖 2,903 + 2,507 赞,均独立人证。品类竞争已成熟,但定位空白(中-高价 × FDA 认证)无人占据。",
+    "evidence_counts": {
+      "raw_voices": 14,
+      "marketplace": 4,
+      "editorials": 12,
+      "simulated": 0
+    },
+    "key_findings": [
+      "医疗预警是 L1 jobs-to-be-done。Oura \"saved my life\" 单帖 2,903 赞,\"caught cancer early\" 2,507 赞。这是品类最强信号,任何切入都要绕不开。",
+      "头部正在失血。Oura 隐私事件(Palantir)单帖 3,968 赞 \"Leaving Oura\",大量用户公开向 RingConn / Galaxy 迁移。",
+      "电池是品类级风险。RingConn 戒指爆炸、Samsung Galaxy Ring 胀手指送医、Oura 卡手指去 ER —— 三家都中招。",
+      "订阅费是 PMF 警报。$5.99/月 在 Marketplace 评论里是第一吐槽点(Oura)。Samsung 走\"无订阅\"路线收割了一波。"
+    ],
+    "rationale_en": "L1 jobs-to-be-done (medical alerts) signal is strong, with single posts getting 2,903 and 2,507 upvotes, both independently verified. Category competition is mature, but a positioning gap (mid-to-high price × FDA certification) is unoccupied.",
+    "key_findings_en": [
+      "Medical alerts are the L1 jobs-to-be-done. Oura 'saved my life' single post got 2,903 upvotes, 'caught cancer early' got 2,507. This is the strongest signal in the category; any entry must address it.",
+      "The leader is bleeding. Oura's privacy incident (Palantir) single post got 3,968 upvotes 'Leaving Oura', with many users publicly migrating to RingConn / Galaxy.",
+      "Battery is a category-level risk. RingConn ring explosion, Samsung Galaxy Ring swelling fingers requiring hospital visit, Oura ring stuck on finger — all three have incidents.",
+      "Subscription fee is a PMF alarm. $5.99/month is the top complaint in Marketplace reviews (Oura). Samsung's 'no subscription' route captured a wave."
+    ]
+  },
+  "players": [
+    {
+      "id": "oura",
+      "name": "Oura Ring 4",
+      "color": "#2c2f3a",
+      "size": 26,
+      "x": 0.62,
+      "y": 0.3,
+      "status": "live",
+      "price": "$349-499",
+      "subscription": "$5.99/月",
+      "summary": "AI Advisor + lifestyle 高端定位 · 主导但正在失血",
+      "name_en": "Oura Ring 4",
+      "summary_en": "AI Advisor + lifestyle high-end positioning · Dominant but bleeding"
+    },
+    {
+      "id": "samsung",
+      "name": "Samsung Galaxy Ring",
+      "color": "#4a4e5b",
+      "size": 22,
+      "x": 0.78,
+      "y": 0.4,
+      "status": "live",
+      "price": "$399",
+      "subscription": "无",
+      "summary": "Samsung Health 生态 · 渠道强但产品基本面问题多",
+      "name_en": "Samsung Galaxy Ring",
+      "summary_en": "Samsung Health ecosystem · Strong channel but many product fundamentals issues"
+    },
+    {
+      "id": "ringconn",
+      "name": "RingConn Gen 2",
+      "color": "#4a4e5b",
+      "size": 19,
+      "x": 0.32,
+      "y": 0.55,
+      "status": "live",
+      "price": "$299",
+      "subscription": "无",
+      "summary": "睡眠呼吸暂停检测 · 平价替代 · 承接 Oura 流失",
+      "name_en": "RingConn Gen 2",
+      "summary_en": "Sleep apnea detection · Affordable alternative · Capturing Oura churn"
+    },
+    {
+      "id": "ultrahuman",
+      "name": "Ultrahuman Ring Air",
+      "color": "#6b6f7c",
+      "size": 16,
+      "x": 0.2,
+      "y": 0.3,
+      "status": "live",
+      "price": "$349",
+      "subscription": "无",
+      "summary": "Biohacking / 训练 · 小众但黏性高",
+      "name_en": "Ultrahuman Ring Air",
+      "summary_en": "Biohacking / training · Niche but high stickiness"
+    },
+    {
+      "id": "apple",
+      "name": "Apple Ring (假设)",
+      "color": "#6b6f7c",
+      "size": 17,
+      "x": 0.45,
+      "y": 0.18,
+      "status": "rumored",
+      "summary": "FDA + Health 生态 + 全渠道 · 最大未定变量",
+      "name_en": "Apple Ring (hypothetical)",
+      "summary_en": "FDA + Health ecosystem + omnichannel · Biggest unknown variable"
+    }
+  ],
+  "themes": [
+    {
+      "id": "t.medical",
+      "label": "医疗预警",
+      "color": "#5b7a52",
+      "size": 19,
+      "x": 0.5,
+      "y": 0.5,
+      "polarity": "win",
+      "summary": "L1 用户最在意 jobs-to-be-done · 5,410 赞 voice 顶帖",
+      "label_en": "Medical alerts",
+      "summary_en": "L1 users' top jobs-to-be-done · 5,410 upvotes voice top post"
+    },
+    {
+      "id": "t.privacy",
+      "label": "隐私",
+      "color": "#a0533c",
+      "size": 18,
+      "x": 0.65,
+      "y": 0.55,
+      "polarity": "pain",
+      "summary": "Palantir 事件 · 3,968 赞退订帖 · 品类天花板",
+      "label_en": "Privacy",
+      "summary_en": "Palantir incident · 3,968 upvotes unsubscription post · Category ceiling"
+    },
+    {
+      "id": "t.sub",
+      "label": "订阅费",
+      "color": "#a0533c",
+      "size": 15,
+      "x": 0.78,
+      "y": 0.2,
+      "polarity": "pain",
+      "summary": "Marketplace 第一吐槽 · $5.99/月 · PMF 失配信号",
+      "label_en": "Subscription fee",
+      "summary_en": "Top complaint on Marketplace · $5.99/month · PMF mismatch signal"
+    },
+    {
+      "id": "t.aitone",
+      "label": "AI judgy",
+      "color": "#a0533c",
+      "size": 14,
+      "x": 0.85,
+      "y": 0.32,
+      "polarity": "pain",
+      "summary": "用户嫌 AI 反馈 judgy · 1,629 赞负面",
+      "label_en": "AI judgy",
+      "summary_en": "Users find AI feedback judgy · 1,629 upvotes negative"
+    },
+    {
+      "id": "t.battery",
+      "label": "电池",
+      "color": "#a0533c",
+      "size": 15,
+      "x": 0.5,
+      "y": 0.78,
+      "polarity": "pain",
+      "summary": "RingConn 爆炸 + Samsung 胀手指 + Oura ring stuck · 品类级风险",
+      "label_en": "Battery",
+      "summary_en": "RingConn explosion + Samsung finger swelling + Oura ring stuck · Category-level risk"
+    },
+    {
+      "id": "t.form",
+      "label": "形态",
+      "color": "#80766a",
+      "size": 14,
+      "x": 0.18,
+      "y": 0.62,
+      "polarity": "neutral",
+      "summary": "卡手指 · 淋浴充电 workaround",
+      "label_en": "Form factor",
+      "summary_en": "Ring stuck on finger · Shower charging workaround"
+    },
+    {
+      "id": "t.migration",
+      "label": "迁移",
+      "color": "#5b7a52",
+      "size": 15,
+      "x": 0.4,
+      "y": 0.72,
+      "polarity": "win",
+      "summary": "Oura 老用户向 RingConn / Galaxy 流失",
+      "label_en": "Migration",
+      "summary_en": "Oura old users churning to RingConn / Galaxy"
+    },
+    {
+      "id": "t.lawsuit",
+      "label": "诉讼",
+      "color": "#80766a",
+      "size": 13,
+      "x": 0.2,
+      "y": 0.45,
+      "polarity": "neutral",
+      "summary": "ITC 案件引发 RingConn 社区集体抵制",
+      "label_en": "Litigation",
+      "summary_en": "ITC case triggers collective boycott in RingConn community"
+    }
+  ],
+  "voices": [
+    {
+      "id": "v01",
+      "player": "oura",
+      "title": "Oura saved my life",
+      "score": 2903,
+      "url": "https://www.reddit.com/r/ouraring/comments/1nh3tze/oura_saved_my_life/",
+      "sentiment": "pos",
+      "themes": [
+        "t.medical"
+      ],
+      "x": 0.55,
+      "y": 0.4,
+      "collected_at": "2025-09-18",
+      "title_en": "Oura saved my life"
+    },
+    {
+      "id": "v02",
+      "player": "oura",
+      "title": "Caught cancer early postpartum",
+      "score": 2507,
+      "url": "https://www.reddit.com/r/ouraring/comments/1nyt25l/my_oura_ring_data_legiti/",
+      "sentiment": "pos",
+      "themes": [
+        "t.medical"
+      ],
+      "x": 0.48,
+      "y": 0.42,
+      "collected_at": "2025-09-25",
+      "title_en": "Caught cancer early postpartum"
+    },
+    {
+      "id": "v03",
+      "player": "oura",
+      "title": "Leaving Oura over Palantir",
+      "score": 3968,
+      "url": "https://www.reddit.com/r/ouraring/comments/1n3f33w/leaving_oura_ring_after_/",
+      "sentiment": "neg",
+      "themes": [
+        "t.privacy"
+      ],
+      "x": 0.7,
+      "y": 0.5,
+      "collected_at": "2025-08-22",
+      "title_en": "Leaving Oura over Palantir"
+    },
+    {
+      "id": "v04",
+      "player": "ringconn",
+      "title": "RingConn Gen 2 exploded on finger",
+      "score": 105,
+      "url": "https://www.reddit.com/r/RingConn/comments/1r5eqo6/my_ringconn_ge/",
+      "sentiment": "neg",
+      "themes": [
+        "t.battery"
+      ],
+      "x": 0.42,
+      "y": 0.72,
+      "collected_at": "2025-11-04",
+      "title_en": "RingConn Gen 2 exploded on finger"
+    },
+    {
+      "id": "v05",
+      "player": "samsung",
+      "title": "Galaxy Ring battery swelling stuck on finger",
+      "score": 8,
+      "url": "https://9to5google.com/2025/09/29/swollen-galaxy-ring-battery/",
+      "sentiment": "neg",
+      "themes": [
+        "t.battery"
+      ],
+      "x": 0.58,
+      "y": 0.75,
+      "collected_at": "2025-09-29",
+      "title_en": "Galaxy Ring battery swelling stuck on finger"
+    },
+    {
+      "id": "v06",
+      "player": "ringconn",
+      "title": "I returned my Oura, got RingConn Air",
+      "score": 118,
+      "url": "https://www.reddit.com/r/RingConn/comments/1q9kbc8/got_my_new_rin/",
+      "sentiment": "pos",
+      "themes": [
+        "t.migration"
+      ],
+      "x": 0.35,
+      "y": 0.68,
+      "collected_at": "2025-10-21",
+      "title_en": "I returned my Oura, got RingConn Air"
+    },
+    {
+      "id": "v07",
+      "player": "ringconn",
+      "title": "Not supporting Oura!",
+      "score": 184,
+      "url": "https://www.reddit.com/r/RingConn/comments/1my1deg/not_supporting/",
+      "sentiment": "neg",
+      "themes": [
+        "t.lawsuit"
+      ],
+      "x": 0.22,
+      "y": 0.48,
+      "collected_at": "2025-08-14",
+      "title_en": "Not supporting Oura!"
+    },
+    {
+      "id": "v08",
+      "player": "ringconn",
+      "title": "Wish there was an 'I'm sick' button",
+      "score": 114,
+      "url": "https://www.reddit.com/r/RingConn/comments/1s9ixa2/wish_there_was/",
+      "sentiment": "neg",
+      "themes": [
+        "t.aitone"
+      ],
+      "x": 0.8,
+      "y": 0.36,
+      "collected_at": "2025-12-02",
+      "title_en": "Wish there was an 'I'm sick' button"
+    },
+    {
+      "id": "v09",
+      "player": "ringconn",
+      "title": "I cried for an hour, my ring thought I was biking",
+      "score": 184,
+      "url": "https://www.reddit.com/r/RingConn/comments/1t1xksd/i_cried_for_al/",
+      "sentiment": "pos",
+      "themes": [
+        "t.aitone"
+      ],
+      "x": 0.82,
+      "y": 0.42,
+      "collected_at": "2026-01-18",
+      "title_en": "I cried for an hour, my ring thought I was biking"
+    },
+    {
+      "id": "v10",
+      "player": "oura",
+      "title": "Ring stuck on finger → ER",
+      "score": 1740,
+      "url": "https://www.reddit.com/r/ouraring/comments/1qtx7tt/finale_update_help_my_ri/",
+      "sentiment": "neg",
+      "themes": [
+        "t.form"
+      ],
+      "x": 0.22,
+      "y": 0.62,
+      "collected_at": "2025-10-30",
+      "title_en": "Ring stuck on finger → ER"
+    },
+    {
+      "id": "v11",
+      "player": "oura",
+      "title": "Charging in the shower workaround",
+      "score": 1635,
+      "url": "https://www.reddit.com/r/ouraring/comments/1suis9d/i_almost_had_to_get_nake/",
+      "sentiment": "pos",
+      "themes": [
+        "t.form"
+      ],
+      "x": 0.15,
+      "y": 0.6,
+      "collected_at": "2025-12-15",
+      "title_en": "Charging in the shower workaround"
+    },
+    {
+      "id": "v12",
+      "player": "oura",
+      "title": "Give us a 'bitchy/funny/ironic' toggle",
+      "score": 940,
+      "url": "https://www.reddit.com/r/ouraring/comments/1ta568e/ate_a_family_sized_bag_o/",
+      "sentiment": "neg",
+      "themes": [
+        "t.aitone"
+      ],
+      "x": 0.88,
+      "y": 0.32,
+      "collected_at": "2026-02-04",
+      "title_en": "Give us a 'bitchy/funny/ironic' toggle"
+    },
+    {
+      "id": "v13",
+      "player": "oura",
+      "title": "$5.99/月 不值",
+      "score": 1761,
+      "url": "https://www.reddit.com/r/ouraring/comments/1qx13mj/if_you_were_on_the_fence/",
+      "sentiment": "neg",
+      "themes": [
+        "t.sub"
+      ],
+      "x": 0.72,
+      "y": 0.2,
+      "collected_at": "2025-10-26",
+      "title_en": "$5.99/月 不值"
+    },
+    {
+      "id": "v14",
+      "player": "samsung",
+      "title": "Samsung Community: 'Worst Samsung product ever'",
+      "score": 40,
+      "url": "https://us.community.samsung.com/t5/Galaxy-Ring/Worst-Samsung-product-ever/m-p/3568427",
+      "sentiment": "neg",
+      "themes": [
+        "t.battery",
+        "t.sub"
+      ],
+      "x": 0.65,
+      "y": 0.65,
+      "collected_at": "2025-11-12",
+      "title_en": "Samsung Community: 'Worst Samsung product ever'"
+    }
+  ],
+  "opportunity": {
+    "id": "opp",
+    "label": "★ 空白机会区",
+    "color": "#5b7a52",
+    "size": 30,
+    "x": 0.42,
+    "y": 0.2,
+    "summary": "中-高价 × FDA 认证 / 医疗级 / 保险报销 · 没有玩家占据 · 新进入者最该切的位置",
+    "label_en": "★ White space opportunity",
+    "summary_en": "Mid-to-high price × FDA certification / medical grade / insurance reimbursement · No player occupies · Best position for new entrants"
+  },
+  "edges": [
+    {
+      "from": "oura",
+      "to": "t.medical",
+      "w": 3
+    },
+    {
+      "from": "oura",
+      "to": "t.privacy",
+      "w": 3
+    },
+    {
+      "from": "oura",
+      "to": "t.sub",
+      "w": 3
+    },
+    {
+      "from": "oura",
+      "to": "t.aitone",
+      "w": 2
+    },
+    {
+      "from": "oura",
+      "to": "t.form",
+      "w": 2
+    },
+    {
+      "from": "samsung",
+      "to": "t.battery",
+      "w": 3
+    },
+    {
+      "from": "samsung",
+      "to": "t.sub",
+      "w": 1
+    },
+    {
+      "from": "samsung",
+      "to": "t.migration",
+      "w": 2
+    },
+    {
+      "from": "ringconn",
+      "to": "t.battery",
+      "w": 2
+    },
+    {
+      "from": "ringconn",
+      "to": "t.migration",
+      "w": 3
+    },
+    {
+      "from": "ringconn",
+      "to": "t.lawsuit",
+      "w": 3
+    },
+    {
+      "from": "ringconn",
+      "to": "t.aitone",
+      "w": 2
+    },
+    {
+      "from": "ultrahuman",
+      "to": "t.lawsuit",
+      "w": 1
+    },
+    {
+      "from": "apple",
+      "to": "opp",
+      "w": 2
+    },
+    {
+      "from": "v01",
+      "to": "t.medical",
+      "w": 1
+    },
+    {
+      "from": "v02",
+      "to": "t.medical",
+      "w": 1
+    },
+    {
+      "from": "v03",
+      "to": "t.privacy",
+      "w": 1
+    },
+    {
+      "from": "v04",
+      "to": "t.battery",
+      "w": 1
+    },
+    {
+      "from": "v05",
+      "to": "t.battery",
+      "w": 1
+    },
+    {
+      "from": "v06",
+      "to": "t.migration",
+      "w": 1
+    },
+    {
+      "from": "v07",
+      "to": "t.lawsuit",
+      "w": 1
+    },
+    {
+      "from": "v08",
+      "to": "t.aitone",
+      "w": 1
+    },
+    {
+      "from": "v09",
+      "to": "t.aitone",
+      "w": 1
+    },
+    {
+      "from": "v12",
+      "to": "t.aitone",
+      "w": 1
+    },
+    {
+      "from": "v10",
+      "to": "t.form",
+      "w": 1
+    },
+    {
+      "from": "v11",
+      "to": "t.form",
+      "w": 1
+    },
+    {
+      "from": "v13",
+      "to": "t.sub",
+      "w": 1
+    },
+    {
+      "from": "v14",
+      "to": "t.battery",
+      "w": 1
+    },
+    {
+      "from": "t.medical",
+      "to": "opp",
+      "w": 3
+    },
+    {
+      "from": "t.privacy",
+      "to": "opp",
+      "w": 2
+    }
+  ],
+  "marketplace": [
+    {
+      "player": "oura",
+      "platform": "Amazon US",
+      "rating": 4.3,
+      "review_count": 12847,
+      "top_complaints": [
+        "订阅费",
+        "续航",
+        "划痕"
+      ],
+      "top_praises": [
+        "医疗预警",
+        "睡眠数据准"
+      ],
+      "url": "https://www.amazon.com/Oura-Ring-Health-Tracker/dp/B0B9PKB89X",
+      "collected_at": "2026-05-15"
+    },
+    {
+      "player": "samsung",
+      "platform": "Samsung Community + Amazon",
+      "rating": 3.6,
+      "review_count": 3420,
+      "top_complaints": [
+        "做工",
+        "电池",
+        "与 Watch 重复"
+      ],
+      "top_praises": [
+        "无订阅",
+        "生态整合"
+      ],
+      "url": "https://us.community.samsung.com/t5/Galaxy-Ring/bd-p/galaxy-ring",
+      "collected_at": "2026-05-12"
+    },
+    {
+      "player": "ringconn",
+      "platform": "Amazon US",
+      "rating": 4.1,
+      "review_count": 2180,
+      "top_complaints": [
+        "APP 稳定性",
+        "物流"
+      ],
+      "top_praises": [
+        "性价比",
+        "无订阅"
+      ],
+      "url": "https://www.amazon.com/RingConn-Gen-2-Smart-Ring/dp/B0CW6BCWPK",
+      "collected_at": "2026-05-15"
+    },
+    {
+      "player": "ultrahuman",
+      "platform": "Amazon US",
+      "rating": 4.1,
+      "review_count": 1082,
+      "top_complaints": [
+        "学习曲线",
+        "数据解读门槛"
+      ],
+      "top_praises": [
+        "代谢追踪",
+        "无订阅"
+      ],
+      "url": "https://www.amazon.com/Ultrahuman-Ring-Air/dp/B0BX31KRLW",
+      "collected_at": "2026-05-15"
+    }
+  ],
+  "paths": [
+    {
+      "id": "path-a",
+      "label": "Path A · 医疗级 SaMD",
+      "core": "FDA 510(k) → 房颤 / 睡眠呼吸暂停 → 保险渠道",
+      "description": "对接最强 voice,绕开消费品价格战,有牢固的护城河",
+      "time": "18-24 个月",
+      "investment": "$1-3M",
+      "moat": "extreme",
+      "recommended": true,
+      "label_en": "Path A · Medical-grade SaMD",
+      "core_en": "FDA 510(k) → Atrial fibrillation / sleep apnea → Insurance channel",
+      "description_en": "Aligns with strongest voice, avoids consumer price war, has solid moat"
+    },
+    {
+      "id": "path-b",
+      "label": "Path B · 隐私优先消费品",
+      "core": "本地推理 + 数据自托管 + 一次性买断",
+      "description": "直接吃 Oura 失血人群;短期可上市,但天花板低",
+      "time": "6-9 个月",
+      "investment": "$300-600k",
+      "moat": "mid",
+      "recommended": false,
+      "label_en": "Path B · Privacy-first consumer product",
+      "core_en": "On-device inference + self-hosted data + one-time purchase",
+      "description_en": "Directly captures Oura churn; short time to market but low ceiling"
+    },
+    {
+      "id": "path-c",
+      "label": "Path C · 形态创新",
+      "core": "指环 → 项链 / 贴片",
+      "description": "避开品类级电池/卡手指风险;但脱离戒指心智,重新做品类教育",
+      "time": "12 个月",
+      "investment": "$500k-1M",
+      "moat": "low",
+      "recommended": false,
+      "label_en": "Path C · Form factor innovation",
+      "core_en": "Ring → Necklace / Patch",
+      "description_en": "Avoids category-level battery/ring-stuck risks; but leaves ring mindshare, requires re-education"
+    }
+  ],
+  "risks": [
+    {
+      "id": "R-01",
+      "title": "Apple Ring 入场",
+      "scenario": "18 个月内官宣 · 直接压价 + 渠道挤压",
+      "severity": "high",
+      "mitigation": "抢 FDA 时间窗 · 聚焦 Apple 不做的医疗适应症",
+      "title_en": "Apple Ring entry",
+      "scenario_en": "Announcement within 18 months · Direct price pressure + channel squeeze",
+      "mitigation_en": "Seize FDA time window · Focus on medical indications Apple won't do"
+    },
+    {
+      "id": "R-02",
+      "title": "电池物理失败",
+      "scenario": "3 家已中招 · 监管介入概率上升",
+      "severity": "high",
+      "mitigation": "选用更保守电池方案 · 主动召回 SOP",
+      "title_en": "Battery physical failure",
+      "scenario_en": "3 players already hit · Regulatory intervention probability rising",
+      "mitigation_en": "Choose more conservative battery solution · Proactive recall SOP"
+    },
+    {
+      "id": "R-03",
+      "title": "FDA 路径延期",
+      "scenario": "510(k) 审评意外 → 18 个月变 30 个月",
+      "severity": "mid",
+      "mitigation": "De Novo 路径备选 · 并行做 EU MDR",
+      "title_en": "FDA path delay",
+      "scenario_en": "510(k) review surprise → 18 months becomes 30 months",
+      "mitigation_en": "De Novo path as backup · Parallel EU MDR"
+    },
+    {
+      "id": "R-04",
+      "title": "订阅费抗议蔓延",
+      "scenario": "SaaS 模式社区抵制扩大",
+      "severity": "mid",
+      "mitigation": "买断或诊疗收费,不走月费",
+      "title_en": "Subscription fee backlash spreading",
+      "scenario_en": "SaaS model community resistance expands",
+      "mitigation_en": "One-time purchase or treatment-based billing, no monthly fee"
+    },
+    {
+      "id": "R-05",
+      "title": "诉讼连锁",
+      "scenario": "Oura ITC 案件后,新玩家可能成新目标",
+      "severity": "low",
+      "mitigation": "专利 FTO 提前调研",
+      "title_en": "Litigation chain",
+      "scenario_en": "After Oura ITC case, new players may become targets",
+      "mitigation_en": "Patent FTO research in advance"
+    }
+  ],
+  "failures": [
+    {
+      "name": "Motiv Ring",
+      "years": "2017-2019",
+      "what": "个人健康追踪定位 · 被 Proxy 收购转向身份认证",
+      "lesson": "没有医疗或生态护城河的消费品定位无法 sustain",
+      "name_en": "Motiv Ring",
+      "what_en": "Personal health tracking positioning · Acquired by Proxy, pivoted to identity authentication",
+      "lesson_en": "Consumer positioning without medical or ecosystem moat cannot sustain"
+    },
+    {
+      "name": "Amazon Halo Rise / Band",
+      "years": "2020-2023",
+      "what": "大厂入场尝试 · 因隐私争议 + 无医疗护城河退场",
+      "lesson": "渠道再强,信任挡板倒了就一切归零",
+      "name_en": "Amazon Halo Rise / Band",
+      "what_en": "Big tech entry attempt · Exited due to privacy controversy + no medical moat",
+      "lesson_en": "No matter how strong the channel, if trust barrier falls, everything goes to zero"
+    }
+  ]
+}

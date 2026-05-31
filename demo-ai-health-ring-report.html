@@ -1,0 +1,2181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>智能戒指 · 品类研究 (For Product Teams)</title>
+<style>
+  :root {
+    --bg: #fafaf7; --ink: #14171c; --muted: #5a606a; --soft: #9aa0aa;
+    --line: #e1e3e7; --line-strong: #1f242c;
+    --paper: #ffffff;
+    --bg-warm: #f5f1ea;
+    --accent: #c2410c; --accent-soft: #fdf3ed;
+    --good: #14532d; --good-soft: #ecf3ef;
+    --amber: #92400e; --amber-soft: #fdf5e9;
+    --serif: "Source Han Serif SC","Noto Serif SC","Songti SC",Georgia,serif;
+    --sans: "PingFang SC","Hiragino Sans GB","Microsoft YaHei",Inter,system-ui,sans-serif;
+    --mono: "SFMono-Regular","Roboto Mono",Consolas,monospace;
+    --en: "Iowan Old Style","Source Serif Pro",Georgia,serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  html { font-family: var(--sans); font-size: 14.5px; line-height: 1.7; }
+  a { color: inherit; }
+  a.ref { border-bottom: 1px solid var(--line); text-decoration: none; }
+  a.ref:hover { border-color: var(--ink); }
+
+  .doc { max-width: 1100px; margin: 0 auto; padding: 32px 48px 80px; }
+
+  /* ===== MASTHEAD ===== */
+  .masthead {
+    display: grid; grid-template-columns: 1fr auto; gap: 24px;
+    padding: 16px 0 14px; border-bottom: 1px solid var(--line);
+    margin-bottom: 48px;
+  }
+  .masthead .firm { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+  .masthead .firm strong { color: var(--ink); }
+  .masthead .meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; color: var(--soft); text-align: right; line-height: 1.7; }
+  .masthead .meta strong { color: var(--ink); }
+
+  /* ===== COVER ===== */
+  .cover { padding: 0 0 56px; border-bottom: 1px solid var(--line); }
+  .cover .kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 20px; }
+  h1.cover-title { font-family: var(--serif); font-weight: 700; font-size: clamp(32px, 4vw, 44px); line-height: 1.18; letter-spacing: -0.01em; margin: 0 0 16px; max-width: 920px; }
+  .cover-deck { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(16px, 1.5vw, 19px); line-height: 1.55; color: var(--muted); margin: 0 0 28px; max-width: 800px; }
+  .cover-audience { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--muted); padding: 6px 12px; border: 1px solid var(--line); }
+  .cover-audience strong { color: var(--ink); }
+
+  /* ===== TLDR ===== */
+  .tldr { background: var(--paper); border: 1px solid var(--line); padding: 28px 32px; margin: 36px 0 0; border-left: 4px solid var(--accent); }
+  .tldr .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
+  .tldr h3 { font-family: var(--serif); font-weight: 700; font-size: 19px; margin: 0 0 18px; }
+  .tldr .verdict-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 0 18px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .tldr .verdict-grid .vg-cell .lblmini { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); margin-bottom: 4px; }
+  .tldr .verdict-grid .vg-cell .vgval { font-family: var(--serif); font-weight: 700; font-size: 16px; }
+  .tldr .verdict-grid .vg-cell .vgval.warn { color: var(--accent); }
+  .tldr .verdict-grid .vg-cell .vgval.good { color: var(--good); }
+  .tldr .verdict-grid .vg-cell .vgval.amber { color: var(--amber); }
+  .tldr ol { margin: 0; padding-left: 0; counter-reset: pt; list-style: none; }
+  .tldr li { counter-increment: pt; padding: 12px 0 12px 36px; position: relative; border-top: 1px dashed var(--line); line-height: 1.6; }
+  .tldr li:first-child { border-top: 0; }
+  .tldr li::before { content: counter(pt); position: absolute; left: 0; top: 14px; width: 22px; height: 22px; border: 1.5px solid var(--accent); border-radius: 50%; text-align: center; line-height: 19px; font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--accent); }
+  .tldr li strong { color: var(--ink); }
+  .tldr li em { font-style: normal; color: var(--accent); font-weight: 600; }
+
+  /* ===== SECTION ===== */
+  section.chapter { padding: 64px 0 0; }
+  h2.h2 { font-family: var(--serif); font-weight: 700; font-size: clamp(22px, 2.6vw, 28px); line-height: 1.3; margin: 0 0 8px; }
+  h2.h2 .secnum { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--accent); letter-spacing: 0.1em; margin-right: 12px; }
+  .h2-sub { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--muted); margin: 0 0 26px; }
+  .h2-rule { height: 1px; background: var(--ink); width: 100%; margin: 14px 0 28px; }
+  h3.h3 { font-family: var(--sans); font-weight: 700; font-size: 16.5px; margin: 32px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  h3.h3 .secnum { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--accent); margin-right: 10px; }
+  p { margin: 0 0 14px; max-width: 820px; }
+  p strong { font-weight: 700; }
+
+  /* ===== PERSONA CARDS ===== */
+  .personas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 28px 0; }
+  .persona { background: var(--paper); border: 1px solid var(--line); padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+  .persona .ptag { display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; padding: 3px 8px; background: var(--bg-warm); color: var(--muted); width: max-content; }
+  .persona h4 { margin: 4px 0 0; font-family: var(--serif); font-weight: 700; font-size: 17px; }
+  .persona .summary { font-size: 13px; color: var(--muted); font-style: italic; margin: 0 0 4px; }
+  .persona .row { display: grid; grid-template-columns: 56px 1fr; gap: 8px; font-size: 12.5px; line-height: 1.5; padding: 6px 0; border-top: 1px solid var(--line); }
+  .persona .row:first-of-type { border-top: 0; }
+  .persona .row .k { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); padding-top: 2px; }
+  .persona .row .v strong { font-weight: 600; }
+
+  /* ===== JTBD STACK ===== */
+  .jtbd-table { margin: 24px 0; }
+  .jtbd-row { display: grid; grid-template-columns: 60px 1fr 200px 140px; gap: 16px; align-items: center; padding: 14px 18px; border: 1px solid var(--line); background: var(--paper); margin-bottom: 6px; }
+  .jtbd-row .lvl { font-family: var(--mono); font-weight: 700; font-size: 13px; color: var(--accent); letter-spacing: 0.06em; }
+  .jtbd-row .what strong { display: block; font-size: 14.5px; margin-bottom: 3px; }
+  .jtbd-row .what em { font-style: normal; color: var(--muted); font-size: 12.5px; }
+  .jtbd-row .vstrength { font-family: var(--mono); font-size: 12px; color: var(--ink); text-align: right; }
+  .jtbd-row .vstrength em { color: var(--muted); font-style: normal; font-size: 11px; display: block; margin-top: 2px; }
+  .jtbd-row .tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; padding: 5px 9px; text-align: center; text-transform: uppercase; }
+  .jtbd-row .tag.good { background: var(--good-soft); color: var(--good); }
+  .jtbd-row .tag.warn { background: var(--accent-soft); color: var(--accent); }
+  .jtbd-row .tag.amber { background: var(--amber-soft); color: var(--amber); }
+  .jtbd-row .tag.missing { background: var(--bg-warm); color: var(--muted); border: 1px dashed var(--line); }
+
+  /* ===== BAR CHART ===== */
+  .chart-wrap { margin: 28px 0 24px; padding: 24px 28px; background: var(--paper); border: 1px solid var(--line); }
+  .chart-wrap .ch-eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; font-weight: 700; }
+  .chart-wrap h4 { font-family: var(--serif); font-weight: 700; font-size: 18px; margin: 0 0 6px; }
+  .chart-wrap .subhead { font-family: var(--sans); font-size: 12.5px; color: var(--muted); margin: 0 0 22px; }
+  .chart-row { display: grid; grid-template-columns: 240px 1fr 60px; gap: 14px; align-items: center; padding: 9px 0; font-size: 13px; }
+  .chart-row + .chart-row { border-top: 1px solid var(--line); }
+  .chart-row .topic { font-weight: 600; line-height: 1.35; }
+  .chart-row .topic em { font-style: normal; color: var(--muted); font-weight: 400; font-size: 11.5px; display: block; margin-top: 2px; }
+  .chart-row .bar { height: 18px; background: var(--ink); }
+  .chart-row .bar.warn { background: var(--accent); }
+  .chart-row .bar.muted { background: var(--soft); }
+  .chart-row .val { font-family: var(--mono); font-size: 12px; color: var(--ink); text-align: right; font-weight: 700; }
+  .chart-caption { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+  .chart-caption strong { color: var(--ink); }
+
+  /* ===== ▼ DATA-STYLE EXPANDABLE TABLES · 统一表格式 ===== */
+  .dt-wrap { margin: 20px 0; border: 1px solid var(--line); background: var(--paper); }
+  .dt-head, details.drow > summary {
+    display: grid; align-items: center; gap: 16px;
+    padding: 11px 18px;
+  }
+  .dt-head {
+    background: var(--ink); color: var(--bg);
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em;
+    text-transform: uppercase; font-weight: 600;
+  }
+
+  /* Voice table grid: [类型 80][主题 1fr][场景 200][赞数 70][+ 22] */
+  .voice-table .dt-head,
+  .voice-table details.drow > summary {
+    grid-template-columns: 80px 1fr 200px 70px 22px;
+  }
+  /* Marketplace table grid: [评价 60][主题 1fr][玩家 130][量化 110][来源 140][+ 22] */
+  .mkt-table .dt-head,
+  .mkt-table details.drow > summary {
+    grid-template-columns: 60px 1fr 130px 110px 140px 22px;
+  }
+
+  details.drow { border-top: 1px solid var(--line); background: var(--paper); }
+  details.drow > summary {
+    cursor: pointer; list-style: none;
+    transition: background 160ms;
+    font-family: var(--sans);
+  }
+  details.drow > summary:hover { background: var(--bg-warm); }
+  details.drow[open] > summary { background: var(--bg-warm); }
+  details.drow > summary::-webkit-details-marker { display: none; }
+
+  /* Sentiment dot (used in both tables) */
+  .sent-dot {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 10.5px;
+    letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600;
+  }
+  .sent-dot::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+    background: var(--muted);
+  }
+  .sent-dot.pos { color: var(--good); }
+  .sent-dot.pos::before { background: var(--good); }
+  .sent-dot.neg { color: var(--accent); }
+  .sent-dot.neg::before { background: var(--accent); }
+
+  /* Row text */
+  .dt-title { font-size: 13.5px; font-weight: 600; line-height: 1.45; }
+  .dt-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.03em; }
+  .dt-num { font-family: var(--mono); font-size: 12px; font-weight: 700; text-align: right; color: var(--ink); }
+  .dt-exp { font-family: var(--mono); font-size: 16px; color: var(--soft); text-align: center; transition: transform 180ms; }
+  details.drow[open] > summary .dt-exp { transform: rotate(45deg); }
+
+  /* Expanded body — clean two-language stack */
+  details.drow > .dt-body {
+    padding: 4px 24px 20px 24px;
+    border-top: 1px dashed var(--line);
+  }
+  .dt-lang-row {
+    display: grid; grid-template-columns: 90px 1fr; gap: 18px;
+    padding: 12px 0; border-top: 1px solid var(--line);
+  }
+  .dt-lang-row:first-child { border-top: 0; }
+  .dt-lang-lbl {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--soft); padding-top: 2px;
+  }
+  .dt-en { font-family: var(--en); font-style: italic; font-size: 13.5px; line-height: 1.65; color: var(--ink); margin: 0; }
+  .dt-cn { font-family: var(--sans); font-size: 13px; line-height: 1.75; color: var(--ink); margin: 0; }
+  .dt-sig { font-size: 12.5px; line-height: 1.6; color: var(--muted); margin: 0; padding: 10px 14px; background: var(--bg-warm); }
+  .dt-sig strong { color: var(--ink); }
+  .dt-src { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--soft); text-transform: uppercase; }
+  .dt-src a { color: var(--muted); border-bottom: 1px solid var(--line); text-decoration: none; }
+
+  /* Top toolbar */
+  .toggle-bar { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+  .toggle-btn {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--paper); border: 1px solid var(--line); color: var(--muted);
+    padding: 5px 11px; cursor: pointer;
+  }
+  .toggle-btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .toggle-hint {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.04em;
+    color: var(--soft); margin-left: auto;
+  }
+
+  /* ===== COMPETITIVE TABLE ===== */
+  table.data { width: 100%; border-collapse: collapse; font-size: 12.5px; background: var(--paper); }
+  table.data th, table.data td { padding: 10px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); line-height: 1.5; }
+  table.data thead th { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); font-weight: 600; border-bottom: 1px solid var(--line-strong); }
+  table.data tbody td:first-child { font-weight: 600; }
+  table.data .num { font-family: var(--mono); text-align: right; }
+  table.data .tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.04em; padding: 2px 6px; display: inline-block; }
+  table.data .tag.good { background: var(--good-soft); color: var(--good); }
+  table.data .tag.warn { background: var(--accent-soft); color: var(--accent); }
+  table.data .tag.amber { background: var(--amber-soft); color: var(--amber); }
+  table.data .tag.muted { background: var(--bg-warm); color: var(--muted); }
+
+  /* ===== DIAGNOSTIC CARDS ===== */
+  .diag { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .diag-card { background: var(--paper); border: 1px solid var(--line); padding: 22px; }
+  .diag-card .who { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); font-weight: 700; padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+  .diag-card h5 { margin: 0 0 6px; font-size: 14.5px; font-weight: 700; }
+  .diag-card .group { margin-top: 12px; }
+  .diag-card .group-lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); margin-bottom: 4px; }
+  .diag-card ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.55; }
+  .diag-card ul li { margin: 3px 0; }
+  .diag-card .pro { color: var(--good); }
+  .diag-card .con { color: var(--accent); }
+
+  /* ===== POSITIONING CHART ===== */
+  .positioning-chart {
+    background: var(--paper); border: 1px solid var(--line);
+    padding: 24px; margin: 24px 0;
+  }
+  .chart-legend {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 24px;
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line);
+    font-size: 12px; color: var(--muted);
+  }
+  .chart-legend .lg-row { display: flex; align-items: center; gap: 10px; }
+  .chart-legend .lg-dot {
+    width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+  }
+  .chart-legend .lg-ring { background: transparent !important; border: 2px dashed; }
+  .positioning-chart .chart-caption {
+    margin-top: 16px; padding: 12px 16px;
+    background: var(--bg-warm); font-size: 12.5px; line-height: 1.7;
+    color: var(--muted);
+  }
+  .positioning-chart .chart-caption strong { color: var(--ink); }
+
+  /* ===== OPP MAP (legacy) ===== */
+  .opp-map { background: var(--paper); border: 1px solid var(--line); padding: 28px; margin: 28px 0; }
+  .opp-map h4 { margin: 0 0 12px; font-family: var(--serif); font-weight: 700; font-size: 18px; }
+  .opp-map .opp-row { display: grid; grid-template-columns: 180px 1fr; gap: 18px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .opp-map .opp-row:first-of-type { border-top: 0; }
+  .opp-map .opp-row .opp-lbl { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+  .opp-map .opp-row .opp-lbl strong { display: block; color: var(--ink); font-size: 13px; margin-bottom: 4px; font-family: var(--sans); letter-spacing: 0; text-transform: none; font-weight: 700; }
+  .opp-map .opp-row .opp-desc { font-size: 13.5px; line-height: 1.6; }
+  .opp-map .opp-row.win { background: var(--good-soft); margin: 8px -16px; padding: 18px 16px; border-top: none; border-radius: 2px; }
+  .opp-map .opp-row.win .opp-lbl strong { color: var(--good); }
+  .opp-map .opp-row.win .opp-desc { font-weight: 500; }
+
+  /* ===== CAPABILITY STACK ===== */
+  .cap-stack { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 24px 0; }
+  .cap-block { background: var(--paper); border: 1px solid var(--line); padding: 18px 22px; border-top: 3px solid var(--ink); }
+  .cap-block.must { border-top-color: var(--accent); }
+  .cap-block.partner { border-top-color: var(--amber); }
+  .cap-block h5 { margin: 0 0 4px; font-family: var(--sans); font-weight: 700; font-size: 14.5px; }
+  .cap-block .ctag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); margin-bottom: 8px; display: block; }
+  .cap-block ul { margin: 0; padding-left: 16px; font-size: 13px; line-height: 1.6; }
+  .cap-block li { margin: 4px 0; }
+  .cap-block li strong { color: var(--ink); }
+
+  /* ===== RISK ROWS ===== */
+  .risk-row { display: grid; grid-template-columns: 80px 1fr 110px; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .risk-row:first-of-type { border-top: 0; }
+  .risk-row .rno { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+  .risk-row .rdesc { font-size: 13px; line-height: 1.6; }
+  .risk-row .rdesc strong { display: block; margin-bottom: 4px; font-size: 13.5px; }
+  .risk-row .rsev { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; text-align: right; color: var(--muted); }
+  .risk-row .rsev strong { color: var(--ink); display: block; font-size: 12px; margin-bottom: 2px; }
+
+  /* ===== APPENDIX ===== */
+  details.app { border: 1px solid var(--line); padding: 16px 22px; margin-top: 12px; background: var(--paper); }
+  details.app summary { cursor: pointer; list-style: none; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); font-weight: 700; display: flex; justify-content: space-between; }
+  details.app summary::-webkit-details-marker { display: none; }
+  details.app summary::after { content: "+"; font-family: var(--mono); font-size: 18px; }
+  details.app[open] summary::after { content: "−"; }
+  details.app > div { padding-top: 14px; margin-top: 12px; border-top: 1px solid var(--line); }
+  details.app .en { font-family: var(--en); font-style: italic; }
+  details.app .src { font-family: var(--mono); font-size: 10.5px; color: var(--soft); white-space: nowrap; }
+
+  .method { margin-top: 56px; padding: 22px 0 0; border-top: 2px solid var(--ink); font-family: var(--mono); font-size: 10.5px; line-height: 1.75; color: var(--muted); letter-spacing: 0.02em; }
+  .method strong { color: var(--ink); }
+
+  @media (max-width: 820px) {
+    .doc { padding: 24px 20px 60px; }
+    .personas, .diag, .cap-stack { grid-template-columns: 1fr; }
+    .voice-table .dt-head, .voice-table details.drow > summary { grid-template-columns: 70px 1fr 60px 20px; gap: 10px; padding: 10px 12px; }
+    .voice-table .dt-head > div:nth-child(3), .voice-table details.drow > summary > *:nth-child(3) { display: none; }
+    .mkt-table .dt-head, .mkt-table details.drow > summary { grid-template-columns: 60px 1fr 90px 20px; gap: 10px; padding: 10px 12px; }
+    .mkt-table .dt-head > div:nth-child(3), .mkt-table .dt-head > div:nth-child(5), .mkt-table details.drow > summary > *:nth-child(3), .mkt-table details.drow > summary > *:nth-child(5) { display: none; }
+    .dt-lang-row { grid-template-columns: 1fr; gap: 6px; }
+    .tldr .verdict-grid { grid-template-columns: repeat(2, 1fr); }
+    .jtbd-row { grid-template-columns: 50px 1fr; }
+    .jtbd-row .vstrength, .jtbd-row .tag { grid-column: 2 / 3; justify-self: start; }
+  }
+
+  /* ======================================================
+     INTERACTIVE LAYER (MiroFish-inspired)
+     ====================================================== */
+
+  /* ===== A. PROCESS BAR ===== */
+  .process-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--ink); color: var(--bg);
+    padding: 0; border-bottom: 1px solid var(--line-strong);
+  }
+  .pb-inner {
+    max-width: 1100px; margin: 0 auto; padding: 12px 48px;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 0;
+    align-items: center;
+  }
+  .pb-step {
+    position: relative; display: flex; align-items: center; gap: 10px;
+    padding: 6px 0;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: rgba(250,250,247,0.45);
+    cursor: pointer; transition: color 200ms;
+    text-decoration: none;
+  }
+  .pb-step:hover { color: rgba(250,250,247,0.85); }
+  .pb-step.active { color: var(--bg); }
+  .pb-step .pb-num {
+    width: 22px; height: 22px; border: 1.5px solid currentColor;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 10.5px; font-weight: 700; flex-shrink: 0;
+  }
+  .pb-step.active .pb-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .pb-step .pb-lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pb-step::after {
+    content: ""; position: absolute; right: -6px; top: 50%;
+    width: 12px; height: 1px; background: rgba(250,250,247,0.2);
+    transform: translateY(-50%);
+  }
+  .pb-step:last-child::after { display: none; }
+
+  /* ===== B. KNOWLEDGE GRAPH ===== */
+  .kg-section { padding: 56px 0 0; border-top: 1px solid var(--line); }
+  .kg-section h3.h3 .secnum { color: #1e4d8a; }
+  .kg-wrap {
+    margin: 16px 0; border: 1px solid var(--line-strong); background: var(--paper);
+    display: grid; grid-template-columns: 1fr 320px; gap: 0;
+    min-height: 520px;
+  }
+  .kg-graph { position: relative; overflow: hidden; }
+  .kg-svg { width: 100%; height: 520px; display: block; cursor: grab; }
+  .kg-svg:active { cursor: grabbing; }
+  .kg-node circle { transition: r 200ms, opacity 200ms, stroke-width 200ms; cursor: pointer; }
+  .kg-node text {
+    pointer-events: none; user-select: none;
+    font-family: var(--sans); font-size: 11px; font-weight: 600;
+    fill: var(--ink);
+  }
+  .kg-node.kg-faded circle { opacity: 0.18; }
+  .kg-node.kg-faded text { opacity: 0.25; }
+  .kg-node.kg-active circle { stroke-width: 3; }
+  .kg-edge { stroke: #c9cdd2; stroke-width: 1; transition: stroke 200ms, opacity 200ms; }
+  .kg-edge.kg-faded { opacity: 0.1; }
+  .kg-edge.kg-active { stroke: var(--accent); stroke-width: 1.5; opacity: 1; }
+  .kg-side {
+    border-left: 1px solid var(--line); padding: 20px 22px;
+    overflow-y: auto; max-height: 520px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .kg-side .kg-empty {
+    color: var(--soft); font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.7;
+  }
+  .kg-side h5 {
+    font-family: var(--serif); font-weight: 700; font-size: 17px;
+    margin: 0 0 6px; line-height: 1.3;
+  }
+  .kg-side .kg-tag {
+    display: inline-block; font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px;
+    background: var(--bg-warm); color: var(--muted); margin-bottom: 14px;
+  }
+  .kg-side .kg-tag.player { background: #e6efff; color: #1e4d8a; }
+  .kg-side .kg-tag.theme { background: var(--good-soft); color: var(--good); }
+  .kg-side .kg-tag.voice { background: var(--accent-soft); color: var(--accent); }
+  .kg-side .kg-tag.oppor { background: var(--good-soft); color: var(--good); border: 1px dashed var(--good); }
+  .kg-side .kg-meta { font-family: var(--mono); font-size: 11px; color: var(--soft); margin-bottom: 12px; }
+  .kg-side .kg-quote { font-family: var(--en); font-style: italic; font-size: 13px; line-height: 1.65; padding-left: 12px; border-left: 2px solid var(--accent); margin: 12px 0; }
+  .kg-side .kg-cn { font-family: var(--sans); font-size: 12.5px; line-height: 1.75; padding-left: 12px; border-left: 2px solid var(--good); margin: 8px 0 12px; }
+  .kg-side .kg-related { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .kg-side .kg-related-lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); margin-bottom: 6px; }
+  .kg-side .kg-related a { display: block; font-size: 12.5px; padding: 4px 0; color: var(--ink); text-decoration: none; border-bottom: 1px dotted var(--line); }
+  .kg-side .kg-related a:hover { color: var(--accent); }
+  .kg-controls {
+    position: absolute; top: 14px; right: 14px;
+    display: flex; gap: 6px; z-index: 5;
+  }
+  .kg-btn {
+    background: var(--paper); border: 1px solid var(--line);
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 5px 9px; cursor: pointer;
+    color: var(--muted);
+  }
+  .kg-btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .kg-legend {
+    display: flex; gap: 18px; padding: 12px 18px; border-top: 1px solid var(--line);
+    background: var(--bg-warm); font-size: 11px; color: var(--muted);
+    font-family: var(--mono); letter-spacing: 0.04em;
+  }
+  .kg-legend-item { display: flex; align-items: center; gap: 6px; }
+  .kg-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .kg-legend-dot.player { background: #1e4d8a; }
+  .kg-legend-dot.theme { background: var(--good); }
+  .kg-legend-dot.voice { background: var(--accent); }
+  .kg-legend-dot.oppor { background: transparent; border: 2px dashed var(--good); }
+
+  /* ===== C. FILTER BAR ===== */
+  .filter-bar {
+    background: var(--paper); border: 1px solid var(--line);
+    padding: 12px 16px; margin: 14px 0;
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  }
+  .filter-bar .fb-lbl {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--soft); padding-right: 4px;
+  }
+  .filter-chip {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em;
+    padding: 5px 10px; border: 1px solid var(--line); background: var(--bg);
+    color: var(--muted); cursor: pointer; transition: all 150ms;
+    text-transform: uppercase;
+  }
+  .filter-chip:hover { border-color: var(--ink); color: var(--ink); }
+  .filter-chip.active {
+    background: var(--ink); color: var(--bg); border-color: var(--ink);
+  }
+  .filter-chip.pos.active { background: var(--good); border-color: var(--good); }
+  .filter-chip.neg.active { background: var(--accent); border-color: var(--accent); }
+  .filter-search {
+    flex: 1; min-width: 200px;
+    padding: 6px 12px; border: 1px solid var(--line);
+    font-family: var(--mono); font-size: 12px; background: var(--bg);
+    color: var(--ink);
+  }
+  .filter-search:focus { outline: none; border-color: var(--ink); background: #fff; }
+  .filter-count { font-family: var(--mono); font-size: 11px; color: var(--soft); }
+  details.drow.fb-hidden { display: none; }
+  details.drow.fb-match-search summary { background: #fff8e6 !important; }
+
+  /* ===== D. WHAT-IF SIMULATED PANELS ===== */
+  .whatif-panel {
+    margin-top: 14px;
+    background:
+      repeating-linear-gradient(45deg, transparent, transparent 12px, rgba(194,65,12,0.025) 12px, rgba(194,65,12,0.025) 13px),
+      #fffaf6;
+    border: 1.5px solid var(--accent);
+  }
+  .whatif-banner {
+    background: var(--accent); color: #fff;
+    padding: 8px 16px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em;
+    text-transform: uppercase; font-weight: 700;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .whatif-banner .wi-warn::before { content: "⚠ "; }
+  .whatif-banner .wi-note {
+    font-size: 9.5px; letter-spacing: 0.08em; opacity: 0.9;
+    font-weight: 500;
+  }
+  .whatif-toggle {
+    background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.4);
+    color: #fff; font-family: var(--mono); font-size: 10px;
+    padding: 3px 8px; cursor: pointer; letter-spacing: 0.06em;
+  }
+  .whatif-toggle:hover { background: rgba(0,0,0,0.4); }
+  .whatif-body { padding: 18px 22px; }
+  .whatif-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .whatif-card {
+    background: var(--paper); border: 1px dashed var(--accent);
+    padding: 14px 16px; font-family: var(--mono); font-size: 11.5px;
+    line-height: 1.55; display: flex; flex-direction: column; gap: 8px;
+  }
+  .whatif-card .wc-scenario {
+    font-family: var(--sans); font-weight: 700; font-size: 13px;
+    color: var(--ink); line-height: 1.4;
+  }
+  .whatif-card .wc-row {
+    display: grid; grid-template-columns: 56px 1fr; gap: 8px;
+    padding-top: 6px; border-top: 1px solid var(--line);
+  }
+  .whatif-card .wc-row:first-of-type { border-top: 0; padding-top: 0; }
+  .whatif-card .wc-k {
+    font-size: 9.5px; letter-spacing: 0.12em; color: var(--soft);
+    text-transform: uppercase; padding-top: 1px;
+  }
+  .whatif-card .wc-v { color: var(--muted); font-family: var(--sans); font-size: 12px; line-height: 1.6; }
+  .whatif-card .wc-conf {
+    align-self: flex-start; padding: 2px 7px;
+    font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    background: var(--accent-soft); color: var(--accent); font-weight: 600;
+    margin-top: auto;
+  }
+  .whatif-card .wc-conf.lo { background: #fceee6; color: var(--amber); }
+  .whatif-card .wc-conf.hi { background: var(--good-soft); color: var(--good); }
+
+  @media (max-width: 820px) {
+    .pb-inner { padding: 10px 16px; grid-template-columns: repeat(5, 1fr); gap: 2px; }
+    .pb-step .pb-lbl { display: none; }
+    .kg-wrap { grid-template-columns: 1fr; }
+    .kg-side { border-left: 0; border-top: 1px solid var(--line); }
+    .whatif-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ===== PROCESS BAR ===== -->
+<nav class="process-bar" id="processBar">
+  <div class="pb-inner">
+    <a class="pb-step active" data-target="#sec-meta" href="#sec-meta">
+      <span class="pb-num">1</span>
+      <span class="pb-lbl">信号扫描 · Setup</span>
+    </a>
+    <a class="pb-step" data-target="#sec-collect" href="#sec-collect">
+      <span class="pb-num">2</span>
+      <span class="pb-lbl">数据采集 · §1-2</span>
+    </a>
+    <a class="pb-step" data-target="#sec-clean" href="#sec-clean">
+      <span class="pb-num">3</span>
+      <span class="pb-lbl">竞品分析 · §3</span>
+    </a>
+    <a class="pb-step" data-target="#sec-analyze" href="#sec-analyze">
+      <span class="pb-num">4</span>
+      <span class="pb-lbl">综合判断 · §4-5</span>
+    </a>
+    <a class="pb-step" data-target="#sec-verdict" href="#sec-verdict">
+      <span class="pb-num">5</span>
+      <span class="pb-lbl">报告 · §6+附录</span>
+    </a>
+  </div>
+</nav>
+
+<div class="doc" id="sec-meta">
+
+  <!-- ===== MASTHEAD ===== -->
+  <div class="masthead">
+    <div class="firm"><strong>VIBE DEMAND RESEARCH</strong> · CATEGORY DEEP DIVE · CONSUMER WEARABLES</div>
+    <div class="meta">
+      <div>Brief №<strong>VDR-CAT-026</strong></div>
+      <div>2026 / 05 / 19</div>
+    </div>
+  </div>
+
+  <!-- ===== COVER ===== -->
+  <div class="cover">
+    <div class="kicker">智能戒指 · 北美市场 · 品类深度</div>
+    <h1 class="cover-title">用户已经把它当医疗设备用,<br>但没有一家厂商按医疗设备做。</h1>
+    <p class="cover-deck">智能戒指是真需求,但当前所有玩家都在错位竞争。最具粘性的使用场景是医疗级早期预警(救命叙事),最受冷遇的功能是 AI 教练。空白象限——"消费包装的医疗设备"——还没人占。</p>
+    <span class="cover-audience">读者 · <strong>新进入者产品团队 / 创始人 / 既有玩家产品总监</strong></span>
+  </div>
+
+  <!-- ===== TLDR ===== -->
+  <div class="tldr">
+    <div class="lbl">TL;DR · 给产品团队的速读</div>
+    <h3>切不切?切哪块?怎么切?</h3>
+
+    <div class="verdict-grid">
+      <div class="vg-cell">
+        <div class="lblmini">品类是否真实</div>
+        <div class="vgval good">是 · 已穿越早期</div>
+      </div>
+      <div class="vg-cell">
+        <div class="lblmini">是否值得切入</div>
+        <div class="vgval good">是 · 有结构性空白</div>
+      </div>
+      <div class="vg-cell">
+        <div class="lblmini">推荐切入点</div>
+        <div class="vgval warn">医疗级预警形态</div>
+      </div>
+      <div class="vg-cell">
+        <div class="lblmini">窗口期</div>
+        <div class="vgval amber">18-24 个月</div>
+      </div>
+    </div>
+
+    <ol>
+      <li><strong>真实需求不是 AI 教练,是医疗预警。</strong>r/ouraring 上两条"Oura 救了我命"故事获 2,903 / 2,507 赞,远超所有 AI 体验类顶帖(最高 940,大多是负面)。<em>赞数差 3-10 倍——这是用户用脚投票披露的真实购买动机。</em></li>
+      <li><strong>所有主流玩家都错过了这一点。</strong>Oura 押 AI Advisor,Samsung 押生态绑定,Apple 还没下场。没有一家把"医疗级预警 + FDA 认证 + 保险报销"做成产品定位。<em>这是行业级错配,不是单一公司的错误。</em></li>
+      <li><strong>新进入者的窗口在右下角:消费定价 + 医疗器械认证。</strong>差异化逻辑不是"做更好的 AI",而是"做用户已经在用但厂商不敢声称的医疗设备"。Apple Watch 走通了同样路径,用了 6 年——戒指品类还在窗口期。</li>
+      <li><strong>必备能力栈是临床/法规/医保,不是 AI 工程。</strong>FDA 510(k) 申报 + 保险 CPT 报销码 + 急诊医师背书 + 医院电子病历集成。这是组织能力问题,不是算法能力问题。新创业者反而有优势——没历史包袱。</li>
+    </ol>
+  </div>
+
+  <!-- ===== §1 品类拆解 ===== -->
+  <section class="chapter" id="sec-collect">
+    <h2 class="h2"><span class="secnum">1</span>品类拆解</h2>
+    <p class="h2-sub">智能戒指是什么、解决什么问题、谁在买、价值链长什么样。</p>
+    <div class="h2-rule"></div>
+
+    <h3 class="h3"><span class="secnum">1.1</span>品类定义与边界</h3>
+    <p>智能戒指(Smart Ring)是一种<strong>无显示屏、被动监测式</strong>的可穿戴设备,通过指环上的传感器采集体温、心率、HRV、血氧、动作等生理数据,通过手机 app 提供回顾性洞察。</p>
+    <p>这一定义决定了三件事:① 它<strong>不与智能手表竞争同一场景</strong>——而是补位手表不便佩戴的时段(睡眠、运动后、商务正装);② 它的核心交付价值是<strong>"无感采集 + 异常提示"</strong>,而不是 push notification 或 always-on display;③ 用户的真实使用方式是<strong>"忘记戴着 + 异常时被打断"</strong>——这与"每天主动看屏"的手表逻辑完全不同。</p>
+
+    <h3 class="h3"><span class="secnum">1.2</span>市场规模与增长</h3>
+    <p>全球智能戒指市场 2024 年终端销售约 USD 280-320M,5 年 CAGR 预期 22-28%,2030 年体量预期突破 USD 1.0-1.5B。<strong>对新进入者来说,这是个"中等大小但快速增长 + 格局未定"的窗口</strong>——足够大到能容纳一家百亿美元公司,小到没有一家玩家有压倒性的渠道护城河。</p>
+    <p>具体数据来自 IDC / Mordor Intelligence / Grand View Research 综合估算,口径不一(部分含 smart jewelry),分析师估算误差区间 ±25%。</p>
+  </section>
+
+  <!-- ===== KNOWLEDGE GRAPH (between §1 and §2) ===== -->
+  <section class="chapter kg-section">
+    <h2 class="h2"><span class="secnum">★</span>品类关系网络(交互式知识图谱)</h2>
+    <p class="h2-sub">把玩家 · 主题 · 顶帖 voice · 机会区织成一张可探索的网络 — hover 节点看关联,点击看证据。</p>
+    <div class="h2-rule"></div>
+
+    <p>下面是把这份报告所有节点合成一张可交互的网络图,replaces "线性阅读" 为 "图谱探索"。<strong>左边是力导向布局的节点网络</strong>(蓝点=玩家,绿点=主题,红点=顶帖 voice,绿虚线=机会区),<strong>右边是详细面板</strong>。hover 任意节点高亮关联;点击展开完整证据。</p>
+
+    <div class="kg-wrap">
+      <div class="kg-graph">
+        <div class="kg-controls">
+          <button class="kg-btn" id="kgReset" title="重置布局">↻ 重置</button>
+          <button class="kg-btn" id="kgFreeze" title="冻结/解冻">⏸ 冻结</button>
+        </div>
+        <svg class="kg-svg" id="kgSvg" viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <aside class="kg-side" id="kgSide">
+        <div class="kg-empty">
+          ← 点击或 hover 左侧任意节点查看详情<br><br>
+          <strong style="color:var(--ink); font-family:var(--serif); font-size:14px;">读图提示</strong><br>
+          · 蓝大圆 = 在售/历史玩家<br>
+          · 绿中圆 = 主题(救命/隐私/价格…)<br>
+          · 红小圆 = 顶帖 voice<br>
+          · 绿虚线圆 = 机会区(空白象限)<br>
+          · 节点之间连线 = 真实关联强度
+        </div>
+      </aside>
+    </div>
+    <div class="kg-legend">
+      <div class="kg-legend-item"><span class="kg-legend-dot player"></span>玩家</div>
+      <div class="kg-legend-item"><span class="kg-legend-dot theme"></span>主题</div>
+      <div class="kg-legend-item"><span class="kg-legend-dot voice"></span>顶帖 voice</div>
+      <div class="kg-legend-item"><span class="kg-legend-dot oppor"></span>机会区</div>
+      <div class="kg-legend-item" style="margin-left:auto;color:var(--soft);">5 玩家 · 8 主题 · 14 voice · 1 机会区 = 28 节点</div>
+    </div>
+  </section>
+
+  <!-- ===== §2 用户洞察 ===== -->
+  <section class="chapter">
+    <h2 class="h2"><span class="secnum">2</span>用户洞察</h2>
+    <p class="h2-sub">谁在买、为什么买、用赞数披露的真实需求结构。</p>
+    <div class="h2-rule"></div>
+
+    <h3 class="h3"><span class="secnum">2.1</span>三类典型用户(基于 78 条 voice 归纳)</h3>
+    <div class="personas">
+      <div class="persona">
+        <span class="ptag">Persona 01 · 主力人群</span>
+        <h4>健康焦虑型轻患者</h4>
+        <p class="summary">30-50 岁,有慢病或家族病史,主动型健康管理者。</p>
+        <div class="row"><div class="k">买点</div><div class="v">"它能告诉我身体哪里不对"</div></div>
+        <div class="row"><div class="k">场景</div><div class="v">术后恢复、备孕 / 产后、慢病自管理、家族癌症筛查</div></div>
+        <div class="row"><div class="k">付费</div><div class="v">高,且对订阅容忍度也较高(但被 Palantir 事件刺激)</div></div>
+        <div class="row"><div class="k">证据</div><div class="v"><strong>2,903 + 2,507 赞</strong>的两条救命叙事均来自此人群</div></div>
+      </div>
+
+      <div class="persona">
+        <span class="ptag">Persona 02 · 高活跃 lifestyle</span>
+        <h4>Quantified Self 早期用户</h4>
+        <p class="summary">25-40 岁,运动 / biohacking 爱好者,数据导向。</p>
+        <div class="row"><div class="k">买点</div><div class="v">"我想精准了解我的 readiness / HRV / 训练负荷"</div></div>
+        <div class="row"><div class="k">场景</div><div class="v">健身、跑步、力量训练、长跑训练计划调整</div></div>
+        <div class="row"><div class="k">付费</div><div class="v">中高,但对订阅敏感,容易迁移到无订阅替代品</div></div>
+        <div class="row"><div class="k">证据</div><div class="v">Reddit 上"on the fence"复购讨论(1,761 赞)反映此群</div></div>
+      </div>
+
+      <div class="persona">
+        <span class="ptag">Persona 03 · 配饰逻辑</span>
+        <h4>Lifestyle / 配饰类购买者</h4>
+        <p class="summary">25-45 岁,把戒指当首饰戴,健康功能是"赠送"。</p>
+        <div class="row"><div class="k">买点</div><div class="v">"它好看而且顺便健康"</div></div>
+        <div class="row"><div class="k">场景</div><div class="v">日常佩戴、配色 / 材质偏好、礼物</div></div>
+        <div class="row"><div class="k">付费</div><div class="v">中,被价格驱动,极度厌恶月费</div></div>
+        <div class="row"><div class="k">证据</div><div class="v">"trying on bras" 戏谑帖(3,020 赞)反映轻度使用心态</div></div>
+      </div>
+    </div>
+
+    <h3 class="h3"><span class="secnum">2.2</span>真实需求结构 · 用赞数排序</h3>
+    <div class="chart-wrap">
+      <div class="ch-eyebrow">FIG 2.1 · UPVOTE DISTRIBUTION BY USE CASE</div>
+      <h4>r/ouraring 顶帖按"使用场景"分布</h4>
+      <p class="subhead">N=78 voice · time window 1 year · 同一主题取最高一帖 · 红条=危机/负面,黑条=正面医疗,灰条=AI/产品体验</p>
+
+      <div class="chart-row">
+        <div class="topic">医疗预警 #1<em>术后感染早期识别</em></div>
+        <div class="bar" style="width: 73%;"></div>
+        <div class="val">2,903</div>
+      </div>
+      <div class="chart-row">
+        <div class="topic">医疗预警 #2<em>产后早期癌症识别</em></div>
+        <div class="bar" style="width: 63%;"></div>
+        <div class="val">2,507</div>
+      </div>
+      <div class="chart-row">
+        <div class="topic">隐私 / 信任崩坏<em>Palantir 合作退订帖</em></div>
+        <div class="bar warn" style="width: 100%;"></div>
+        <div class="val">3,968</div>
+      </div>
+      <div class="chart-row">
+        <div class="topic">CEO 危机响应<em>Tom Hale 公开声明</em></div>
+        <div class="bar warn" style="width: 50%;"></div>
+        <div class="val">1,973</div>
+      </div>
+      <div class="chart-row">
+        <div class="topic">复购意愿<em>"expensive but I bought again"</em></div>
+        <div class="bar" style="width: 44%;"></div>
+        <div class="val">1,761</div>
+      </div>
+      <div class="chart-row">
+        <div class="topic">AI 反馈 · 诉求人格<em>"give bitchy/funny toggle"</em></div>
+        <div class="bar muted" style="width: 24%;"></div>
+        <div class="val">940</div>
+      </div>
+      <div class="chart-row">
+        <div class="topic">AI 反馈 · "judgy"<em>判断性语气抗议</em></div>
+        <div class="bar muted" style="width: 10%;"></div>
+        <div class="val">388</div>
+      </div>
+      <div class="chart-row">
+        <div class="topic">AI 误识别<em>"thinks everything I do is housework"</em></div>
+        <div class="bar muted" style="width: 8%;"></div>
+        <div class="val">301</div>
+      </div>
+
+      <div class="chart-caption"><strong>对产品团队的启示:</strong>用户在 r/ouraring 顶帖里告诉你他们最在意两件事——"它会不会救我"(黑条)和"它会不会出卖我"(红条)。"它的 AI 好不好用"(灰条)在他们眼里是配角。<strong>所有押在 AI 教练的产品投入,本质上都在追低优先级 JTBD。</strong></div>
+    </div>
+
+    <h3 class="h3"><span class="secnum">2.3</span>需求层级与厂商兑现度</h3>
+    <div class="jtbd-table">
+      <div class="jtbd-row">
+        <div class="lvl">L1</div>
+        <div class="what"><strong>医疗级早期预警</strong><em>体温 / HRV / 心律异常先于症状出现</em></div>
+        <div class="vstrength">5,410 赞<em>用户最在意</em></div>
+        <div class="tag missing">主流玩家未承认</div>
+      </div>
+      <div class="jtbd-row">
+        <div class="lvl">L2</div>
+        <div class="what"><strong>日常状态量化</strong><em>readiness / sleep score / activity</em></div>
+        <div class="vstrength">中等<em>稳定使用频次</em></div>
+        <div class="tag good">扎实兑现</div>
+      </div>
+      <div class="jtbd-row">
+        <div class="lvl">L3</div>
+        <div class="what"><strong>长期慢性趋势</strong><em>压力曲线 / 睡眠债 / 训练负荷</em></div>
+        <div class="vstrength">中低<em>部分用户深度使用</em></div>
+        <div class="tag amber">部分兑现</div>
+      </div>
+      <div class="jtbd-row">
+        <div class="lvl">L4</div>
+        <div class="what"><strong>AI 教练 / 个性化建议</strong><em>解释数据 / 推荐行动</em></div>
+        <div class="vstrength">1,629 赞(负面为主)<em>用户主动抗议</em></div>
+        <div class="tag warn">押注过度 / 用户不买账</div>
+      </div>
+    </div>
+
+    <!-- ===== §2.4 用户原话精选 · 跨玩家 · 表格式可展开 ===== -->
+    <h3 class="h3"><span class="secnum">2.4</span>用户原话精选 · 跨玩家覆盖 · 完整双语对照</h3>
+    <p>从 252 条 voice 中挑出 9 条最具品类代表性的原话,跨 <strong>Oura · RingConn · Samsung Galaxy Ring</strong> 三个主流玩家。完整英文 + 完整中文翻译,逐条折叠。</p>
+    <div style="margin: 14px 0; padding: 12px 16px; background: var(--bg-warm); font-family: var(--mono); font-size: 11px; line-height: 1.7; color: var(--muted); letter-spacing: 0.02em;">
+      <strong style="color: var(--ink);">样本透明度 · </strong> r/ouraring 数据密度最高(品类内最活跃 sub),r/RingConn 中等(社区规模小但活跃),r/Ultrahuman 数据稀疏,<strong style="color: var(--accent);">Samsung Galaxy Ring 没有专属 subreddit</strong>(用户散在 r/samsung / r/galaxywatch / HN / 9to5google 等),通过 HN + 新闻文章补充。<strong style="color: var(--ink);">下面 9 条已按品类代表性而非数据密度排序</strong>,确保 Samsung 和 RingConn 不被 Oura 数据掩盖。
+    </div>
+
+    <div class="toggle-bar">
+      <button class="toggle-btn" onclick="document.querySelectorAll('.voice-table details').forEach(d=>d.open=true)">全部展开</button>
+      <button class="toggle-btn" onclick="document.querySelectorAll('.voice-table details').forEach(d=>d.open=false)">全部收起</button>
+      <span class="toggle-hint">3 Oura · 4 RingConn · 2 Samsung Galaxy Ring</span>
+    </div>
+
+    <!-- ===== FILTER BAR · VOICE TABLE ===== -->
+    <div class="filter-bar" data-filter-target=".voice-table">
+      <span class="fb-lbl">玩家</span>
+      <button class="filter-chip active" data-filter-group="player" data-filter-value="all">全部</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Oura">Oura</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="RingConn">RingConn</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Samsung">Samsung</button>
+      <span class="fb-lbl" style="margin-left:8px;">情绪</span>
+      <button class="filter-chip active" data-filter-group="sent" data-filter-value="all">全部</button>
+      <button class="filter-chip pos" data-filter-group="sent" data-filter-value="pos">● 正面</button>
+      <button class="filter-chip neg" data-filter-group="sent" data-filter-value="neg">● 负面</button>
+      <input type="search" class="filter-search" placeholder="搜索原文或主题..." data-filter-search>
+      <span class="filter-count" data-filter-count>9 / 9</span>
+    </div>
+
+    <div class="dt-wrap voice-table">
+
+      <div class="dt-head">
+        <div>玩家</div>
+        <div>用户原话主题</div>
+        <div>场景 / 来源</div>
+        <div style="text-align:right;">赞数</div>
+        <div></div>
+      </div>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">Oura</span>
+          <span class="dt-title">"Oura saved my life" · 救了我命</span>
+          <span class="dt-meta">救命叙事 · 术后感染 · 2025-09</span>
+          <span class="dt-num">2,903</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"I had surgery a week ago Tuesday. It was a cosmetic abdominal surgery after losing close to 200 lbs, so when my Oura started telling me 2 days after the surgery that something was wrong, I trusted it. My readiness tanked, my HRV crashed, my temperature went up. I went back to the surgeon and they caught a developing infection before I got really sick."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"我上周二做了一台手术——减重近 200 磅后的腹部整形手术。术后第二天,Oura 就开始跟我说'有问题了'——我的 readiness 评分崩了,HRV 暴跌,体温也升了起来。我相信了它,马上回去找医生。他们在我还没真正发作之前就发现了感染,把它截住了。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">用户主动把"早期预警"归功给设备,讲清了完整因果链(数据异常 → 信任 → 就医 → 确诊)。<strong>这是 Oura 在品类里独占的真护城河</strong>——但 Oura 没把它做成产品定位,而是当 PR 故事。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/ouraring/comments/1nh3tze/oura_saved_my_life/">r/ouraring · 原帖 permalink</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">Oura</span>
+          <span class="dt-title">"Caught cancer early postpartum" · 帮我及早发现癌症</span>
+          <span class="dt-meta">救命叙事 #2 · 产后 6 月 · 2025-10</span>
+          <span class="dt-num">2,507</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"My oura ring data legitimately helped me catch cancer early (6 months postpartum). I (28F) just want to share my story, not to scare anyone, but in case it helps someone else trust their data. My nighttime body temp kept running high week after week, my HRV wouldn't recover, and Oura kept flagging it. I pushed my doctor to investigate."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"我的 Oura 数据确确实实帮我及早发现了癌症(产后 6 个月)。我 28 岁女性,只想分享我的经历——不是为了吓唬谁,而是让别人在类似情形下相信自己的数据。我的夜间体温一周接一周地偏高,HRV 始终恢复不过来,Oura 一直在标记异常。我催着医生进一步检查,最后发现了。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">第二个独立医疗级预警案例,60 天内出现。"trust your data" 是品类杀手叙事——用户已把设备纳入医疗决策链。这正是 FDA SaMD 的市场基础,但目前没有任何玩家正式认领这个定位。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/ouraring/comments/1nyt25l/my_oura_ring_data_legiti/">r/ouraring · 原帖 permalink</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">Oura</span>
+          <span class="dt-title">"Leaving Oura after Palantir partnership" · 因 Palantir 合作退订</span>
+          <span class="dt-meta">信任崩坏 · 一年内 sub 最高赞 · 2025-09</span>
+          <span class="dt-num">3,968</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"Earlier this week I watched ICE pull a father out of his car while driving his 5yo daughter to school in DC. The daughter was screaming. I cannot in good conscience continue to give my biometric data — my body temperature, my HRV, my sleep patterns — to a company that just signed a SaaS contract with Palantir, the company building the surveillance infrastructure that made that scene possible. I'm canceling my subscription. I encourage others to do the same."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"这周早些时候,我亲眼看到 ICE 在华盛顿把一个父亲从他正开着的车里拽出来——他当时正送 5 岁的女儿去上学,女儿在车里尖叫。我没法心安理得地把我的生物数据——体温、HRV、睡眠模式——继续交给一家刚跟 Palantir 签了 SaaS 合同的公司。Palantir 就是那种让上述场景成为可能的监控基础设施供应商。我要取消订阅。也建议其他人这么做。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">整个 subreddit 一年内最高赞,不是产品问题,是信任问题。医疗级数据品类对"政府合同"是结构性不信任——这不是公关能消化掉的危机。新进入者必须把数据治理放在第一位。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/ouraring/comments/1n3f33w/leaving_oura_ring_after_/">r/ouraring · 原帖 permalink</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">RingConn</span>
+          <span class="dt-title">"My RingConn Gen 2 just exploded on finger" · 戒指在手指上爆炸</span>
+          <span class="dt-meta">品类级电池物理失败 · 2025-Q4</span>
+          <span class="dt-num">105</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"My RingConn Gen 2 just exploded on finger. I bought my RingConn back in July 2025. I wore it for a few weeks, then stumbled upon a review by the Quantified Scientist on YouTube, and decided to stop wearing it until it received a few updates for better tracking. I dug it back out…"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"我的 RingConn Gen 2 刚在手指上爆炸。我 2025 年 7 月买的 RingConn,戴了几周,后来看到 YouTube 上 Quantified Scientist 的评测后决定先停戴,等几次算法更新再说。最近又把它翻出来戴上,然后…"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig"><strong>这是品类级风险信号,不是单家问题。</strong>叠加 Samsung Galaxy Ring 电池胀起(见下一行)和 Oura "ring stuck on finger" 故事,<em>三家主流玩家都有戒指物理伤害案例</em>。新进入者的电池选型 + 紧急移除机制 + 召回流程必须在 MVP 阶段考虑。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/RingConn/comments/1r5eqo6/my_ringconn_ge/">r/RingConn · 原帖 permalink</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">Samsung</span>
+          <span class="dt-title">"Galaxy Ring battery swelling stuck on finger → hospital" · 电池胀起进医院</span>
+          <span class="dt-meta">品类级电池物理失败 #2 · 2025-09</span>
+          <span class="dt-num">HN 8</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"Ahhh this is not good. My Samsung Galaxy Ring's battery started swelling. … Swollen Galaxy Ring battery gets stuck on finger, leads to hospital visit."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"哎,这下不好了。我的 Samsung Galaxy Ring 电池开始胀起来了。…… 胀起的 Galaxy Ring 卡在手指上,送医院。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">9to5google + Android Authority 双源报道。和上面 RingConn 爆炸案例配对——<strong>电池物理失败已经在两家独立玩家上发生</strong>。iFixit 称 Galaxy Ring 是 "$400 of disposable tech",不可维修。这是品类级供应链 + 形态根本性挑战。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://9to5google.com/2025/09/29/swollen-galaxy-ring-battery/">9to5google</a> · <a href="https://www.androidauthority.com/samsung-galaxy-ring-battery-swelling-">Android Authority</a> · <a href="https://www.zdnet.com/home-and-office/ifixit-the-samsung-galaxy-ring-i">iFixit / ZDNet</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">RingConn</span>
+          <span class="dt-title">"I returned my Oura ring and got the RingConn Air" · 退 Oura 换 RingConn</span>
+          <span class="dt-meta">跨玩家迁移真实案例 · 2025-Q4</span>
+          <span class="dt-num">118</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"Got my new RingConn air! I returned my oura ring and got the ring conn and I already love it sooo much more it looks so much better on my finger and the color is so cute!"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"拿到我新的 RingConn Air 啦!我把 Oura 退了换了 RingConn,我已经爱它爱得不行——戴在手指上好看多了,颜色也太可爱了!"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">真实跨玩家迁移叙事,且驱动因素是<strong>外观</strong>而不是功能——配饰心智已经在和健康心智竞争。这条信号对"无订阅 + 高颜值"的玩家(RingConn / Ultrahuman / Galaxy Ring)是利好,对押"AI/医疗"的玩家(Oura)是流失。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/RingConn/comments/1q9kbc8/got_my_new_rin/">r/RingConn · 原帖 permalink</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">RingConn</span>
+          <span class="dt-title">"Not supporting Oura!" · 不再支持 Oura</span>
+          <span class="dt-meta">Oura 起诉竞品的用户反弹 · 2025-Q3</span>
+          <span class="dt-num">184</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"I've been following the whole Oura vs. RingConn/Ultrahuman situation pretty closely, and honestly, I'm done with Oura. Instead of innovating and competing fairly, they've gone down the anti-competitive route by suing their competition. I'm glad I bought a RingConn when I did."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"我一直在密切关注 Oura 起诉 RingConn / Ultrahuman 这件事。说实话,我对 Oura 死心了。他们没有靠创新和公平竞争,而是走上了通过起诉竞争对手的反竞争路线。还好我当初买的是 RingConn。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">Oura 通过 ITC 案件起诉 RingConn / Ultrahuman 的策略产生<strong>反作用</strong>——RingConn 用户社区把这件事当作"反 Oura"集体身份。这是新进入者的入场机会:用户已经在情感上和 Oura 拉开距离,只需要给一个对标产品。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/RingConn/comments/1my1deg/not_supporting/">r/RingConn · 原帖 permalink</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">RingConn</span>
+          <span class="dt-title">"Wish there was an 'I'm sick' button" · 希望加'我生病了'开关</span>
+          <span class="dt-meta">情境标签需求 · 跨多帖 · 2025-Q4</span>
+          <span class="dt-num">114</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"Anyone else get the flu and feel frustrated with their RingConn giving a bad sleep score for oversleeping? Like, babe, I'm sick! I need extra sleep!" · 评论 (42): "I wish there was a pregnancy mode, I'm not oversleeping, and my heart rate is higher because I have a whole human inside of me" · (17): "Or an injury button. My ring thinks I'm a lazy sack of shit but broke my ankle and can't get my steps in like normal LOL"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"有没有人感冒了,然后 RingConn 给一个糟糕的睡眠分数,只因为'睡得太多'?宝贝,我生病了!我需要多睡!" · 高赞评论:"希望加个怀孕模式——我不是睡多了,我心率高是因为我体内有一整个人。" · "或者一个'受伤'按钮——我的戒指以为我是个懒鬼,但我脚踝骨折了走不动。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">跨多个独立帖的<strong>高频用户诉求</strong>:sick / pregnant / injured / cycling / sex 等"情境标签"。当前所有玩家都用"通用算法 + 通用提示"模式——但用户实际生活有大量"我现在状态特殊"的情境。给新进入者:lifestyle-aware mode toggles 是低成本高粘性的功能差异化点。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/RingConn/comments/1s9ixa2/wish_there_was/">r/RingConn · 原帖 + 高赞评论</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">RingConn</span>
+          <span class="dt-title">"I cried for an hour and my ring thought I was biking" · 我哭了一小时,戒指以为我在骑车</span>
+          <span class="dt-meta">情绪状态识别盲区 · 2025-Q4</span>
+          <span class="dt-num">184</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"I cried for almost an hour and my ring thought I was biking. I've been going through it lately and I had an intense cry session that my ring recorded as exercise. Thankfully I can laugh about it today."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"我哭了将近一个小时,戒指以为我在骑车。我最近不容易,有一次哭得很厉害,戒指把它记成了运动。谢天谢地今天可以一笑置之。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">情绪 / 应激状态没有被任何主流戒指算法识别——心率上升 + 体动 → 一律识别为"运动"。<strong>情绪健康(mental health)是品类的下一个空白能力</strong>,且和救命叙事(医疗预警)有相同的"早期信号"逻辑。给新进入者:HRV + 体温 + 微动作能识别情绪应激,可做差异化卖点。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/RingConn/comments/1t1xksd/i_cried_for_al/">r/RingConn · 原帖 permalink</a></p></div>
+        </div>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- ===== §3 竞品分析 ===== -->
+  <section class="chapter" id="sec-clean">
+    <h2 class="h2"><span class="secnum">3</span>竞品全景 + Marketplace VOC</h2>
+    <p class="h2-sub">主流玩家定位 · 亚马逊好评/差评主题 · 真实用户原话 · 错配诊断。</p>
+    <div class="h2-rule"></div>
+
+    <h3 class="h3"><span class="secnum">3.1</span>玩家能力与定位对比</h3>
+    <table class="data">
+      <thead>
+        <tr><th>玩家</th><th>定价</th><th>订阅</th><th>核心定位</th><th>渠道</th><th>L1 医疗预警</th><th>L4 AI 教练</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Oura Ring 4</td><td class="num">$349-499</td><td>$5.99/月</td><td>AI Advisor + lifestyle 高端</td><td>DTC + Best Buy</td><td><span class="tag amber">暗交付</span></td><td><span class="tag warn">押注过度</span></td></tr>
+        <tr><td>Samsung Galaxy Ring</td><td class="num">$399</td><td>无</td><td>Samsung Health 生态</td><td>三星全渠道</td><td><span class="tag muted">未投入</span></td><td><span class="tag amber">弱</span></td></tr>
+        <tr><td>Ultrahuman Ring Air</td><td class="num">$349</td><td>无</td><td>Biohacking / 训练</td><td>DTC + Amazon</td><td><span class="tag muted">未投入</span></td><td><span class="tag amber">弱</span></td></tr>
+        <tr><td>RingConn Gen 2</td><td class="num">$299</td><td>无</td><td>No-subscription 替代 + 睡眠呼吸暂停</td><td>Amazon + 众筹</td><td><span class="tag muted">未投入</span></td><td><span class="tag muted">无</span></td></tr>
+        <tr><td>Amazfit Helio</td><td class="num">$200</td><td>无</td><td>大众平价 / 中国</td><td>Amazon + CN 线下</td><td><span class="tag muted">未投入</span></td><td><span class="tag muted">无</span></td></tr>
+        <tr><td>Colmi R02</td><td class="num">~$20</td><td>无</td><td>开源 / DIY 硬件</td><td>速卖通</td><td><span class="tag muted">N/A</span></td><td><span class="tag muted">N/A</span></td></tr>
+        <tr><td><strong>Apple Ring(未发布)</strong></td><td class="num">est. $399-599</td><td>未定</td><td>Health 生态 + FDA 路径</td><td>Apple Store</td><td><span class="tag warn">潜在最强</span></td><td><span class="tag amber">中</span></td></tr>
+      </tbody>
+    </table>
+
+    <!-- ===== ▼ 新增 §3.2 Marketplace VOC ===== -->
+    <h3 class="h3"><span class="secnum">3.2</span>Marketplace VOC · 亚马逊 / Best Buy / Trustpilot 评论主题</h3>
+    <p>下面汇总来自 Amazon / Best Buy / Trustpilot / Android Central / Wareable 等公开零售与测评渠道的真实用户主题。本节是<strong>给产品团队的"问题清单"</strong>——下一代戒指如果要超越现有玩家,这些都是必须解决的具体点。</p>
+
+    <div class="toggle-bar">
+      <button class="toggle-btn" onclick="document.querySelectorAll('.mkt-table details').forEach(d=>d.open=true)">全部展开</button>
+      <button class="toggle-btn" onclick="document.querySelectorAll('.mkt-table details').forEach(d=>d.open=false)">全部收起</button>
+      <span class="toggle-hint">5 正 + 7 负 · 跨 Oura / Samsung / RingConn 三主流玩家</span>
+    </div>
+
+    <!-- ===== FILTER BAR · MARKETPLACE TABLE ===== -->
+    <div class="filter-bar" data-filter-target=".mkt-table">
+      <span class="fb-lbl">玩家</span>
+      <button class="filter-chip active" data-filter-group="player" data-filter-value="all">全部</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Oura">Oura</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Samsung">Samsung</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="RingConn">RingConn</button>
+      <span class="fb-lbl" style="margin-left:8px;">评价</span>
+      <button class="filter-chip active" data-filter-group="sent" data-filter-value="all">全部</button>
+      <button class="filter-chip pos" data-filter-group="sent" data-filter-value="pos">● 好评</button>
+      <button class="filter-chip neg" data-filter-group="sent" data-filter-value="neg">● 差评</button>
+      <input type="search" class="filter-search" placeholder="搜索主题或来源..." data-filter-search>
+      <span class="filter-count" data-filter-count>12 / 12</span>
+    </div>
+
+    <div class="dt-wrap mkt-table">
+
+      <div class="dt-head">
+        <div>评价</div>
+        <div>主题</div>
+        <div>玩家</div>
+        <div>关键数据</div>
+        <div>来源平台</div>
+        <div></div>
+      </div>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">好评</span>
+          <span class="dt-title">睡眠追踪精度</span>
+          <span class="dt-meta">Oura Ring 4</span>
+          <span class="dt-meta">theme tag 717</span>
+          <span class="dt-meta">Best Buy</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"Sleep tracking on Oura is genuinely better than what I got from my Apple Watch. It picks up on disturbances I didn't realize I had."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"Oura 的睡眠追踪比我之前 Apple Watch 上的真的好。它能识别出我自己都没察觉到的睡眠紊乱。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://www.bestbuy.com/site/oura-ring-4-smart-ring-stealth/6595529.p">Best Buy · Oura Ring 4 评论主题</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">好评</span>
+          <span class="dt-title">睡眠呼吸暂停检测</span>
+          <span class="dt-meta">RingConn Gen 2</span>
+          <span class="dt-meta">独家功能</span>
+          <span class="dt-meta">Gadgets &amp; Wearables</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"RingConn flagged my sleep apnea events for weeks before I went to a sleep clinic. Oura never did. That alone was worth the price of the ring."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"RingConn 在我去睡眠诊所之前几个星期就开始标记我的呼吸暂停事件。Oura 从来没标过。光这一项就值回戒指的钱。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://gadgetsandwearables.com/2025/12/22/ringconn-gen-2-air-review/">Gadgets &amp; Wearables · RingConn Gen 2 Air</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">好评</span>
+          <span class="dt-title">长续航 + 无订阅</span>
+          <span class="dt-meta">RingConn</span>
+          <span class="dt-meta">~1 周 / 无月费</span>
+          <span class="dt-meta">ShopSavvy</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"Battery lasts about a week with the portable charging case, and there's no monthly fee. After dealing with Oura's $5.99/month subscription for two years, this feels liberating."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"用便携充电盒一次能撑一周左右,而且没有月费。在被 Oura 的 $5.99/月订阅折磨了两年之后,这种感觉很解放。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://shopsavvy.com/reviews-tldr/ringconn-gen-2-smart-ring">ShopSavvy · RingConn Gen 2 综合</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">好评</span>
+          <span class="dt-title">形态薄 + 佩戴感</span>
+          <span class="dt-meta">RingConn Gen 2</span>
+          <span class="dt-meta">宽 -12% / 厚 -23%</span>
+          <span class="dt-meta">Sypnotix</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"12% smaller in width and 23% smaller in thickness compared to Gen 1. The sensor protrusion is barely noticeable now. I can actually wear it under gloves without it being annoying."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"和一代相比,宽度小了 12%、厚度小了 23%。传感器凸起现在几乎察觉不到。我现在戴着它进手套都不觉得别扭了。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://www.sypnotix.com/reviews/ringconn-gen2-smart-ring-review">Sypnotix · RingConn Gen 2 Review</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">好评</span>
+          <span class="dt-title">救命级用户证言(COVID 案例)</span>
+          <span class="dt-meta">Oura</span>
+          <span class="dt-meta">4.2/5 高频</span>
+          <span class="dt-meta">Trustpilot</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"My Oura ring picked up on the first signs of COVID a full day before I had symptoms. My temperature spike was clear in the app. This thing has earned its place on my finger."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"我的 Oura 在我出现症状的整整一天之前就识别到了新冠的最初信号。app 里的体温尖峰非常清楚。这玩意儿在我手指上是有它位置的。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://www.trustpilot.com/review/ouraring.com">Trustpilot · ouraring.com</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">订阅费抗议(第一痛点)</span>
+          <span class="dt-meta">Oura Ring 4</span>
+          <span class="dt-meta">$5.99/月</span>
+          <span class="dt-meta">NBC Select</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"$349 for the hardware AND $5.99/month forever? Just to see my own sleep data? Pass. RingConn has the same features for $299, one time."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"$349 买硬件,然后还要永远 $5.99/月?就为了看我自己的睡眠数据?不要。RingConn 同样功能 $299,一次买断。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://www.nbcnews.com/select/shopping/oura-ring-4-review-rcna196889">NBC Select · Oura Ring 4 Review</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">尺寸错配 → 退换难</span>
+          <span class="dt-meta">Oura</span>
+          <span class="dt-meta">"$200 lesson"</span>
+          <span class="dt-meta">WearableXP</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"Sizing kit matters more than you think. I skipped it, ordered too small, and the return policy on opened rings is a nightmare. Cost me $200 to learn this."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"那个量尺套件比你想的重要得多。我跳过了,订了个太小的码,而开过封的戒指退货政策简直是噩梦。这堂课花了我 $200。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://wearablexp.com/smart-rings/oura-ring-4-review/">WearableXP · Oura Ring 4 Review 2026</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">电池一年衰减</span>
+          <span class="dt-meta">Samsung Galaxy Ring</span>
+          <span class="dt-meta">5d → 1d</span>
+          <span class="dt-meta">Samsung Community</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"After about a year my Galaxy Ring battery is shot. It used to last 5 days, now it's down to one. I'm charging it daily, which defeats the whole point."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"用了一年左右,Galaxy Ring 的电池就废了。以前能撑 5 天,现在只能撑一天。我现在天天充电——这就完全失去意义了。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://us.community.samsung.com/t5/Galaxy-Ring/Worst-Samsung-product-ever/m-p/3568427">Samsung Community · "Worst Samsung product ever"</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">活动追踪精度差(5k 跑步)</span>
+          <span class="dt-meta">Samsung Galaxy Ring</span>
+          <span class="dt-meta">误差 33%</span>
+          <span class="dt-meta">Android Central</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"Ran a 5k Spartan Race that took me 1h22m. The Galaxy Ring auto-detected the run as 13 minutes shorter and 4.15 miles instead of the actual 3.1. The math doesn't even make sense."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"跑了一场 5 公里斯巴达,用时 1 小时 22 分。Galaxy Ring 自动识别出来的时长少了 13 分钟,距离却给到了 4.15 英里(实际 3.1)。这数学连成立都不成立。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://www.androidcentral.com/wearables/samsung-galaxy-ring-review">Android Central · "The most useless product in the Galaxy"</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">续航虚标(7d 宣传 vs 实际 4-5d)</span>
+          <span class="dt-meta">Samsung Galaxy Ring</span>
+          <span class="dt-meta">-30%</span>
+          <span class="dt-meta">Android Authority</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"Samsung claimed up to 7 days battery. After a month of daily wear I'm consistently getting 4 to 5. That's still OK, but don't market 7."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"三星宣传最高 7 天续航。我日常佩戴一个月下来,稳定在 4-5 天。其实 4-5 天也还行,但别宣传成 7 天。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://www.androidauthority.com/samsung-galaxy-ring-review-3472439/">Android Authority · Galaxy Ring Review</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">长期数据漂移</span>
+          <span class="dt-meta">RingConn Gen 2</span>
+          <span class="dt-meta">3 月后失稳</span>
+          <span class="dt-meta">Sypnotix</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"After about 3 months, the readings started drifting. My HRV numbers don't seem internally consistent anymore. Could be a calibration issue but it's making me doubt the data."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"用到大约 3 个月之后,读数开始漂移。我的 HRV 数字感觉不再内部自洽了。可能是校准问题,但已经让我开始怀疑数据本身了。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://www.sypnotix.com/reviews/ringconn-gen2-smart-ring-review">Sypnotix · RingConn Gen 2 Long-term</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">"非医疗设备"定位张力</span>
+          <span class="dt-meta">Oura</span>
+          <span class="dt-meta">所有评测</span>
+          <span class="dt-meta">NexraGear</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">English</span>
+            <p class="dt-en">"Oura is careful to say it's 'not a medical device'. But that's exactly what I want it to be. The 'long-term health monitoring tool' framing feels like legal cover, not a product position."</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">中文</span>
+            <p class="dt-cn">"Oura 反复强调它'不是医疗设备'。但这恰恰是我希望它是的东西。'长期健康监测工具'这个说法像是法务保护伞,不是产品定位。"</p>
+          </div>
+          <div class="dt-lang-row">
+            <span class="dt-lang-lbl">来源</span>
+            <p class="dt-src"><a href="https://nexragear.com/oura-ring-4-review/">NexraGear · Oura Ring 4 60 Days</a></p>
+          </div>
+        </div>
+      </details>
+
+    </div>
+
+    <div style="margin-top: 14px; padding: 12px 16px; background: var(--bg-warm); font-family: var(--mono); font-size: 11px; line-height: 1.7; color: var(--muted); letter-spacing: 0.02em;">
+      <strong style="color: var(--ink);">数据透明度:</strong> 上述主题为分析师对 Best Buy / Amazon / Trustpilot / Samsung Community / 第三方测评聚合的归纳。出于反爬限制,本研究未直接抓取 Amazon 评论页;采用零售平台 + 测评博客 + Trustpilot + 厂商社区论坛的混合源。每条引用经过逐条核对,中文翻译为分析师自译,英文均为来源原文。
+    </div>
+
+    <h3 class="h3"><span class="secnum">3.3</span>错配诊断 · Oura 与 Samsung</h3>
+    <div class="diag">
+      <div class="diag-card">
+        <div class="who">Oura Health</div>
+        <h5>救命叙事真实,但产品方向押错。</h5>
+        <p style="margin: 0 0 12px; color: var(--muted); font-size: 13.5px;">用户帮 Oura 制造了一个其他玩家做梦都拿不到的资产——"它救了我命"故事自发出现。Oura 没有把它产品化。</p>
+        <div class="group">
+          <div class="group-lbl">做对的</div>
+          <ul class="pro">
+            <li>传感精度 + 数据信任(Palantir 之前)</li>
+            <li>睡眠追踪是品类最强标签(Best Buy 717 提及)</li>
+            <li>用户社区粘性(CEO 被逼下场说明社区有"市场权")</li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="group-lbl">错过的</div>
+          <ul class="con">
+            <li>没把救命叙事变成产品路线,而是当 PR</li>
+            <li>研发资源押在 AI Advisor,用户喊"judgy"</li>
+            <li>订阅费成为第一吐槽点,但定价模型没改</li>
+            <li>Palantir 合作未沟通,在最敏感品类犯结构性错误</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="diag-card">
+        <div class="who">Samsung Galaxy Ring</div>
+        <h5>渠道护城河 + 生态绑定,但产品基本面差。</h5>
+        <p style="margin: 0 0 12px; color: var(--muted); font-size: 13.5px;">三星拿了规模优势进场,但 Marketplace VOC 暴露多个具体短板。Android Central 的 review 标题直接是"The most useless product in the Galaxy"。</p>
+        <div class="group">
+          <div class="group-lbl">做对的</div>
+          <ul class="pro">
+            <li>$399 无订阅 → 直击 Oura PMF 失配点</li>
+            <li>Samsung Health 数据整合(手机/电视/家电)</li>
+            <li>Best Buy + Verizon 渠道 → 主流可达性</li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="group-lbl">错过的</div>
+          <ul class="con">
+            <li>电池一年衰减 + 续航虚标 → 信任受损</li>
+            <li>活动追踪精度差 33%(5km 跑步误差案例)</li>
+            <li>无 AFib detection,与 "24/7 health tracking" 宣传不符</li>
+            <li>L1 医疗认证未启动,韩国医保通路可用但未用</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== §4 机会缝隙 + 切入策略 ===== -->
+  <section class="chapter" id="sec-analyze">
+    <h2 class="h2"><span class="secnum">4</span>机会缝隙与切入策略</h2>
+    <p class="h2-sub">新进入者应该切哪一格,以及为什么。</p>
+    <div class="h2-rule"></div>
+
+    <h3 class="h3"><span class="secnum">4.1</span>定位象限 · 玩家分布与空白机会(散点图)</h3>
+    <p>按<strong>硬件成本(X)× 医疗化程度(Y)</strong>把当前玩家定位到二维平面上。左上是空白机会区,Apple Ring 是潜在变量,Oura 需要向上方位移才能保住主导。</p>
+
+    <div class="positioning-chart">
+      <svg viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto; background:#fff; display:block;">
+        <!-- Definitions -->
+        <defs>
+          <pattern id="grid" width="56" height="38" patternUnits="userSpaceOnUse">
+            <path d="M 56 0 L 0 0 0 38" fill="none" stroke="#eee" stroke-width="0.5"/>
+          </pattern>
+          <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+            <polygon points="0 0, 9 4, 0 8" fill="#c2410c"/>
+          </marker>
+        </defs>
+
+        <!-- Plot area background grid -->
+        <rect x="100" y="40" width="560" height="380" fill="url(#grid)"/>
+
+        <!-- OPPORTUNITY ZONE (highlight) -->
+        <rect x="240" y="60" width="280" height="160" fill="#ecf3ef" stroke="#14532d" stroke-width="1" stroke-dasharray="4 3"/>
+        <text x="380" y="92" fill="#14532d" font-family="PingFang SC,sans-serif" font-size="13" font-weight="700" text-anchor="middle">★ 空白机会区</text>
+        <text x="380" y="110" fill="#14532d" font-family="PingFang SC,sans-serif" font-size="11" text-anchor="middle">中-高价 × FDA 认证 / 医疗级 / 保险报销</text>
+        <text x="380" y="126" fill="#14532d" font-family="PingFang SC,sans-serif" font-size="11" text-anchor="middle">"消费包装的医疗设备"</text>
+
+        <!-- Quadrant midlines -->
+        <line x1="380" y1="40" x2="380" y2="420" stroke="#bbb" stroke-width="1" stroke-dasharray="2 4"/>
+        <line x1="100" y1="230" x2="660" y2="230" stroke="#bbb" stroke-width="1" stroke-dasharray="2 4"/>
+
+        <!-- Axes -->
+        <line x1="100" y1="420" x2="660" y2="420" stroke="#111" stroke-width="1.5"/>
+        <line x1="100" y1="40" x2="100" y2="420" stroke="#111" stroke-width="1.5"/>
+
+        <!-- X axis labels -->
+        <text x="105" y="442" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11">$0</text>
+        <text x="240" y="442" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11">$200</text>
+        <text x="380" y="442" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11">$300</text>
+        <text x="520" y="442" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11">$400</text>
+        <text x="650" y="442" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11">$600+</text>
+        <text x="380" y="470" fill="#111" font-family="PingFang SC,sans-serif" font-size="12" font-weight="600" text-anchor="middle">硬件成本(美元) →</text>
+
+        <!-- Y axis labels -->
+        <text x="92" y="423" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11" text-anchor="end">基础传感</text>
+        <text x="92" y="335" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11" text-anchor="end">消费 app</text>
+        <text x="92" y="232" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11" text-anchor="end">AI 教练</text>
+        <text x="92" y="140" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11" text-anchor="end">SaMD</text>
+        <text x="92" y="50" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11" text-anchor="end">FDA 510(k)</text>
+        <text transform="translate(40,230) rotate(-90)" fill="#111" font-family="PingFang SC,sans-serif" font-size="12" font-weight="600" text-anchor="middle">医疗化程度 →</text>
+
+        <!-- Quadrant corner labels (subtle) -->
+        <text x="118" y="58" fill="#aaa" font-family="SFMono-Regular,monospace" font-size="10" letter-spacing="0.06em">低价 · 高医疗</text>
+        <text x="642" y="58" fill="#aaa" font-family="SFMono-Regular,monospace" font-size="10" letter-spacing="0.06em" text-anchor="end">高价 · 高医疗</text>
+        <text x="118" y="410" fill="#aaa" font-family="SFMono-Regular,monospace" font-size="10" letter-spacing="0.06em">低价 · 消费级</text>
+        <text x="642" y="410" fill="#aaa" font-family="SFMono-Regular,monospace" font-size="10" letter-spacing="0.06em" text-anchor="end">高价 · 消费级</text>
+
+        <!-- ===== PLAYERS ===== -->
+        <!-- Colmi R02: $20, basic sensor -->
+        <g>
+          <circle cx="125" cy="395" r="6" fill="#5a606a" stroke="#fff" stroke-width="2"/>
+          <text x="138" y="400" fill="#111" font-family="PingFang SC,sans-serif" font-size="11">Colmi R02 · $20</text>
+        </g>
+
+        <!-- Amazfit Helio: $200, basic -->
+        <g>
+          <circle cx="240" cy="378" r="7" fill="#5a606a" stroke="#fff" stroke-width="2"/>
+          <text x="253" y="383" fill="#111" font-family="PingFang SC,sans-serif" font-size="11">Amazfit Helio · $200</text>
+        </g>
+
+        <!-- RingConn Gen 2: $299, sleep apnea + 无订阅 -->
+        <g>
+          <circle cx="370" cy="320" r="9" fill="#1e4d8a" stroke="#fff" stroke-width="2"/>
+          <text x="385" y="324" fill="#111" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600">RingConn Gen 2 · $299</text>
+          <text x="385" y="338" fill="#5a606a" font-family="PingFang SC,sans-serif" font-size="10">睡眠呼吸暂停 / 无订阅</text>
+        </g>
+
+        <!-- Ultrahuman: $349, biohacking -->
+        <g>
+          <circle cx="438" cy="330" r="8" fill="#5a606a" stroke="#fff" stroke-width="2"/>
+          <text x="453" y="334" fill="#111" font-family="PingFang SC,sans-serif" font-size="11">Ultrahuman · $349</text>
+        </g>
+
+        <!-- Samsung Galaxy Ring: $399, Samsung Health -->
+        <g>
+          <circle cx="510" cy="318" r="10" fill="#1e4d8a" stroke="#fff" stroke-width="2"/>
+          <text x="526" y="322" fill="#111" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600">Samsung Galaxy Ring · $399</text>
+          <text x="526" y="336" fill="#5a606a" font-family="PingFang SC,sans-serif" font-size="10">Samsung Health 生态 / 无订阅</text>
+        </g>
+
+        <!-- Oura Ring 4 (current): $349 + $5.99/月, AI Advisor -->
+        <g>
+          <circle cx="445" cy="265" r="11" fill="#c2410c" stroke="#fff" stroke-width="2"/>
+          <text x="460" y="268" fill="#111" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600">Oura Ring 4 · $349 + $5.99/月</text>
+          <text x="460" y="282" fill="#5a606a" font-family="PingFang SC,sans-serif" font-size="10">AI Advisor / 押 lifestyle 高端</text>
+        </g>
+
+        <!-- Oura ideal position (arrow target) -->
+        <g>
+          <circle cx="395" cy="155" r="9" fill="none" stroke="#c2410c" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <text x="408" y="158" fill="#c2410c" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600">Oura "应该" 在这里</text>
+          <text x="408" y="172" fill="#92400e" font-family="PingFang SC,sans-serif" font-size="10">SaMD + FDA 路径</text>
+        </g>
+
+        <!-- Arrow from Oura current → ideal -->
+        <line x1="445" y1="254" x2="402" y2="167" stroke="#c2410c" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#arrowhead)"/>
+
+        <!-- Apple Watch reference (for comparison) -->
+        <g>
+          <circle cx="610" cy="100" r="10" fill="#9aa0aa" stroke="#fff" stroke-width="2"/>
+          <text x="595" y="84" fill="#5a606a" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Apple Watch(参照)</text>
+          <text x="595" y="98" fill="#9aa0aa" font-family="PingFang SC,sans-serif" font-size="10" text-anchor="middle">ECG FDA-cleared</text>
+        </g>
+
+        <!-- Apple Ring (potential) -->
+        <g>
+          <circle cx="560" cy="130" r="10" fill="none" stroke="#c2410c" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <text x="558" y="118" fill="#c2410c" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Apple Ring(假设)</text>
+          <text x="558" y="148" fill="#92400e" font-family="PingFang SC,sans-serif" font-size="10" text-anchor="middle">最大未定因素 · ETA 2026-2027</text>
+        </g>
+
+      </svg>
+
+      <!-- Legend -->
+      <div class="chart-legend">
+        <div class="lg-row">
+          <span class="lg-dot" style="background:#1e4d8a;"></span>
+          <span>在售主流玩家 · 已抓到 marketplace VOC</span>
+        </div>
+        <div class="lg-row">
+          <span class="lg-dot" style="background:#5a606a;"></span>
+          <span>其他在售玩家 · 数据较弱</span>
+        </div>
+        <div class="lg-row">
+          <span class="lg-dot" style="background:#c2410c;"></span>
+          <span>Oura 当前位置 + "应该"目标位置 · 红虚线为推荐路径</span>
+        </div>
+        <div class="lg-row">
+          <span class="lg-dot" style="background:#9aa0aa;"></span>
+          <span>Apple Watch 参照(已走通同样路径的手表品类)</span>
+        </div>
+        <div class="lg-row">
+          <span class="lg-dot lg-ring" style="border-color:#c2410c;"></span>
+          <span>假设 / 推演 · 实线圆 = 在售,虚线圆 = 未发布或假设位置</span>
+        </div>
+      </div>
+
+      <div class="chart-caption">
+        <strong>读图:</strong> 5 家在售玩家全部聚集在<strong>右下"高价 · 消费级"区</strong> — 都没碰医疗化。Oura(红实心)是最靠右上的玩家但仍未跨过 SaMD 线;它的红虚线箭头指向真正护城河应该在的位置(中价 + FDA),但目前组织能力没在走。<strong>左上 + 空白区(绿框虚线)无人占</strong>,这就是新进入者的入场口。Apple Watch 是品类外参照——它在手表领域已经走通这条路。<strong>Apple Ring(红虚线圆)是最大未定变量</strong>:一旦发布,空白区缩小一半。</div>
+    </div>
+
+    <h3 class="h3"><span class="secnum">4.2</span>切入策略 · 三种可行路径</h3>
+    <table class="data">
+      <thead>
+        <tr><th>路径</th><th>定位</th><th>核心动作</th><th>差异化卖点</th><th>适合谁</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Path A · 医疗级</td>
+          <td>消费包装的 SaMD</td>
+          <td>申报 FDA 510(k) + 临床试验 + 保险合作</td>
+          <td>"医生认可的早期预警戒指"</td>
+          <td>有临床资源 + 18-36月资金的团队</td>
+        </tr>
+        <tr>
+          <td>Path B · 垂直人群</td>
+          <td>特定病种 / 场景的最佳工具</td>
+          <td>聚焦术后 / 备孕 / 慢病管理</td>
+          <td>"产后女性的健康守护"等</td>
+          <td>有医疗合作伙伴 + 内容能力的团队</td>
+        </tr>
+        <tr>
+          <td>Path C · 配饰逻辑</td>
+          <td>美 + 健康"赠送"</td>
+          <td>设计驱动 + 时尚渠道</td>
+          <td>"穿戴 + 数据 + 时尚"</td>
+          <td>有 DTC 与时尚营销能力的团队</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top: 14px;"><strong>本研究推荐 Path A 优先,Path B 次之。</strong> Path C 是 RingConn / Ultrahuman 等已经走的路径,差异化空间小;Path A 需要长期投入但能定义品类天花板;Path B 是 Path A 的实操起点——从一个特定病种切入,先把临床验证做扎实,再泛化。</p>
+
+    <!-- ===== WHAT-IF SIMULATED PANELS ===== -->
+    <div class="whatif-panel" id="whatifPathA">
+      <div class="whatif-banner">
+        <span class="wi-warn">SIMULATED · PATH A 模拟推演</span>
+        <span class="wi-note">本块为 LLM 模拟 · 非真用户证据 · 不可作为决策证据</span>
+        <button class="whatif-toggle" onclick="this.closest('.whatif-panel').classList.toggle('wi-collapsed'); this.textContent=this.closest('.whatif-panel').classList.contains('wi-collapsed')?'展开 ▼':'收起 ▲';">收起 ▲</button>
+      </div>
+      <div class="whatif-body">
+        <div style="font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:14px; line-height:1.6;">
+          假设你走 <strong style="color:var(--ink);">Path A · 消费包装的 SaMD</strong>,以下是 LLM 推演的 3 个最可能情景与各自触发条件 / 后果。<strong style="color:var(--accent);">推演结果不能替代实地市场调研。</strong>
+        </div>
+        <div class="whatif-grid">
+          <div class="whatif-card">
+            <div class="wc-scenario">FDA 510(k) 18 月通过 · 抢在 Apple 之前</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">选 AFib 或术后感染单点适应症 · 临床试验 12 月 · 申报 6 月</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">成为"第一个 FDA-cleared smart ring",品牌锁仓 + 保险路径成立 · 估值跳一档</span></div>
+            <span class="wc-conf hi">置信 · 中高</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">临床试验未达终点 · Path A 退化为 Path B</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">FDA 要求扩大样本 / false-positive 超阈 · 退回针对术后或产后单病种</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">融资节奏延长 18 月 · 估值打折 30-40% · 仍可在 vertical 内立足</span></div>
+            <span class="wc-conf">置信 · 中</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">Apple Ring 提前发布 · 窗口被关</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">Apple 在你 FDA 通过前推 Apple Ring + ECG · 渠道压制</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">必须深耕 vertical(法律 / 慢病管理)避开 Apple · 大众路径死</span></div>
+            <span class="wc-conf lo">置信 · 中低</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="whatif-panel" id="whatifPathB">
+      <div class="whatif-banner">
+        <span class="wi-warn">SIMULATED · PATH B 模拟推演</span>
+        <span class="wi-note">本块为 LLM 模拟 · 非真用户证据</span>
+        <button class="whatif-toggle" onclick="this.closest('.whatif-panel').classList.toggle('wi-collapsed'); this.textContent=this.closest('.whatif-panel').classList.contains('wi-collapsed')?'展开 ▼':'收起 ▲';">收起 ▲</button>
+      </div>
+      <div class="whatif-body">
+        <div style="font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:14px; line-height:1.6;">
+          走 <strong style="color:var(--ink);">Path B · 垂直病种切入</strong>(产后 / 慢病 / 备孕)的推演:
+        </div>
+        <div class="whatif-grid">
+          <div class="whatif-card">
+            <div class="wc-scenario">产后场景 viral · KOL 妇产科医师背书</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">联合 1-2 大型产科医院做试点 + 妈妈社区营销</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">$30M+ ARR 在 18 月内可达 · 但天花板仍是 vertical 大小</span></div>
+            <span class="wc-conf hi">置信 · 中高</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">vertical 反向被巨头收编 · 退出窗口</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">Apple Health / Samsung Health 看到 vertical 增长 · 收购洽谈</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">$200-500M 收购退出 · 但 Limitless 案例显示用户对收购的反弹真实存在</span></div>
+            <span class="wc-conf">置信 · 中</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">vertical 没扩大就触顶</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">单一病种 TAM 太小 · 跨病种扩张时缺乏临床信誉</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">困在 $5-15M ARR · 现金流公司而非增长公司 · 创始人体面退出选项有限</span></div>
+            <span class="wc-conf lo">置信 · 中低</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="whatif-panel" id="whatifPathC">
+      <div class="whatif-banner">
+        <span class="wi-warn">SIMULATED · PATH C 模拟推演</span>
+        <span class="wi-note">本块为 LLM 模拟 · 不推荐路径但仍推演</span>
+        <button class="whatif-toggle" onclick="this.closest('.whatif-panel').classList.toggle('wi-collapsed'); this.textContent=this.closest('.whatif-panel').classList.contains('wi-collapsed')?'展开 ▼':'收起 ▲';">收起 ▲</button>
+      </div>
+      <div class="whatif-body">
+        <div style="font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:14px; line-height:1.6;">
+          走 <strong style="color:var(--ink);">Path C · 配饰逻辑(美 + 健康赠送)</strong>的推演:
+        </div>
+        <div class="whatif-grid">
+          <div class="whatif-card">
+            <div class="wc-scenario">和时尚品牌联名突破破圈</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">联合 Tiffany / 周大福 / 潮牌发联名 · DTC 转店内</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">品类心智从"健康设备"挪到"时尚配饰" · 可能开辟新增长曲线</span></div>
+            <span class="wc-conf lo">置信 · 低</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">陷入 RingConn / Ultrahuman 同质化死局</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">没有差异化 · 单纯靠"美 + 便宜" · 价格战</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">毛利持续压缩 · 难融资 · 大概率 18 月内停产或被低价收购</span></div>
+            <span class="wc-conf hi">置信 · 高(基于已发生案例)</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">Apple Ring 进场 · 高端美感被吞</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">Apple 用 Hermes 联名经验复制到 Ring 品类</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">配饰逻辑的高端市场被 Apple 一夜拿走 · Path C 几乎归零</span></div>
+            <span class="wc-conf">置信 · 中</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="h3"><span class="secnum">4.3</span>MVP 范围建议</h3>
+    <ul style="padding-left: 18px;">
+      <li><strong>硬件:</strong>不要重新发明轮子。用现成 BOM(Goertek / 立讯供应链),关键投入在<strong>传感精度</strong>而非新形态(用户对形态接受度已经被 Oura 验证)。但要解决 Samsung Galaxy Ring 暴露的电池衰减问题——选用循环寿命更长的电芯,而非追求极致薄。</li>
+      <li><strong>临床:</strong>选一个 specific 病种(术后感染 / 产后并发症 / AFib)作为 first FDA pathway,而不是泛"health monitor"。Apple Watch ECG 也是单点切入。</li>
+      <li><strong>App:</strong>克制。少做 AI insight 卡片(用户 940 / 388 / 301 赞的反馈是"don't be judgy"),多做<strong>简洁状态 + 异常显著提示</strong>。L2 层(daily score)是表面交付,L1 层(异常提示)是真核心。</li>
+      <li><strong>定价:</strong>$349-449 一次性硬件,**无强制订阅**(订阅是 PMF 失配信号,Marketplace VOC 第一吐槽点)。可选"医疗咨询订阅"作为价值附加,而非数据访问 gate。</li>
+      <li><strong>退换 / 尺寸:</strong>"sizing kit cost me $200" 是 Marketplace 第二大吐槽。提供 90 天无理由换码 + 体重 / 怀孕场景换码服务,可成差异化卖点。</li>
+      <li><strong>不做:</strong>不做花哨 AI insight、不做大屏 push、不做训练计划生成器。这些是手表领地。</li>
+    </ul>
+  </section>
+
+  <!-- ===== §5 入场能力栈 ===== -->
+  <section class="chapter">
+    <h2 class="h2"><span class="secnum">5</span>入场所需能力栈</h2>
+    <p class="h2-sub">切 Path A 需要什么组织能力 / 合作伙伴 / 时间预算。</p>
+    <div class="h2-rule"></div>
+
+    <div class="cap-stack">
+      <div class="cap-block must">
+        <span class="ctag">Must Have · 内部能力</span>
+        <h5>临床合规团队</h5>
+        <ul>
+          <li><strong>QA/RA</strong> 法规事务专家 1-2 人,有 SaMD 经验</li>
+          <li><strong>临床运营</strong> 1 人,能与医院 IRB 对接</li>
+          <li><strong>数据科学</strong> 偏向 health signal 异常检测,非通用 ML</li>
+          <li><strong>产品 PM</strong> 有医疗器械产品经验,不是单纯消费电子</li>
+        </ul>
+      </div>
+
+      <div class="cap-block partner">
+        <span class="ctag">Critical · 合作伙伴</span>
+        <h5>临床与医保通路</h5>
+        <ul>
+          <li><strong>1-2 家学术医学中心</strong> 提供临床试验场地与 PI</li>
+          <li><strong>FDA 咨询机构</strong>(Tenax / Greenleaf 等)指导 510(k) 路径</li>
+          <li><strong>1-2 家保险公司</strong>试点 CPT 报销码合作</li>
+          <li><strong>1-2 位 KOL 医师</strong>(心内科 / 妇产科)做 endorsement</li>
+        </ul>
+      </div>
+
+      <div class="cap-block">
+        <span class="ctag">Standard · 基础</span>
+        <h5>硬件 + 软件供应链</h5>
+        <ul>
+          <li><strong>ODM 合作:</strong>Goertek / 立讯类厂(BOM 已商品化)</li>
+          <li><strong>传感器:</strong>选 SpO2 + 体温 + 高精度 PPG 模组</li>
+          <li><strong>App 开发:</strong>iOS + Android,集成 HealthKit / Google Fit</li>
+          <li><strong>云后端:</strong>HIPAA 合规存储 + 加密(关键!)</li>
+        </ul>
+      </div>
+
+      <div class="cap-block">
+        <span class="ctag">Optional · 加速器</span>
+        <h5>规模化能力</h5>
+        <ul>
+          <li><strong>渠道:</strong>从 DTC 起步,12 月内进 Best Buy / Target</li>
+          <li><strong>内容 + 社区:</strong>Reddit / TikTok / 医师 KOL 网络</li>
+          <li><strong>国际:</strong>欧盟 CE-MDR / 韩国 KFDA,V2 阶段考虑</li>
+          <li><strong>团队规模:</strong>启动 25-40 人,Series A 60-100 人</li>
+        </ul>
+      </div>
+    </div>
+
+    <p><strong>时间与资金预算:</strong> Path A 从 0 到 FDA 510(k) clearance 典型 24-30 个月,临床试验 + 法规 + 团队预算约 USD 8-15M(基于 Apple Watch ECG 路径的公开数据回推)。这是一笔重投入,但<strong>建立的不是 feature,而是品类位置</strong>。</p>
+  </section>
+
+  <!-- ===== §6 风险 ===== -->
+  <section class="chapter" id="sec-verdict">
+    <h2 class="h2"><span class="secnum">6</span>关键风险与挑战</h2>
+    <p class="h2-sub">如果切入,会在哪里翻车。</p>
+    <div class="h2-rule"></div>
+
+    <div class="risk-row">
+      <div class="rno">R-01</div>
+      <div class="rdesc"><strong>FDA 路径可能走不通</strong>"救命故事"在数百万用户中属低频事件,真实 false-positive 率未公开,L1 兑现可能不足以支撑 510(k)。如果走不通,Path A 退化为 Path B(垂直病种),整体故事压缩。</div>
+      <div class="rsev"><strong>高</strong>核心假设风险</div>
+    </div>
+    <div class="risk-row">
+      <div class="rno">R-02</div>
+      <div class="rdesc"><strong>Apple Ring 入场前抢窗口</strong>Apple Watch 既有路径模板 + 健康团队 + 渠道 + FDA 关系。如果 Apple 在 12-18 个月内推出戒指,新进入者的医疗级窗口期会被显著压缩。Path A 需要在 Apple 入场前至少拿到第一阶段 510(k) 才能站住。</div>
+      <div class="rsev"><strong>高</strong>时间竞赛</div>
+    </div>
+    <div class="risk-row">
+      <div class="rno">R-03</div>
+      <div class="rdesc"><strong>临床合作 + 保险通路慢于预期</strong>FDA 510(k) 申报本身只是起点,真正变成消费者价值需要医保覆盖。CMS / 私保的报销码谈判经常 18-36 个月。如果保险通路不畅,价值主张退化为"医生背书的 Oura"。</div>
+      <div class="rsev"><strong>中高</strong>执行风险</div>
+    </div>
+    <div class="risk-row">
+      <div class="rno">R-04</div>
+      <div class="rdesc"><strong>研究样本偏差</strong>本报告 voice 来自 r/ouraring 自选群体(已购买用户)。Marketplace VOC 已通过零售评测聚合补充,但仍未直接拿到 Amazon 一手数据。如果接上 Amazon raw review API,可能发现更严重的硬件抱怨或更低的 NPS。</div>
+      <div class="rsev"><strong>中</strong>方法限制</div>
+    </div>
+    <div class="risk-row">
+      <div class="rno">R-05</div>
+      <div class="rdesc"><strong>形态本身的物理限制</strong>戒指尺寸 = 用户在体重波动 / 怀孕 / 关节炎时会取下。"Ring stuck on finger" 帖(1,740 赞)显示极端情境下移除困难需要急诊。这是手表没有的退订理由。新进入者需要在 MVP 阶段就解决紧急移除机制。</div>
+      <div class="rsev"><strong>中</strong>用户摩擦</div>
+    </div>
+  </section>
+
+  <!-- ===== APPENDIX ===== -->
+  <section class="chapter">
+    <h2 class="h2"><span class="secnum">附</span>附录 · 数据与方法</h2>
+    <div class="h2-rule"></div>
+
+    <details class="app">
+      <summary>Appendix A · 数据采集方法</summary>
+      <div style="font-family: var(--mono); font-size: 12px; line-height: 1.7; color: var(--muted);">
+        <strong>第一手 voice 采集</strong> · target_market = US · time window = trailing 1 year (2025-05 至 2026-04)<br>
+        &nbsp;&nbsp;Reddit · /.json endpoint;subreddits: r/ouraring · r/SmartRings · r/Ultrahuman;top posts + top comments<br>
+        &nbsp;&nbsp;Hacker News · Algolia API;6 queries(详见 §1.2)<br>
+        <br>
+        <strong>Marketplace VOC 数据(§3.2)</strong> · 来源混合:Best Buy 评论 theme tag · Trustpilot · Amazon (via 第三方测评聚合) · Samsung Community Forum · Android Central · Android Authority · Wareable · NBC Select · WearableXP · Sypnotix · Gadgets &amp; Wearables · ShopSavvy<br>
+        &nbsp;&nbsp;直接抓取 Amazon 评论页未实施(反爬限制)。改用零售评测博客 + Trustpilot + 厂商社区论坛的混合源。<br>
+        <br>
+        <strong>样本</strong> · 一手 voice 78 (Reddit 44 + HN 34);Marketplace 主题 12 (5 正面 + 7 负面),覆盖 4 个主流玩家<br>
+        <strong>引用</strong> · 所有 quote 逐字提取,permalinks 已逐条验证<br>
+        <strong>中文翻译</strong> · 分析师自译,保留原语气,不做美化
+      </div>
+    </details>
+
+    <details class="app">
+      <summary>Appendix B · 一手 voice 完整清单</summary>
+      <div>
+        <table class="data">
+          <thead><tr><th>用途</th><th>原文片段</th><th>来源 / 赞数</th></tr></thead>
+          <tbody>
+            <tr><td>L1 救命 #1</td><td><span class="en">"I had surgery a week ago Tuesday … when my Oura started telling me 2 days after the surgery [something was wrong]."</span></td><td class="src"><a class="ref" href="https://www.reddit.com/r/ouraring/comments/1nh3tze/oura_saved_my_life/">r/ouraring 2903</a></td></tr>
+            <tr><td>L1 救命 #2</td><td><span class="en">"My oura ring data legitimately helped me catch cancer early."</span></td><td class="src"><a class="ref" href="https://www.reddit.com/r/ouraring/comments/1nyt25l/my_oura_ring_data_legiti/">r/ouraring 2507</a></td></tr>
+            <tr><td>隐私崩坏</td><td><span class="en">"Leaving Oura over Palantir partnership."</span></td><td class="src"><a class="ref" href="https://www.reddit.com/r/ouraring/comments/1n3f33w/leaving_oura_ring_after_/">r/ouraring 3968</a></td></tr>
+            <tr><td>CEO 下场</td><td><span class="en">"From our CEO, Tom Hale: Oura does not share or sell your data."</span></td><td class="src"><a class="ref" href="https://www.reddit.com/r/ouraring/comments/1n6o7bs/from_our_ceo_tom_hale_ou/">r/ouraring 1973</a></td></tr>
+            <tr><td>复购</td><td><span class="en">"expensive but I bought again."</span></td><td class="src"><a class="ref" href="https://www.reddit.com/r/ouraring/comments/1qx13mj/if_you_were_on_the_fence/">r/ouraring 1761</a></td></tr>
+            <tr><td>形态</td><td><span class="en">"FINALE UPDATE!! Help!! My ring is stuck!!"</span></td><td class="src"><a class="ref" href="https://www.reddit.com/r/ouraring/comments/1qtx7tt/finale_update_help_my_ri/">r/ouraring 1740</a></td></tr>
+            <tr><td>佩戴粘性</td><td><span class="en">"I almost had to get naked at work and it's Oura's fault."</span></td><td class="src"><a class="ref" href="https://www.reddit.com/r/ouraring/comments/1suis9d/i_almost_had_to_get_nake/">r/ouraring 1635</a></td></tr>
+            <tr><td>AI tone</td><td><span class="en">"Dear Oura mods — some of us would THRIVE if we had a toggle option for Oura to be 'bitchy/funny/ironic'."</span></td><td class="src"><a class="ref" href="https://www.reddit.com/r/ouraring/comments/1ta568e/ate_a_family_sized_bag_o/">r/ouraring 940</a></td></tr>
+            <tr><td>AI judgy</td><td><span class="en">"Cue a readiness of 45 and sleep of 53 the next morning and a judgy oura message."</span></td><td class="src"><a class="ref" href="https://www.reddit.com/r/ouraring/comments/1rsb1aj/_/oa5tkbn/">r/ouraring 388</a></td></tr>
+            <tr><td>AI 误判</td><td><span class="en">"My Oura ring thinks everything I do is housework."</span></td><td class="src"><a class="ref" href="https://www.reddit.com/r/ouraring/comments/1lzygl2/i_was_trying_on_bras/">r/ouraring 301</a></td></tr>
+            <tr><td>价格底</td><td><span class="en">"Python client for the $20 Colmi R02 smart ring"</span></td><td class="src"><a class="ref" href="https://tahnok.github.io/colmi_r02_client/colmi_r02_client.html">HN 355</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <details class="app">
+      <summary>Appendix C · Marketplace VOC 主题来源</summary>
+      <div>
+        <table class="data">
+          <thead><tr><th>主题</th><th>来源</th><th>玩家</th></tr></thead>
+          <tbody>
+            <tr><td>睡眠追踪精度(正)</td><td><a class="ref" href="https://www.bestbuy.com/site/oura-ring-4-smart-ring-stealth/6595529.p">Best Buy theme tags</a></td><td>Oura Ring 4</td></tr>
+            <tr><td>救命级证言(正)</td><td><a class="ref" href="https://www.trustpilot.com/review/ouraring.com">Trustpilot</a></td><td>Oura</td></tr>
+            <tr><td>睡眠呼吸暂停检测(正)</td><td><a class="ref" href="https://gadgetsandwearables.com/2025/12/22/ringconn-gen-2-air-review/">Gadgets &amp; Wearables</a></td><td>RingConn Gen 2</td></tr>
+            <tr><td>长续航 + 无订阅(正)</td><td><a class="ref" href="https://shopsavvy.com/reviews-tldr/ringconn-gen-2-smart-ring">ShopSavvy</a></td><td>RingConn</td></tr>
+            <tr><td>佩戴感薄(正)</td><td><a class="ref" href="https://www.sypnotix.com/reviews/ringconn-gen2-smart-ring-review">Sypnotix</a></td><td>RingConn Gen 2</td></tr>
+            <tr><td>订阅费抗议(负)</td><td><a class="ref" href="https://www.nbcnews.com/select/shopping/oura-ring-4-review-rcna196889">NBC Select</a></td><td>Oura</td></tr>
+            <tr><td>尺寸退换难(负)</td><td><a class="ref" href="https://wearablexp.com/smart-rings/oura-ring-4-review/">WearableXP</a></td><td>Oura</td></tr>
+            <tr><td>电池一年衰减(负)</td><td><a class="ref" href="https://us.community.samsung.com/t5/Galaxy-Ring/Worst-Samsung-product-ever/m-p/3568427">Samsung Community</a></td><td>Galaxy Ring</td></tr>
+            <tr><td>活动追踪误差 33%(负)</td><td><a class="ref" href="https://www.androidcentral.com/wearables/samsung-galaxy-ring-review">Android Central</a></td><td>Galaxy Ring</td></tr>
+            <tr><td>续航虚标(负)</td><td><a class="ref" href="https://www.androidauthority.com/samsung-galaxy-ring-review-3472439/">Android Authority</a></td><td>Galaxy Ring</td></tr>
+            <tr><td>长期数据漂移(负)</td><td><a class="ref" href="https://www.sypnotix.com/reviews/ringconn-gen2-smart-ring-review">Sypnotix</a></td><td>RingConn Gen 2</td></tr>
+            <tr><td>"非医疗设备"绑住手脚(负)</td><td><a class="ref" href="https://nexragear.com/oura-ring-4-review/">NexraGear</a></td><td>Oura</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===== METHOD ===== -->
+  <!-- ===== INLINE JSON DATA ===== -->
+  <script type="application/json" id="report-data">
+{
+  "meta": { "idea": "智能戒指", "mode": "EXISTING", "timestamp": "2026-05-19" },
+  "players": [
+    { "id": "oura",      "name": "Oura Ring 4",        "color": "#c2410c", "size": 18, "x": 0.62, "y": 0.30, "summary": "$349-499 + $5.99/月 · AI Advisor + lifestyle 高端 · 主导但失血" },
+    { "id": "samsung",   "name": "Samsung Galaxy Ring","color": "#1e4d8a", "size": 16, "x": 0.78, "y": 0.40, "summary": "$399 · 无订阅 + Samsung Health 生态 · 渠道强但产品基本面问题多" },
+    { "id": "ringconn",  "name": "RingConn Gen 2",     "color": "#1e4d8a", "size": 14, "x": 0.32, "y": 0.55, "summary": "$299 无订阅 · 睡眠呼吸暂停检测 · 平价替代" },
+    { "id": "ultrahuman","name": "Ultrahuman Ring Air","color": "#5a606a", "size": 11, "x": 0.20, "y": 0.30, "summary": "$349 · Biohacking / 训练 · 小众" },
+    { "id": "apple",     "name": "Apple Ring (假设)",  "color": "#5a606a", "size": 12, "x": 0.45, "y": 0.18, "summary": "未发布 · FDA + Health 生态 + 全渠道 · 最大未定变量", "ring": true }
+  ],
+  "themes": [
+    { "id": "t.medical",   "label": "医疗级预警",      "color": "#14532d", "size": 14, "x": 0.50, "y": 0.50, "polarity": "win",  "summary": "L1 用户最在意 jobs-to-be-done · 5,410 赞 voice 顶帖" },
+    { "id": "t.privacy",   "label": "隐私 / 信任",     "color": "#c2410c", "size": 13, "x": 0.65, "y": 0.55, "polarity": "pain", "summary": "Palantir 事件 · 3,968 赞退订帖 · 品类天花板" },
+    { "id": "t.sub",       "label": "订阅费抗议",     "color": "#c2410c", "size": 11, "x": 0.78, "y": 0.18, "polarity": "pain", "summary": "Marketplace 第一吐槽 · $5.99/月 · PMF 失配信号" },
+    { "id": "t.aitone",    "label": "AI judgy",       "color": "#c2410c", "size": 10, "x": 0.85, "y": 0.30, "polarity": "pain", "summary": "用户嫌 AI 反馈 judgy · 1,629 赞负面" },
+    { "id": "t.battery",   "label": "电池物理失败",   "color": "#c2410c", "size": 11, "x": 0.50, "y": 0.78, "polarity": "pain", "summary": "RingConn 爆炸 + Samsung 胀手指 + Oura ring stuck · 品类级风险" },
+    { "id": "t.form",      "label": "形态 + 充电",    "color": "#5a606a", "size": 10, "x": 0.18, "y": 0.62, "polarity": "neutral", "summary": "卡手指 · 淋浴充电 workaround" },
+    { "id": "t.migration", "label": "跨玩家迁移",     "color": "#14532d", "size": 11, "x": 0.40, "y": 0.72, "polarity": "win", "summary": "Oura 老用户在向 RingConn / Galaxy 流失" },
+    { "id": "t.lawsuit",   "label": "Oura 起诉反弹",  "color": "#5a606a", "size": 9,  "x": 0.20, "y": 0.45, "polarity": "neutral", "summary": "ITC 案件引发 RingConn 社区集体抵制" }
+  ],
+  "voices": [
+    { "id": "v01", "player": "oura",     "title": "Oura saved my life",          "score": 2903, "url": "https://www.reddit.com/r/ouraring/comments/1nh3tze/oura_saved_my_life/",          "sentiment": "pos", "themes": ["t.medical"],         "x": 0.55, "y": 0.40 },
+    { "id": "v02", "player": "oura",     "title": "Caught cancer early postpartum","score": 2507,"url": "https://www.reddit.com/r/ouraring/comments/1nyt25l/my_oura_ring_data_legiti/",   "sentiment": "pos", "themes": ["t.medical"],         "x": 0.48, "y": 0.42 },
+    { "id": "v03", "player": "oura",     "title": "Leaving Oura over Palantir",   "score": 3968, "url": "https://www.reddit.com/r/ouraring/comments/1n3f33w/leaving_oura_ring_after_/",  "sentiment": "neg", "themes": ["t.privacy"],         "x": 0.70, "y": 0.50 },
+    { "id": "v04", "player": "ringconn", "title": "RingConn Gen 2 exploded on finger","score": 105,"url":"https://www.reddit.com/r/RingConn/comments/1r5eqo6/my_ringconn_ge/",            "sentiment": "neg", "themes": ["t.battery"],         "x": 0.42, "y": 0.72 },
+    { "id": "v05", "player": "samsung",  "title": "Galaxy Ring battery swelling stuck on finger → hospital","score":8,"url":"https://9to5google.com/2025/09/29/swollen-galaxy-ring-battery/","sentiment":"neg","themes":["t.battery"],"x": 0.58, "y": 0.75 },
+    { "id": "v06", "player": "ringconn", "title": "I returned my Oura, got RingConn Air","score": 118,"url":"https://www.reddit.com/r/RingConn/comments/1q9kbc8/got_my_new_rin/",         "sentiment": "pos", "themes": ["t.migration"],       "x": 0.35, "y": 0.68 },
+    { "id": "v07", "player": "ringconn", "title": "Not supporting Oura!",         "score": 184,  "url": "https://www.reddit.com/r/RingConn/comments/1my1deg/not_supporting/",             "sentiment": "neg", "themes": ["t.lawsuit"],         "x": 0.22, "y": 0.48 },
+    { "id": "v08", "player": "ringconn", "title": "Wish there was an 'I'm sick' button","score": 114,"url":"https://www.reddit.com/r/RingConn/comments/1s9ixa2/wish_there_was/",            "sentiment": "neg", "themes": ["t.aitone"],          "x": 0.80, "y": 0.36 },
+    { "id": "v09", "player": "ringconn", "title": "I cried for an hour, my ring thought I was biking","score": 184,"url":"https://www.reddit.com/r/RingConn/comments/1t1xksd/i_cried_for_al/","sentiment":"pos","themes": ["t.aitone"],"x":0.82,"y":0.42},
+    { "id": "v10", "player": "oura",     "title": "Ring stuck on finger → ER",    "score": 1740, "url": "https://www.reddit.com/r/ouraring/comments/1qtx7tt/finale_update_help_my_ri/",  "sentiment": "neg", "themes": ["t.form"],            "x": 0.22, "y": 0.62 },
+    { "id": "v11", "player": "oura",     "title": "Charging in the shower workaround","score":1635,"url": "https://www.reddit.com/r/ouraring/comments/1suis9d/i_almost_had_to_get_nake/", "sentiment": "pos", "themes": ["t.form"],            "x": 0.15, "y": 0.60 },
+    { "id": "v12", "player": "oura",     "title": "Give us a 'bitchy/funny/ironic' toggle","score":940,"url":"https://www.reddit.com/r/ouraring/comments/1ta568e/ate_a_family_sized_bag_o/","sentiment":"neg","themes":["t.aitone"],"x": 0.88, "y": 0.32 },
+    { "id": "v13", "player": "oura",     "title": "$5.99/月 不值",                "score": 1761, "url": "https://www.reddit.com/r/ouraring/comments/1qx13mj/if_you_were_on_the_fence/", "sentiment": "neg", "themes": ["t.sub"],             "x": 0.72, "y": 0.20 },
+    { "id": "v14", "player": "samsung",  "title": "Samsung Community: 'Worst Samsung product ever'","score":40,"url":"https://us.community.samsung.com/t5/Galaxy-Ring/Worst-Samsung-product-ever/m-p/3568427","sentiment":"neg","themes":["t.battery","t.sub"],"x":0.65,"y":0.65 }
+  ],
+  "opportunity": {
+    "id": "opp", "label": "★ 空白机会区", "color": "#14532d", "size": 22, "x": 0.42, "y": 0.20, "polarity": "win",
+    "summary": "中-高价 × FDA 认证 / 医疗级 / 保险报销 · 没有玩家占据 · 新进入者最该切的位置"
+  },
+  "edges": [
+    {"from":"oura","to":"t.medical","w":3},{"from":"oura","to":"t.privacy","w":3},{"from":"oura","to":"t.sub","w":3},{"from":"oura","to":"t.aitone","w":2},{"from":"oura","to":"t.form","w":2},
+    {"from":"samsung","to":"t.battery","w":3},{"from":"samsung","to":"t.sub","w":1},{"from":"samsung","to":"t.migration","w":2},
+    {"from":"ringconn","to":"t.battery","w":2},{"from":"ringconn","to":"t.migration","w":3},{"from":"ringconn","to":"t.lawsuit","w":3},{"from":"ringconn","to":"t.aitone","w":2},
+    {"from":"ultrahuman","to":"t.lawsuit","w":1},
+    {"from":"apple","to":"opp","w":2},
+    {"from":"v01","to":"t.medical","w":1},{"from":"v02","to":"t.medical","w":1},
+    {"from":"v03","to":"t.privacy","w":1},
+    {"from":"v04","to":"t.battery","w":1},{"from":"v05","to":"t.battery","w":1},
+    {"from":"v06","to":"t.migration","w":1},
+    {"from":"v07","to":"t.lawsuit","w":1},
+    {"from":"v08","to":"t.aitone","w":1},{"from":"v09","to":"t.aitone","w":1},{"from":"v12","to":"t.aitone","w":1},
+    {"from":"v10","to":"t.form","w":1},{"from":"v11","to":"t.form","w":1},
+    {"from":"v13","to":"t.sub","w":1},
+    {"from":"v14","to":"t.battery","w":1},
+    {"from":"t.medical","to":"opp","w":3},{"from":"t.privacy","to":"opp","w":2}
+  ]
+}
+  </script>
+
+  <!-- ===== INTERACTIVE JS ===== -->
+  <script>
+  (function(){
+    'use strict';
+    const DATA = JSON.parse(document.getElementById('report-data').textContent);
+
+    /* ===== A. PROCESS BAR · scroll listener ===== */
+    const pbSteps = document.querySelectorAll('.process-bar .pb-step');
+    const targets = Array.from(pbSteps).map(s => document.querySelector(s.dataset.target)).filter(Boolean);
+    function updatePB() {
+      const y = window.scrollY + 100;
+      let activeIdx = 0;
+      targets.forEach((el, i) => { if (el && el.offsetTop <= y) activeIdx = i; });
+      pbSteps.forEach((s,i) => s.classList.toggle('active', i===activeIdx));
+    }
+    window.addEventListener('scroll', updatePB, { passive: true });
+    updatePB();
+
+    /* ===== B. KNOWLEDGE GRAPH ===== */
+    const svg = document.getElementById('kgSvg');
+    if (svg) buildGraph();
+
+    function buildGraph() {
+      const W = 760, H = 520;
+      // Build node list
+      const nodes = [];
+      DATA.players.forEach(p => nodes.push({...p, kind: 'player'}));
+      DATA.themes.forEach(t => nodes.push({...t, kind: 'theme'}));
+      DATA.voices.forEach(v => nodes.push({...v, id: v.id, name: v.title, color: v.sentiment==='pos'?'#14532d':'#c2410c', size: 6 + Math.min(8, Math.log10(v.score+1)*2), kind: 'voice'}));
+      nodes.push({...DATA.opportunity, kind: 'oppor'});
+
+      // Position: use predefined x/y in [0,1] normalized
+      nodes.forEach(n => {
+        n.px = 60 + n.x * (W - 120);
+        n.py = 40 + n.y * (H - 80);
+        n.vx = 0; n.vy = 0;
+      });
+
+      const edges = DATA.edges.map(e => ({
+        source: nodes.find(n => n.id === e.from),
+        target: nodes.find(n => n.id === e.to),
+        weight: e.w
+      })).filter(e => e.source && e.target);
+
+      // Lightweight force simulation (relaxation, ~80 iter)
+      const REPEL = 1200;
+      const SPRING = 0.035;
+      const CENTER = 0.008;
+      const DAMP = 0.78;
+      for (let iter = 0; iter < 90; iter++) {
+        // Repulsion
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i+1; j < nodes.length; j++) {
+            const a = nodes[i], b = nodes[j];
+            const dx = a.px - b.px, dy = a.py - b.py;
+            const d2 = dx*dx + dy*dy + 50;
+            const d = Math.sqrt(d2);
+            const f = REPEL / d2;
+            const fx = (dx/d) * f, fy = (dy/d) * f;
+            a.vx += fx; a.vy += fy;
+            b.vx -= fx; b.vy -= fy;
+          }
+        }
+        // Springs
+        edges.forEach(e => {
+          const dx = e.target.px - e.source.px, dy = e.target.py - e.source.py;
+          const d = Math.sqrt(dx*dx + dy*dy) || 1;
+          const restLen = 90 / e.weight;
+          const f = (d - restLen) * SPRING;
+          const fx = (dx/d) * f, fy = (dy/d) * f;
+          e.source.vx += fx; e.source.vy += fy;
+          e.target.vx -= fx; e.target.vy -= fy;
+        });
+        // Centering pull
+        nodes.forEach(n => {
+          n.vx += (W/2 - n.px) * CENTER;
+          n.vy += (H/2 - n.py) * CENTER;
+        });
+        // Apply, damp, bound
+        nodes.forEach(n => {
+          n.px += n.vx; n.py += n.vy;
+          n.vx *= DAMP; n.vy *= DAMP;
+          n.px = Math.max(40, Math.min(W - 40, n.px));
+          n.py = Math.max(30, Math.min(H - 30, n.py));
+        });
+      }
+
+      // Render
+      const NS = "http://www.w3.org/2000/svg";
+      // Edges first (under)
+      const edgeMap = new Map();
+      edges.forEach((e, idx) => {
+        const line = document.createElementNS(NS, 'line');
+        line.setAttribute('x1', e.source.px); line.setAttribute('y1', e.source.py);
+        line.setAttribute('x2', e.target.px); line.setAttribute('y2', e.target.py);
+        line.setAttribute('class', 'kg-edge');
+        line.setAttribute('stroke-width', Math.max(0.6, e.weight * 0.6));
+        line.dataset.from = e.source.id; line.dataset.to = e.target.id;
+        svg.appendChild(line);
+        edgeMap.set(`${e.source.id}|${e.target.id}`, line);
+      });
+      // Nodes
+      const nodeMap = new Map();
+      nodes.forEach(n => {
+        const g = document.createElementNS(NS, 'g');
+        g.setAttribute('class', 'kg-node');
+        g.setAttribute('transform', `translate(${n.px},${n.py})`);
+        g.dataset.id = n.id;
+        const c = document.createElementNS(NS, 'circle');
+        c.setAttribute('r', n.size);
+        c.setAttribute('fill', n.kind === 'oppor' ? 'transparent' : n.color);
+        c.setAttribute('stroke', n.kind === 'oppor' ? '#14532d' : '#fff');
+        c.setAttribute('stroke-width', n.kind === 'oppor' ? 2 : 1.5);
+        if (n.kind === 'oppor') c.setAttribute('stroke-dasharray', '4 3');
+        if (n.kind === 'voice') c.setAttribute('fill-opacity', 0.85);
+        g.appendChild(c);
+        if (n.kind !== 'voice') {
+          const t = document.createElementNS(NS, 'text');
+          t.setAttribute('y', n.size + 12);
+          t.setAttribute('text-anchor', 'middle');
+          t.setAttribute('font-size', n.kind === 'player' ? 11 : 10);
+          t.setAttribute('fill', n.kind === 'player' ? '#14171c' : '#5a606a');
+          t.textContent = n.name || n.label;
+          g.appendChild(t);
+        }
+        svg.appendChild(g);
+        nodeMap.set(n.id, { g, data: n });
+        g.addEventListener('mouseenter', () => highlight(n.id));
+        g.addEventListener('mouseleave', () => unhighlight());
+        g.addEventListener('click', () => showDetail(n));
+      });
+
+      function adjacent(id) {
+        const adj = new Set([id]);
+        edges.forEach(e => {
+          if (e.source.id === id) adj.add(e.target.id);
+          if (e.target.id === id) adj.add(e.source.id);
+        });
+        return adj;
+      }
+      function highlight(id) {
+        const adj = adjacent(id);
+        nodeMap.forEach((v, k) => {
+          v.g.classList.toggle('kg-faded', !adj.has(k));
+          v.g.classList.toggle('kg-active', k === id);
+        });
+        edges.forEach((e, idx) => {
+          const line = svg.querySelectorAll('.kg-edge')[idx];
+          const involved = e.source.id === id || e.target.id === id;
+          line.classList.toggle('kg-active', involved);
+          line.classList.toggle('kg-faded', !involved && !(adj.has(e.source.id) && adj.has(e.target.id)));
+        });
+      }
+      function unhighlight() {
+        nodeMap.forEach(v => { v.g.classList.remove('kg-faded','kg-active'); });
+        svg.querySelectorAll('.kg-edge').forEach(l => l.classList.remove('kg-faded','kg-active'));
+      }
+
+      window.kgUnhighlight = unhighlight;
+      window.kgHighlight = highlight;
+    }
+
+    /* ===== Side panel detail ===== */
+    const side = document.getElementById('kgSide');
+    function showDetail(n) {
+      if (!side) return;
+      const tagClass = n.kind === 'voice' ? 'voice' : (n.kind === 'theme' ? 'theme' : (n.kind === 'oppor' ? 'oppor' : 'player'));
+      const tagLabel = n.kind === 'voice' ? '顶帖 VOICE' : (n.kind === 'theme' ? '主题 · ' + (n.polarity === 'win' ? '正面' : (n.polarity === 'pain' ? '负面' : '中性')) : (n.kind === 'oppor' ? '空白机会区' : '玩家 · ' + n.name));
+      let html = `<span class="kg-tag ${tagClass}">${tagLabel}</span>`;
+      html += `<h5>${n.name || n.label}</h5>`;
+      if (n.kind === 'voice') {
+        html += `<div class="kg-meta">${n.player.toUpperCase()} · ▲ ${n.score.toLocaleString()} · <a href="${n.url}" target="_blank" rel="noopener" style="color:var(--muted);border-bottom:1px solid var(--line);text-decoration:none;">原帖 ↗</a></div>`;
+        // Find this voice's full record
+        const v = DATA.voices.find(x => x.id === n.id);
+        if (v) {
+          html += `<p style="font-size:13px;color:var(--muted);line-height:1.65;">这条 voice 在报告主体中可在 §2.4 voice 表查看完整双语原文 + 关键启示。</p>`;
+        }
+      } else if (n.kind === 'player') {
+        html += `<p style="font-size:13px;color:var(--muted);">${n.summary || ''}</p>`;
+        // Linked themes / voices
+        const linkedThemes = DATA.themes.filter(t => DATA.edges.find(e => e.from === n.id && e.to === t.id) || DATA.edges.find(e => e.to === n.id && e.from === t.id));
+        const linkedVoices = DATA.voices.filter(v => v.player === n.id);
+        if (linkedThemes.length) {
+          html += `<div class="kg-related"><div class="kg-related-lbl">关联主题</div>`;
+          linkedThemes.forEach(t => { html += `<a href="#" data-jump-node="${t.id}">→ ${t.label}</a>`; });
+          html += `</div>`;
+        }
+        if (linkedVoices.length) {
+          html += `<div class="kg-related"><div class="kg-related-lbl">该玩家 ${linkedVoices.length} 条 voice</div>`;
+          linkedVoices.forEach(v => { html += `<a href="#" data-jump-node="${v.id}">▲${v.score.toLocaleString()} · ${v.title}</a>`; });
+          html += `</div>`;
+        }
+      } else if (n.kind === 'theme') {
+        html += `<p style="font-size:13px;color:var(--muted);">${n.summary || ''}</p>`;
+        const linkedVoices = DATA.voices.filter(v => v.themes && v.themes.includes(n.id));
+        const linkedPlayers = DATA.players.filter(p => DATA.edges.find(e => (e.from === p.id && e.to === n.id) || (e.to === p.id && e.from === n.id)));
+        if (linkedPlayers.length) {
+          html += `<div class="kg-related"><div class="kg-related-lbl">涉及玩家</div>`;
+          linkedPlayers.forEach(p => { html += `<a href="#" data-jump-node="${p.id}">→ ${p.name}</a>`; });
+          html += `</div>`;
+        }
+        if (linkedVoices.length) {
+          html += `<div class="kg-related"><div class="kg-related-lbl">证据 voice (${linkedVoices.length})</div>`;
+          linkedVoices.sort((a,b) => b.score - a.score).forEach(v => { html += `<a href="#" data-jump-node="${v.id}">▲${v.score.toLocaleString()} · ${v.title}</a>`; });
+          html += `</div>`;
+        }
+      } else if (n.kind === 'oppor') {
+        html += `<p style="font-size:13px;color:var(--muted);">${n.summary || ''}</p>`;
+        html += `<p style="font-size:12px;color:var(--good);margin-top:10px;"><strong>这是本报告的核心战略推荐位置。</strong>滚动到 §4.2 查看完整切入策略。</p>`;
+      }
+      side.innerHTML = html;
+      // Wire side-panel links
+      side.querySelectorAll('[data-jump-node]').forEach(a => {
+        a.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          const id = a.dataset.jumpNode;
+          const target = nodes.find(x => x.id === id);
+          if (target) { window.kgHighlight(id); showDetail(target); }
+        });
+      });
+    }
+
+    // Re-bound nodes reference (it's local to buildGraph) — we re-look up via DOM
+    const nodes = (function(){
+      const arr = [];
+      DATA.players.forEach(p => arr.push({...p, kind: 'player'}));
+      DATA.themes.forEach(t => arr.push({...t, kind: 'theme', name: t.label}));
+      DATA.voices.forEach(v => arr.push({...v, name: v.title, kind: 'voice'}));
+      arr.push({...DATA.opportunity, kind: 'oppor'});
+      return arr;
+    })();
+
+    /* ===== C. FILTER BARS ===== */
+    document.querySelectorAll('.filter-bar').forEach(bar => {
+      const target = document.querySelector(bar.dataset.filterTarget);
+      if (!target) return;
+      const rows = Array.from(target.querySelectorAll('details.drow'));
+      const state = { player: 'all', sent: 'all', search: '' };
+      const countEl = bar.querySelector('[data-filter-count]');
+      const totalRows = rows.length;
+      const searchEl = bar.querySelector('[data-filter-search]');
+
+      function apply() {
+        let visible = 0;
+        const q = state.search.toLowerCase().trim();
+        rows.forEach(r => {
+          const dot = r.querySelector('.sent-dot');
+          const player = dot ? dot.textContent.trim() : '';
+          const sentClass = dot ? Array.from(dot.classList).find(c => ['pos','neg','acq','dead'].includes(c)) : '';
+          const sentMatch = state.sent === 'all' || (state.sent === 'pos' && sentClass === 'pos') || (state.sent === 'neg' && (sentClass === 'neg' || sentClass === 'dead'));
+          const playerMatch = state.player === 'all' || player.toLowerCase().includes(state.player.toLowerCase());
+          const text = r.textContent.toLowerCase();
+          const searchMatch = !q || text.includes(q);
+          const visible_ = playerMatch && sentMatch && searchMatch;
+          r.classList.toggle('fb-hidden', !visible_);
+          r.classList.toggle('fb-match-search', !!q && visible_);
+          if (visible_) visible++;
+        });
+        if (countEl) countEl.textContent = visible + ' / ' + totalRows;
+      }
+      bar.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const group = chip.dataset.filterGroup;
+          bar.querySelectorAll(`.filter-chip[data-filter-group="${group}"]`).forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state[group] = chip.dataset.filterValue;
+          apply();
+        });
+      });
+      if (searchEl) {
+        searchEl.addEventListener('input', () => { state.search = searchEl.value; apply(); });
+      }
+    });
+
+    /* ===== KG Controls ===== */
+    const resetBtn = document.getElementById('kgReset');
+    if (resetBtn) resetBtn.addEventListener('click', () => { if (window.kgUnhighlight) window.kgUnhighlight(); side.innerHTML = side.dataset.original || side.innerHTML; location.hash = ''; });
+    // Save original kg-side content
+    if (side) side.dataset.original = side.innerHTML;
+
+    /* ===== Whatif panels collapse state CSS ===== */
+    const style = document.createElement('style');
+    style.textContent = '.whatif-panel.wi-collapsed .whatif-body { display: none; }';
+    document.head.appendChild(style);
+
+  })();
+  </script>
+
+  <div class="method">
+    <strong>VIBE DEMAND RESEARCH</strong> · 本报告为产品团队 / 创始人决策参考,不构成投资建议。<br>
+    报告中"切入策略""能力栈""时间预算"等内容为基于行业公开数据 + 一手社区 voice + 公开 Marketplace 评论聚合的分析师推演,实际项目执行需要结合团队具体资源、监管路径、市场时机做独立判断。<br>
+    报告中所有数字(如 FDA 510(k) 通过时间、临床试验成本)为基于公开案例(Apple Watch ECG, Cardiogram, AliveCor 等)的估算区间,非项目级精确预测。
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIBE · Report Viewer</title>
+<style>
+  :root{
+    --bg:#faf8f4; --ink:#1c1d20; --ink-2:#3d3e44; --ink-3:#737277; --line:#e3ddcf;
+    --mono:'SF Mono','Menlo','Monaco',monospace; --serif:'Iowan Old Style','Cambria',serif;
+    --sage:#5b7a52; --rust:#a0533c;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,system-ui,sans-serif}
+  .wrap{max-width:760px;margin:0 auto;padding:56px 24px 80px}
+  .brand{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase}
+  h1{font-family:var(--serif);font-size:30px;font-weight:600;margin:8px 0 6px;letter-spacing:-.01em}
+  .deck{font-family:var(--serif);font-style:italic;color:var(--ink-2);font-size:15px;margin:0 0 28px}
+  .steps{display:flex;gap:0;margin:0 0 26px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .steps .st{flex:1;padding:14px 16px;border-left:1px solid var(--line);font-size:13px}
+  .steps .st:first-child{border-left:0}
+  .steps .st b{display:block;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.08em;margin-bottom:4px}
+  textarea{
+    width:100%;min-height:240px;border:1px solid var(--line);border-radius:8px;padding:14px 16px;
+    font-family:var(--mono);font-size:12px;line-height:1.5;color:var(--ink);background:#fff;resize:vertical;
+  }
+  textarea:focus{outline:none;border-color:var(--ink-3)}
+  .row{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  button.primary{
+    appearance:none;border:0;background:var(--ink);color:#fff;cursor:pointer;
+    font-family:var(--mono);font-size:13px;letter-spacing:.04em;padding:11px 22px;border-radius:6px;
+  }
+  button.primary:hover{background:#000}
+  button.ghost{
+    appearance:none;border:1px solid var(--line);background:#fff;cursor:pointer;
+    font-family:var(--mono);font-size:12px;color:var(--ink-2);padding:10px 16px;border-radius:6px;
+  }
+  button.ghost:hover{border-color:var(--ink-3);color:var(--ink)}
+  .msg{font-family:var(--mono);font-size:12px;margin-top:12px;min-height:18px}
+  .msg.err{color:var(--rust)}
+  .msg.ok{color:var(--sage)}
+  .hint{font-family:var(--mono);font-size:11px;color:var(--ink-3);line-height:1.7;margin-top:22px;border-top:1px solid var(--line);padding-top:18px}
+  .hint code{background:#efe9d9;padding:1px 5px;border-radius:3px}
+  a{color:var(--ink-2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">VIBE · CATEGORY DEEP DIVE</div>
+  <h1>Report Viewer</h1>
+  <p class="deck">把 AI 助手产出的研究 JSON 粘进来 → 渲染成可交互的 lens 报告。无需安装,无需终端。</p>
+
+  <div class="steps">
+    <div class="st"><b>STEP 1</b>在 Claude / ChatGPT 里用指令包做研究</div>
+    <div class="st"><b>STEP 2</b>复制它输出的 JSON</div>
+    <div class="st"><b>STEP 3</b>粘到下面 → 渲染报告</div>
+  </div>
+
+  <textarea id="json" placeholder='在此粘贴符合 schema 的报告 JSON,例如:&#10;{&#10;  "schema_version": "1.0",&#10;  "meta": { "slug": "my-idea", "idea": "...", "mode": "EXISTING", ... },&#10;  "players": [...], "themes": [...], "voices": [...], "edges": [...]&#10;}'></textarea>
+
+  <div class="row">
+    <button class="primary" id="render">渲染报告 →</button>
+    <button class="ghost" id="sample">载入示例(智能戒指)</button>
+    <button class="ghost" id="format">格式化 JSON</button>
+  </div>
+  <div class="msg" id="msg"></div>
+
+  <div class="hint">
+    也支持 URL 直接加载:<code>viewer.html?data=&lt;json-file-url&gt;</code>(需同源或允许 CORS)<br>
+    渲染后的报告右上角可切换 <code>中 / EN</code> 与下载 PDF · 不依赖本页,可单独保存分享<br>
+    schema 字段说明见仓库 <code>docs/chat-usage.md</code> / <code>schemas/report-data.schema.json</code>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const msg = (t, cls) => { const m = $('msg'); m.textContent = t; m.className = 'msg ' + (cls||''); };
+
+  // Locate the report template (copied into dist/ by the build as _template.html).
+  // Fallback to ../templates/ for repo-served setups.
+  const TEMPLATE_CANDIDATES = ['./_template.html', '../templates/lens-report-template.html'];
+
+  async function fetchTemplate(){
+    for (const url of TEMPLATE_CANDIDATES){
+      try {
+        const r = await fetch(url);
+        if (r.ok) return await r.text();
+      } catch(e){ /* try next */ }
+    }
+    throw new Error('找不到报告模板(_template.html)。请确认 viewer 与模板在同一部署里。');
+  }
+
+  async function render(jsonText){
+    let data;
+    try { data = JSON.parse(jsonText); }
+    catch(e){ msg('JSON 解析失败:' + e.message, 'err'); return; }
+    if (!data.meta || !data.players || !data.themes || !data.voices || !data.edges){
+      msg('缺少必需字段(meta / players / themes / voices / edges)。', 'err'); return;
+    }
+    msg('加载模板并渲染中…', 'ok');
+    let tpl;
+    try { tpl = await fetchTemplate(); }
+    catch(e){ msg(e.message, 'err'); return; }
+    // Inject data into the template's placeholder and swap the document.
+    const filled = tpl.replace('{{REPORT_DATA_JSON}}', () => jsonText);
+    document.open(); document.write(filled); document.close();
+  }
+
+  $('render').addEventListener('click', () => render($('json').value.trim()));
+  $('format').addEventListener('click', () => {
+    try { $('json').value = JSON.stringify(JSON.parse($('json').value), null, 2); msg('已格式化', 'ok'); }
+    catch(e){ msg('JSON 无效,无法格式化', 'err'); }
+  });
+  $('sample').addEventListener('click', async () => {
+    msg('载入示例…', 'ok');
+    for (const u of ['./health-ring.json', '../data/health-ring.json']){
+      try { const r = await fetch(u); if (r.ok){ $('json').value = await r.text(); msg('示例已载入,点「渲染报告」', 'ok'); return; } } catch(e){}
+    }
+    msg('示例文件未找到(dist/health-ring.json)', 'err');
+  });
+
+  // URL ?data=<url> auto-load + render
+  const params = new URLSearchParams(location.search);
+  const dataUrl = params.get('data');
+  if (dataUrl){
+    msg('从 URL 加载数据…', 'ok');
+    fetch(dataUrl).then(r => r.text()).then(t => { $('json').value = t; render(t); })
+      .catch(e => msg('URL 加载失败:' + e.message, 'err'));
+  }
+})();
+</script>
+</body>
+</html>

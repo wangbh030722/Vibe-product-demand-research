@@ -1,0 +1,2621 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title id="docTitle">CATEGORY DEEP DIVE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+  /* ============ Tokens — "Editorial Research Brief" ============
+     Near-monochrome warm ink on white · ONE green accent (= "demand is real")
+     · ONE muted clay-red reserved strictly for negative sentiment. Flat hairline
+     surfaces, no glass. Legacy variable names are kept but repointed to this tight
+     palette so the whole document calms down and unifies. */
+  :root{
+    --bg:#ffffff; --surface:#f7f7f4; --surface-2:#f0f0ec;
+    --ink:#191815; --ink-2:#56564e; --ink-3:#8c8b80; --line:#e8e7e1; --line-2:#dcdbd4;
+    --sans:'Inter','Noto Sans SC',-apple-system,system-ui,sans-serif;
+    --display:'Plus Jakarta Sans','Inter','Noto Sans SC',sans-serif;
+    --mono:var(--sans);
+    --serif:var(--display);
+
+    /* the single accent + its soft tint and hairline */
+    --accent:#0a6b43; --accent-2:#0a6b43; --accent-soft:#ecf3ef; --accent-line:#cde0d6;
+
+    /* sentiment — the ONLY semantic colours, kept editorial-muted */
+    --pos:#0a6b43; --neg:#a8362a; --neu:#8c8b80;
+
+    /* legacy aliases → unified palette (kills the old bright-mint sprawl) */
+    --primary:#0a6b43; --primary-container:#0a6b43; --primary-2:#0a6b43;
+    --fluo:#0a6b43; --fluo-deep:#0a6b43; --fluo-soft:#ecf3ef;
+    --charcoal:#191815; --charcoal-2:#56564e; --charcoal-3:#8c8b80;
+    --sage:#0a6b43; --sage-2:#0a6b43; --sage-3:#0a6b43;
+    --rust:#a8362a; --rust-2:#a8362a; --rust-3:#a8362a;
+    --warm-gray:#8c8b80; --warm-gray-2:#b8b7ac;
+    --opp:#0a6b43;
+
+    /* flat card (glass tokens neutralised) */
+    --glass-bg:#ffffff; --glass-border:var(--line); --glass-shadow:none;
+    --shadow:0 1px 0 var(--line);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55}
+
+  /* ============ Header ============ */
+  .app-header{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    padding:12px 22px;border-bottom:1px solid var(--line);background:var(--bg);
+    position:sticky;top:0;z-index:50;
+  }
+  .brand{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink-2);text-transform:uppercase}
+  .brand b{color:var(--ink);letter-spacing:.05em}
+  .view-switcher{display:flex;gap:2px;background:#efe9d9;padding:3px;border-radius:6px}
+  .view-switcher button{
+    appearance:none;border:0;background:transparent;color:var(--ink-3);
+    font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+    padding:5px 11px;border-radius:4px;cursor:pointer;
+  }
+  body[data-view="graph"] .vs-graph,
+  body[data-view="split"] .vs-split,
+  body[data-view="lens"]  .vs-lens{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+  .header-right{justify-self:end;display:flex;gap:12px;align-items:center}
+  /* export dropdown (replaces the old verdict pill + single download button) */
+  .export-wrap{position:relative}
+  .export-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:50;min-width:180px;
+    background:#fff;border:1px solid var(--line);border-radius:9px;padding:5px;
+    box-shadow:0 12px 32px -10px rgba(0,0,0,.18)}
+  .export-menu[hidden]{display:none}
+  .export-item{display:block;width:100%;text-align:left;appearance:none;border:0;background:none;
+    cursor:pointer;font-family:var(--sans);font-size:12.5px;color:var(--ink-2);
+    padding:8px 10px;border-radius:6px;white-space:nowrap;transition:background .12s,color .12s}
+  .export-item:hover{background:var(--surface);color:var(--ink)}
+  .ex-caret{font-size:9px;opacity:.7}
+
+  /* ============ Workbench layout ============ */
+  .workbench{display:flex;height:calc(100vh - 49px);overflow:hidden}
+  .center-panel,.lens-panel{transition:width .32s ease, opacity .25s ease;overflow:hidden}
+  body[data-view="graph"] .center-panel{width:100%}
+  body[data-view="graph"] .lens-panel{width:0;opacity:0;pointer-events:none}
+  body[data-view="split"] .center-panel{width:50%;border-right:1px solid var(--line)}
+  body[data-view="split"] .lens-panel{width:50%}
+  body[data-view="lens"]  .center-panel{width:0;opacity:0;pointer-events:none}
+  body[data-view="lens"]  .lens-panel{width:100%}
+
+  /* ============ Center panel (Always-On graph) ============ */
+  .center-panel{position:relative;background:radial-gradient(ellipse at 50% 45%,#ffffff 0%,#f0fbf6 90%);overflow:hidden;cursor:grab}
+  .center-panel.is-panning{cursor:grabbing}
+  /* ---- Demand-signal radar ---- */
+  .radar-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .radar-hud{position:absolute;top:34px;left:18px;z-index:6;font-size:11px;color:#6b6f7c;
+    line-height:1.7;letter-spacing:.3px;pointer-events:none;font-variant-numeric:tabular-nums}
+  .radar-hud b{color:#006c47;font-weight:700}
+  .radar-controls{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);z-index:7;
+    display:flex;gap:9px}
+  .radar-btn{background:rgba(0,108,71,.10);border:1px solid #006c47;color:#006c47;
+    padding:7px 15px;border-radius:20px;font-size:12px;cursor:pointer;letter-spacing:.3px;
+    transition:.16s;font-family:inherit}
+  .radar-btn:hover{background:rgba(0,108,71,.22);box-shadow:0 0 14px rgba(0,108,71,.25)}
+  .radar-btn:active{transform:scale(.96)}
+  .radar-btn.ghost{border-color:#cdc8b8;color:#8a8678;background:rgba(0,0,0,.02)}
+  .radar-scanmsg{position:absolute;bottom:92px;left:50%;transform:translateX(-50%);z-index:7;
+    font-size:11.5px;color:#006c47;letter-spacing:.5px;opacity:0;transition:.35s;pointer-events:none;
+    background:rgba(253,251,245,.85);padding:3px 10px;border-radius:12px}
+  .radar-scanmsg.show{opacity:1}
+  .radar-scanmsg b{font-weight:700}
+  /* ---- detailed-report insight visuals ---- */
+  .ins-mode{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;
+    color:var(--ink-2);background:var(--surface);border:1px solid var(--line);padding:3px 10px;border-radius:6px;margin-bottom:10px}
+  .ins-grid{display:grid;grid-template-columns:1fr;gap:14px;margin:12px 0 6px}
+  .ins-card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fff}
+  .ins-card h4{margin:0 0 11px;font-size:11px;letter-spacing:.05em;color:var(--ink-3);
+    text-transform:uppercase;font-family:var(--mono)}
+  .ins-stat-row{display:flex;gap:22px;margin:0 0 13px}
+  .ins-stat b{display:block;font-size:32px;font-family:var(--mono);font-weight:700;color:var(--ink);line-height:1.05;letter-spacing:-.02em}
+  .ins-stat span{font-size:11px;color:var(--ink-3)}
+  .ins-bar{display:flex;height:24px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+  .ins-bar .seg{display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;
+    font-family:var(--mono);min-width:42px;white-space:nowrap}
+  .ins-bar .seg.pos{background:var(--pos)}.ins-bar .seg.neg{background:var(--neg)}
+  .ins-trow{display:grid;grid-template-columns:104px 1fr 26px;align-items:center;gap:10px;margin:7px 0}
+  .ins-tlabel{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ins-tbar{height:9px;background:#f0ebdd;border-radius:5px;overflow:hidden}
+  .ins-tbar i{display:block;height:100%}
+  .ins-tbar i.pos{background:var(--fluo-deep)}.ins-tbar i.neg{background:var(--rust-2)}.ins-tbar i.neu{background:#a8a094}
+  .ins-tcount{font-size:11px;color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+  .ins-quotes{display:grid;grid-template-columns:1fr;gap:16px;margin-top:8px}
+  .ins-qcol h4{display:flex;align-items:center;gap:7px;margin:0 0 4px;font-size:12.5px;color:var(--ink)}
+  .ins-qcol .qdot{width:9px;height:9px;border-radius:50%;flex:none}
+  .ins-qcol.pos .qdot{background:var(--pos)}.ins-qcol.neg .qdot{background:var(--neg)}
+  .ins-q{border-left:2px solid var(--line);padding:4px 0 4px 11px;margin:9px 0;font-size:13px;
+    line-height:1.55;color:var(--ink-2)}
+  .ins-q.pos{border-left-color:var(--pos)}.ins-q.neg{border-left-color:var(--neg)}
+  .ins-q .qsrc{display:block;margin-top:3px;font-size:11px;color:var(--ink-3);font-family:var(--mono)}
+  /* ranked Top-N marker (most-prominent scenario / pain / complaint) */
+  .rk{display:inline-flex;align-items:center;justify-content:center;flex:none;
+    width:19px;height:19px;border-radius:50%;font-family:var(--mono);font-size:11px;font-weight:700;
+    background:var(--fluo-deep);color:#fff;line-height:1;margin-right:9px;vertical-align:baseline}
+  .rk.neg{background:var(--rust-2)}.rk.neu{background:#8a8a82}
+  .ins-q.ranked{display:flex;align-items:flex-start;border-left:0;padding-left:0}
+  .ins-q.ranked .rk{margin-top:1px}
+  .ins-q.ranked .rq-body{flex:1;border-left:2px solid var(--line);padding-left:11px}
+  .ins-q.ranked.pos .rq-body{border-left-color:var(--pos)}
+  .ins-q.ranked.neg .rq-body{border-left-color:var(--neg)}
+  /* "信息量过少" — too few samples to judge sentiment */
+  .bt-thin{display:inline-block;font-size:11px;color:var(--ink-3);font-family:var(--mono);
+    background:#f3f3f3;border:1px solid var(--line);border-radius:5px;padding:2px 8px}
+  /* subtle Chinese translation under an English voice (zh mode only) */
+  .v-zh{font-size:11px;color:var(--ink-3);line-height:1.4;margin-top:1px;opacity:.85}
+  /* user & demand decomposition */
+  .ud-jtbd{background:var(--fluo-soft);border:1px solid rgba(0,108,71,.3);border-radius:9px;
+    padding:11px 14px;margin:8px 0 4px;font-size:14px;line-height:1.55;color:var(--ink)}
+  .ud-jtbd .ud-jtbd-lbl{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;
+    color:#006c47;background:rgba(0,108,71,.16);padding:2px 8px;border-radius:9px;margin-right:8px}
+  .ud-grid{display:grid;grid-template-columns:1fr;gap:11px;margin:6px 0 4px}
+  .ud-card{border:1px solid var(--line);border-left:3px solid #7c7a72;border-radius:8px;padding:10px 13px;background:#fff}
+  .ud-card.sc{border-left-color:var(--accent)}.ud-card.pe{border-left-color:var(--ink-3)}
+  .ud-card.un{border-left-color:var(--neg)}.ud-card.wa{border-left-color:var(--line-2)}
+  .ud-card .ud-name{font-weight:600;font-size:13.5px;color:var(--ink);margin-bottom:3px}
+  .ud-card .ud-sum{font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+  .ev-link{text-decoration:none;color:#006c47;font-size:12px;margin-left:3px}
+  .ev-link:hover{color:#3f5a39}
+  /* advisory entry directions */
+  .fb-path.adv .fp-row{font-size:13px;line-height:1.55;color:var(--ink-2);margin:6px 0}
+  .fb-path.adv .fp-row b{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:#006c47;
+    background:rgba(0,108,71,.12);padding:1px 7px;border-radius:8px;margin-right:7px;text-transform:uppercase}
+  .fb-path.adv .fp-row.risk b{color:var(--neg);background:rgba(168,54,42,.09)}
+  .fb-path.adv .fp-oq{margin:5px 0 0 0;padding-left:18px}
+  .fb-path.adv .fp-oq li{font-size:12.5px;line-height:1.5;color:var(--ink-2);margin:2px 0}
+  /* demand map / opportunity matrix */
+  .dm-chart{display:block;width:100%;height:auto;aspect-ratio:760/420;margin:10px 0 2px;overflow:hidden}
+  /* usage-scenario share bars */
+  .sc-list{margin:8px 0 2px}
+  .sc-row{display:grid;grid-template-columns:140px 1fr 40px;align-items:center;gap:6px 14px;padding:9px 0;border-bottom:1px solid #efe9da}
+  .sc-row:last-child{border-bottom:0}
+  .sc-name{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sc-bar{height:10px;background:#f0ebdd;border-radius:5px;overflow:hidden}
+  .sc-bar i{display:block;height:100%;background:var(--accent);border-radius:5px}
+  .sc-pct{font-size:12px;color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+  .sc-sum{grid-column:1 / -1;font-size:12.5px;line-height:1.5;color:var(--ink-3);margin:-3px 0 0}
+  /* persona chips */
+  .pchip-row{display:flex;flex-wrap:wrap;gap:9px;margin:8px 0 2px}
+  .pchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:20px;
+    padding:7px 14px;background:#fff;font-size:13px;color:var(--ink);cursor:default;
+    box-shadow:0 1px 2px rgba(40,35,20,.04)}
+  .pchip:hover{border-color:var(--charcoal-3)}
+  .pchip-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none}
+  .pchip-pct{font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  /* ---- flat editorial cards: hairline border, calm, one unified form ---- */
+  .ins-card,.ud-card{position:relative;border:1px solid var(--line);border-radius:10px;background:var(--bg);
+    box-shadow:none;transition:border-color .18s ease,background .18s ease;overflow:hidden}
+  .ins-card{padding:18px 20px}
+  .ins-card::before,.ud-card::before{content:none}
+  .ins-card:hover,.ud-card:hover{border-color:var(--line-2);background:var(--surface)}
+  .read-note{font-family:var(--mono);font-style:normal;font-size:10.5px;letter-spacing:.01em;color:var(--ink-3);opacity:.95;border-left-color:var(--accent-line);line-height:1.6}
+  .fb-body h3{margin:24px 0 8px}
+  .fb-body h2 + .sec-summary{margin-top:8px}
+  .sec-summary{max-width:720px}
+  /* sticky one-click report nav (TOC) */
+  .fb-nav{position:sticky;top:49px;z-index:20;display:flex;align-items:center;gap:12px;
+    margin:0 0 18px;padding:9px 0;background:rgba(255,255,255,.85);backdrop-filter:blur(20px) saturate(1.1);-webkit-backdrop-filter:blur(20px) saturate(1.1);
+    border-bottom:1px solid var(--line)}
+  .fb-nav .fbn-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-3);white-space:nowrap;flex:none}
+  .fb-nav .fbn-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+  .fb-nav .fbn-links::-webkit-scrollbar{display:none}
+  .fbn-link{white-space:nowrap;font-size:12px;color:var(--ink-3);text-decoration:none;padding:5px 11px;
+    border-radius:7px;transition:background .15s,color .15s}
+  .fbn-link:hover{background:var(--surface);color:var(--ink)}
+  .fbn-link.active{background:var(--accent);color:#fff;font-weight:600}
+  @media print{.fb-nav{display:none}}
+  /* ---- professional report modules (borrowed contract: R2/R4/R5) ---- */
+  .read-note{font-size:11px;color:var(--ink-3);line-height:1.55;margin:8px 0 2px;
+    padding-left:10px;border-left:2px solid var(--line)}
+  .read-note b{color:var(--ink-2);font-weight:600}
+  /* one unified tag; only a small leading dot differs (data vs. judgment) */
+  .kicker{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:0;background:none;margin-bottom:9px}
+  .kicker::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .kicker.judgment::before{background:var(--ink-3)}
+  .secnum + .kicker, h2 .kicker{margin-left:10px;vertical-align:middle}
+  /* brand comparison table */
+  .bt{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+  .bt th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-3);padding:7px 10px;border-bottom:1px solid var(--line)}
+  .bt td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .bt tr:hover td{background:rgba(0,0,0,.02)}
+  .bt .bt-name{font-weight:600;color:var(--ink)}
+  .bt .bt-link{font-size:10.5px;color:var(--ink-3);text-decoration:none;border-bottom:1px dotted var(--ink-3)}
+  .bt .bt-link:hover{color:#006c47;border-color:#006c47}
+  .bt-mini{display:inline-flex;height:8px;width:96px;border-radius:4px;overflow:hidden;
+    border:1px solid var(--line);vertical-align:middle}
+  .bt-mini i{display:block;height:100%}.bt-mini i.pos{background:var(--pos)}.bt-mini i.neg{background:var(--neg)}
+  .bt-num{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+  .bt-sent{margin-left:8px;font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  .bt-sent .p{color:#006c47}.bt-sent .n{color:var(--neg)}
+  /* "更多玩家" — players with no voices matched, listed by name only (no 0 metrics) */
+  .bt-more{margin:14px 0 2px}
+  .bt-more .bt-more-h{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-3);margin:0 0 9px}
+  .bt-more .bt-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .bt-chip{display:inline-flex;align-items:baseline;gap:8px;padding:7px 12px;border:1px solid var(--line);
+    border-radius:999px;background:#fff;font-size:12.5px;transition:border-color .15s}
+  .bt-chip:hover{border-color:#006c47}
+  .bt-chip .nm{font-weight:600;color:var(--ink)}
+  .bt-chip .pr{font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  .bt-chip a{font-size:10.5px;color:var(--ink-3);text-decoration:none;border-bottom:1px dotted var(--ink-3)}
+  .bt-chip a:hover{color:#006c47;border-color:#006c47}
+  /* theme × sentiment heatmap (full report width, label column flexes) */
+  .hm{width:100%;border-collapse:separate;border-spacing:6px;font-size:12px;margin:10px 0;table-layout:fixed}
+  .hm th{font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--ink-3);
+    text-transform:uppercase;padding:4px 10px 8px;text-align:center;width:120px}
+  .hm th:first-child{width:auto}
+  .hm td.hm-th{width:auto;text-align:left;color:var(--ink);padding:6px 18px 6px 2px;font-size:13.5px;white-space:nowrap;font-weight:500}
+  .hm td.cell{width:120px;height:40px;text-align:center;color:#fff;font-variant-numeric:tabular-nums;
+    font-size:12.5px;border-radius:6px;font-weight:600}
+  /* quote wall */
+  .qw{columns:1;margin:10px 0 2px}
+  .qw .tile{break-inside:avoid;border:1px solid var(--line);border-left:3px solid var(--pos);
+    border-radius:8px;padding:10px 12px;margin:0 0 12px;font-size:13px;line-height:1.5;background:#fff;color:var(--ink-2)}
+  .qw .tile.neg{border-left-color:var(--neg)}
+  .qw .tile .qw-src{display:block;margin-top:6px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+  /* inline "expand all voices" disclosure (deep-dive themes) */
+  .ins-more{margin:6px 0 2px}
+  .ins-more>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;
+    font-family:var(--mono);font-size:11px;color:var(--fluo-deep);background:rgba(0,108,71,.08);
+    border:1px solid rgba(0,108,71,.22);border-radius:999px;padding:4px 11px;user-select:none;transition:background .15s}
+  .ins-more>summary:hover{background:rgba(0,108,71,.14)}
+  .ins-more>summary::-webkit-details-marker{display:none}
+  .ins-more>summary::before{content:"▸";font-size:10px;transition:transform .15s}
+  .ins-more[open]>summary::before{transform:rotate(90deg)}
+  .ins-more[open]>summary{margin-bottom:8px}
+  /* full raw-voice appendix — every collected voice, filterable */
+  .va-toolbar{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 12px}
+  .va-filter{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);background:#fff;
+    border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;transition:all .15s}
+  .va-filter:hover{border-color:#006c47;color:var(--ink)}
+  .va-filter.active{background:var(--fluo-deep);border-color:var(--fluo-deep);color:#fff;font-weight:600}
+  .va-list{border-top:1px solid var(--line)}
+  .va-row{display:grid;grid-template-columns:30px 12px 1fr auto auto;align-items:baseline;gap:10px;
+    padding:8px 2px;border-bottom:1px solid var(--line);font-size:13px}
+  .va-idx{font-family:var(--mono);font-size:11px;color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+  .va-dot{width:7px;height:7px;border-radius:50%;align-self:center}
+  .va-dot.pos{background:var(--pos)}.va-dot.neg{background:var(--neg)}
+  .va-main{min-width:0}
+  .va-title{color:var(--ink);text-decoration:none;border-bottom:1px solid transparent}
+  .va-title:hover{color:#006c47;border-bottom-color:#006c47}
+  .va-sub{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
+  .va-score{font-family:var(--mono);font-size:11px;color:var(--fluo-deep);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .va-count{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin:10px 0 0}
+  .qw .tile .qw-src a{color:var(--ink-3)}
+  /* discussion-trend line chart (full report width) */
+  .trend-chart{display:block;width:100%;height:auto;aspect-ratio:760/156;margin:8px 0 2px;overflow:visible}
+  /* methodology footer */
+  .meth{border-top:1px solid var(--line);margin-top:14px;padding-top:14px;font-size:12.5px;
+    color:var(--ink-2);line-height:1.7}
+  .meth .meth-src{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:8px;word-break:break-word}
+  .meth .meth-gaps{background:var(--surface);border:1px solid var(--line);border-left:2px solid var(--neg);
+    border-radius:6px;padding:10px 13px;margin-top:10px;font-size:12px;color:var(--ink-2);line-height:1.6}
+  .kg-zoom-controls{
+    position:absolute;top:46px;left:18px;display:flex;flex-direction:column;gap:1px;z-index:6;
+    background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:5px;overflow:hidden;backdrop-filter:blur(4px);
+  }
+  .kg-zoom-controls button{
+    appearance:none;border:0;background:transparent;width:28px;height:26px;cursor:pointer;
+    font-family:var(--mono);font-size:13px;color:var(--ink-2);line-height:1;
+  }
+  .kg-zoom-controls button:hover{background:rgba(0,0,0,.05);color:var(--ink)}
+  .kg-zoom-controls button + button{border-top:1px solid var(--line)}
+  .zoom-level{
+    position:absolute;top:46px;left:54px;
+    font-family:var(--mono);font-size:10px;color:var(--ink-3);
+    background:rgba(255,255,255,.7);padding:3px 7px;border-radius:3px;backdrop-filter:blur(4px);
+  }
+  .evidence-counter{
+    position:absolute;top:16px;left:18px;right:18px;z-index:5;
+    display:flex;gap:20px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.04em;
+  }
+  .evidence-counter b{color:var(--ink);font-weight:600;margin-right:3px}
+  .center-hint{
+    position:absolute;bottom:16px;left:18px;font-family:var(--mono);font-size:10.5px;
+    color:var(--ink-3);letter-spacing:.04em;background:rgba(255,255,255,.6);padding:5px 10px;border-radius:4px;
+    backdrop-filter:blur(4px);
+  }
+  .legend{
+    position:absolute;bottom:16px;right:18px;font-family:var(--mono);font-size:10px;color:var(--ink-3);
+    background:rgba(255,255,255,.6);padding:8px 11px;border-radius:4px;backdrop-filter:blur(4px);
+    line-height:1.7;
+  }
+  .legend .lg-row{display:flex;align-items:center;gap:6px}
+  .legend .lg-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+  .kg-svg{width:100%;height:100%;display:block}
+  .kg-svg .node{cursor:pointer;transition:opacity .35s ease}
+  .kg-svg .node circle{transition:stroke-width .25s ease}
+  .kg-svg .node text{
+    font-family:var(--mono);font-size:11.5px;fill:var(--ink-2);
+    pointer-events:none;text-anchor:middle;letter-spacing:.02em;
+  }
+  .kg-svg .node-player text{font-size:12.5px;fill:var(--ink);font-weight:500}
+  .kg-svg .edge{stroke:#bfb59c;stroke-opacity:.4;transition:stroke-opacity .3s ease, stroke-width .3s ease;fill:none}
+  body[data-selected-id] .kg-svg .node{opacity:.14}
+  body[data-selected-id] .kg-svg .node.is-selected{opacity:1}
+  body[data-selected-id] .kg-svg .node.is-neighbor{opacity:.9}
+  body[data-selected-id] .kg-svg .edge{stroke-opacity:.06}
+  body[data-selected-id] .kg-svg .edge.is-incident{stroke-opacity:.78;stroke-width:1.6}
+  .kg-svg .node.is-selected circle.core{stroke:#000;stroke-width:2.4}
+
+  /* Voice nodes always visible but visually subordinate. They brighten when
+     their player/theme is hovered or selected. */
+  .kg-svg .node-voice{transition:opacity .25s ease}
+  .kg-svg .node-voice circle.core{opacity:.7}
+  body .kg-svg .node-voice.is-related circle.core{opacity:1}
+  body .kg-svg .node-voice.is-hover circle.core{opacity:1}
+  /* During selection-dim mode, non-related voices fade further but stay
+     faintly visible (so user knows they exist) */
+  body[data-selected-id] .kg-svg .node-voice:not(.is-related):not(.is-selected){opacity:.3}
+
+  /* Hover state (visual feedback BEFORE click) */
+  .kg-svg .node.is-hover circle.core{stroke:#000;stroke-width:1.8}
+  .kg-svg .node.is-hover-neighbor{opacity:.9 !important}
+  .kg-svg .edge.is-hover-incident{stroke-opacity:.65;stroke-width:1.5}
+
+  /* Floating tooltip */
+  .kg-tooltip{
+    position:absolute;pointer-events:none;z-index:20;
+    background:rgba(23,23,23,.94);color:#f5f1e7;
+    font-family:var(--mono);font-size:11px;letter-spacing:.02em;
+    padding:8px 11px;border-radius:5px;max-width:280px;line-height:1.5;
+    opacity:0;transition:opacity .12s ease;transform:translate(-50%,calc(-100% - 14px));
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+  }
+  .kg-tooltip.show{opacity:1}
+  .kg-tooltip .tt-title{color:#fff;font-family:var(--serif);font-size:13.5px;letter-spacing:0;margin-bottom:3px}
+  .kg-tooltip .tt-meta{color:#a8a39a;font-size:10.5px}
+  .kg-tooltip .tt-score{color:#fbbf24;font-weight:600;margin-left:6px}
+  .kg-tooltip .tt-hint{color:#a8a39a;font-size:10px;margin-top:6px;padding-top:5px;border-top:1px solid #3a3a3a}
+
+  /* Voice freshness ring */
+  .kg-svg .node-voice .ring{
+    fill:none;stroke:currentColor;stroke-opacity:.32;
+    transform-origin:center;transform-box:fill-box;
+    animation:freshPulse 2.6s ease-in-out infinite;
+  }
+  .kg-svg .node-voice .ring.delayed{animation-delay:.4s}
+  .kg-svg .node-voice .ring.delayed2{animation-delay:.9s}
+  @keyframes freshPulse{
+    0%  {stroke-opacity:.36; transform:scale(1);}
+    70% {stroke-opacity:0;    transform:scale(1.9);}
+    100%{stroke-opacity:0;    transform:scale(1.9);}
+  }
+
+  /* Stagger fade-in on load (opacity-only — CSS transform would override SVG transform attr) */
+  .kg-svg .node{opacity:0; animation:nodeFadeIn .55s ease forwards}
+  .kg-svg .edge{opacity:0; animation:edgeFadeIn .5s ease forwards}
+  body[data-selected-id] .kg-svg .node{animation:none; opacity:1}
+  body[data-selected-id] .kg-svg .edge{animation:none; opacity:1}
+  @keyframes nodeFadeIn{
+    from{opacity:0}
+    to  {opacity:var(--target-op,1)}
+  }
+  @keyframes edgeFadeIn{from{opacity:0}to{opacity:1}}
+
+  /* Opportunity node ring (subtle constant pulse) */
+  .kg-svg .node-opportunity circle.core{
+    animation:oppPulse 3.5s ease-in-out infinite;transform-origin:center;transform-box:fill-box;
+  }
+  @keyframes oppPulse{
+    0%,100%{stroke-opacity:.85}
+    50%{stroke-opacity:.4}
+  }
+
+  /* ============ Lens panel ============ */
+  .lens-panel{display:flex;flex-direction:column;background:var(--bg)}
+  .lens-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 18px;background:#f3f3f3}
+  .lens-tabs button{
+    appearance:none;border:0;background:transparent;
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+    padding:13px 14px;cursor:pointer;color:var(--ink-3);border-bottom:2px solid transparent;
+    text-transform:uppercase;
+  }
+  .lens-tabs button.active{color:var(--ink);border-bottom-color:var(--ink)}
+  .lens-body{flex:1;overflow:auto;padding:24px 28px}
+  .lens-view{display:none}
+  body[data-lens="overview"]    .lens-view[data-lens-id="overview"]   ,
+  body[data-lens="voices"]      .lens-view[data-lens-id="voices"]     ,
+  body[data-lens="players"]     .lens-view[data-lens-id="players"]    ,
+  body[data-lens="opportunity"] .lens-view[data-lens-id="opportunity"],
+  body[data-lens="strategy"]    .lens-view[data-lens-id="strategy"]   ,
+  body[data-lens="risks"]       .lens-view[data-lens-id="risks"]      {display:block}
+
+  /* lens content typography */
+  .lens-body h3{font-family:var(--serif);font-size:22px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
+  .lens-body h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;margin:22px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  .lens-body p{margin:0 0 10px;color:var(--ink-2)}
+  .pc-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-bottom:6px}
+  .pc-summary{font-style:italic;color:var(--ink-2);font-family:var(--serif);font-size:14.5px}
+
+  /* overview specifics */
+  .verdict-card{border:1px solid var(--line);background:#fff;padding:18px 20px;border-radius:6px;margin-bottom:18px}
+  .verdict-card .v-title{font-family:var(--serif);font-size:24px;line-height:1.3;margin:8px 0 14px}
+  .verdict-card .v-counts{display:flex;gap:24px;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .verdict-card .v-counts b{font-size:18px;color:var(--ink);font-family:var(--serif);font-weight:600;display:block}
+  .kf{list-style:none;padding:0;margin:0;counter-reset:kf}
+  .kf li{counter-increment:kf;padding:10px 0 10px 32px;position:relative;border-bottom:1px dashed var(--line)}
+  .kf li::before{content:counter(kf,decimal-leading-zero);position:absolute;left:0;top:11px;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em}
+  .kf li:last-child{border-bottom:0}
+  .kf b{color:var(--ink)}
+
+  /* player chips */
+  .player-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .player-chips .chip{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink-3);
+    font-family:var(--mono);font-size:11px;padding:6px 11px;border-radius:4px;cursor:pointer;
+  }
+  body[data-selected-id="oura"]       .chip[data-player-id="oura"]      ,
+  body[data-selected-id="samsung"]    .chip[data-player-id="samsung"]   ,
+  body[data-selected-id="ringconn"]   .chip[data-player-id="ringconn"]  ,
+  body[data-selected-id="ultrahuman"] .chip[data-player-id="ultrahuman"],
+  body[data-selected-id="apple"]      .chip[data-player-id="apple"]     {background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  /* player cards */
+  .player-card{border:1px solid var(--line);background:#fff;border-radius:6px;padding:18px 20px;margin-bottom:14px}
+  body[data-lens="players"][data-selected-id] .player-card{display:none}
+  body[data-selected-id="oura"]       .player-card[data-player-id="oura"]      ,
+  body[data-selected-id="samsung"]    .player-card[data-player-id="samsung"]   ,
+  body[data-selected-id="ringconn"]   .player-card[data-player-id="ringconn"]  ,
+  body[data-selected-id="ultrahuman"] .player-card[data-player-id="ultrahuman"],
+  body[data-selected-id="apple"]      .player-card[data-player-id="apple"]     {display:block}
+
+  /* voice rows */
+  .voice-row{display:grid;grid-template-columns:18px 1fr auto;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);align-items:start;font-size:13.5px}
+  .voice-row:last-child{border-bottom:0}
+  .voice-row .dot{font-size:10px;line-height:18px}
+  .voice-row.pos .dot{color:var(--pos)}
+  .voice-row.neg .dot{color:var(--neg)}
+  .voice-row .vt{color:var(--ink)}
+  .voice-row .vm{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .voice-row .vs{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap;padding-top:1px}
+  .voice-row a{color:inherit;text-decoration:none;border-bottom:1px solid #d6cdb4}
+  .voice-row a:hover{border-bottom-color:var(--ink)}
+
+  /* voices lens filter */
+  .filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+  .filter-bar .fb-lbl{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin-right:4px}
+  .filter-bar .chip{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink-3);
+    font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:4px;cursor:pointer;
+  }
+  .filter-bar .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .voice-row.fb-hidden{display:none}
+
+  /* opp / strategy / risks placeholders */
+  .placeholder-block{border:1px dashed var(--line);background:#fff;padding:24px;border-radius:6px;text-align:center;color:var(--ink-3);font-family:var(--mono);font-size:12px}
+  .opp-card{border:2px dashed var(--opp);background:#f0fdf4;padding:22px;border-radius:6px;margin-bottom:14px}
+  .opp-card h3{color:var(--opp)}
+  .strategy-card{border:1px solid var(--line);background:#fff;border-radius:6px;padding:18px 20px;margin-bottom:14px}
+  .strategy-card.rec{border-color:var(--pos);background:#f7fdf7}
+  .strategy-card h4{margin-top:0;border:0;padding:0;color:var(--ink);font-family:var(--serif);font-size:16px;text-transform:none;letter-spacing:0}
+  .risk-row{display:grid;grid-template-columns:46px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+  .risk-row .rid{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .risk-row .sev{font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:3px;align-self:start}
+  .sev.hi{background:#fef2f2;color:var(--accent)}
+  .sev.md{background:#fff7ed;color:var(--neg)}
+  .sev.lo{background:#f3f4f6;color:var(--ink-3)}
+
+  /* fallback — always visible, scroll down to read */
+  .report-fallback{border-top:1px solid var(--line);background:var(--bg);padding:0 22px 8px;
+    background-image:linear-gradient(rgba(28,28,24,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(28,28,24,.022) 1px,transparent 1px);
+    background-size:32px 32px}
+  .fb-body{display:block;padding:32px 0 72px;text-align:left;color:var(--ink);max-width:980px;margin:0 auto}
+  .fb-body h1{font-family:var(--display);font-size:25px;font-weight:700;margin:0 0 9px;letter-spacing:-.02em;line-height:1.2;max-width:880px}
+  .fb-body .fb-deck{font-family:var(--sans);font-size:16px;font-weight:400;color:var(--ink-2);margin-bottom:28px;max-width:680px;line-height:1.6}
+  /* section header: mono eyebrow (S1 /) above a Plus Jakarta headline */
+  .fb-body h2{font-family:var(--display);font-size:18.5px;font-weight:700;letter-spacing:-.01em;color:var(--ink);
+    margin:52px 0 6px;border-top:1px solid var(--line);padding-top:20px;display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .fb-body h2 .secnum{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--fluo-deep);
+    text-transform:uppercase;align-self:center}
+  .fb-body h2 .fb-icon{display:none}
+  .sec-summary{font-family:var(--sans);font-size:15.5px;font-weight:400;line-height:1.65;color:var(--ink-2);
+    margin:6px 0 18px;max-width:680px}
+  .fb-body h3{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-3);margin:28px 0 10px}
+  .fb-body p{font-family:var(--sans);font-size:15px;line-height:1.65;color:var(--ink-2);margin:8px 0 12px;max-width:680px}
+  .fb-body ul{font-family:var(--serif);font-size:14.5px;line-height:1.65;color:var(--ink-2);margin:6px 0 14px;padding-left:22px}
+  .fb-body ul li{margin-bottom:4px}
+  .fb-body .fb-table{width:100%;border-collapse:collapse;margin:14px 0;font-family:var(--mono);font-size:11.5px}
+  .fb-body .fb-table th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--ink);font-weight:600;color:var(--ink);letter-spacing:.05em;text-transform:uppercase;font-size:10.5px}
+  .fb-body .fb-table td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+  .fb-body .fb-table tr:last-child td{border-bottom:0}
+  .fb-body .fb-quote{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--ink);border-left:2px solid var(--sage);padding:2px 0 2px 14px;margin:14px 0}
+  .fb-body .fb-quote.neg{border-left-color:var(--rust)}
+  .fb-body .fb-quote .src{display:block;font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:5px;letter-spacing:.04em}
+  .fb-body .fb-verdict{background:#e6fbf2;border-left:3px solid var(--sage);padding:14px 16px;margin:14px 0 22px;font-family:var(--serif);font-size:15px}
+  .fb-body .fb-verdict b{color:var(--sage);font-weight:600}
+  .fb-body .pos{color:var(--sage);font-weight:600}
+  .fb-body .neg{color:var(--rust);font-weight:600}
+  .fb-body .neu{color:var(--warm-gray);font-weight:600}
+  .fb-body .meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+
+  /* selection indicator strip */
+  .selection-strip{
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.06em;
+    padding:4px 0 12px;display:none;
+  }
+  body[data-selected-id] .selection-strip{display:block}
+  .selection-strip b{color:var(--ink);font-weight:600}
+  .selection-strip .clear{margin-left:10px;color:var(--accent);cursor:pointer;border-bottom:1px solid var(--accent)}
+
+  /* ============ MOBILE / ≤999px ============
+     Below 1000px, abandon the side-by-side workbench:
+     - Top header collapses (brand truncates, view-switcher drops)
+     - Workbench becomes vertical: graph on top (40vh), lens below
+     - Lens tabs become horizontally scrollable
+     - Player chips wrap
+     - Touch-friendly tap targets (min 44px)
+     - Tooltip auto-hides faster
+  */
+  @media (max-width: 999px) {
+    .app-header {
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 10px 14px;
+    }
+    .brand { font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+    .view-switcher { display: none }  /* mobile uses tap-tab nav, not split modes */
+    .header-right { gap: 8px }
+    .lang-select { font-size: 10px; padding: 5px 22px 5px 9px }
+
+    .workbench {
+      flex-direction: column;
+      height: calc(100vh - 47px);
+    }
+    /* Graph: top 38vh; lens: rest. Always-on, no view switcher. */
+    .center-panel, .lens-panel {
+      width: 100% !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      transition: none !important;
+    }
+    .center-panel { height: 38vh; min-height: 280px; border-right: 0 !important; border-bottom: 1px solid var(--line) }
+    .lens-panel { flex: 1; min-height: 0 }
+
+    /* Hide the top overlay strips on the small radar — both are redundant with the
+       verdict card right below, and they collided with the top sector labels. */
+    .evidence-counter { display: none }
+    .radar-hud { display: none }
+    .center-hint { font-size: 9px; bottom: 8px; left: 10px; padding: 4px 8px }
+    .legend { font-size: 9px; bottom: 8px; right: 10px; padding: 6px 9px; line-height: 1.5 }
+    .kg-zoom-controls { top: 30px; left: 10px }
+    .kg-zoom-controls button { width: 34px; height: 34px; font-size: 14px }
+    .zoom-level { top: 30px; left: 50px; font-size: 9.5px }
+
+    /* Lens tabs horizontal scroll */
+    .lens-tabs {
+      padding: 0 10px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .lens-tabs::-webkit-scrollbar { display: none }
+    .lens-tabs button {
+      padding: 11px 14px;
+      font-size: 11.5px;
+      flex-shrink: 0;
+      min-height: 44px;
+    }
+    .lens-body { padding: 16px 16px 24px }
+
+    /* Player chips wrap nicer + tap targets */
+    .player-chips .chip { padding: 9px 13px; font-size: 12px; min-height: 38px }
+    .lens-body h3 { font-size: 19px }
+    .v-title { font-size: 18px }
+
+    /* Tooltip: tighter for finger-driven nav */
+    .kg-tooltip { font-size: 10.5px; max-width: 220px; padding: 7px 9px }
+
+    /* Print button: smaller, less obtrusive */
+    .print-btn { bottom: 12px; right: 12px; padding: 7px 11px; font-size: 10px }
+
+    /* Fallback: tighter padding + readable headings (no font-chaos) */
+    .report-fallback { padding: 12px 14px }
+    .fb-body { padding: 18px 0 30px }
+    .fb-body h1 { font-size: 22px }
+    .fb-body h2 { font-size: 17px; margin-top: 40px; padding-top: 18px }
+    .fb-body h2 .secnum { font-size: 11px }
+    .sec-summary { font-size: 14.5px }
+    /* data tables: tighter cells so they never overflow a phone */
+    .bt { font-size: 12px }
+    .bt th, .bt td { padding: 8px 6px }
+    .hm td.cell { height: 34px; font-size: 11.5px }
+    .va-row { font-size: 12px; gap: 8px }
+  }
+
+  /* ============ PRINT / PDF ============ */
+  @page {
+    size: A4;
+    margin: 16mm 14mm 18mm 14mm;
+  }
+  @media print{
+    /* Hide interactive UI */
+    .app-header, .workbench, .report-fallback button { display: none !important; }
+    /* Force fallback open */
+    .report-fallback { border: 0 !important; background: transparent !important; padding: 0 !important; }
+    .report-fallback .fb-body { display: block !important; padding: 0 !important; max-width: none !important; margin: 0 !important; }
+
+    /* Black on white for printer */
+    html, body { background: #fff !important; color: #000 !important; }
+    .fb-body, .fb-body * {
+      font-family: var(--serif), Georgia, serif !important;
+      color: #000 !important;
+    }
+    /* Restore semantic colors for verdict box, quotes */
+    .fb-body .fb-verdict { background: #f5f1e7 !important; border-left: 3px solid #000 !important; }
+    .fb-body .fb-quote { border-left: 2px solid #000 !important; }
+    .fb-body .pos { color: #2d5a3d !important; }
+    .fb-body .neg { color: #8b3f25 !important; }
+
+    /* Page-break control */
+    .fb-body h1 { margin-top: 0; }
+    .fb-body h2 { page-break-before: always; page-break-after: avoid; }
+    .fb-body h2:first-of-type { page-break-before: avoid; }
+    .fb-body h3 { page-break-after: avoid; }
+    .fb-body table, .fb-body .fb-quote, .fb-body .fb-verdict,
+    .fb-body ul, .fb-body ol { page-break-inside: avoid; }
+    .fb-body img, .fb-body svg { page-break-inside: avoid; }
+
+    /* Table contrast for B&W print */
+    .fb-body .fb-table th { border-bottom: 2px solid #000 !important; }
+    .fb-body .fb-table td { border-bottom: 1px solid #999 !important; }
+
+    /* Links: show URL inline (so printout has citation) */
+    .fb-body a[href^="http"]::after {
+      content: " (" attr(href) ")";
+      font-size: 9pt;
+      color: #555 !important;
+      font-style: italic;
+    }
+
+    /* Page footer via running element */
+    .fb-body { counter-reset: page-counter; }
+  }
+  /* Always-on print helper button (visible on screen, hidden in print) */
+  .print-btn {
+    position: fixed; bottom: 18px; right: 18px; z-index: 60;
+    appearance: none; border: 1px solid var(--line); background: rgba(255,255,255,.85);
+    backdrop-filter: blur(4px);
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+    color: var(--ink-2); padding: 8px 14px; border-radius: 5px; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(28,29,32,.06);
+  }
+  .print-btn:hover { color: var(--ink); border-color: var(--charcoal-3); }
+  @media print { .print-btn { display: none !important; } }
+
+  /* ============ Header buttons (lang + download) ============ */
+  .dl-btn {
+    appearance:none; border:1px solid var(--line); background:#fff; cursor:pointer;
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; color:var(--ink-2);
+    padding:5px 10px; border-radius:5px;
+  }
+  .dl-btn:hover { border-color:var(--charcoal-3); color:var(--ink); }
+  .dl-btn { white-space:nowrap; }
+  /* CN | EN sliding switch */
+  .lang-switch {
+    position:relative; display:inline-flex; align-items:center; padding:2px; height:24px;
+    border:1px solid var(--line); background:#fff; border-radius:999px; cursor:pointer;
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; appearance:none;
+  }
+  .lang-switch .ls-opt { position:relative; z-index:1; width:30px; text-align:center;
+    line-height:20px; color:var(--ink-3); transition:color .2s; }
+  .lang-switch .ls-thumb { position:absolute; z-index:0; top:2px; left:2px; width:30px; height:20px;
+    border-radius:999px; background:#006c47; transition:transform .22s cubic-bezier(.4,0,.2,1); }
+  body[data-lang="en"] .lang-switch .ls-thumb { transform:translateX(30px); }
+  body[data-lang="zh"] .lang-switch .ls-opt[data-l="zh"],
+  body[data-lang="en"] .lang-switch .ls-opt[data-l="en"] { color:#fff; }
+  .lang-switch:hover { border-color:var(--charcoal-3); }
+  /* multi-language dropdown (replaces the slider when 3+ languages exist) */
+  .lang-select{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink-2);cursor:pointer;
+    font-family:var(--mono);font-size:11px;letter-spacing:.02em;padding:5px 26px 5px 12px;border-radius:999px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M2 3.5L5 6.5L8 3.5' stroke='%238c8b80' fill='none' stroke-width='1.4'/></svg>");
+    background-repeat:no-repeat;background-position:right 9px center}
+  .lang-select:hover{border-color:var(--accent)}
+  @media print { .lang-switch, .lang-select, .dl-btn, .export-wrap { display:none !important; } }
+
+  /* ============ Filter bar v2 — tidy wrapped groups ============ */
+  .filter-bar { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; align-items:stretch; }
+  .fb-group { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .fb-group .fb-lbl {
+    font-family:var(--mono); font-size:9.5px; color:var(--ink-3); letter-spacing:.12em;
+    text-transform:uppercase; width:42px; flex-shrink:0;
+  }
+
+  /* ============ Always-visible fallback report ============ */
+  .report-divider {
+    border-top:1px solid var(--line); background:#f3f3f3; text-align:center;
+    padding:18px; font-family:var(--mono); font-size:10.5px; letter-spacing:.14em;
+    color:var(--ink-3); text-transform:uppercase;
+  }
+  .report-divider .rd-arrow { display:block; margin-top:4px; font-size:14px; opacity:.5; }
+
+  /* ============ Report visualization (icons, badges, bars) ============ */
+  .fb-body .fb-icon { width:15px; height:15px; vertical-align:-2px; margin-right:7px; stroke:var(--charcoal-2); }
+  .fb-verdict-viz {
+    display:flex; gap:0; margin:16px 0 26px; border:1px solid var(--line); border-radius:8px; overflow:hidden;
+  }
+  .fb-verdict-viz .vv-status {
+    flex:0 0 auto; padding:18px 22px; display:flex; flex-direction:column; gap:4px;
+    justify-content:center; align-items:center; border-right:1px solid var(--line); min-width:120px;
+  }
+  .fb-verdict-viz .vv-status .vv-icon { font-size:26px; line-height:1; }
+  .fb-verdict-viz .vv-status .vv-label { font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+  .fb-verdict-viz[data-status="real"]  .vv-status { background:#e6fbf2; color:var(--sage); }
+  .fb-verdict-viz[data-status="partial"] .vv-status { background:#ffdad6; color:var(--rust); }
+  .fb-verdict-viz[data-status="insufficient"] .vv-status { background:#f7e9e3; color:var(--accent); }
+  .fb-verdict-viz .vv-body { flex:1; padding:16px 20px; display:flex; flex-direction:column; justify-content:center; }
+  .fb-verdict-viz .vv-rationale { font-family:var(--serif); font-size:14px; color:var(--ink); margin-bottom:10px; line-height:1.5; }
+  .fb-counts-row { display:flex; gap:0; }
+  .fb-counts-row .fc { flex:1; text-align:center; padding:2px 4px; border-left:1px solid var(--line); }
+  .fb-counts-row .fc:first-child { border-left:0; }
+  .fb-counts-row .fc b { display:block; font-family:var(--mono); font-size:30px; color:var(--ink); font-weight:700; letter-spacing:-.02em; }
+  .fb-counts-row .fc span { font-family:var(--mono); font-size:9px; color:var(--ink-3); letter-spacing:.04em; text-transform:uppercase; }
+
+  /* key findings as icon cards */
+  .fb-findings { display:grid; grid-template-columns:1fr; gap:8px; margin:10px 0 8px; }
+  .fb-finding { display:flex; gap:12px; align-items:flex-start; padding:12px 14px; border:1px solid var(--line); border-radius:7px; background:#fff; }
+  .fb-finding .ff-num { font-family:var(--mono); font-size:11px; color:#fff; background:var(--charcoal); width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .fb-finding p { margin:0; font-size:13.5px; line-height:1.55; }
+
+  /* player mini-cards grid */
+  .fb-player-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; margin:12px 0; }
+  .fb-player-card { border:1px solid var(--line); border-radius:7px; padding:12px 14px; background:#fff; }
+  .fb-player-card .pcc-name { font-family:var(--serif); font-size:15px; font-weight:600; margin-bottom:3px; }
+  .fb-player-card .pcc-meta { font-family:var(--mono); font-size:10px; color:var(--ink-3); margin-bottom:6px; }
+  .fb-player-card .pcc-status { display:inline-block; font-family:var(--mono); font-size:9px; padding:2px 7px; border-radius:9px; letter-spacing:.04em; text-transform:uppercase; }
+  .pcc-status.live { background:#e6fbf2; color:var(--sage); }
+  .pcc-status.rumored { background:#f7e9e3; color:var(--accent); }
+  .pcc-status.stagnant, .pcc-status.dead { background:#f3f1ec; color:var(--warm-gray); }
+
+  /* risk rows with severity bar */
+  .fb-risk { display:grid; grid-template-columns:54px 1fr 80px; gap:12px; align-items:center; padding:11px 0; border-bottom:1px dashed var(--line); }
+  .fb-risk:last-child { border-bottom:0; }
+  .fb-risk .fr-id { font-family:var(--mono); font-size:11px; color:var(--ink-3); }
+  .fb-risk .fr-title { font-family:var(--serif); font-size:14px; color:var(--ink); }
+  .fb-risk .fr-scenario { font-family:var(--mono); font-size:10.5px; color:var(--ink-3); margin-top:2px; }
+  .fb-sev { display:flex; align-items:center; gap:5px; justify-content:flex-end; }
+  .fb-sev .fs-bar { display:flex; gap:2px; }
+  .fb-sev .fs-bar i { width:6px; height:14px; border-radius:1px; background:var(--line); display:block; }
+  .fb-sev[data-sev="high"] .fs-bar i:nth-child(-n+3) { background:var(--accent); }
+  .fb-sev[data-sev="mid"]  .fs-bar i:nth-child(-n+2) { background:var(--rust); }
+  .fb-sev[data-sev="low"]  .fs-bar i:nth-child(-n+1) { background:var(--warm-gray); }
+  .fb-sev .fs-lbl { font-family:var(--mono); font-size:9.5px; color:var(--ink-3); }
+
+  /* path cards with recommend badge */
+  .fb-path { border:1px solid var(--line); border-radius:7px; padding:14px 16px; margin-bottom:10px; background:#fff; }
+  .fb-path.rec { border-color:var(--sage); background:#f7fdf4; }
+  .fb-path .fp-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+  .fb-path .fp-name { font-family:var(--serif); font-size:15px; font-weight:600; }
+  .fb-path .fp-badge { font-family:var(--mono); font-size:9px; padding:2px 8px; border-radius:9px; background:var(--sage); color:#fff; letter-spacing:.06em; text-transform:uppercase; flex-shrink:0; }
+  .fb-path .fp-core { font-family:var(--mono); font-size:10.5px; color:var(--ink-3); margin-bottom:6px; }
+  .fb-path .fp-stats { display:flex; gap:16px; font-family:var(--mono); font-size:10.5px; color:var(--ink-2); margin-top:8px; }
+  .fb-path .fp-stats b { color:var(--ink); }
+</style>
+</head>
+<body data-view="split" data-lens="overview" data-style="minimal" data-lang="zh">
+
+<!-- ============ HEADER · text filled by render() ============ -->
+<header class="app-header">
+  <div class="brand" id="brandLabel"></div>
+  <div class="view-switcher" role="tablist">
+    <button data-view="graph" class="vs-graph" data-i18n="view.graph">◧ 全景</button>
+    <button data-view="split" class="vs-split" data-i18n="view.split">◫ 50/50</button>
+    <button data-view="lens"  class="vs-lens" data-i18n="view.lens">◨ 详情</button>
+  </div>
+  <div class="header-right">
+    <button class="lang-switch" id="langToggle" title="中 / EN" aria-label="切换中英文">
+      <span class="ls-opt" data-l="zh">中</span>
+      <span class="ls-opt" data-l="en">EN</span>
+      <span class="ls-thumb"></span>
+    </button>
+    <div class="export-wrap" id="exportWrap">
+      <button class="dl-btn" id="exportBtn" aria-haspopup="true" aria-expanded="false">
+        <span data-i18n="btn.export">⤓ 导出</span> <span class="ex-caret">▾</span></button>
+      <div class="export-menu" id="exportMenu" role="menu" hidden>
+        <button class="export-item" data-act="pdf"    role="menuitem" data-i18n="btn.exportPdf">导出报告 (PDF)</button>
+        <button class="export-item" data-act="md"     role="menuitem" data-i18n="btn.exportMd">导出原文 (Markdown)</button>
+        <button class="export-item" data-act="voices" role="menuitem" data-i18n="btn.exportVoices">导出全部原声</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ WORKBENCH ============ -->
+<main class="workbench">
+
+  <!-- LEFT: Always-On knowledge graph -->
+  <aside class="center-panel">
+    <div class="evidence-counter" id="evidenceCounter"></div>
+    <canvas class="radar-canvas" id="radarCanvas"></canvas>
+    <div class="radar-hud" id="radarHud">
+      <div class="rh-line"><span data-i18n="radar.signals">有效信号</span> · <b id="rhN">0</b>　<span data-i18n="radar.sectors">扇区</span> · <b id="rhSec">0</b></div>
+      <div class="rh-line"><span data-i18n="radar.range">量程</span> · <b id="rhRange">1</b> · <span id="rhConf" data-i18n="radar.core">核心需求层</span></div>
+    </div>
+    <div class="kg-tooltip" id="kgTip"></div>
+    <div class="radar-scanmsg" id="radarScan"></div>
+    <div class="radar-controls">
+      <button class="radar-btn" id="radarExpand"><span data-i18n="radar.expand">⊕ 扩大扫描范围</span></button>
+      <button class="radar-btn ghost" id="radarPause"><span data-i18n="radar.pause">⏸ 暂停</span></button>
+    </div>
+    <div class="center-hint" data-i18n="graph.hint">悬停看原话 · 点击扇区切到对应视角 · ⊕ 扩大量程探测更多信号</div>
+    <div class="legend">
+      <div class="lg-row"><span class="lg-dot" style="background:var(--pos)"></span><span data-i18n="legend.voicePos">原话(正面)</span></div>
+      <div class="lg-row"><span class="lg-dot" style="background:var(--neg)"></span><span data-i18n="legend.voiceNeg">原话(负面)</span></div>
+      <div class="lg-row"><span class="lg-dot" style="background:transparent;border:1.5px solid #747a60"></span><span data-i18n="legend.opp">机会缝隙(空白扇区)</span></div>
+    </div>
+  </aside>
+
+  <!-- RIGHT: Lens panel -->
+  <section class="lens-panel">
+    <nav class="lens-tabs">
+      <button data-lens="overview" class="active" data-i18n="lens.overview">概览</button>
+      <button data-lens="voices" data-i18n="lens.voices">用户声音</button>
+      <button data-lens="players" data-i18n="lens.players">竞品玩家</button>
+      <button data-lens="opportunity" data-i18n="lens.opportunity">机会缝隙</button>
+      <button data-lens="strategy" data-i18n="lens.strategy">切入策略</button>
+      <button data-lens="risks" data-i18n="lens.risks">风险</button>
+    </nav>
+    <div class="lens-body">
+      <div class="selection-strip">
+        <span data-i18n="sel.current">当前选中</span> · <b id="selLabel">—</b><span class="clear" id="clearSel" data-i18n="sel.clear">清除选择</span>
+      </div>
+
+      <!-- LENS: OVERVIEW · data-driven -->
+      <div class="lens-view" data-lens-id="overview" id="lensOverview"></div>
+
+      <!-- LENS: PLAYERS · data-driven -->
+      <div class="lens-view" data-lens-id="players" id="lensPlayers"></div>
+
+      <!-- LENS: VOICES · already data-driven (filter bar + voiceList) -->
+      <div class="lens-view" data-lens-id="voices">
+        <p class="pc-meta" id="voiceContext"></p>
+        <div class="filter-bar" id="voiceFilter"></div>
+        <div id="voiceList"></div>
+      </div>
+
+      <!-- LENS: OPPORTUNITY · data-driven -->
+      <div class="lens-view" data-lens-id="opportunity" id="lensOpportunity"></div>
+
+      <!-- LENS: STRATEGY · data-driven -->
+      <div class="lens-view" data-lens-id="strategy" id="lensStrategy"></div>
+
+      <!-- LENS: RISKS · data-driven -->
+      <div class="lens-view" data-lens-id="risks" id="lensRisks"></div>
+
+    </div>
+  </section>
+</main>
+
+<!-- ============ FULL REPORT · always visible, scroll down ============ -->
+<div class="report-divider">
+  <span data-i18n="report.divider">完整报告</span>
+  <span class="rd-arrow">↓</span>
+</div>
+<footer class="report-fallback" id="fbFooter">
+  <article class="fb-body" id="fbBody"></article>
+</footer>
+
+<!-- ============ DATA ============ -->
+<script type="application/json" id="report-data">
+{{REPORT_DATA_JSON}}
+</script>
+
+<!-- ============ SCRIPT ============ -->
+<script>
+(function(){
+  // ---- Data load (with friendly error) ----
+  let data;
+  try {
+    const raw = document.getElementById('report-data').textContent.trim();
+    if (!raw) throw new Error('No data — empty report-data block. Did you run scripts/render_report.py?');
+    // detect un-replaced placeholder without literally writing it (orchestrator would replace it here too)
+    if (raw.charAt(0) === '{' && raw.charAt(1) === '{') throw new Error('Placeholder not replaced — template was loaded directly. Render via scripts/render_report.py.');
+    data = JSON.parse(raw);
+  } catch (e) {
+    document.body.innerHTML = `
+      <div style="max-width:640px;margin:80px auto;padding:30px;border:2px solid #ba1a1a;background:#ffdad6;border-radius:6px;font-family:system-ui;color:#1c1c18">
+        <h2 style="margin:0 0 12px;color:#ba1a1a">数据加载失败 · Data Error</h2>
+        <p style="margin:0 0 8px"><b>${e.name || 'Error'}:</b> ${e.message}</p>
+        <p style="margin:0;color:#737277;font-size:13px">检查 <code>data/{slug}.json</code> 是否存在且为合法 JSON,并通过 <code>python scripts/validate_data.py</code>。</p>
+      </div>`;
+    return;
+  }
+
+  // ---- HTML escape + format helpers ----
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const fmtNum = n => Number(n).toLocaleString();
+
+  // ============ i18n ============
+  const I18N = {
+    zh: {
+      'view.graph':'◧ 全景','view.split':'◫ 50/50','view.lens':'◨ 详情',
+      'btn.download':'⎙ 下载 PDF',
+      'btn.export':'⤓ 导出','btn.exportPdf':'导出报告 (PDF)','btn.exportMd':'导出原文 (Markdown)','btn.exportVoices':'导出全部原声',
+      'lens.overview':'概览','lens.voices':'用户声音','lens.players':'竞品玩家',
+      'lens.opportunity':'机会缝隙','lens.strategy':'切入策略','lens.risks':'风险',
+      'legend.player':'玩家','legend.themeWin':'主题(正面)','legend.themePain':'主题(痛点)',
+      'legend.neutral':'中性 / 退场','legend.opp':'机会区','legend.voicePos':'原话(正面)','legend.voiceNeg':'原话(负面)',
+      'graph.hint':'悬停看原话 · 点击扇区切到对应视角 · ⊕ 扩大量程探测更多信号',
+      'radar.signals':'有效信号','radar.sectors':'扇区','radar.range':'量程','radar.core':'核心需求层',
+      'radar.expand':'⊕ 扩大扫描范围','radar.pause':'⏸ 暂停',
+      'radar.ext':'扩展需求层','radar.outer':'外圈探测层',
+      'radar.axisCore':'核心 · 高赞','radar.axisTail':'长尾 · 新声',
+      'sent.praise':'好评','sent.complaint':'差评','sent.demand':'需求信号','sent.gap':'痛点/缺口',
+      'ins.market':'市场洞察','ins.user':'用户洞察','ins.product':'产品洞察',
+      'ins.split':'口碑结构','ins.demandSplit':'需求信号结构','ins.themeDist':'需求主题分布',
+      'ins.upvotes':'累计赞同','ins.avgScore':'平均热度','ins.discussed':'被讨论',
+      'ins.topPraise':'高频好评 · 用户认可','ins.topComplaint':'高频差评 · 用户不满',
+      'ins.topDemand':'强需求信号 · 用户在求','ins.topGap':'未满足的缺口 · 现有方案不够',
+      'mode.existing':'存量市场 · 已有产品在售','mode.nonstock':'非存量市场 · 需求验证',
+      'ins.communities':'社区','ins.shareOfVoice':'声量占比','ins.heatmap':'主题 × 情绪 · 痛点图',
+      'ins.brandTable':'玩家对比','ins.mentions':'被提及','ins.quoteWall':'真实原声墙','ins.deepdive':'最受关注的主题 · Top 3',
+      'ins.measured':'实测数据','ins.judgment':'分析判断',
+      'ins.btBrand':'玩家','ins.btShare':'声量占比','ins.btSent':'口碑(好 / 差)','ins.btMeta':'价格 / 状态','ins.btSite':'官网搜索','ins.btMore':'更多玩家(本次未采集到讨论)','ins.btThin':'信息量过少','ins.btThinUnit':' 条',
+      'ins.rnSplit':'读法:按真实原声<b>条数</b>统计的正负向占比;数字为条数,不是赞数累加。',
+      'ins.rnTheme':'读法:每个需求主题被多少条真实原声提及(占总数的百分比)。条越长 = 讨论越集中。',
+      'ins.rnHeat':'读法:颜色越深 = 该主题下该情绪的原声越多。<b>颜色是信号,数字是次要标注</b>。',
+      'ins.rnBrand':'读法:声量占比 = 该玩家在已采集真实讨论中所占的比例(主要玩家合计约 100%);口碑为好 / 差评比例,仅当原声 ≥ 10 条时才计算,不足则标注「信息量过少」。本次未采集到讨论的玩家列入「更多玩家」,不代表其真实份额为零。官网为搜索链接。',
+      'ins.rnSov':'读法:每个玩家占据了多少比例的讨论声量(占总原声的百分比)。',
+      'ins.rnDeep':'读法:挑出用户讨论最多的 3 个主题,每个主题下放最高赞的真实原声,帮你快速看清「大家到底在聊什么、怎么说」。底部百分比 = 该主题被多少比例的原声提及;好评率 = 该主题下正向声音占比。',
+      'ins.expandAll':'展开全部原声','ins.voicesUnit':'条原声',
+      'va.section':'全部真实原声','va.all':'全部','va.showing':'当前显示',
+      'va.rn':'读法:本次采集到的全部真实原声明细(按赞数排序),可按情绪 / 社区筛选;每条点击回到 Reddit/HN 原帖。这是上方所有结论与图表的原始证据。',
+      'ins.method':'方法与数据来源','ins.methodBody':'数据来自 Reddit(经 pullpush.io 归档)+ Hacker News 的真实公开讨论。每条原声可点击回到原帖。',
+      'ins.gaps':'已知盲区','ins.gapsBody':'数据为 Reddit 真实公开讨论(经 Arctic Shift / pullpush 归档),赞数为摄取时刻快照、非实时,部分时段 / 社区可能不全。结论用于判断需求真伪,不构成投资建议。',
+      'ud.section':'用户与需求拆解','ud.jtbd':'核心任务 JTBD','ud.scenarios':'使用场景','ud.personas':'用户画像',
+      'ud.needs':'未被满足的需求','ud.workarounds':'替代方案 / Workaround','ud.wtp':'支付意愿 / 价格带',
+      'ud.rnDemand':'读法:从真实原声拆出的场景 / 人群 / 需求,每条带 <b>▸</b> 链接回支撑它的真实帖子。',
+      'ud.matrix':'需求地图 · 机会矩阵',
+      'st.dirs':'可能的切入方向','st.bet':'赌的假设','st.evidence':'支撑证据','st.openq':'待验证问题','st.risk':'不确定性',
+      'st.dirsNote':'这些是「方向 + 待验证假设」,不是拍板的推荐 —— 判断权留给你。',
+      'sel.current':'当前选中','sel.clear':'清除选择',
+      'report.divider':'完整报告',
+      'verdict.real':'✓ 真实需求','verdict.partial':'◐ 部分支持','verdict.insufficient':'⚠ 证据不足',
+      'ov.findings':'核心发现','ov.counts.raw':'真实原话','ov.counts.themes':'需求主题','ov.counts.mkt':'电商评论','ov.counts.ed':'媒体测评','ov.counts.players':'玩家',
+      'pl.topVoices':'高赞原话','pl.mkt':'电商口碑','pl.smallSample':'本玩家社区规模较小,样本不足以形成主题级证据。',
+      'vo.sentiment':'情绪','vo.theme':'主题','vo.all':'全部','vo.pos':'● 正面','vo.neg':'● 负面',
+      'vo.count':'条原话(共','vo.count2':')',
+      'op.who':'谁最可能占据','st.recommend':'推荐','st.time':'时间','st.invest':'投入','st.moat':'护城河',
+      'rk.sevHigh':'高','rk.sevMid':'中','rk.sevLow':'低',
+      'fb.s1':'市场与品类洞察','fb.s2':'用户声音洞察','fb.s3':'竞品全景','fb.s4':'机会缝隙','fb.s5':'入场能力栈','fb.s6':'风险与挑战',
+      'fb.themeDist':'主题分布','fb.voiceSel':'代表性原话','fb.players':'玩家速览','fb.mkt':'电商口碑','fb.failures':'失败案例',
+      'fb.paths':'切入策略','fb.s5note':'本节由用户根据具体策略路径填写。',
+      'tt.player':'玩家','tt.theme':'主题','tt.voicesOn':'条原话讨论','tt.clickPlayer':'点击 → 看该玩家档案',
+      'tt.clickTheme':'点击 → 看该主题下的所有用户声音','tt.clickOpp':'点击 → 看完整机会分析','tt.relatedTopics':'关联主题/原话',
+      'tt.oppGap':'机会缝隙 · 无玩家占据','moat.low':'低','moat.mid':'中','moat.high':'强','moat.extreme':'极强',
+    },
+    en: {
+      'view.graph':'◧ Graph','view.split':'◫ 50/50','view.lens':'◨ Detail',
+      'btn.download':'⎙ Download PDF',
+      'btn.export':'⤓ Export','btn.exportPdf':'Export report (PDF)','btn.exportMd':'Export text (Markdown)','btn.exportVoices':'Export all voices',
+      'lens.overview':'Overview','lens.voices':'Voices','lens.players':'Players',
+      'lens.opportunity':'Opportunity','lens.strategy':'Strategy','lens.risks':'Risks',
+      'legend.player':'Player','legend.themeWin':'Theme (win)','legend.themePain':'Theme (pain)',
+      'legend.neutral':'Neutral / exited','legend.opp':'Opportunity','legend.voicePos':'Voice (pos)','legend.voiceNeg':'Voice (neg)',
+      'graph.hint':'Hover to read a voice · click a sector to switch lens · ⊕ widen range for more signals',
+      'radar.signals':'Signals','radar.sectors':'Sectors','radar.range':'Range','radar.core':'Core demand layer',
+      'radar.expand':'⊕ Widen scan range','radar.pause':'⏸ Pause',
+      'radar.ext':'Extended layer','radar.outer':'Outer probe layer',
+      'radar.axisCore':'Core · top-voted','radar.axisTail':'Long tail',
+      'sent.praise':'Praise','sent.complaint':'Complaint','sent.demand':'Demand signal','sent.gap':'Unmet gap',
+      'ins.market':'Market insight','ins.user':'User insight','ins.product':'Product insight',
+      'ins.split':'Sentiment split','ins.demandSplit':'Demand signal split','ins.themeDist':'Demand theme distribution',
+      'ins.upvotes':'Total upvotes','ins.avgScore':'Avg heat','ins.discussed':'discussed',
+      'ins.topPraise':'Top praise · what users love','ins.topComplaint':'Top complaints · what frustrates',
+      'ins.topDemand':'Strong demand signals · what users want','ins.topGap':'Unmet gaps · current options fall short',
+      'mode.existing':'Existing market · products on sale','mode.nonstock':'Non-stock market · demand validation',
+      'ins.communities':'communities','ins.shareOfVoice':'Share of voice','ins.heatmap':'Theme × sentiment · pain map',
+      'ins.brandTable':'Brand comparison','ins.mentions':'mentions','ins.quoteWall':'Voice wall','ins.deepdive':'Top themes by attention · Top 3',
+      'ins.measured':'measured data','ins.judgment':'analyst judgment',
+      'ins.btBrand':'Brand','ins.btShare':'Share of voice','ins.btSent':'Sentiment (pos / neg)','ins.btMeta':'Price / status','ins.btSite':'Find site','ins.btMore':'More players (no discussion captured this run)','ins.btThin':'too few to judge','ins.btThinUnit':' voices',
+      'ins.rnSplit':'How to read: positive/negative split by <b>number of real voices</b> — counts, not summed upvotes.',
+      'ins.rnTheme':'How to read: how many real voices mention each demand theme (% of total). Longer = more concentrated.',
+      'ins.rnHeat':'How to read: darker = more voices for that theme×sentiment. <b>Color is the signal; the number is secondary</b>.',
+      'ins.rnBrand':'How to read: share of voice = this brand\'s slice of all captured discussion (main players ≈ 100% together); sentiment is the pos/neg ratio, shown only when ≥ 10 voices exist — otherwise flagged "too few to judge". Brands with no discussion captured this run are listed under "More players" — that is not a real zero share. Site = search link.',
+      'ins.rnSov':'How to read: what share of the conversation each player holds (% of total voices).',
+      'ins.rnDeep':'How to read: the 3 themes users discuss most, each with the top-voted real posts — so you can see at a glance what people are actually talking about and how. Bottom %: how much of the corpus mentions this theme; pos rate: share of positive voices within it.',
+      'ins.expandAll':'Show all voices','ins.voicesUnit':'voices',
+      'va.section':'All real voices','va.all':'All','va.showing':'Showing',
+      'va.rn':'How to read: the full list of every real voice collected this run (ranked by upvotes) — filter by sentiment/community; each links back to the original Reddit/HN post. This is the raw evidence behind every chart and conclusion above.',
+      'ins.method':'Method & sources','ins.methodBody':'Data is real public discussion from Reddit (via the pullpush.io archive) + Hacker News. Every voice links back to its source post.',
+      'ins.gaps':'Known gaps','ins.gapsBody':'Data is real public Reddit discussion (via the Arctic Shift / pullpush archives); upvotes are a snapshot at ingest, not live; some periods/communities may be incomplete. Findings judge demand reality — not investment advice.',
+      'ud.section':'User & Demand Decomposition','ud.jtbd':'Core JTBD','ud.scenarios':'Usage scenarios','ud.personas':'Personas',
+      'ud.needs':'Unmet needs','ud.workarounds':'Workarounds','ud.wtp':'Willingness to pay',
+      'ud.rnDemand':'How to read: scenarios / personas / needs decomposed from real voices; each <b>▸</b> links back to the supporting post.',
+      'ud.matrix':'Demand map · opportunity matrix',
+      'st.dirs':'Possible directions','st.bet':'Hypothesis','st.evidence':'Evidence','st.openq':'Open questions','st.risk':'Risk',
+      'st.dirsNote':'These are directions + assumptions to validate, not a definitive recommendation — the call is yours.',
+      'sel.current':'Selected','sel.clear':'Clear',
+      'report.divider':'Full Report',
+      'verdict.real':'✓ Real demand','verdict.partial':'◐ Partial','verdict.insufficient':'⚠ Insufficient',
+      'ov.findings':'Key Findings','ov.counts.raw':'raw voices','ov.counts.themes':'demand themes','ov.counts.mkt':'marketplace','ov.counts.ed':'editorials','ov.counts.players':'players',
+      'pl.topVoices':'Top Voices','pl.mkt':'Marketplace VOC','pl.smallSample':'Community too small for theme-level evidence.',
+      'vo.sentiment':'Sentiment','vo.theme':'Theme','vo.all':'All','vo.pos':'● Positive','vo.neg':'● Negative',
+      'vo.count':'voices (of','vo.count2':')',
+      'op.who':'Who could occupy it','st.recommend':'recommended','st.time':'Time','st.invest':'Invest','st.moat':'Moat',
+      'rk.sevHigh':'High','rk.sevMid':'Mid','rk.sevLow':'Low',
+      'fb.s1':'Market & Category Insight','fb.s2':'User Voice Insight','fb.s3':'Competitive Landscape','fb.s4':'Opportunity Gap','fb.s5':'Capability Stack','fb.s6':'Risks & Challenges',
+      'fb.themeDist':'Theme Distribution','fb.voiceSel':'Representative Voices','fb.players':'Players','fb.mkt':'Marketplace VOC','fb.failures':'Failure Cases',
+      'fb.paths':'Entry Paths','fb.s5note':'Filled in per chosen strategy path.',
+      'tt.player':'Player','tt.theme':'Theme','tt.voicesOn':'voices discuss this','tt.clickPlayer':'Click → player profile',
+      'tt.clickTheme':'Click → all voices on this theme','tt.clickOpp':'Click → full opportunity analysis','tt.relatedTopics':'related topics/voices',
+      'tt.oppGap':'Opportunity gap · unoccupied','moat.low':'Low','moat.mid':'Mid','moat.high':'High','moat.extreme':'Extreme',
+    },
+  };
+  const LANG = () => document.body.dataset.lang || 'zh';
+  // UI strings exist for zh + en; any other language falls back to en chrome.
+  const T = key => { const l = LANG(); const dict = I18N[l] || (l === 'zh' ? I18N.zh : I18N.en) || I18N.zh;
+    return dict[key] ?? (I18N.en && I18N.en[key]) ?? I18N.zh[key] ?? key; };
+  // data field (multi-language): zh is the base; any other language prefers
+  // <field>_<lang>, then <field>_en (international fallback), then the base.
+  const tf = (obj, field) => {
+    if (!obj) return '';
+    const l = LANG();
+    if (l !== 'zh') {
+      const k = obj[field + '_' + l]; if (k != null && k !== '') return k;
+      const e = obj[field + '_en'];   if (e != null && e !== '') return e;
+    }
+    return obj[field] ?? '';
+  };
+  // Voice titles stay the original English Reddit text. Under each, show a subtle
+  // translation in the current language (title_<lang>, produced by the pipeline).
+  // In en mode there's no subtitle (the title is already English).
+  const voiceZh = v => { const l = LANG(); if (l === 'en' || !v) return ''; return v['title_' + l] || ''; };
+  const zhLine = v => { const z = voiceZh(v); return z ? `<div class="v-zh">${esc(z)}</div>` : ''; };
+  // Parse the source subreddit ("r/xxx") from a voice url, for source tags.
+  const subOf = url => { const m = /reddit\.com\/r\/([A-Za-z0-9_]+)/.exec(url || ''); return m ? 'r/' + m[1] : (/(news\.)?ycombinator/.test(url||'') ? 'HN' : 'web'); };
+  // Brand official-site SEARCH link (no LLM-emitted URLs → zero dead links).
+  const brandSearch = name => 'https://duckduckgo.com/?q=' + encodeURIComponent((name || '') + ' official site');
+  function applyI18n(){
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = T(el.dataset.i18n);
+    });
+  }
+
+  // ---- Theme/player lookup (lang-aware) ----
+  const themeLabel = id => { const t = data.themes.find(t => t.id === id); return t ? tf(t, 'label') : id; };
+  const playerName = id => { const p = data.players.find(p => p.id === id); return p ? tf(p, 'name') : id; };
+
+  const verdictStatus = (data.verdict && data.verdict.status) || 'partial';
+
+  // ---- Chrome (title, brand, verdict pill) — re-runnable on lang switch ----
+  function renderChrome(){
+    document.getElementById('docTitle').textContent = `${tf(data.meta,'idea')} · CATEGORY DEEP DIVE`;
+    document.getElementById('brandLabel').innerHTML = `<b>VIBE</b> · CATEGORY DEEP DIVE · ${esc(tf(data.meta,'idea'))}`;
+    applyI18n();
+    // mode-aware radar legend (override the static i18n labels)
+    const lp = document.querySelector('[data-i18n="legend.voicePos"]');
+    const ln = document.querySelector('[data-i18n="legend.voiceNeg"]');
+    if (lp) lp.textContent = sentLabel('pos');
+    if (ln) ln.textContent = sentLabel('neg');
+  }
+  document.body.dataset.mode   = data.meta.mode || 'EXISTING';
+  document.body.dataset.status = verdictStatus;
+
+  // ---- Inline SVG icons (stroke-based, inherit currentColor) ----
+  const IC = {
+    section: '<svg class="fb-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+    category:'<svg class="fb-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+    users:   '<svg class="fb-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.8M21 20a6 6 0 0 0-4-5.6"/></svg>',
+    grid:    '<svg class="fb-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M7.5 7.5 11 16M16.5 7.5 13 16"/></svg>',
+    target:  '<svg class="fb-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></svg>',
+    stack:   '<svg class="fb-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3 21 8l-9 5-9-5 9-5Z"/><path d="M3 13l9 5 9-5M3 17l9 5 9-5"/></svg>',
+    warn:    '<svg class="fb-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3 22 20H2L12 3Z"/><path d="M12 10v5M12 18h.01"/></svg>',
+  };
+  const statusIcon = { real:'✓', partial:'◐', insufficient:'⚠' };
+  const polCls   = p => ({ win:'pos', pain:'neg', neutral:'neu', pos:'pos', neg:'neg' }[p] || 'neu');
+  const polLabel = p => ({ win:'win', pain:'pain', neutral:'·', pos:'pos', neg:'neg' }[p] || p);
+
+  // ---- Mode-aware framing ----
+  // EXISTING market → voices read as product reviews (好评 / 差评).
+  // NON_STOCK market → voices read as demand validation (需求信号 / 痛点缺口).
+  const isNonStock = () => (data.meta.mode || 'EXISTING') === 'NON_STOCK';
+  const sentLabel  = sent => sent === 'pos'
+      ? (isNonStock() ? T('sent.demand') : T('sent.praise'))
+      : (isNonStock() ? T('sent.gap')    : T('sent.complaint'));
+
+  // ---- Render evidence counter strip (top-left of graph) ----
+  function renderEvidenceCounter(){
+    const c = (data.verdict && data.verdict.evidence_counts) || {};
+    document.getElementById('evidenceCounter').innerHTML = `
+      <span><b>${(data.voices||[]).length || c.raw_voices || 0}</b> ${T('ov.counts.raw')}</span>
+      <span><b>${(data.themes||[]).length}</b> ${T('ov.counts.themes')}</span>`;
+  }
+
+  // ---- Render OVERVIEW lens ----
+  function renderOverview(){
+    const v = data.verdict || {};
+    const counts = v.evidence_counts || {};
+    const findings = (tf(v, 'key_findings') || v.key_findings || []).map((t,i) =>
+      `<div class="fb-finding"><span class="ff-num">${i+1}</span><p>${t}</p></div>`).join('');
+    document.getElementById('lensOverview').innerHTML = `
+      <div class="verdict-card">
+        <div class="pc-meta">VERDICT · ${esc(data.meta.timestamp)}</div>
+        <div class="v-title">${esc(tf(data.meta,'thesis'))}</div>
+        <div class="v-counts">
+          <div><b>${(data.voices||[]).length || counts.raw_voices || 0}</b> ${T('ov.counts.raw')}</div>
+          <div><b>${(data.themes||[]).length}</b> ${T('ov.counts.themes')}</div>
+        </div>
+      </div>
+      <h4>${T('ov.findings')}</h4>
+      <div class="fb-findings">${findings}</div>`;
+  }
+
+  // ---- Render PLAYERS lens ----
+  function renderPlayers(){
+    const statusLabel = s => ({ live: LANG()==='zh'?'在售':'live', rumored: LANG()==='zh'?'未发布':'rumored',
+                                stagnant: LANG()==='zh'?'停滞':'stagnant', dead: LANG()==='zh'?'退场':'dead' }[s] || s);
+    const chips = data.players.map(p =>
+      `<button class="chip" data-player-id="${esc(p.id)}">${esc(tf(p,'name'))}</button>`
+    ).join('');
+    const cards = data.players.map(p => {
+      const playerVoices = data.voices.filter(v => v.player === p.id)
+        .sort((a,b) => Math.abs(b.score) - Math.abs(a.score)).slice(0, 5);
+      const voiceRows = playerVoices.map(v => {
+        const themes = v.themes.map(themeLabel).join(' · ');
+        return `<div class="voice-row ${esc(v.sentiment)}">
+            <span class="dot">●</span>
+            <div><div class="vt"><a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(tf(v,'title'))}</a></div>${zhLine(v)}
+              <div class="vm">${esc(themes)}</div></div>
+            <span class="vs">↑${fmtNum(Math.abs(v.score))}</span>
+          </div>`;
+      }).join('');
+      const mkt = (data.marketplace || []).find(m => m.player === p.id);
+      const mktBlock = mkt
+        ? `<h4>${T('pl.mkt')}</h4><p>${esc(mkt.platform)} <b>⭐ ${mkt.rating}</b> · ${fmtNum(mkt.review_count)} · ${(mkt.top_complaints || []).map(esc).join(' / ')}</p>`
+        : '';
+      const meta = [p.price, p.subscription, statusLabel(p.status)].filter(Boolean).map(esc).join(' · ');
+      const voicesBlock = voiceRows ? `<h4>${T('pl.topVoices')}</h4>${voiceRows}`
+        : `<p style="font-style:italic;color:var(--ink-3)">${T('pl.smallSample')}</p>`;
+      return `<article class="player-card" data-player-id="${esc(p.id)}">
+        <h3>${esc(tf(p,'name'))}</h3><div class="pc-meta">${meta}</div>
+        <p class="pc-summary">${esc(tf(p,'summary'))}</p>${voicesBlock}${mktBlock}
+      </article>`;
+    }).join('');
+    document.getElementById('lensPlayers').innerHTML = `<div class="player-chips">${chips}</div>${cards}`;
+  }
+
+  // ---- Render VOICES lens (grouped filter bar) ----
+  function renderVoicesScaffold(){
+    const themeChips = data.themes.map(t =>
+      `<button class="chip" data-filter="theme" data-val="${esc(t.id)}">${esc(tf(t,'label'))}</button>`
+    ).join('');
+    document.getElementById('voiceFilter').innerHTML = `
+      <div class="fb-group">
+        <span class="fb-lbl">${T('vo.sentiment')}</span>
+        <button class="chip active" data-filter="sent" data-val="all">${T('vo.all')}</button>
+        <button class="chip" data-filter="sent" data-val="pos">● ${sentLabel('pos')}</button>
+        <button class="chip" data-filter="sent" data-val="neg">● ${sentLabel('neg')}</button>
+      </div>
+      <div class="fb-group">
+        <span class="fb-lbl">${T('vo.theme')}</span>
+        <button class="chip active" data-filter="theme" data-val="all">${T('vo.all')}</button>
+        ${themeChips}
+      </div>`;
+  }
+
+  // ---- Render OPPORTUNITY lens ----
+  function renderOpportunity(){
+    const o = data.opportunity || {};
+    document.getElementById('lensOpportunity').innerHTML = `<div class="opp-card">
+        <h3>${esc(tf(o,'label') || '★')}</h3><p>${esc(tf(o,'summary'))}</p>
+      </div>`;
+  }
+
+  // ---- Render STRATEGY lens ----
+  function renderStrategy(){
+    const paths = (data.paths || []).map(p => {
+      const cls = p.recommended ? 'fb-path rec' : 'fb-path';
+      const stats = [p.time && `${T('st.time')} <b>${esc(p.time)}</b>`,
+                     p.investment && `${T('st.invest')} <b>${esc(p.investment)}</b>`,
+                     p.moat && `${T('st.moat')} <b>${T('moat.'+p.moat) || esc(p.moat)}</b>`].filter(Boolean).join('');
+      return `<div class="${cls}">
+          <div class="fp-head"><span class="fp-name">${esc(tf(p,'label'))}</span>
+            ${p.recommended ? `<span class="fp-badge">${T('st.recommend')}</span>` : ''}</div>
+          <div class="fp-core">${esc(tf(p,'core'))}</div>
+          <p style="margin:0;font-size:13px;color:var(--ink-2)">${esc(tf(p,'description'))}</p>
+          ${stats ? `<div class="fp-stats">${stats}</div>` : ''}
+        </div>`;
+    }).join('');
+    document.getElementById('lensStrategy').innerHTML = paths || '<p style="color:var(--ink-3);font-style:italic">—</p>';
+  }
+
+  // ---- Render RISKS lens (severity bars) ----
+  function renderRisks(){
+    const sevLabel = { high:T('rk.sevHigh'), mid:T('rk.sevMid'), low:T('rk.sevLow') };
+    const rows = (data.risks || []).map(r => `
+      <div class="fb-risk">
+        <span class="fr-id">${esc(r.id)}</span>
+        <div><div class="fr-title">${esc(tf(r,'title'))}</div><div class="fr-scenario">${esc(tf(r,'scenario'))}</div></div>
+        <div class="fb-sev" data-sev="${esc(r.severity)}">
+          <span class="fs-lbl">${sevLabel[r.severity] || r.severity}</span>
+          <span class="fs-bar"><i></i><i></i><i></i></span>
+        </div>
+      </div>`).join('');
+    document.getElementById('lensRisks').innerHTML = rows || '<p style="color:var(--ink-3);font-style:italic">—</p>';
+  }
+
+  // ---- Render FALLBACK long-form report (§1-§6) with icons + viz ----
+  function renderFallback(){
+    const v = data.verdict || {};
+    const counts = v.evidence_counts || {};
+    const sevLabel = { high:T('rk.sevHigh'), mid:T('rk.sevMid'), low:T('rk.sevLow') };
+
+    // ---- objective aggregates: mentions / % of corpus (R2/R3) ----
+    const allV   = data.voices || [];
+    const N      = allV.length || 1;
+    const pct    = n => Math.round(n / N * 100);
+    const posV   = allV.filter(x => x.sentiment === 'pos').sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+    const negV   = allV.filter(x => x.sentiment !== 'pos').sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+    const posPct = pct(posV.length);
+    const modeLabel = isNonStock() ? T('mode.nonstock') : T('mode.existing');
+    const themeCounts = data.themes.map(t => ({ t, n: allV.filter(x=>x.themes.includes(t.id)).length }))
+                                   .filter(x => x.n > 0)   // drop themes no voice maps to
+                                   .sort((a,b)=>b.n-a.n);
+    const maxTN = Math.max(1, ...themeCounts.map(x=>x.n));
+    const playerStats = data.players.map(p => {
+      const pv = allV.filter(x => x.player === p.id);
+      const pos = pv.filter(x=>x.sentiment==='pos').length;
+      return { p, n: pv.length, pos, neg: pv.length - pos };
+    }).sort((a,b)=>b.n-a.n);
+    // Split: players we actually heard in the corpus ("主要玩家") vs. those with
+    // zero matched voices ("更多玩家"). Showing 0/0% rows is misleading — limited
+    // search ≠ a real zero — so the silent ones are listed by name only.
+    const mainPlayers = playerStats.filter(s => s.n > 0);
+    const morePlayers = playerStats.filter(s => s.n === 0);
+    const maxPN = Math.max(1, ...playerStats.map(s=>s.n));
+    // share among the *heard* corpus (players sum to ~100%), not % of all voices
+    const heardTotal = Math.max(1, mainPlayers.reduce((a,s)=>a+s.n,0));
+    const sharePct = n => Math.round(n / heardTotal * 100);
+    const commMap = {}; allV.forEach(x => { const s = subOf(x.url); commMap[s] = (commMap[s]||0)+1; });
+    const comms = Object.entries(commMap).sort((a,b)=>b[1]-a[1]);
+
+    // Section conclusions: prefer the LLM's core-insight paragraph
+    // (data.section_insights, language-aware); fall back to an objective
+    // data-derived one-liner when an insight isn't available.
+    const L = (zh,en) => LANG()==='zh' ? zh : en;
+    const SI = data.section_insights || {};
+    const insight = (key, fb) => { const t = tf(SI, key); return t ? esc(t) : fb; };
+    const topTheme = themeCounts[0] ? esc(tf(themeCounts[0].t,'label')) : '—';
+    const topThemePct = themeCounts[0] ? pct(themeCounts[0].n) : 0;
+    const negByTheme = data.themes.map(t => ({ t, n: allV.filter(x=>x.themes.includes(t.id) && x.sentiment!=='pos').length })).sort((a,b)=>b.n-a.n);
+    const topNegTheme = (negByTheme[0] && negByTheme[0].n) ? esc(tf(negByTheme[0].t,'label')) : '';
+    const leader = mainPlayers[0];
+    const oppLabel = esc(tf(data.opportunity||{},'label'));
+    const _rk = data.risks || [];
+    const topSev = _rk.some(r=>r.severity==='high')?L('高','high'):(_rk.some(r=>r.severity==='mid')?L('中','mid'):L('低','low'));
+    const secSum = txt => txt ? `<p class="sec-summary">${txt}</p>` : '';
+    const s1sum = insight('market', L(`已采集 <b>${N}</b> 条真实讨论,覆盖 <b>${comms.length}</b> 个社区;整体 <b>${posPct}%</b> 正向,讨论最集中在「${topTheme}」。`,
+                    `<b>${N}</b> real discussions across <b>${comms.length}</b> communities; <b>${posPct}%</b> positive overall, most concentrated on “${topTheme}”.`));
+    const s2sum = insight('user', L(`用户最在意「${topTheme}」(<b>${topThemePct}%</b> 提及)。${topNegTheme?`不满主要集中在「${topNegTheme}」。`:`负面声音很少。`}`,
+                    `Users care most about “${topTheme}” (<b>${topThemePct}%</b> of mentions).${topNegTheme?` Complaints cluster on “${topNegTheme}”.`:` Few negatives.`}`));
+    const s3sum = insight('competitive', leader ? L(`<b>${esc(tf(leader.p,'name'))}</b> 占据 <b>${sharePct(leader.n)}%</b> 声量、领先;${mainPlayers.length} 个玩家被讨论到${morePlayers.length?`,另有 ${morePlayers.length} 个本次未采集到讨论`:''}。`,
+                             `<b>${esc(tf(leader.p,'name'))}</b> leads with <b>${sharePct(leader.n)}%</b> share of voice; ${mainPlayers.length} players discussed${morePlayers.length?`, ${morePlayers.length} more with no discussion captured`:''}.`) : '');
+    const s4sum = L(`讨论量前三的真实需求:${themeCounts.slice(0,3).map(x=>esc(tf(x.t,'label'))).join(' · ')}。`,
+                    `Top-3 most-discussed real needs: ${themeCounts.slice(0,3).map(x=>esc(tf(x.t,'label'))).join(' · ')}.`);
+    const s7sum = L(`按赞数排序、精选 ${Math.min(24,N)} 条代表性真实原声(共 ${N} 条,完整列表见下一节)。`, `${Math.min(24,N)} curated real voices by upvotes (of ${N} total — full list in the next section).`);
+    const s8sum = L(`本次共采集 <b>${N}</b> 条真实原声,以下为全部明细,可按情绪或社区筛选,每条均可点击回到原帖。`, `All <b>${N}</b> real voices collected this run — filter by sentiment or community; every row links back to the original post.`);
+    const s5sum = insight('opportunity', oppLabel ? L(`关键空白机会:${oppLabel};下方为可选的切入策略路径。`,
+                               `Key white-space: ${oppLabel}; candidate entry-strategy paths below.`) : '');
+    const s6sum = insight('risk', _rk.length ? L(`共识别 ${_rk.length} 项主要风险,最高级别:${topSev}。`,
+                                 `${_rk.length} key risks identified; highest severity: ${topSev}.`) : '');
+
+    const measured = `<span class="kicker measured">${T('ins.measured')}</span>`;
+    const judgment = `<span class="kicker judgment">${T('ins.judgment')}</span>`;
+    const rnote = txt => `<div class="read-note">${txt}</div>`;
+
+    const splitBar = `<div class="ins-bar">
+      ${posV.length?`<span class="seg pos" style="width:${Math.max(posPct,12)}%">${sentLabel('pos')} ${posPct}%</span>`:''}
+      ${negV.length?`<span class="seg neg" style="width:${Math.max(100-posPct,12)}%">${sentLabel('neg')} ${100-posPct}%</span>`:''}
+    </div>`;
+    const themeBars = themeCounts.map(({t,n})=>`<div class="ins-trow">
+        <span class="ins-tlabel">${esc(tf(t,'label'))}</span>
+        <span class="ins-tbar"><i class="${polCls(t.polarity)}" style="width:${Math.round(n/maxTN*100)}%"></i></span>
+        <span class="ins-tcount">${pct(n)}%</span></div>`).join('');
+    const sovBars = mainPlayers.map(s=>`<div class="ins-trow">
+        <span class="ins-tlabel">${esc(tf(s.p,'name'))}</span>
+        <span class="ins-tbar"><i class="pos" style="width:${Math.round(s.n/maxPN*100)}%"></i></span>
+        <span class="ins-tcount">${sharePct(s.n)}%</span></div>`).join('') || '<p class="meta">—</p>';
+    const marketCards = `<div class="ins-grid">
+      <div class="ins-card">${measured}
+        <h4>${isNonStock()?T('ins.demandSplit'):T('ins.split')}</h4>
+        <div class="ins-stat-row">
+          <div class="ins-stat"><b>${allV.length}</b><span>${T('ov.counts.raw')}</span></div>
+          <div class="ins-stat"><b>${comms.length}</b><span>${T('ins.communities')}</span></div>
+          <div class="ins-stat"><b>${data.players.length}</b><span>${T('ov.counts.players')}</span></div>
+        </div>
+        ${splitBar}${rnote(T('ins.rnSplit'))}
+      </div>
+      <div class="ins-card">${measured}<h4>${T('ins.themeDist')}</h4>${themeBars}${rnote(T('ins.rnTheme'))}</div>
+    </div>`;
+
+    // theme × sentiment heatmap (color is the signal)
+    const hmRows = themeCounts.map(({t}) => {
+      const tv = allV.filter(x=>x.themes.includes(t.id));
+      const pos = tv.filter(x=>x.sentiment==='pos').length;
+      return { t, pos, neg: tv.length - pos };
+    });
+    const hmMax = Math.max(1, ...hmRows.flatMap(r=>[r.pos,r.neg]));
+    const hmCell = (val,kind) => { if(!val) return 'background:var(--surface);color:var(--ink-3)';
+      const a = (0.16 + (val/hmMax)*0.74).toFixed(2);
+      return `background:rgba(${kind==='pos'?'10,107,67':'168,54,42'},${a})`; };
+    const heatmap = `<table class="hm"><thead><tr><th></th><th>${sentLabel('pos')}</th><th>${sentLabel('neg')}</th></tr></thead><tbody>
+      ${hmRows.map(r=>`<tr><td class="hm-th">${esc(tf(r.t,'label'))}</td>
+        <td class="cell" style="${hmCell(r.pos,'pos')}">${r.pos||''}</td>
+        <td class="cell" style="${hmCell(r.neg,'neg')}">${r.neg||''}</td></tr>`).join('')}
+    </tbody></table>`;
+
+    const qcol = (arr,cls,title)=>`<div class="ins-qcol ${cls}"><h4><span class="qdot"></span>${title}</h4>
+      ${arr.slice(0,5).map((x,i)=>`<div class="ins-q ranked ${cls}"><span class="rk ${cls}">${i+1}</span><div class="rq-body">"${esc(tf(x,'title'))}"${zhLine(x)}
+        <span class="qsrc">${esc(subOf(x.url))} · ↑${fmtNum(Math.abs(x.score))} · <a href="${esc(x.url)}" target="_blank" rel="noopener">link</a></span></div>
+      </div>`).join('') || '<p class="meta">—</p>'}</div>`;
+    const groupedQuotes = `<div class="ins-quotes">
+      ${qcol(posV,'pos', isNonStock()?T('ins.topDemand'):T('ins.topPraise'))}
+      ${qcol(negV,'neg', isNonStock()?T('ins.topGap'):T('ins.topComplaint'))}
+    </div>`;
+
+    // brand comparison table — only players actually heard in the corpus.
+    // Lead with proportion (声量 share among heard players); raw mentions is a
+    // small secondary. Sentiment shown as a 好/差 ratio, not raw counts.
+    const brandTable = `<table class="bt"><thead><tr>
+        <th>${T('ins.btBrand')}</th><th>${T('ins.btShare')}</th>
+        <th>${T('ins.btSent')}</th><th>${T('ins.btMeta')}</th></tr></thead><tbody>
+      ${mainPlayers.map(s=>{ const tot=s.pos+s.neg;
+        const posR = tot ? Math.round(s.pos/tot*100) : 0;
+        // only judge a good/bad rate with ≥10 voices — otherwise it's noise
+        const sentCell = tot >= 10
+          ? `<span class="bt-mini"><i class="pos" style="width:${posR}%"></i><i class="neg" style="width:${100-posR}%"></i></span><span class="bt-sent"><span class="p">${posR}%</span> / <span class="n">${100-posR}%</span></span>`
+          : `<span class="bt-thin">${T('ins.btThin')} · ${tot}${T('ins.btThinUnit')}</span>`;
+        return `<tr>
+          <td><span class="bt-name">${esc(tf(s.p,'name'))}</span><br>
+            <a class="bt-link" href="${brandSearch(tf(s.p,'name'))}" target="_blank" rel="noopener">${T('ins.btSite')} ↗</a></td>
+          <td><b style="font-size:15px;color:var(--ink)">${sharePct(s.n)}%</b> <span class="bt-num" style="font-size:11px">· ${s.n} ${T('ins.mentions')}</span></td>
+          <td>${sentCell}</td>
+          <td style="font-size:12.5px;color:var(--ink-2)">${esc(s.p.price||'')||'—'}${s.p.status?` · ${esc(s.p.status)}`:''}</td></tr>`; }).join('')}
+    </tbody></table>
+    ${morePlayers.length ? `<div class="bt-more"><p class="bt-more-h">${T('ins.btMore')} · ${morePlayers.length}</p>
+      <div class="bt-chips">${morePlayers.map(s=>`<span class="bt-chip"><span class="nm">${esc(tf(s.p,'name'))}</span>${s.p.price?`<span class="pr">${esc(s.p.price)}</span>`:''}<a href="${brandSearch(tf(s.p,'name'))}" target="_blank" rel="noopener">${T('ins.btSite')} ↗</a></span>`).join('')}</div></div>` : ''}`;
+
+    // deep-dive trio (top 3 themes, each with linked stories + objective takeaway)
+    const dvQuote = x => `<div class="ins-q ${x.sentiment==='pos'?'pos':'neg'}">"${esc(tf(x,'title'))}"${zhLine(x)}
+          <span class="qsrc">${esc(subOf(x.url))} · ↑${fmtNum(Math.abs(x.score))} · <a href="${esc(x.url)}" target="_blank" rel="noopener">link</a></span></div>`;
+    const deepDive = `<div class="ins-grid">
+      ${themeCounts.slice(0,3).map(({t,n},i)=>{
+        const tv = allV.filter(x=>x.themes.includes(t.id)).sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+        const pos = tv.filter(x=>x.sentiment==='pos').length;
+        const head = tv.slice(0,3).map(dvQuote).join('');
+        const rest = tv.slice(3);
+        const more = rest.length ? `<details class="ins-more"><summary>${T('ins.expandAll')} · ${tv.length} ${T('ins.voicesUnit')}</summary>${rest.map(dvQuote).join('')}</details>` : '';
+        return `<div class="ins-card"><h4 style="display:flex;align-items:center;color:var(--ink)"><span class="rk">${i+1}</span>${esc(tf(t,'label'))} <span style="font-family:var(--mono);font-weight:400;font-size:11px;color:var(--ink-3);margin-left:auto;text-transform:none;letter-spacing:0">${tv.length} ${T('ins.voicesUnit')}</span></h4>
+          ${head || '<p class="meta">—</p>'}
+          ${more}
+          <div class="read-note"><b>${pct(n)}%</b> ${T('ins.discussed')} · <b>${tv.length?Math.round(pos/tv.length*100):0}%</b> ${sentLabel('pos')}</div></div>`;
+      }).join('')}
+    </div>`;
+
+    // quote wall (verbatim, source-tagged) — curated highlights
+    const allSorted = [...allV].sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+    const wallN = Math.min(24, allSorted.length);
+    const wall = allSorted.slice(0,wallN).map(x=>`
+      <div class="tile ${x.sentiment==='pos'?'':'neg'}">"${esc(tf(x,'title'))}"${zhLine(x)}
+        <span class="qw-src">${esc(subOf(x.url))} · ↑${fmtNum(Math.abs(x.score))} · <a href="${esc(x.url)}" target="_blank" rel="noopener">link</a></span></div>`).join('');
+
+    // FULL RAW-VOICE APPENDIX — every collected voice, filterable by sentiment/community.
+    // Surfaces the real corpus size (shows the collection workload, not just summaries).
+    const commTop = comms.slice(0,6).map(c=>c[0]);
+    const vaRow = (x,i) => `<div class="va-row" data-sent="${x.sentiment==='pos'?'pos':'neg'}" data-sub="${esc(subOf(x.url))}">
+      <span class="va-idx">${i+1}</span><span class="va-dot ${x.sentiment==='pos'?'pos':'neg'}"></span>
+      <div class="va-main"><a class="va-title" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(tf(x,'title'))}</a>${zhLine(x)}</div>
+      <span class="va-sub">${esc(subOf(x.url))}</span><span class="va-score">↑${fmtNum(Math.abs(x.score))}</span></div>`;
+    const appendix = `<div class="va-toolbar">
+        <button class="va-filter active" data-f="all">${T('va.all')} · ${allV.length}</button>
+        <button class="va-filter" data-f="pos">${sentLabel('pos')} · ${posV.length}</button>
+        <button class="va-filter" data-f="neg">${sentLabel('neg')} · ${negV.length}</button>
+        ${commTop.map(c=>`<button class="va-filter" data-f="sub:${esc(c)}">${esc(c)}</button>`).join('')}
+      </div>
+      <div class="va-list">${allSorted.map(vaRow).join('')}</div>
+      <p class="va-count" data-total="${allV.length}">${T('va.showing')} <b>${allV.length}</b> / ${allV.length}</p>`;
+
+    // language-aware array getter (for open_questions / open_questions_en)
+    const tfArr = (o,f) => { if(!o) return []; const l=LANG();
+      if(l!=='zh'){ const k=o[f+'_'+l]; if(Array.isArray(k)) return k; const e=o[f+'_en']; if(Array.isArray(e)) return e; }
+      return Array.isArray(o[f])?o[f]:[]; };
+    // voice lookup for evidence links (▸ back to the real supporting post)
+    const vById = {}; (data.voices||[]).forEach(v => vById[v.id] = v);
+    const evLinks = ids => (ids||[]).map(id => { const v = vById[id]; return v
+        ? `<a class="ev-link" href="${esc(v.url)}" target="_blank" rel="noopener" title="${esc(tf(v,'title'))}">▸</a>` : ''; }).join('');
+
+    // ENTRY DIRECTIONS — advisory (hypothesis + evidence + open questions + risk),
+    // not a definitive recommendation. Falls back to old path fields for old data.
+    const pathCards = (data.paths || []).map(p => {
+      const adv = tf(p,'hypothesis') || tf(p,'evidence') || tfArr(p,'open_questions').length || tf(p,'risk');
+      if (adv) {
+        const oq = tfArr(p,'open_questions');
+        return `<div class="fb-path adv">
+          <div class="fp-head"><span class="fp-name">${esc(tf(p,'label'))}</span></div>
+          <div class="fp-core">${esc(tf(p,'core'))}</div>
+          ${tf(p,'hypothesis')?`<div class="fp-row"><b>${T('st.bet')}</b>${esc(tf(p,'hypothesis'))}</div>`:''}
+          ${tf(p,'evidence')?`<div class="fp-row"><b>${T('st.evidence')}</b>${esc(tf(p,'evidence'))}</div>`:''}
+          ${oq.length?`<div class="fp-row"><b>${T('st.openq')}</b><ul class="fp-oq">${oq.map(q=>`<li>${esc(q)}</li>`).join('')}</ul></div>`:''}
+          ${tf(p,'risk')?`<div class="fp-row risk"><b>${T('st.risk')}</b>${esc(tf(p,'risk'))}</div>`:''}
+        </div>`;
+      }
+      const stats = [p.time && `${T('st.time')} <b>${esc(p.time)}</b>`,
+                     p.investment && `${T('st.invest')} <b>${esc(p.investment)}</b>`,
+                     p.moat && `${T('st.moat')} <b>${T('moat.'+p.moat) || esc(p.moat)}</b>`].filter(Boolean).join('');
+      return `<div class="fb-path ${p.recommended?'rec':''}">
+          <div class="fp-head"><span class="fp-name">${esc(tf(p,'label'))}</span>${p.recommended?`<span class="fp-badge">${T('st.recommend')}</span>`:''}</div>
+          <div class="fp-core">${esc(tf(p,'core'))}</div>
+          <p style="margin:0;font-size:13px;color:var(--ink-2)">${esc(tf(p,'description'))}</p>
+          ${stats?`<div class="fp-stats">${stats}</div>`:''}</div>`; }).join('');
+
+    // USER & DEMAND DECOMPOSITION (VOC-style; each item ▸ links to real voices)
+    const UD = data.user_demand || {};
+    const udCards = (arr, nameK, cls, ranked) => { const a = (arr||[]); const list = ranked ? a.slice(0,5) : a;
+      return list.map((x,i) => `
+      <div class="ud-card ${cls}">
+        <div class="ud-name">${ranked?`<span class="rk neg">${i+1}</span>`:''}${esc(tf(x,nameK))} ${evLinks(x.evidence)}</div>
+        <div class="ud-sum">${esc(tf(x,'summary'))}</div>
+      </div>`).join('') || '<p class="meta">—</p>'; };
+    // Usage scenarios → ranked share bars (more scannable than card paragraphs)
+    const scen = UD.scenarios || [];
+    const maxSh = Math.max(1, ...scen.map(s => s.share || 0));
+    const scenarioBars = scen.length ? scen.slice().sort((a,b)=>(b.share||0)-(a.share||0)).slice(0,5).map((s,i) => `
+      <div class="sc-row">
+        <span class="sc-name"><span class="rk">${i+1}</span>${esc(tf(s,'name'))} ${evLinks(s.evidence)}</span>
+        <span class="sc-bar"><i style="width:${Math.round((s.share||0)/maxSh*100)}%"></i></span>
+        <span class="sc-pct">${s.share!=null?s.share+'%':'·'}</span>
+        <span class="sc-sum">${esc(tf(s,'summary'))}</span>
+      </div>`).join('') : '<p class="meta">—</p>';
+    // Personas → compact chips (summary on hover)
+    const personaChips = (UD.personas||[]).length ? `<div class="pchip-row">${(UD.personas).map(p => `
+      <div class="pchip" title="${esc(tf(p,'summary'))}"><span class="pchip-dot"></span><b>${esc(tf(p,'name'))}</b>${p.share!=null?`<span class="pchip-pct">${p.share}%</span>`:''} ${evLinks(p.evidence)}</div>`).join('')}</div>` : '<p class="meta">—</p>';
+    const hasUD = tf(UD,'jtbd') || scen.length || (UD.unmet_needs||[]).length;
+    const demandSection = hasUD ? `
+      ${tf(UD,'jtbd')?`<div class="ud-jtbd"><span class="ud-jtbd-lbl">${T('ud.jtbd')}</span>${esc(tf(UD,'jtbd'))}</div>`:''}
+      <h3>${T('ud.scenarios')}</h3><div class="sc-list">${scenarioBars}</div>
+      <h3>${T('ud.personas')}</h3>${personaChips}
+      <h3>${T('ud.needs')}</h3><div class="ud-grid">${udCards(UD.unmet_needs,'need','un',true)}</div>
+      <h3>${T('ud.workarounds')}</h3><div class="ud-grid">${udCards(UD.workarounds,'approach','wa')}</div>
+      ${tf(UD,'wtp')?`<h3>${T('ud.wtp')}</h3><p>${esc(tf(UD,'wtp'))}</p>`:''}
+      ${rnote(T('ud.rnDemand'))}` : '';
+
+    // 需求地图 / 机会矩阵 — X=讨论热度, Y=满足度; 右下角(高需求×低满足)=空白机会
+    const mThemes = themeCounts.map(({t,n}) => {
+      const tv = allV.filter(x=>x.themes.includes(t.id));
+      const pos = tv.filter(x=>x.sentiment==='pos').length;
+      return { t, n, demand: pct(n), satis: tv.length ? Math.round(pos/tv.length*100) : 50 };
+    });
+    const demandMatrix = mThemes.length ? (() => {
+      // generous padding so bubbles + their labels never spill past the frame
+      const W=760,H=420,padL=58,padR=34,padT=40,padB=52;
+      const iW=W-padL-padR, iH=H-padT-padB;
+      const maxD = Math.max(1, ...mThemes.map(m=>m.demand));
+      const maxN = Math.max(1, ...mThemes.map(m=>m.n));
+      const xAt = d => padL + (d/maxD)*iW;
+      const yAt = s => padT + (1 - s/100)*iH;            // low satisfaction → bottom
+      const midX = padL + iW*0.5, midY = padT + iH*0.5;
+      const grid = `
+        <rect x="${padL}" y="${padT}" width="${iW.toFixed(1)}" height="${iH.toFixed(1)}" fill="none" stroke="#e6e2db" stroke-width="1"/>
+        <rect x="${midX.toFixed(1)}" y="${midY.toFixed(1)}" width="${(padL+iW-midX).toFixed(1)}" height="${(padT+iH-midY).toFixed(1)}" fill="rgba(10,107,67,0.09)"/>
+        <line x1="${midX.toFixed(1)}" y1="${padT}" x2="${midX.toFixed(1)}" y2="${padT+iH}" stroke="#e6e2db" stroke-width="1"/>
+        <line x1="${padL}" y1="${midY.toFixed(1)}" x2="${padL+iW}" y2="${midY.toFixed(1)}" stroke="#e6e2db" stroke-width="1"/>
+        <text x="${(padL+iW-8).toFixed(1)}" y="${(padT+iH-8).toFixed(1)}" font-size="11" fill="#006c47" text-anchor="end" font-weight="700">★ ${L('空白机会','White space')}</text>`;
+      const bubbles = mThemes.map(m => {
+        const r = 6 + (m.n/maxN)*13;
+        // clamp the whole bubble inside the plotting area
+        let x = Math.min(Math.max(xAt(m.demand), padL + r), padL + iW - r);
+        let y = Math.min(Math.max(yAt(m.satis),   padT + r), padT + iH - r);
+        const col = m.t.polarity==='pain' ? '168,54,42' : (m.t.polarity==='win' ? '10,107,67' : '140,139,128');
+        // label above the bubble; flip below if it would clip the top edge
+        const above = (y - r - 6) > (padT + 4);
+        const ly = above ? (y - r - 5) : (y + r + 13);
+        // flip text-anchor near the left/right edges so long labels stay inside
+        let anchor='middle', lx=x;
+        if (x < padL + 64){ anchor='start'; lx = padL + 1; }
+        else if (x > padL + iW - 64){ anchor='end'; lx = padL + iW - 1; }
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="rgba(${col},0.45)" stroke="rgba(${col},0.95)" stroke-width="1.5"/>
+          <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="11" fill="#444933" text-anchor="${anchor}">${esc(tf(m.t,'label'))}</text>`;
+      }).join('');
+      const axes = `
+        <text x="${padL}" y="${(padT+iH+32).toFixed(1)}" font-size="11" font-family="var(--mono)" fill="#747a60">${L('讨论热度 →','Discussion volume →')}</text>
+        <text x="16" y="${(padT+10).toFixed(1)}" font-size="11" font-family="var(--mono)" fill="#747a60" transform="rotate(-90 16 ${(padT+iH/2).toFixed(1)})">${L('满足度 ↑','Satisfaction ↑')}</text>`;
+      return `<svg class="dm-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="overflow:hidden">${grid}${bubbles}${axes}</svg>
+        ${rnote(L('读法:每个气泡是一个需求主题,横轴=讨论热度、纵轴=满足度、大小=被提及量。<b>右下角(高需求×低满足)= 最该切的空白机会</b>。','How to read: each bubble is a demand theme — x=volume, y=satisfaction, size=mentions. <b>Bottom-right (high demand × low satisfaction) = the white space to target.</b>'))}`;
+    })() : '';
+    const risks = (data.risks || []).map(r => `
+      <div class="fb-risk"><span class="fr-id">${esc(r.id)}</span>
+        <div><div class="fr-title">${esc(tf(r,'title'))}</div><div class="fr-scenario">${esc(tf(r,'scenario'))} → <i>${esc(tf(r,'mitigation'))}</i></div></div>
+        <div class="fb-sev" data-sev="${esc(r.severity)}"><span class="fs-lbl">${sevLabel[r.severity]||r.severity}</span><span class="fs-bar"><i></i><i></i><i></i></span></div>
+      </div>`).join('');
+    const failures = (data.failures || []).map(f => `<li><b>${esc(tf(f,'name'))}</b> (${esc(f.years)}) — ${esc(tf(f,'what'))}${tf(f,'lesson') ? ' — <i>'+esc(tf(f,'lesson'))+'</i>':''}</li>`).join('');
+
+    // discussion-trend chart (Reddit yearly volume, or Google interest if available)
+    const trend = data.trend || [];
+    // Generation date (report timestamp) — the latest year is "year-to-date" as of
+    // this day, so we label that last bucket with the cutoff instead of pretending
+    // it's a full year. mm/dd parsed from meta.timestamp (YYYY-MM-DD).
+    const _gm = /^(\d{4})-(\d{2})-(\d{2})/.exec(data.meta.timestamp || '') || [];
+    const genYear = _gm[1] || '', genMD = _gm[2] ? (+_gm[2])+'/'+(+_gm[3]) : '';
+    const trendChart = trend.length >= 3 ? (() => {
+      const vals = trend.map(t => t.count != null ? t.count : (t.value || 0));
+      const mx = Math.max(1, ...vals);
+      const W = 760, H = 156, padL = 8, padR = 12, padT = 22, padB = 32;
+      const iW = W - padL - padR, iH = H - padT - padB;
+      const xAt = i => padL + (trend.length === 1 ? iW/2 : (i/(trend.length-1))*iW);
+      const yAt = val => padT + iH - (val/mx)*iH;
+      // is the last bucket the current, year-to-date year? render it as "partial"
+      const lastI = vals.length - 1;
+      const partial = i => i === lastI && genYear && String(trend[i].period) === genYear;
+      const pts = vals.map((v,i)=>`${xAt(i).toFixed(1)},${yAt(v).toFixed(1)}`);
+      const solidPts = (partial(lastI) ? pts.slice(0, lastI) : pts).join(' ');
+      const area = `${padL.toFixed(1)},${(padT+iH).toFixed(1)} ${pts.join(' ')} ${(padL+iW).toFixed(1)},${(padT+iH).toFixed(1)}`;
+      const dashTail = partial(lastI)
+        ? `<line x1="${xAt(lastI-1).toFixed(1)}" y1="${yAt(vals[lastI-1]).toFixed(1)}" x2="${xAt(lastI).toFixed(1)}" y2="${yAt(vals[lastI]).toFixed(1)}" stroke="#006c47" stroke-width="2.2" stroke-dasharray="4 3" stroke-linecap="round"/>`
+        : '';
+      const grid = [0,0.5,1].map(f=>`<line x1="${padL}" y1="${(padT+iH-f*iH).toFixed(1)}" x2="${(padL+iW).toFixed(1)}" y2="${(padT+iH-f*iH).toFixed(1)}" stroke="#e7e0d0" stroke-width="1"/>`).join('');
+      const dots = vals.map((v,i)=>{
+        const cx = xAt(i).toFixed(1), cy = yAt(v).toFixed(1), pt = partial(i);
+        const dot = pt
+          ? `<circle cx="${cx}" cy="${cy}" r="3.4" fill="#fff" stroke="#006c47" stroke-width="1.8"/>`
+          : `<circle cx="${cx}" cy="${cy}" r="3.2" fill="#006c47"/>`;
+        const valTxt = `<text x="${cx}" y="${(yAt(v)-8).toFixed(1)}" font-size="10" fill="#006c47" text-anchor="middle">${v}</text>`;
+        const xlbl = pt && genMD
+          ? `<text x="${cx}" y="${H-15}" font-size="10" fill="#9a978f" text-anchor="middle">${esc(trend[i].period)}</text>
+             <text x="${cx}" y="${H-4}" font-size="8.5" fill="var(--neg)" text-anchor="middle">${L('截至','thru')} ${genMD}</text>`
+          : `<text x="${cx}" y="${H-8}" font-size="10" fill="#9a978f" text-anchor="middle">${esc(trend[i].period)}</text>`;
+        return dot + valTxt + xlbl;
+      }).join('');
+      const srcLabel = data.trend_source === 'google'
+        ? L('Google 搜索热度','Google search interest')
+        : L('Reddit 真实原声 · 按发帖年份','Reddit voices · by post year');
+      const partialNote = partial(lastI)
+        ? L(`(虚线点 ${trend[lastI].period} 为年内数据,截至生成日 ${genMD};受 pullpush 归档滞后影响通常偏低,仅供参考)`,
+            ` (dashed ${trend[lastI].period} point is year-to-date as of ${genMD}; runs low due to pullpush archive lag — indicative only)`)
+        : '';
+      const rn = (data.trend_source === 'google'
+        ? L('读法:Google 搜索兴趣指数(0-100,峰值=100),反映需求关注度趋势。','How to read: Google search-interest index (0-100, peak=100) — attention/demand over time.')
+        : L('读法:本次采集到的真实原声按发帖年份的分布(与下方「全部真实原声」一致),反映话题近年的活跃走势;为采集样本,非全网总量。','How to read: the collected real voices by the year each was posted (matches the “All real voices” list below) — shows how active the topic has been; a sample, not total web volume.')) + partialNote;
+      return `<h3>${L('讨论热度趋势','Discussion trend')} · <span style="font-size:12px;color:var(--ink-3);font-weight:400">${srcLabel}</span></h3>
+        <svg class="trend-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+          ${grid}
+          <polygon points="${area}" fill="rgba(10,107,67,0.08)"/>
+          <polyline points="${solidPts}" fill="none" stroke="#006c47" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+          ${dashTail}
+          ${dots}
+        </svg>${rnote(rn)}`;
+    })() : '';
+
+    const methodology = `<div class="meth">${T('ins.methodBody')}
+      <div class="meth-src">${T('ins.communities')}: ${comms.slice(0,10).map(c=>esc(c[0])+' ('+c[1]+')').join(' · ')||'—'}</div>
+      <div class="meth-gaps"><b>${T('ins.gaps')}:</b> ${T('ins.gapsBody')}</div></div>`;
+
+    const cw = data.meta.collection_window;
+    document.getElementById('fbBody').innerHTML = `
+      <div class="meta">VIBE · CATEGORY DEEP DIVE · №${esc((data.meta.slug||'').toUpperCase())} · ${esc(data.meta.timestamp)}</div>
+      <h1>${esc(tf(data.meta,'thesis') || tf(data.meta,'idea'))}</h1>
+      <p class="fb-deck">${esc(tf(data.meta,'deck'))}</p>
+
+      <div class="fb-verdict-viz" data-status="${verdictStatus}">
+        <div class="vv-status"><span class="vv-icon">${statusIcon[verdictStatus]||'◐'}</span><span class="vv-label">${T('verdict.'+verdictStatus).replace(/^\S+\s/, '')}</span></div>
+        <div class="vv-body">
+          <div class="vv-rationale">${esc(tf(v,'rationale'))}</div>
+          <div class="fb-counts-row">
+            <div class="fc"><b>${allV.length}</b><span>${T('ov.counts.raw')}</span></div>
+            <div class="fc"><b>${(data.themes||[]).length}</b><span>${T('ov.counts.themes')}</span></div>
+            <div class="fc"><b>${comms.length}</b><span>${T('ins.communities')}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <h2>${IC.category}<span class="secnum">§1</span>${T('fb.s1')}${measured}</h2>
+      ${secSum(s1sum)}
+      <div class="ins-mode">${esc(modeLabel)}</div>
+      ${marketCards}
+      ${trendChart}
+      <h3>${T('ins.shareOfVoice')}</h3>${sovBars}${rnote(T('ins.rnSov'))}
+
+      <h2>${IC.users}<span class="secnum">§2</span>${T('fb.s2')}${measured}</h2>
+      ${secSum(s2sum)}
+      <h3>${T('ins.heatmap')}</h3>${heatmap}${rnote(T('ins.rnHeat'))}
+      ${groupedQuotes}
+
+      ${hasUD ? `<h2>${IC.users}<span class="secnum">§3</span>${T('ud.section')}${measured}</h2>
+      ${demandSection}` : ''}
+
+      <h2>${IC.grid}<span class="secnum">${hasUD?'§4':'§3'}</span>${T('fb.s3')}${measured}</h2>
+      ${secSum(s3sum)}
+      <h3>${T('ins.brandTable')}</h3>${brandTable}${rnote(T('ins.rnBrand'))}
+      ${failures ? `<h3>${T('fb.failures')}</h3><ul>${failures}</ul>` : ''}
+
+      <h2>${IC.stack}<span class="secnum">${hasUD?'§5':'§4'}</span>${T('ins.deepdive')}${measured}</h2>
+      ${secSum(s4sum)}
+      ${deepDive}${rnote(T('ins.rnDeep'))}
+
+      <h2>${IC.target}<span class="secnum">${hasUD?'§6':'§5'}</span>${T('fb.s4')}${judgment}</h2>
+      ${secSum(s5sum)}
+      ${demandMatrix ? `<h3>${T('ud.matrix')}${measured}</h3>${demandMatrix}` : ''}
+      <p><b>${esc(tf(data.opportunity||{},'label'))}</b> · ${esc(tf(data.opportunity||{},'summary'))}</p>
+      ${pathCards ? `<h3>${T('st.dirs')}</h3><p class="sec-summary">${T('st.dirsNote')}</p>${pathCards}` : ''}
+
+      <h2>${IC.warn}<span class="secnum">${hasUD?'§7':'§6'}</span>${T('fb.s6')}${judgment}</h2>
+      ${secSum(s6sum)}
+      ${risks || '<p>—</p>'}
+
+      <h2>${IC.users}<span class="secnum">${hasUD?'§8':'§7'}</span>${T('ins.quoteWall')}${measured}</h2>
+      ${secSum(s7sum)}
+      <div class="qw">${wall}</div>
+
+      <h2>${IC.users}<span class="secnum">${hasUD?'§9':'§8'}</span>${T('va.section')}${measured}</h2>
+      ${secSum(s8sum)}
+      ${appendix}${rnote(T('va.rn'))}
+
+      <h2>${IC.section}<span class="secnum">${hasUD?'§10':'§9'}</span>${T('ins.method')}</h2>
+      ${methodology}
+
+      <p class="meta" style="margin-top:30px">schema v${esc(data.schema_version || '1.0')}${cw?` · ${esc(cw.from)} – ${esc(cw.to)}`:''}</p>`;
+    buildReportNav();
+    wireVoiceAppendix();
+  }
+
+  // ---- Raw-voice appendix: filter rows by sentiment / community ----
+  let _vaWired = false;
+  function wireVoiceAppendix(){
+    if (_vaWired) return;          // delegate once; #fbBody persists across re-renders
+    const fb = document.getElementById('fbBody');
+    if (!fb) return;
+    _vaWired = true;
+    fb.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('.va-filter'); if (!btn) return;
+      const tb = btn.closest('.va-toolbar'); if (!tb) return;
+      tb.querySelectorAll('.va-filter').forEach(b => b.classList.toggle('active', b === btn));
+      const f = btn.dataset.f;
+      const wrap = tb.parentNode;
+      const rows = [...wrap.querySelectorAll('.va-row')];
+      let shown = 0;
+      rows.forEach(r => {
+        const ok = f === 'all' ? true
+          : f === 'pos' ? r.dataset.sent === 'pos'
+          : f === 'neg' ? r.dataset.sent === 'neg'
+          : f.startsWith('sub:') ? r.dataset.sub === f.slice(4) : true;
+        r.style.display = ok ? '' : 'none';
+        if (ok) shown++;
+      });
+      const cnt = wrap.querySelector('.va-count');
+      if (cnt) cnt.querySelector('b').textContent = shown;
+    });
+  }
+
+  // ---- Sticky section nav for the full report (one-click jump + scroll-spy) ----
+  let _navObs = null;
+  function buildReportNav(){
+    const fb = document.getElementById('fbBody');
+    if (!fb) return;
+    const old = fb.querySelector('.fb-nav'); if (old) old.remove();
+    const h2s = [...fb.querySelectorAll('h2')];
+    if (h2s.length < 2) return;
+    h2s.forEach((h, i) => { h.id = 'fbsec-' + i; });
+    const links = h2s.map((h, i) => {
+      const clone = h.cloneNode(true);
+      clone.querySelectorAll('.kicker, .fb-icon, svg').forEach(e => e.remove());
+      const num = (clone.querySelector('.secnum') || {}).textContent || ('§' + (i + 1));
+      const sn = clone.querySelector('.secnum'); if (sn) sn.remove();
+      const title = clone.textContent.trim();
+      return `<a class="fbn-link" href="#fbsec-${i}" data-i="${i}">${esc(num)} ${esc(title)}</a>`;
+    }).join('');
+    const nav = document.createElement('nav');
+    nav.className = 'fb-nav';
+    nav.innerHTML = `<span class="fbn-label">${esc(T('report.divider'))}</span><div class="fbn-links">${links}</div>`;
+    fb.insertBefore(nav, fb.firstChild);
+    nav.addEventListener('click', (ev) => {
+      const a = ev.target.closest('.fbn-link'); if (!a) return;
+      ev.preventDefault();
+      const el = document.getElementById('fbsec-' + a.dataset.i);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    // scroll-spy: highlight the section currently in view
+    if (_navObs) _navObs.disconnect();
+    const linkEls = [...nav.querySelectorAll('.fbn-link')];
+    _navObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const i = h2s.indexOf(e.target);
+          linkEls.forEach(l => l.classList.toggle('active', +l.dataset.i === i));
+          const al = linkEls[i]; if (al && al.scrollIntoView) al.scrollIntoView({ block: 'nearest', inline: 'center' });
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    h2s.forEach(h => _navObs.observe(h));
+  }
+
+  // ---- Master render (re-runnable for lang switch) ----
+  function renderAll(){
+    renderChrome();
+    renderEvidenceCounter();
+    renderOverview();
+    renderPlayers();
+    renderVoicesScaffold();
+    renderOpportunity();
+    renderStrategy();
+    renderRisks();
+    renderFallback();
+    if (typeof renderVoices === 'function') renderVoices();  // voice list (filter-aware)
+  }
+
+  const VW = 960, VH = 700, CX = VW/2, CY = VH/2;
+
+  // Build node lookup
+  const nodes = {};
+  const addNode = (n, kind) => { nodes[n.id] = Object.assign({kind}, n); };
+  data.players.forEach(p => addNode(p, 'player'));
+  data.themes .forEach(t => addNode(t, 'theme'));
+  data.voices .forEach(v => addNode(v, 'voice'));
+  addNode(data.opportunity, 'opportunity');
+
+  const PAD_X = 80, PAD_Y = 70;
+  const SX = VW - PAD_X * 2, SY = VH - PAD_Y * 2;
+  const nodeArr = Object.values(nodes);
+
+  // Compute radius per node FIRST (needed for collision separation).
+  function radiusOf(n) {
+    if (n.kind === 'player') return (n.size || 22);
+    if (n.kind === 'theme')  return (n.size || 16);
+    if (n.kind === 'voice')  return Math.max(7, Math.min(15, Math.log10((n.score||10)+1) * 3.6));
+    if (n.kind === 'opportunity') return (n.size || 28);
+    return 8;
+  }
+
+  // Build incident-edges lookup (needed by the layout springs)
+  const neighbors = {};
+  const incidentEdges = {};
+  data.edges.forEach((e, i) => {
+    (neighbors[e.from] = neighbors[e.from] || new Set()).add(e.to);
+    (neighbors[e.to]   = neighbors[e.to]   || new Set()).add(e.from);
+    (incidentEdges[e.from] = incidentEdges[e.from] || new Set()).add(i);
+    (incidentEdges[e.to]   = incidentEdges[e.to]   || new Set()).add(i);
+  });
+
+  // ---------------- Auto-layout (force-directed + collision) ----------------
+  // Works for ANY data — with or without curated x/y. Prevents node overlap
+  // (the bug where voices w/o coords all collapsed to center).
+  //
+  // Seeding:
+  //   - if a node has x/y in data → use it (scaled), with tiny jitter
+  //   - else → deterministic spread on a phyllotaxis spiral by index
+  // Then run repulsion + edge springs + center gravity + hard collision.
+  const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+  nodeArr.forEach((n, i) => {
+    n.r = radiusOf(n);
+    if (typeof n.x === 'number' && typeof n.y === 'number') {
+      n.px = PAD_X + n.x * SX + (Math.random() - 0.5) * 8;
+      n.py = PAD_Y + n.y * SY + (Math.random() - 0.5) * 8;
+    } else {
+      // phyllotaxis spiral → even, non-overlapping initial spread
+      const t = i / Math.max(1, nodeArr.length);
+      const rad = Math.sqrt(t) * Math.min(SX, SY) * 0.46;
+      const ang = i * GOLDEN;
+      n.px = VW / 2 + rad * Math.cos(ang);
+      n.py = VH / 2 + rad * Math.sin(ang);
+    }
+    n.vx = 0; n.vy = 0;
+    n.phase = Math.random() * Math.PI * 2;
+    n.driftAmp = n.kind === 'voice' ? 5 : (n.kind === 'theme' ? 3 : 1.6);
+  });
+
+  // Labeled nodes (players/themes/opp) need horizontal room for their text.
+  // Give them a larger effective collision radius so labels don't overlap.
+  function pad(n) {
+    if (n.kind === 'voice') return n.r + 10;        // no label
+    // estimate label half-width (mono ~6.5px/char) but cap it
+    const label = n.name || n.label || '';
+    const halfLabel = Math.min(70, label.length * 3.4);
+    return Math.max(n.r + 26, halfLabel);
+  }
+
+  function runForceLayout(iters) {
+    const REPEL = 7000;     // node-node electrostatic repulsion (spread out)
+    const SPRING = 0.05;    // edge spring stiffness
+    const GRAVITY = 0.006;  // weak center pull → fills canvas
+    const DAMP = 0.86;
+    const VMAX = 34;
+    for (let it = 0; it < iters; it++) {
+      const cooling = 1 - it / iters;
+      for (let a = 0; a < nodeArr.length; a++) {
+        const na = nodeArr[a];
+        for (let b = a + 1; b < nodeArr.length; b++) {
+          const nb = nodeArr[b];
+          let dx = na.px - nb.px, dy = na.py - nb.py;
+          let d2 = dx*dx + dy*dy;
+          if (d2 < 0.01) { dx = (Math.random()-0.5); dy = (Math.random()-0.5); d2 = dx*dx+dy*dy; }
+          const d = Math.sqrt(d2);
+          const f = (REPEL / d2) * cooling;
+          let fx = (dx / d) * f, fy = (dy / d) * f;
+          // label-aware hard collision
+          const minDist = pad(na) + pad(nb);
+          if (d < minDist) {
+            const push = (minDist - d) * 0.5;
+            fx += (dx / d) * push;
+            fy += (dy / d) * push;
+          }
+          na.vx += fx; na.vy += fy;
+          nb.vx -= fx; nb.vy -= fy;
+        }
+      }
+      data.edges.forEach(e => {
+        const a = nodes[e.from], b = nodes[e.to]; if (!a || !b) return;
+        let dx = b.px - a.px, dy = b.py - a.py;
+        const d = Math.sqrt(dx*dx + dy*dy) || 0.01;
+        const rest = (a.kind === 'voice' || b.kind === 'voice') ? 95 : 185;
+        const f = SPRING * (d - rest);
+        const fx = (dx / d) * f, fy = (dy / d) * f;
+        a.vx += fx; a.vy += fy;
+        b.vx -= fx; b.vy -= fy;
+      });
+      nodeArr.forEach(n => {
+        n.vx += (VW/2 - n.px) * GRAVITY;
+        n.vy += (VH/2 - n.py) * GRAVITY;
+        n.vx *= DAMP; n.vy *= DAMP;
+        n.vx = Math.max(-VMAX, Math.min(VMAX, n.vx));
+        n.vy = Math.max(-VMAX, Math.min(VMAX, n.vy));
+        n.px += n.vx; n.py += n.vy;
+        const m = 24;
+        n.px = Math.max(m + n.r, Math.min(VW - m - n.r, n.px));
+        n.py = Math.max(m + n.r, Math.min(VH - m - n.r, n.py));
+      });
+    }
+  }
+  runForceLayout(360);
+  // Final label-aware collision relaxation (guarantees no residual overlap)
+  for (let pass = 0; pass < 16; pass++) {
+    for (let a = 0; a < nodeArr.length; a++) {
+      for (let b = a + 1; b < nodeArr.length; b++) {
+        const na = nodeArr[a], nb = nodeArr[b];
+        let dx = na.px - nb.px, dy = na.py - nb.py;
+        let d = Math.sqrt(dx*dx + dy*dy) || 0.01;
+        const minDist = pad(na) + pad(nb);
+        if (d < minDist) {
+          const shift = (minDist - d) / 2;
+          const ux = dx / d, uy = dy / d;
+          na.px += ux * shift; na.py += uy * shift;
+          nb.px -= ux * shift; nb.py -= uy * shift;
+          const m = 24;
+          na.px = Math.max(m, Math.min(VW - m, na.px)); na.py = Math.max(m, Math.min(VH - m, na.py));
+          nb.px = Math.max(m, Math.min(VW - m, nb.px)); nb.py = Math.max(m, Math.min(VH - m, nb.py));
+        }
+      }
+    }
+  }
+  // Snapshot settled positions as drift anchors
+  nodeArr.forEach(n => { n.bx = n.px; n.by = n.py; });
+
+  // ============ Demand-signal radar (replaces force-graph centerpiece) ============
+  // A dark sonar scope embedded in the light report panel. Each real voice is a
+  // blip; the sweep lights it as it passes. Themes = sectors, the least-discussed
+  // sector is flagged as the white-space opportunity. "Widen range" grows the
+  // scope and surfaces outer weak signals — the radar-expanding-its-reach gesture.
+  const cv = document.getElementById('radarCanvas');
+  const rctx = cv.getContext('2d');
+  const RDPR = Math.min(2, window.devicePixelRatio || 1);
+  let RW = 0, RH = 0, RCX = 0, RCY = 0, RR = 0;
+
+  // Radar sectors = only themes that actually have voices, so there are no empty
+  // labelled dimensions (a 0-voice theme is a cluster artifact, not a wedge).
+  const rThemes = (() => {
+    const pop = data.themes.filter(t => (data.voices||[]).some(v => v.themes && v.themes.includes(t.id)));
+    return pop.length >= 2 ? pop : data.themes;
+  })();
+  const NSEC = Math.max(1, rThemes.length);
+  const SECTOR = (Math.PI * 2) / NSEC;
+  const secOf = {}; rThemes.forEach((t, i) => secOf[t.id] = i);
+  function hashf(s){ let h = 2166136261; for (const c of (s||'')) h = ((h ^ c.charCodeAt(0)) * 16777619) >>> 0; return (h % 1000) / 1000; }
+
+  let blips = [], ghosts = [], rangeLevel = 1, rMaxScore = 1, oppSec = 0;
+  let selVoiceIds = new Set();     // mutated by applySelection() to highlight blips
+  let radarPaused = false;
+
+  function buildBlips(){
+    rMaxScore = Math.max(1, ...data.voices.map(v => v.score || 1));
+    // RANK-based radius: spread voices evenly from the high-upvote core (center)
+    // to the long tail (rim), regardless of absolute scores.
+    const N = data.voices.length;
+    const order = data.voices.map(v => ({ v, s: Math.abs(v.score || 0) }))
+                            .sort((a, b) => b.s - a.s);   // highest score first
+    const rankOf = {};
+    order.forEach((o, i) => { rankOf[o.v.id] = i; });
+    // ONE blip per (voice × theme): every labelled theme wedge then contains
+    // EXACTLY its own voices — no empty dimensions, and no blip lands in a wedge
+    // it doesn't belong to. A multi-theme voice shows a dot in each wedge.
+    blips = [];
+    data.voices.forEach((v, k) => {
+      const rankFrac = N > 1 ? (rankOf[v.id] / (N - 1)) : 0; // 0 = top upvotes, 1 = long tail
+      const rr = 0.18 + rankFrac * 0.74;                     // even spread 0.18 → 0.92
+      const themeIds = (v.themes && v.themes.length) ? v.themes : [null];
+      themeIds.forEach((tid, ti) => {
+        const sec = (tid != null && secOf[tid] != null) ? secOf[tid] : (k % NSEC);
+        const frac = hashf(v.id + ':' + (tid != null ? tid : ti)) * 0.7 + 0.15; // angle in wedge
+        const ang = sec * SECTOR + frac * SECTOR - Math.PI / 2;                  // sector 0 at top
+        blips.push({ v, id: v.id, sec, ang, rr, rankFrac, lit: 0, neg: v.sentiment !== 'pos' });
+      });
+    });
+  }
+  function secCounts(){ const c = new Array(NSEC).fill(0); blips.forEach(b => c[b.sec]++); return c; }
+  function pickOpp(){ const c = secCounts(); let m = 1e9; c.forEach((n, i) => { if (n < m){ m = n; oppSec = i; } }); }
+
+  function layoutRadar(){
+    const rect = cv.parentElement.getBoundingClientRect();
+    RW = rect.width; RH = rect.height;
+    cv.width = RW * RDPR; cv.height = RH * RDPR;
+    rctx.setTransform(RDPR, 0, 0, RDPR, 0, 0);
+    RCX = RW / 2; RCY = RH / 2 - 12;     // lift slightly so bottom labels clear the controls
+    RR = Math.min(RW, RH) * 0.38;
+  }
+  function angDiff(a, b){ return Math.abs(((a - b + Math.PI) % (Math.PI*2)) - Math.PI); }
+  function blipXY(b){ const rad = RR * b.rr; return { x: RCX + Math.cos(b.ang)*rad, y: RCY + Math.sin(b.ang)*rad }; }
+
+  let sweep = 0, rLast = performance.now();
+  function radarFrame(now){
+    const dt = Math.min(50, now - rLast); rLast = now;
+    if (!radarPaused) sweep = (sweep + dt * 0.0011) % (Math.PI*2);
+    drawRadar();
+    requestAnimationFrame(radarFrame);
+  }
+  function drawRadar(){
+    if (!RW) layoutRadar();
+    rctx.clearRect(0, 0, RW, RH);
+    const disc = rctx.createRadialGradient(RCX, RCY, 0, RCX, RCY, RR);
+    disc.addColorStop(0, '#141821'); disc.addColorStop(1, '#0e1117');
+    rctx.beginPath(); rctx.arc(RCX, RCY, RR, 0, Math.PI*2); rctx.fillStyle = disc; rctx.fill();
+    rctx.save(); rctx.beginPath(); rctx.arc(RCX, RCY, RR, 0, Math.PI*2); rctx.clip();
+
+    const rings = 3 + rangeLevel;
+    for (let i = 1; i <= rings; i++){
+      rctx.beginPath(); rctx.arc(RCX, RCY, RR*i/rings, 0, Math.PI*2);
+      rctx.strokeStyle = `rgba(38,225,154,${i===rings?0.34:0.13})`; rctx.lineWidth = 1; rctx.stroke();
+    }
+    for (let s = 0; s < NSEC; s++){
+      const a = s*SECTOR - Math.PI/2;
+      rctx.beginPath(); rctx.moveTo(RCX, RCY); rctx.lineTo(RCX+Math.cos(a)*RR, RCY+Math.sin(a)*RR);
+      rctx.strokeStyle = 'rgba(38,225,154,0.09)'; rctx.lineWidth = 1; rctx.stroke();
+    }
+    const oa = oppSec*SECTOR - Math.PI/2;        // opportunity (white-space) wedge
+    rctx.beginPath(); rctx.moveTo(RCX, RCY); rctx.arc(RCX, RCY, RR, oa, oa+SECTOR); rctx.closePath();
+    const og = rctx.createRadialGradient(RCX, RCY, 0, RCX, RCY, RR);
+    og.addColorStop(0,'rgba(201,161,74,0)'); og.addColorStop(1,'rgba(201,161,74,0.16)');
+    rctx.fillStyle = og; rctx.fill();
+    for (let k = 0; k < 26; k++){                 // sweep afterglow trail
+      const a = sweep - k*0.03, alpha = 0.10*(1 - k/26);
+      rctx.beginPath(); rctx.moveTo(RCX, RCY); rctx.arc(RCX, RCY, RR, a-0.04, a); rctx.closePath();
+      rctx.fillStyle = `rgba(0,108,71,${alpha})`; rctx.fill();
+    }
+    rctx.beginPath(); rctx.moveTo(RCX, RCY);      // sweep line
+    rctx.lineTo(RCX+Math.cos(sweep-Math.PI/2)*RR, RCY+Math.sin(sweep-Math.PI/2)*RR);
+    rctx.strokeStyle = 'rgba(46,229,157,0.9)'; rctx.lineWidth = 2; rctx.stroke();
+
+    // radial axis labels (radius = engagement: core high-upvote → long tail)
+    rctx.font = '500 9px -apple-system,"PingFang SC",sans-serif';
+    rctx.textAlign = 'left'; rctx.textBaseline = 'middle';
+    rctx.fillStyle = 'rgba(46,229,157,0.55)';
+    rctx.fillText(T('radar.axisCore'), RCX + 6, RCY + RR*0.16);
+    rctx.fillStyle = 'rgba(46,229,157,0.40)';
+    rctx.fillText(T('radar.axisTail'), RCX + 6, RCY + RR*0.90);
+    rctx.restore();
+
+    const hasSel = selVoiceIds.size > 0;
+    ghosts.forEach(g => drawBlip(g, true, hasSel));
+    blips.forEach(b => drawBlip(b, false, hasSel));
+    rctx.beginPath(); rctx.arc(RCX, RCY, 3, 0, Math.PI*2); rctx.fillStyle = 'rgba(46,229,157,.95)'; rctx.fill();
+
+    rctx.font = '600 11px -apple-system,"PingFang SC",sans-serif';
+    rctx.textAlign = 'center'; rctx.textBaseline = 'middle';
+    rThemes.forEach((t, s) => {                   // theme labels outside the disc
+      const a = (s+0.5)*SECTOR - Math.PI/2;
+      const lx = RCX + Math.cos(a)*(RR+20), ly = RCY + Math.sin(a)*(RR+20);
+      rctx.fillStyle = s===oppSec ? 'rgba(0,108,71,.95)' : 'rgba(68,73,51,.78)';
+      rctx.fillText((s===oppSec?'★ ':'') + (tf(t,'label')||''), lx, ly);
+    });
+  }
+  function drawBlip(b, ghost, hasSel){
+    const p = blipXY(b); b._x = p.x; b._y = p.y;
+    const sa = sweep % (Math.PI*2), ba = (b.ang + Math.PI/2) % (Math.PI*2);
+    if (angDiff(sa, ba) < 0.05) b.lit = 1;
+    b.lit *= 0.975;
+    const base = ghost ? 2.4 : (3 + (1 - b.rr)*4);
+    const litR = base + b.lit*5;
+    const dim = hasSel && !selVoiceIds.has(b.id) ? 0.28 : 1;
+    const col = b.neg ? '232,131,111' : '46,229,157';
+    if (b.lit > 0.05){
+      rctx.beginPath(); rctx.arc(b._x, b._y, litR+6, 0, Math.PI*2);
+      rctx.fillStyle = `rgba(${col},${0.18*b.lit*dim})`; rctx.fill();
+    }
+    rctx.beginPath(); rctx.arc(b._x, b._y, litR, 0, Math.PI*2);
+    const aMin = (ghost?0.30:0.6) * dim;
+    rctx.fillStyle = `rgba(${col},${aMin + b.lit*0.4*dim})`; rctx.fill();
+    if (selVoiceIds.has(b.id)){
+      rctx.beginPath(); rctx.arc(b._x, b._y, litR+3, 0, Math.PI*2);
+      rctx.strokeStyle = `rgba(${col},.9)`; rctx.lineWidth = 1.5; rctx.stroke();
+    }
+  }
+
+  // hover → tooltip (reuses tooltipFor + nodes lookup defined below)
+  const rTip = document.getElementById('kgTip');
+  cv.addEventListener('mousemove', (e) => {
+    const r = cv.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    let hit = null, bd = 14;
+    for (const b of blips.concat(ghosts)){ const d = Math.hypot(b._x-mx, b._y-my); if (d < bd){ bd = d; hit = b; } }
+    if (hit){
+      const v = hit.v;
+      if (v.synthetic){
+        rTip.innerHTML = `<div class="tt-title">弱信号 · 待二次验证</div>
+          <div class="tt-meta">外圈探测 · 扩大量程捕获<span class="tt-score">↑${v.score}</span></div>`;
+      } else {
+        rTip.innerHTML = tooltipFor(nodes[hit.id]);
+      }
+      rTip.style.left = Math.min(RW-20, mx+14) + 'px';
+      rTip.style.top  = Math.max(8, my-8) + 'px';
+      rTip.classList.add('show');
+      cv.style.cursor = 'pointer';
+    } else { rTip.classList.remove('show'); cv.style.cursor = 'default'; }
+  });
+  cv.addEventListener('mouseleave', () => rTip.classList.remove('show'));
+
+  // click → blip switches to that voice's theme; empty sector switches by bearing
+  cv.addEventListener('click', (e) => {
+    const r = cv.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    let hit = null, bd = 16;
+    for (const b of blips){ const d = Math.hypot(b._x-mx, b._y-my); if (d < bd){ bd = d; hit = b; } }
+    if (hit){ onNodeClick(nodes[hit.id]); return; }
+    const dx = mx - RCX, dy = my - RCY;
+    if (Math.hypot(dx, dy) > RR){ delete document.body.dataset.selectedId; applySelection(null); return; }
+    let a = Math.atan2(dy, dx) + Math.PI/2; a = (a + Math.PI*2) % (Math.PI*2);
+    const sec = Math.floor(a / SECTOR) % NSEC;
+    if (sec === oppSec && data.opportunity){ onNodeClick(Object.assign({kind:'opportunity'}, data.opportunity)); return; }
+    const theme = rThemes[sec];
+    if (theme) onNodeClick(nodes[theme.id]);
+  });
+
+  // widen range → grow rings + surface outer weak signals
+  function flashScan(html){
+    const el = document.getElementById('radarScan');
+    el.innerHTML = html; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+  // Widen range = real deeper online search via the local app backend.
+  // Appends NEW real voices (no synthetic blips). Static/downloaded reports have
+  // no backend → we say so honestly instead of faking data.
+  let expanding = false;
+  document.getElementById('radarExpand').addEventListener('click', async () => {
+    if (expanding) return;
+    const meta = data.meta || {};
+    if (!meta.slug){ flashScan('无法定位报告(缺 slug),无法深搜'); return; }
+    const btn = document.getElementById('radarExpand');
+    const span = btn.querySelector('span'); const orig = span.textContent;
+    expanding = true; btn.disabled = true; span.textContent = '● 深度搜索中…';
+    flashScan('继续联网深搜真实信号 · 约 30–60s…');
+    try {
+      const seen = (data.voices || []).map(v => v.url).filter(Boolean);
+      const r = await fetch('/api/expand', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ slug: meta.slug, idea: meta.idea, market: meta.target_market,
+          mode: meta.mode, seen_urls: seen }) });
+      if (!r.ok) throw new Error('backend');
+      const res = await r.json();
+      const nv = (res && res.new_voices) || [];
+      if (!nv.length){ flashScan('本轮没有捕获到新的强相关信号 · 可再试一次或换措辞'); return; }
+      nv.forEach(v => { data.voices.push(v); nodes[v.id] = Object.assign({ kind:'voice' }, v); });
+      if (data.verdict && data.verdict.evidence_counts) data.verdict.evidence_counts.raw_voices = data.voices.length;
+      buildBlips(); pickOpp();
+      rangeLevel = Math.min(4, rangeLevel + 1);
+      updateRadarHud();
+      renderEvidenceCounter(); renderOverview(); renderVoicesScaffold(); renderVoices(); renderFallback();
+      flashScan(`⊕ 深搜完成 · 新增 <b>${nv.length}</b> 条真实原声 · 现共 <b>${data.voices.length}</b> 条`);
+    } catch (e) {
+      flashScan('扩大量程需在本地 app 内运行(下载的静态报告无法联网深搜)');
+    } finally {
+      expanding = false; btn.disabled = false; span.textContent = orig;
+    }
+  });
+  document.getElementById('radarPause').addEventListener('click', function(){
+    radarPaused = !radarPaused;
+    this.querySelector('span').textContent = radarPaused ? '▶ 继续' : '⏸ 暂停';
+  });
+
+  function updateRadarHud(){
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('rhN', (data.voices||[]).length + ghosts.length); set('rhSec', NSEC); set('rhRange', rangeLevel);
+    const conf = document.getElementById('rhConf');
+    if (conf) conf.textContent = rangeLevel<=1 ? T('radar.core') : (rangeLevel<=2 ? T('radar.ext') : T('radar.outer'));
+  }
+
+  buildBlips(); pickOpp(); layoutRadar(); updateRadarHud();
+  if (window.ResizeObserver){ new ResizeObserver(() => layoutRadar()).observe(cv.parentElement); }
+  window.addEventListener('resize', layoutRadar);
+  requestAnimationFrame(radarFrame);
+
+  // (zoom/pan/drift loop removed — the radar canvas owns its own animation)
+
+  // ---------------- Hover ----------------
+  const tipEl = document.getElementById('kgTip');
+  const centerPanel = document.querySelector('.center-panel');
+
+  function tooltipFor(n) {
+    if (n.kind === 'voice') {
+      const sent = n.sentiment === 'pos' ? '正面' : '负面';
+      const player = (nodes[n.player] && nodes[n.player].name) || n.player;
+      const theme = n.themes.map(t => (nodes[t] && nodes[t].label) || t).join(' · ');
+      return `<div class="tt-title">${esc(n.title || '')}</div>${zhLine(n)}
+              <div class="tt-meta">${sent} · ${player} · ${theme}<span class="tt-score">↑${n.score.toLocaleString()}</span></div>
+              <div class="tt-hint">点击 → 切到「用户声音」并锁定该主题</div>`;
+    }
+    if (n.kind === 'player') {
+      const voiceCount = (incidentEdges[n.id] || new Set()).size;
+      return `<div class="tt-title">${n.name}</div>
+              <div class="tt-meta">玩家 · 关联 ${voiceCount} 个主题/原话</div>
+              <div class="tt-hint">点击 → 看该玩家档案</div>`;
+    }
+    if (n.kind === 'theme') {
+      const voiceCount = data.voices.filter(v => v.themes.includes(n.id)).length;
+      return `<div class="tt-title">${n.label}</div>
+              <div class="tt-meta">主题 · ${voiceCount} 条原话讨论</div>
+              <div class="tt-hint">点击 → 看该主题下的所有用户声音</div>`;
+    }
+    if (n.kind === 'opportunity') {
+      return `<div class="tt-title">${n.label}</div>
+              <div class="tt-meta">机会缝隙 · 无玩家占据</div>
+              <div class="tt-hint">点击 → 看完整机会分析</div>`;
+    }
+    return '';
+  }
+
+  // Compute which voices a non-voice node "owns" semantically (not just 1-hop).
+  // Player → all voices where voice.player == player.id
+  // Theme  → all voices where voice.themes includes theme.id
+  // Voice  → no related voices (it IS the voice)
+  // Opp    → voices connected to themes that are connected to opp (rare)
+  function relatedVoicesFor(n) {
+    if (n.kind === 'player') return data.voices.filter(v => v.player === n.id).map(v => v.id);
+    if (n.kind === 'theme')  return data.voices.filter(v => v.themes.includes(n.id)).map(v => v.id);
+    if (n.kind === 'opportunity') {
+      const oppThemes = Array.from(neighbors[n.id] || []);
+      return data.voices.filter(v => v.themes.some(t => oppThemes.includes(t))).map(v => v.id);
+    }
+    return [];
+  }
+
+  // Selection — drives radar blip highlight (selVoiceIds) + the selection strip
+  function applySelection(id) {
+    selVoiceIds = new Set();
+    const sl = document.getElementById('selLabel');
+    if (!id) { if (sl) sl.textContent = '—'; return; }
+    const node = nodes[id];
+    if (node) {
+      if (node.kind === 'voice') selVoiceIds.add(id);
+      else (relatedVoicesFor(node) || []).forEach(vid => selVoiceIds.add(vid));
+      const label = tf(node, 'name') || tf(node, 'label') || node.title || id;
+      if (sl) sl.textContent = `${node.kind} · ${label}`;
+    }
+  }
+
+  function onNodeClick(node) {
+    const lensFor = { player:'players', theme:'voices', voice:'voices', opportunity:'opportunity' };
+    const lens = lensFor[node.kind];
+    if (!lens) return;
+    document.body.dataset.lens = lens;
+    document.body.dataset.selectedId = node.id;
+    syncTabs();
+    applySelection(node.id);
+    if (document.body.dataset.view === 'graph') document.body.dataset.view = 'split';
+    if (lens === 'voices') filterVoicesBySelection(node);
+  }
+
+  // Lens tabs
+  function syncTabs() {
+    const cur = document.body.dataset.lens;
+    document.querySelectorAll('.lens-tabs button').forEach(b => {
+      b.classList.toggle('active', b.dataset.lens === cur);
+    });
+  }
+  // Lens tabs — event delegation (survives re-render)
+  document.querySelector('.lens-tabs').addEventListener('click', (ev) => {
+    const btn = ev.target.closest('button[data-lens]'); if (!btn) return;
+    document.body.dataset.lens = btn.dataset.lens;
+    delete document.body.dataset.selectedId;
+    applySelection(null);
+    syncTabs();
+    resetVoiceFilter();
+  });
+
+  // View switcher
+  document.querySelector('.view-switcher').addEventListener('click', (ev) => {
+    const btn = ev.target.closest('button[data-view]'); if (!btn) return;
+    document.body.dataset.view = btn.dataset.view;
+  });
+
+  // Player chips — delegate on the lens container (re-rendered on lang switch)
+  document.getElementById('lensPlayers').addEventListener('click', (ev) => {
+    const chip = ev.target.closest('.chip[data-player-id]'); if (!chip) return;
+    const pid = chip.dataset.playerId;
+    document.body.dataset.selectedId = pid;
+    applySelection(pid);
+  });
+
+  // Clear selection (static element)
+  document.getElementById('clearSel').addEventListener('click', () => {
+    delete document.body.dataset.selectedId;
+    applySelection(null);
+    resetVoiceFilter();
+  });
+
+  // ============ Voices lens ============
+  const voiceList = () => document.getElementById('voiceList');
+  function renderVoices(filterFn) {
+    const list = voiceList(); if (!list) return;
+    list.innerHTML = '';
+    let n = 0;
+    data.voices.forEach(v => {
+      if (filterFn && !filterFn(v)) return;
+      n++;
+      const row = document.createElement('div');
+      row.className = 'voice-row ' + v.sentiment;
+      const themeLabels = v.themes.map(themeLabel).join(' · ');
+      row.innerHTML = `
+        <span class="dot">●</span>
+        <div>
+          <div class="vt"><a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(tf(v,'title'))}</a></div>${zhLine(v)}
+          <div class="vm">${esc(playerName(v.player))} · ${esc(themeLabels)}</div>
+        </div>
+        <span class="vs">↑${fmtNum(Math.abs(v.score))}</span>
+      `;
+      list.appendChild(row);
+    });
+    const ctx = document.getElementById('voiceContext');
+    if (ctx) ctx.textContent = `${n} ${T('vo.count')} ${data.voices.length}${T('vo.count2')}`;
+  }
+
+  // Filter chips
+  const filterState = { sent: 'all', theme: 'all' };
+  function applyVoiceFilter() {
+    renderVoices(v => {
+      if (filterState.sent !== 'all' && v.sentiment !== filterState.sent) return false;
+      if (filterState.theme !== 'all' && !v.themes.includes(filterState.theme)) return false;
+      return true;
+    });
+  }
+  // delegate on the filter bar (re-rendered on lang switch)
+  document.getElementById('voiceFilter').addEventListener('click', (ev) => {
+    const chip = ev.target.closest('.chip[data-filter]'); if (!chip) return;
+    const group = chip.dataset.filter, val = chip.dataset.val;
+    filterState[group] = val;
+    document.querySelectorAll(`#voiceFilter .chip[data-filter="${group}"]`).forEach(c =>
+      c.classList.toggle('active', c.dataset.val === val));
+    applyVoiceFilter();
+  });
+  function resetVoiceFilter() {
+    filterState.sent = 'all'; filterState.theme = 'all';
+    document.querySelectorAll('#voiceFilter .chip').forEach(c => c.classList.toggle('active', c.dataset.val === 'all'));
+    renderVoices();
+  }
+
+  // When a theme node is clicked → pre-filter voices to that theme
+  function filterVoicesBySelection(node) {
+    if (node.kind === 'theme') {
+      filterState.theme = node.id;
+      document.querySelectorAll('#voiceFilter .chip[data-filter="theme"]').forEach(c =>
+        c.classList.toggle('active', c.dataset.val === node.id));
+      applyVoiceFilter();
+    } else if (node.kind === 'voice') {
+      // single-voice: highlight only that voice's themes via theme filter
+      const t = node.themes[0];
+      filterState.theme = t;
+      document.querySelectorAll('#voiceFilter .chip[data-filter="theme"]').forEach(c =>
+        c.classList.toggle('active', c.dataset.val === t));
+      applyVoiceFilter();
+    } else {
+      resetVoiceFilter();
+    }
+  }
+
+  // ============ Export menu (PDF · Markdown report · all voices) ============
+  function downloadText(name, text, mime){
+    const blob = new Blob([text], { type: (mime||'text/markdown') + ';charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  }
+  const _slug = (data.meta && data.meta.slug) || 'report';
+  const _mdClean = s => String(s == null ? '' : s).replace(/\r?\n+/g, ' ').replace(/\|/g, '/').trim();
+  const _arrL = (o, f) => { if (!o) return []; const l = LANG();
+    if (l !== 'zh') { const k = o[f+'_'+l]; if (Array.isArray(k)) return k; const e = o[f+'_en']; if (Array.isArray(e)) return e; }
+    return Array.isArray(o[f]) ? o[f] : []; };
+
+  // text-only Markdown of the whole report — charts re-expressed as tables/lists
+  function buildReportMarkdown(){
+    const zh = LANG() === 'zh', L = (a,b) => zh ? a : b;
+    const m = data.meta || {}, v = data.verdict || {};
+    const allV = data.voices || [], N = allV.length || 1;
+    const pct = n => Math.round(n / N * 100);
+    const posV = allV.filter(x => x.sentiment === 'pos').sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+    const negV = allV.filter(x => x.sentiment !== 'pos').sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+    const commMap = {}; allV.forEach(x => { const s = subOf(x.url); commMap[s] = (commMap[s]||0)+1; });
+    const comms = Object.entries(commMap).sort((a,b)=>b[1]-a[1]);
+    const themeCounts = (data.themes||[]).map(t => ({ t, n: allV.filter(x=>x.themes.includes(t.id)).length }))
+                          .filter(x => x.n > 0).sort((a,b)=>b.n-a.n);
+    const players = (data.players||[]).map(p => { const pv = allV.filter(x=>x.player===p.id);
+        const pos = pv.filter(x=>x.sentiment==='pos').length; return { p, n: pv.length, pos, neg: pv.length-pos }; })
+        .sort((a,b)=>b.n-a.n);
+    const main = players.filter(s=>s.n>0), more = players.filter(s=>s.n===0);
+    const heard = Math.max(1, main.reduce((a,s)=>a+s.n,0));
+    const UD = data.user_demand || {};
+    const o = [], P = s => o.push(s);
+    const sec = (label, body) => { P(`\n## ${label}`); if (body) P(_mdClean(body)); };
+
+    P(`# ${_mdClean(tf(m,'thesis') || tf(m,'idea'))}`);
+    if (tf(m,'deck')) P(`\n${_mdClean(tf(m,'deck'))}`);
+    P(`\n> ${_mdClean(tf(m,'idea'))} · ${_mdClean(m.timestamp)} · ${_mdClean(m.target_market||'')}`);
+    P(`\n**${L('采集真实原声','Real voices')}**: ${allV.length} · **${L('社区','Communities')}**: ${comms.length} · **${L('玩家','Players')}**: ${(data.players||[]).length} · **${L('情绪','Sentiment')}**: ${sentLabel('pos')} ${pct(posV.length)}% / ${sentLabel('neg')} ${100-pct(posV.length)}%`);
+
+    sec(L('核心发现','Key findings'), tf(v,'rationale'));
+    _arrL(v,'key_findings').forEach(k => P(`- ${_mdClean(k)}`));
+
+    const SI = data.section_insights || {};
+    sec(`§1 ${L('市场与品类洞察','Market & category')}`, tf(SI,'market'));
+    P(`\n### ${L('需求主题分布','Theme distribution')}`);
+    P(`| ${L('主题','Theme')} | ${L('占比','Share')} | ${L('条数','Count')} |`);
+    P(`|---|---:|---:|`);
+    themeCounts.forEach(({t,n}) => P(`| ${_mdClean(tf(t,'label'))} | ${pct(n)}% | ${n} |`));
+
+    sec(`§2 ${L('用户声音洞察','User voice')}`, tf(SI,'user'));
+    P(`\n### ${L('主题 × 情绪','Theme × sentiment')}`);
+    P(`| ${L('主题','Theme')} | ${sentLabel('pos')} | ${sentLabel('neg')} |`);
+    P(`|---|---:|---:|`);
+    themeCounts.forEach(({t}) => { const tv = allV.filter(x=>x.themes.includes(t.id));
+      const pos = tv.filter(x=>x.sentiment==='pos').length; P(`| ${_mdClean(tf(t,'label'))} | ${pos} | ${tv.length-pos} |`); });
+    const quoteLines = (arr,label) => { P(`\n### ${label} · Top 5`);
+      arr.slice(0,5).forEach((x,i)=>{ const sub=voiceZh(x); P(`${i+1}. "${_mdClean(tf(x,'title'))}"${sub?` — ${_mdClean(sub)}`:''}`);
+        P(`   ${subOf(x.url)} · ↑${fmtNum(Math.abs(x.score))} · ${x.url}`); }); };
+    quoteLines(posV, isNonStock()?L('真实需求信号','Demand signals'):L('好评','Praise'));
+    quoteLines(negV, isNonStock()?L('缺口/不满','Gaps'):L('差评','Complaints'));
+
+    if (tf(UD,'jtbd') || (UD.scenarios||[]).length){
+      sec(`§3 ${L('用户与需求拆解','User & demand')}`, tf(SI,'user'));
+      if (tf(UD,'jtbd')) P(`\n**JTBD**: ${_mdClean(tf(UD,'jtbd'))}`);
+      const scen=(UD.scenarios||[]).slice().sort((a,b)=>(b.share||0)-(a.share||0)).slice(0,5);
+      if (scen.length){ P(`\n### ${L('使用场景','Scenarios')}`); scen.forEach((s,i)=>P(`${i+1}. **${_mdClean(tf(s,'name'))}**${s.share!=null?` — ${s.share}%`:''} — ${_mdClean(tf(s,'summary'))}`)); }
+      const grp=(arr,nameK,title)=>{ if(!(arr||[]).length) return; P(`\n### ${title}`); arr.slice(0,5).forEach((x,i)=>P(`${i+1}. **${_mdClean(tf(x,nameK))}** — ${_mdClean(tf(x,'summary'))}`)); };
+      grp(UD.personas,'name',L('目标人群','Personas'));
+      grp(UD.unmet_needs,'need',L('未满足需求','Unmet needs'));
+      grp(UD.workarounds,'approach',L('替代方案','Workarounds'));
+      if (tf(UD,'wtp')) P(`\n**${L('付费意愿','Willingness to pay')}**: ${_mdClean(tf(UD,'wtp'))}`);
+    }
+
+    sec(`§4 ${L('竞品全景','Competitive')}`, tf(SI,'competitive'));
+    P(`\n### ${L('玩家对比','Brand comparison')}`);
+    P(`| ${L('玩家','Brand')} | ${L('声量占比','Share')} | ${L('口碑(好/差)','Sentiment')} | ${L('价格/状态','Price/status')} |`);
+    P(`|---|---:|---|---|`);
+    main.forEach(s => { const tot=s.pos+s.neg, posR=tot?Math.round(s.pos/tot*100):0;
+      const sent = tot>=10 ? `${posR}% / ${100-posR}%` : L(`信息量过少(${tot}条)`,`too few (${tot})`);
+      P(`| ${_mdClean(tf(s.p,'name'))} | ${Math.round(s.n/heard*100)}% (${s.n}) | ${sent} | ${_mdClean(s.p.price||'—')}${s.p.status?` · ${s.p.status}`:''} |`); });
+    if (more.length) P(`\n${L('更多玩家(本次未采集到讨论)','More players (no discussion captured)')}: ${more.map(s=>_mdClean(tf(s.p,'name'))).join(' · ')}`);
+
+    P(`\n## §5 ${L('最受关注的主题 · Top 3','Top themes · Top 3')}`);
+    themeCounts.slice(0,3).forEach(({t,n},i) => { const tv = allV.filter(x=>x.themes.includes(t.id)).sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+      const pos = tv.filter(x=>x.sentiment==='pos').length;
+      P(`\n**${i+1}. ${_mdClean(tf(t,'label'))}** — ${pct(n)}% ${L('被讨论','discussed')} · ${tv.length?Math.round(pos/tv.length*100):0}% ${sentLabel('pos')}`);
+      tv.slice(0,3).forEach(x => P(`   - "${_mdClean(tf(x,'title'))}" (${subOf(x.url)} · ↑${fmtNum(Math.abs(x.score))}) ${x.url}`)); });
+
+    sec(`§6 ${L('机会缝隙','Opportunity')}`, tf(SI,'opportunity'));
+    const opp = data.opportunity || {};
+    if (tf(opp,'label')) P(`\n**${_mdClean(tf(opp,'label'))}** — ${_mdClean(tf(opp,'summary'))}`);
+    if ((data.paths||[]).length){ P(`\n### ${L('切入方向(供参考,非定论)','Entry directions (advisory)')}`);
+      data.paths.forEach(p => { P(`\n- **${_mdClean(tf(p,'label'))}** — ${_mdClean(tf(p,'core'))}`);
+        if (tf(p,'hypothesis')) P(`  - ${L('假设','Bet')}: ${_mdClean(tf(p,'hypothesis'))}`);
+        if (tf(p,'evidence'))   P(`  - ${L('证据','Evidence')}: ${_mdClean(tf(p,'evidence'))}`);
+        _arrL(p,'open_questions').forEach(q => P(`  - ${L('待解','Open')}: ${_mdClean(q)}`));
+        if (tf(p,'risk'))       P(`  - ${L('风险','Risk')}: ${_mdClean(tf(p,'risk'))}`); }); }
+
+    if ((data.risks||[]).length){ sec(`§7 ${L('风险与挑战','Risks')}`, tf(SI,'risk'));
+      data.risks.forEach(r => P(`- [${r.severity}] **${_mdClean(tf(r,'title'))}** — ${_mdClean(tf(r,'scenario'))} → ${_mdClean(tf(r,'mitigation'))}`)); }
+
+    const tr = data.trend || [];
+    if (tr.length){ P(`\n## ${L('讨论热度趋势(真实原声·按发帖年份)','Discussion trend (voices by year)')}`);
+      P(`| ${L('年份','Year')} | ${L('条数','Count')} |`); P(`|---|---:|`);
+      tr.forEach(t => P(`| ${t.period} | ${t.count!=null?t.count:(t.value||0)} |`)); }
+
+    P(`\n## ${L('方法与数据来源','Methodology')}`);
+    P(L('数据来自 Reddit(Arctic Shift + pullpush 归档)与 Hacker News 的真实公开讨论。','Real public discussion from Reddit (Arctic Shift + pullpush) and Hacker News.'));
+    P(`${L('覆盖社区','Communities')}: ${comms.slice(0,12).map(c=>`${c[0]} (${c[1]})`).join(' · ') || '—'}`);
+    P(`\n— ${L('完整原文请见','Full voices')}: ${_slug}-voices.md · ${L('全部原声','total')} ${allV.length}`);
+    return o.join('\n') + '\n';
+  }
+
+  // every collected voice → a plain Markdown list (the raw evidence dump)
+  function buildVoicesMarkdown(){
+    const zh = LANG() === 'zh', L = (a,b)=>zh?a:b;
+    const allV = [...(data.voices||[])].sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+    const o = [];
+    o.push(`# ${_mdClean(tf(data.meta,'idea'))} · ${L('全部真实原声','All real voices')} (${allV.length})`);
+    o.push(`> ${_mdClean((data.meta||{}).timestamp)} · ${L('按赞数排序','ranked by upvotes')}\n`);
+    allV.forEach((x,i) => {
+      o.push(`${i+1}. **[${sentLabel(x.sentiment==='pos'?'pos':'neg')}]** "${_mdClean(tf(x,'title'))}"`);
+      const sub = voiceZh(x); if (sub) o.push(`   - ${_mdClean(sub)}`);
+      o.push(`   - ${subOf(x.url)} · ↑${fmtNum(Math.abs(x.score))} · ${x.url}`);
+    });
+    return o.join('\n') + '\n';
+  }
+
+  function runExport(act){
+    if (act === 'pdf') { window.print(); return; }
+    const lang = LANG();
+    if (act === 'md')     downloadText(`${_slug}-report-${lang}.md`, buildReportMarkdown());
+    if (act === 'voices') downloadText(`${_slug}-voices-${lang}.md`, buildVoicesMarkdown());
+  }
+  const _exBtn = document.getElementById('exportBtn');
+  const _exMenu = document.getElementById('exportMenu');
+  const _exToggle = open => { const show = open == null ? _exMenu.hidden : open;
+    _exMenu.hidden = !show; _exBtn.setAttribute('aria-expanded', String(show)); };
+  _exBtn.addEventListener('click', e => { e.stopPropagation(); _exToggle(); });
+  _exMenu.addEventListener('click', e => { const it = e.target.closest('.export-item'); if (!it) return;
+    runExport(it.dataset.act); _exToggle(false); });
+  document.addEventListener('click', e => { if (!e.target.closest('#exportWrap')) _exToggle(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') _exToggle(false); });
+
+  // ============ Language switcher (multi-language) ============
+  // Base content is zh; the pipeline always backfills en, and optionally the
+  // generation target language (meta.target_lang) into <field>_<code>. The report
+  // can display in any language that's present.
+  const LANG_LABEL = { zh:'中文', en:'English', ja:'日本語', es:'Español', fr:'Français', de:'Deutsch' };
+  function availableLangs(){
+    const out = ['zh', 'en'];
+    const tl = (data.meta && data.meta.target_lang) || 'zh';
+    if (tl && !out.includes(tl)) out.push(tl);
+    return out;
+  }
+  function switchLang(code){
+    document.body.dataset.lang = code;
+    renderAll();              // re-render everything in the new language
+    updateRadarHud();         // radar redraws theme labels every frame via tf()
+    applySelection(document.body.dataset.selectedId || null);  // keep blip highlight
+  }
+  // set the initial language (from meta.target_lang) BEFORE building the switcher
+  // so the slider/dropdown reflects it; tf() falls back to en/base if untranslated.
+  document.body.dataset.lang = (data.meta && data.meta.target_lang) || 'zh';
+  (function initLangSwitcher(){
+    const langs = availableLangs();
+    const slider = document.getElementById('langToggle');
+    if (!slider) return;
+    if (langs.length <= 2){   // common case: CN | EN sliding toggle
+      slider.addEventListener('click', () => switchLang(LANG() === 'zh' ? 'en' : 'zh'));
+      return;
+    }
+    // 3+ languages → swap the slider for a compact dropdown
+    const sel = document.createElement('select');
+    sel.id = 'langSelect'; sel.className = 'lang-select';
+    sel.innerHTML = langs.map(c => `<option value="${c}">${LANG_LABEL[c] || c}</option>`).join('');
+    sel.value = LANG();
+    sel.addEventListener('change', () => switchLang(sel.value));
+    slider.replaceWith(sel);
+  })();
+
+  // ============ Initial render ============
+  // (initial language already set above, before the switcher was built)
+  renderAll();
+  syncTabs();
+
+  // ============ URL Deeplink + browser history ============
+  // Public state lives on body[data-*]. Keep URL hash in sync both ways.
+  // Format:  #lens=players&id=oura&view=split
+  //
+  // Rules:
+  //   - body → hash:  one MutationObserver covers every data-* change.
+  //   - hash → body:  on hashchange (back/forward + manual edit) restore state.
+  //   - load:         apply hash if present.
+  //   - history:      pushState on every state change so back button works.
+
+  const STATE_KEYS = ['lens', 'view', 'selectedId'];
+
+  function readBodyState() {
+    const s = {};
+    for (const k of STATE_KEYS) {
+      if (document.body.dataset[k] != null) s[k] = document.body.dataset[k];
+    }
+    return s;
+  }
+
+  function stateToHash(s) {
+    const parts = [];
+    if (s.lens && s.lens !== 'overview') parts.push('lens=' + encodeURIComponent(s.lens));
+    if (s.selectedId)                    parts.push('id='   + encodeURIComponent(s.selectedId));
+    if (s.view && s.view !== 'split')    parts.push('view=' + encodeURIComponent(s.view));
+    return parts.length ? '#' + parts.join('&') : '';
+  }
+
+  function hashToState() {
+    const h = window.location.hash.replace(/^#/, '');
+    if (!h) return { lens: 'overview', view: 'split' };
+    const s = {};
+    for (const pair of h.split('&')) {
+      const [k, v] = pair.split('=');
+      if (!k) continue;
+      const dec = decodeURIComponent(v || '');
+      if (k === 'lens')  s.lens  = dec;
+      if (k === 'id')    s.selectedId = dec;
+      if (k === 'view')  s.view  = dec;
+    }
+    if (!s.lens) s.lens = 'overview';
+    if (!s.view) s.view = 'split';
+    return s;
+  }
+
+  function applyState(s) {
+    // Validate lens
+    const validLenses = ['overview','voices','players','opportunity','strategy','risks'];
+    if (!validLenses.includes(s.lens)) s.lens = 'overview';
+    // Validate view
+    const validViews = ['graph','split','lens'];
+    if (!validViews.includes(s.view)) s.view = 'split';
+    // Validate selectedId
+    const validIds = new Set([...data.players, ...data.themes, ...data.voices].map(n => n.id));
+    if (data.opportunity) validIds.add(data.opportunity.id);
+    if (s.selectedId && !validIds.has(s.selectedId)) delete s.selectedId;
+
+    // Apply
+    document.body.dataset.lens = s.lens;
+    document.body.dataset.view = s.view;
+    if (s.selectedId) document.body.dataset.selectedId = s.selectedId;
+    else              delete document.body.dataset.selectedId;
+    syncTabs();
+    applySelection(s.selectedId || null);
+  }
+
+  // Body → URL (debounced + skip when our own popstate triggered it)
+  let suppressHashUpdate = false;
+  let hashUpdateTimer = null;
+  const observer = new MutationObserver(() => {
+    if (suppressHashUpdate) return;
+    clearTimeout(hashUpdateTimer);
+    hashUpdateTimer = setTimeout(() => {
+      const newHash = stateToHash(readBodyState());
+      const currentHash = window.location.hash;
+      if (newHash !== currentHash && newHash !== '' || (newHash === '' && currentHash !== '')) {
+        const url = newHash || window.location.pathname + window.location.search;
+        history.pushState({ s: readBodyState() }, '', url);
+      }
+    }, 80);
+  });
+  observer.observe(document.body, {
+    attributes: true,
+    attributeFilter: STATE_KEYS.map(k => 'data-' + k.replace(/([A-Z])/g, '-$1').toLowerCase()),
+  });
+
+  // URL → body
+  window.addEventListener('popstate', () => {
+    suppressHashUpdate = true;
+    applyState(hashToState());
+    setTimeout(() => { suppressHashUpdate = false; }, 30);
+  });
+
+  window.addEventListener('hashchange', () => {
+    // Only react if hash change wasn't from our own pushState
+    if (suppressHashUpdate) return;
+    suppressHashUpdate = true;
+    applyState(hashToState());
+    setTimeout(() => { suppressHashUpdate = false; }, 30);
+  });
+
+  // Initial load: apply hash if present (overrides default body state)
+  if (window.location.hash) {
+    suppressHashUpdate = true;
+    applyState(hashToState());
+    setTimeout(() => { suppressHashUpdate = false; }, 30);
+  }
+})();
+</script>
+</body>
+</html>

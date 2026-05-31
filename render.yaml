@@ -1,0 +1,21 @@
+# Render Blueprint — one-click always-on deploy.
+# In Render: New + → "Blueprint" → pick this repo. It reads this file.
+# Then set the secret OPENAI_API_KEY (and optional base url / model) in the dashboard.
+# Friends just open the service URL; your computer can be off.
+services:
+  - type: web
+    name: vibe-demand-research
+    runtime: python
+    plan: free                      # free tier sleeps after ~15min idle (cold start ~30s)
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 scripts/app.py
+    autoDeploy: true
+    envVars:
+      - key: OPENAI_API_KEY         # set this as a SECRET in the Render dashboard
+        sync: false
+      - key: OPENAI_BASE_URL        # optional (e.g. https://api.deepseek.com/v1)
+        sync: false
+      - key: OPENAI_MODEL           # optional (e.g. deepseek-chat)
+        sync: false
+      - key: REDDIT_SOURCE          # optional: auto | arcticshift | pullpush
+        value: auto

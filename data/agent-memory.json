@@ -1,0 +1,643 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "slug": "agent-memory",
+    "idea": "AI 智能体记忆 (agent memory)",
+    "mode": "EXISTING",
+    "timestamp": "2026-05-28",
+    "target_market": "US",
+    "thesis": "Agent memory is overhyped; production failures erode trust.",
+    "deck": "Despite RAG successes and multi-agent collaboration wins, trust issues and production failures dominate the pain points, indicating a gap in reliable, secure memory solutions.",
+    "idea_en": "AI agent memory",
+    "thesis_en": "Agent memory is overhyped; production failures erode trust.",
+    "deck_en": "Despite RAG successes and multi-agent collaboration wins, trust issues and production failures dominate the pain points, indicating a gap in reliable, secure memory solutions."
+  },
+  "verdict": {
+    "status": "partial",
+    "rationale": "Voices show real demand but also significant pain; opportunity exists but not yet proven.",
+    "evidence_counts": {
+      "raw_voices": 14,
+      "marketplace": 0,
+      "editorials": 0,
+      "simulated": 0
+    },
+    "key_findings": [
+      "Trust issues and production failures are top pain points.",
+      "RAG success and automation demand show market need.",
+      "Security risks and overhype create barriers.",
+      "Multi-agent collaboration is a win but memory reliability is lacking."
+    ],
+    "rationale_en": "Voices show real demand but also significant pain; opportunity exists but not yet proven.",
+    "key_findings_en": [
+      "Trust issues and production failures are top pain points.",
+      "RAG success and automation demand show market need.",
+      "Security risks and overhype create barriers.",
+      "Multi-agent collaboration is a win but memory reliability is lacking."
+    ]
+  },
+  "players": [
+    {
+      "id": "mem0",
+      "name": "Mem0",
+      "color": "#2c2f3a",
+      "size": 26,
+      "x": 0.82,
+      "y": 0.45,
+      "summary": "",
+      "name_en": "Mem0"
+    },
+    {
+      "id": "letta",
+      "name": "Letta",
+      "color": "#4a4e5b",
+      "size": 24,
+      "x": 0.599,
+      "y": 0.735,
+      "summary": "",
+      "name_en": "Letta"
+    },
+    {
+      "id": "langchain",
+      "name": "LangChain",
+      "color": "#4a4e5b",
+      "size": 22,
+      "x": 0.241,
+      "y": 0.626,
+      "summary": "",
+      "name_en": "LangChain"
+    },
+    {
+      "id": "crewai",
+      "name": "CrewAI",
+      "color": "#6b6f7c",
+      "size": 20,
+      "x": 0.241,
+      "y": 0.274,
+      "summary": "",
+      "name_en": "CrewAI"
+    },
+    {
+      "id": "google_deepmind",
+      "name": "Google DeepMind",
+      "color": "#6b6f7c",
+      "size": 18,
+      "x": 0.599,
+      "y": 0.165,
+      "summary": "",
+      "name_en": "Google DeepMind"
+    }
+  ],
+  "themes": [
+    {
+      "id": "t.trust_issues",
+      "label": "信任危机",
+      "color": "#a0533c",
+      "size": 17,
+      "x": 0.2,
+      "y": 0.3,
+      "polarity": "pain",
+      "summary": "用户对AI智能体的可靠性失去信心",
+      "label_en": "Trust Crisis",
+      "summary_en": "Users lose confidence in AI agent reliability"
+    },
+    {
+      "id": "t.prod_fail",
+      "label": "生产失败",
+      "color": "#a0533c",
+      "size": 15,
+      "x": 0.3,
+      "y": 0.7,
+      "polarity": "pain",
+      "summary": "开发环境正常但生产环境失败",
+      "label_en": "Production Failures",
+      "summary_en": "Works in dev but fails in production"
+    },
+    {
+      "id": "t.overhype",
+      "label": "过度炒作",
+      "color": "#a0533c",
+      "size": 14,
+      "x": 0.5,
+      "y": 0.2,
+      "polarity": "pain",
+      "summary": "AI智能体领域存在大量炒作和误导",
+      "label_en": "Overhype",
+      "summary_en": "AI agent space is full of hype and misinformation"
+    },
+    {
+      "id": "t.security",
+      "label": "安全风险",
+      "color": "#a0533c",
+      "size": 13,
+      "x": 0.7,
+      "y": 0.4,
+      "polarity": "pain",
+      "summary": "AI智能体易被攻陷，存在安全隐患",
+      "label_en": "Security Risks",
+      "summary_en": "AI agents are vulnerable to attacks, posing security risks"
+    },
+    {
+      "id": "t.rag_success",
+      "label": "RAG成功",
+      "color": "#5b7a52",
+      "size": 12,
+      "x": 0.8,
+      "y": 0.8,
+      "polarity": "win",
+      "summary": "企业级RAG系统实施取得积极成果",
+      "label_en": "RAG Success",
+      "summary_en": "Enterprise RAG implementations yield positive results"
+    },
+    {
+      "id": "t.agent_collab",
+      "label": "智能体协作",
+      "color": "#5b7a52",
+      "size": 16,
+      "x": 0.6,
+      "y": 0.6,
+      "polarity": "win",
+      "summary": "多智能体协作完成任务令人印象深刻",
+      "label_en": "Agent Collaboration",
+      "summary_en": "Multi-agent collaboration impresses with task completion"
+    },
+    {
+      "id": "t.research_boost",
+      "label": "研究加速",
+      "color": "#5b7a52",
+      "size": 11,
+      "x": 0.9,
+      "y": 0.2,
+      "polarity": "win",
+      "summary": "AI辅助研究论文写作效率极高",
+      "label_en": "Research Acceleration",
+      "summary_en": "AI-assisted research paper writing is highly efficient"
+    },
+    {
+      "id": "t.automation_demand",
+      "label": "自动化需求",
+      "color": "#5b7a52",
+      "size": 14,
+      "x": 0.4,
+      "y": 0.8,
+      "polarity": "win",
+      "summary": "市场对AI自动化解决方案需求旺盛",
+      "label_en": "Automation Demand",
+      "summary_en": "Strong market demand for AI automation solutions"
+    },
+    {
+      "id": "t.other",
+      "label": "其他",
+      "color": "#80766a",
+      "size": 9,
+      "x": 0.1,
+      "y": 0.9,
+      "polarity": "neutral",
+      "summary": "未归类的一般性讨论",
+      "label_en": "Other",
+      "summary_en": "Uncategorized general discussion"
+    }
+  ],
+  "voices": [
+    {
+      "id": "v01",
+      "player": "mem0",
+      "title": "I build AI agents for a living. It's a mess out there.",
+      "score": 2478,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1ojyu8p/i_build_ai_agents_for_a_living_its_a_mess_out/",
+      "sentiment": "neg",
+      "themes": [
+        "t.trust_issues",
+        "t.overhype"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "I build AI agents for a living. It's a mess out there."
+    },
+    {
+      "id": "v02",
+      "player": "letta",
+      "title": "I'm starting to lose trust in the AI agents space.",
+      "score": 1718,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1ltnqup/im_starting_to_lose_trust_in_the_ai_agents_space/",
+      "sentiment": "neg",
+      "themes": [
+        "t.trust_issues"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "I'm starting to lose trust in the AI agents space."
+    },
+    {
+      "id": "v03",
+      "player": "langchain",
+      "title": "Spent 4,000 USD on AI coding. Everything worked in dev. Nothing worked in production.",
+      "score": 1555,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1o0k3fv/spent_4000_usd_on_ai_coding_everything_worked_in/",
+      "sentiment": "neg",
+      "themes": [
+        "t.prod_fail"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "Spent 4,000 USD on AI coding. Everything worked in dev. Nothing worked in production."
+    },
+    {
+      "id": "v04",
+      "player": "crewai",
+      "title": "Stop building AI agents.",
+      "score": 1410,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1taei9m/stop_building_ai_agents/",
+      "sentiment": "neg",
+      "themes": [
+        "t.overhype"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "Stop building AI agents."
+    },
+    {
+      "id": "v05",
+      "player": "google_deepmind",
+      "title": "Google just dropped new Gemini 2.5 Computer Use model which is insane",
+      "score": 980,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1o178u4/google_just_dropped_new_gemini_25_computer_use/",
+      "sentiment": "pos",
+      "themes": [
+        "t.agent_collab"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "Google just dropped new Gemini 2.5 Computer Use model which is insane"
+    },
+    {
+      "id": "v06",
+      "player": "mem0",
+      "title": "I've Built 50+ AI Agents. Here's What Everyone Gets Wrong.",
+      "score": 1278,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1n1q7aj/ive_built_50_ai_agents_heres_what_everyone_gets/",
+      "sentiment": "neg",
+      "themes": [
+        "t.overhype",
+        "t.trust_issues"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "I've Built 50+ AI Agents. Here's What Everyone Gets Wrong."
+    },
+    {
+      "id": "v07",
+      "player": "letta",
+      "title": "Your AI agent is already compromised and you dont even know it",
+      "score": 1051,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1o7xuhf/your_ai_agent_is_already_compromised_and_you_dont/",
+      "sentiment": "neg",
+      "themes": [
+        "t.security"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "Your AI agent is already compromised and you dont even know it"
+    },
+    {
+      "id": "v08",
+      "player": "langchain",
+      "title": "Building RAG systems at enterprise scale: lessons from 10+ implementations",
+      "score": 964,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1nbrm95/building_rag_systems_at_enterprise_scale_20k_docs/",
+      "sentiment": "pos",
+      "themes": [
+        "t.rag_success"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "Building RAG systems at enterprise scale: lessons from 10+ implementations"
+    },
+    {
+      "id": "v09",
+      "player": "crewai",
+      "title": "Claude Code just spawned 3 AI agents that talked to each other and finished my work",
+      "score": 1189,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1qydazj/claude_code_just_spawned_3_ai_agents_that_talked/",
+      "sentiment": "pos",
+      "themes": [
+        "t.agent_collab"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "Claude Code just spawned 3 AI agents that talked to each other and finished my work"
+    },
+    {
+      "id": "v10",
+      "player": "google_deepmind",
+      "title": "A Harvard physics professor used Claude AI to co-author a research paper in 2 weeks",
+      "score": 935,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1s27pe0/a_harvard_physics_professor_just_used_claude_ai/",
+      "sentiment": "pos",
+      "themes": [
+        "t.research_boost"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "A Harvard physics professor used Claude AI to co-author a research paper in 2 weeks"
+    },
+    {
+      "id": "v11",
+      "player": "mem0",
+      "title": "I scraped every AI automation job on Upwork. Here's what clients want.",
+      "score": 1250,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1lniibw/i_scraped_every_ai_automation_job_posted_on/",
+      "sentiment": "pos",
+      "themes": [
+        "t.automation_demand"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "I scraped every AI automation job on Upwork. Here's what clients want."
+    },
+    {
+      "id": "v12",
+      "player": "letta",
+      "title": "I let an AI Agent handle my spam texts. Scammers now ask for therapy.",
+      "score": 1789,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1rdf0fw/i_let_an_ai_agent_handle_my_spam_texts_for_a_week/",
+      "sentiment": "pos",
+      "themes": [
+        "t.automation_demand"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "I let an AI Agent handle my spam texts. Scammers now ask for therapy."
+    },
+    {
+      "id": "v13",
+      "player": "langchain",
+      "title": "Working as AI Engineer is wild",
+      "score": 940,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1qojw8w/working_as_ai_engineer_is_wild/",
+      "sentiment": "neg",
+      "themes": [
+        "t.other"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "Working as AI Engineer is wild"
+    },
+    {
+      "id": "v14",
+      "player": "crewai",
+      "title": "Made $15K selling AI automations in 5 months but learned expensive lessons",
+      "score": 780,
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1mih3fr/made_15k_selling_ai_automations_in_5_months_but/",
+      "sentiment": "pos",
+      "themes": [
+        "t.automation_demand",
+        "t.prod_fail"
+      ],
+      "collected_at": "2026-05-28",
+      "title_en": "Made $15K selling AI automations in 5 months but learned expensive lessons"
+    }
+  ],
+  "opportunity": {
+    "id": "opp",
+    "label": "★ Reliable Agent Memory",
+    "color": "#5b7a52",
+    "size": 30,
+    "x": 0.42,
+    "y": 0.18,
+    "summary": "Build a secure, production-grade memory layer that earns developer trust.",
+    "label_en": "★ Reliable Agent Memory",
+    "summary_en": "Build a secure, production-grade memory layer that earns developer trust."
+  },
+  "edges": [
+    {
+      "from": "mem0",
+      "to": "t.trust_issues",
+      "w": 2
+    },
+    {
+      "from": "mem0",
+      "to": "t.overhype",
+      "w": 2
+    },
+    {
+      "from": "letta",
+      "to": "t.trust_issues",
+      "w": 2
+    },
+    {
+      "from": "letta",
+      "to": "t.security",
+      "w": 1
+    },
+    {
+      "from": "langchain",
+      "to": "t.prod_fail",
+      "w": 2
+    },
+    {
+      "from": "langchain",
+      "to": "t.rag_success",
+      "w": 2
+    },
+    {
+      "from": "langchain",
+      "to": "t.other",
+      "w": 1
+    },
+    {
+      "from": "crewai",
+      "to": "t.overhype",
+      "w": 1
+    },
+    {
+      "from": "crewai",
+      "to": "t.agent_collab",
+      "w": 2
+    },
+    {
+      "from": "crewai",
+      "to": "t.automation_demand",
+      "w": 2
+    },
+    {
+      "from": "crewai",
+      "to": "t.prod_fail",
+      "w": 1
+    },
+    {
+      "from": "google_deepmind",
+      "to": "t.agent_collab",
+      "w": 1
+    },
+    {
+      "from": "google_deepmind",
+      "to": "t.research_boost",
+      "w": 2
+    },
+    {
+      "from": "v01",
+      "to": "t.trust_issues",
+      "w": 1
+    },
+    {
+      "from": "v01",
+      "to": "t.overhype",
+      "w": 1
+    },
+    {
+      "from": "v02",
+      "to": "t.trust_issues",
+      "w": 1
+    },
+    {
+      "from": "v03",
+      "to": "t.prod_fail",
+      "w": 1
+    },
+    {
+      "from": "v04",
+      "to": "t.overhype",
+      "w": 1
+    },
+    {
+      "from": "v05",
+      "to": "t.agent_collab",
+      "w": 1
+    },
+    {
+      "from": "v06",
+      "to": "t.overhype",
+      "w": 1
+    },
+    {
+      "from": "v06",
+      "to": "t.trust_issues",
+      "w": 1
+    },
+    {
+      "from": "v07",
+      "to": "t.security",
+      "w": 1
+    },
+    {
+      "from": "v08",
+      "to": "t.rag_success",
+      "w": 1
+    },
+    {
+      "from": "v09",
+      "to": "t.agent_collab",
+      "w": 1
+    },
+    {
+      "from": "v10",
+      "to": "t.research_boost",
+      "w": 1
+    },
+    {
+      "from": "v11",
+      "to": "t.automation_demand",
+      "w": 1
+    },
+    {
+      "from": "v12",
+      "to": "t.automation_demand",
+      "w": 1
+    },
+    {
+      "from": "v13",
+      "to": "t.other",
+      "w": 1
+    },
+    {
+      "from": "v14",
+      "to": "t.automation_demand",
+      "w": 1
+    },
+    {
+      "from": "v14",
+      "to": "t.prod_fail",
+      "w": 1
+    },
+    {
+      "from": "t.rag_success",
+      "to": "opp",
+      "w": 2
+    },
+    {
+      "from": "t.agent_collab",
+      "to": "opp",
+      "w": 2
+    }
+  ],
+  "paths": [
+    {
+      "id": "path-a",
+      "label": "Path A · Secure Memory Core",
+      "core": "Build a secure, production-grade memory layer with encryption and audit logs.",
+      "description": "Focus on reliability and security to address trust and production failures.",
+      "time": "12 个月",
+      "investment": "$2-5M",
+      "moat": "high",
+      "recommended": true,
+      "label_en": "Path A · Secure Memory Core",
+      "core_en": "Build a secure, production-grade memory layer with encryption and audit logs.",
+      "description_en": "Focus on reliability and security to address trust and production failures."
+    },
+    {
+      "id": "path-b",
+      "label": "Path B · Multi-Agent Memory",
+      "core": "Leverage multi-agent collaboration patterns for shared memory.",
+      "description": "Integrate with existing agent frameworks for seamless memory sharing.",
+      "time": "18 个月",
+      "investment": "$3-6M",
+      "moat": "mid",
+      "recommended": false,
+      "label_en": "Path B · Multi-Agent Memory",
+      "core_en": "Leverage multi-agent collaboration patterns for shared memory.",
+      "description_en": "Integrate with existing agent frameworks for seamless memory sharing."
+    },
+    {
+      "id": "path-c",
+      "label": "Path C · RAG-Enhanced Memory",
+      "core": "Combine RAG with memory for context-aware retrieval.",
+      "description": "Build on RAG success to add persistent memory capabilities.",
+      "time": "9 个月",
+      "investment": "$1-3M",
+      "moat": "low",
+      "recommended": false,
+      "label_en": "Path C · RAG-Enhanced Memory",
+      "core_en": "Combine RAG with memory for context-aware retrieval.",
+      "description_en": "Build on RAG success to add persistent memory capabilities."
+    }
+  ],
+  "risks": [
+    {
+      "id": "R-01",
+      "title": "Trust Deficit",
+      "scenario": "Users remain skeptical despite improvements.",
+      "severity": "high",
+      "mitigation": "Transparent audit logs and open-source verification.",
+      "title_en": "Trust Deficit",
+      "scenario_en": "Users remain skeptical despite improvements.",
+      "mitigation_en": "Transparent audit logs and open-source verification."
+    },
+    {
+      "id": "R-02",
+      "title": "Production Failure",
+      "scenario": "Memory layer fails under load or edge cases.",
+      "severity": "high",
+      "mitigation": "Rigorous testing and gradual rollout with monitoring.",
+      "title_en": "Production Failure",
+      "scenario_en": "Memory layer fails under load or edge cases.",
+      "mitigation_en": "Rigorous testing and gradual rollout with monitoring."
+    },
+    {
+      "id": "R-03",
+      "title": "Security Breach",
+      "scenario": "Memory data leaked or tampered with.",
+      "severity": "high",
+      "mitigation": "End-to-end encryption and access controls.",
+      "title_en": "Security Breach",
+      "scenario_en": "Memory data leaked or tampered with.",
+      "mitigation_en": "End-to-end encryption and access controls."
+    },
+    {
+      "id": "R-04",
+      "title": "Overhype Backlash",
+      "scenario": "Market dismisses as another overhyped AI product.",
+      "severity": "mid",
+      "mitigation": "Focus on concrete use cases and measurable outcomes.",
+      "title_en": "Overhype Backlash",
+      "scenario_en": "Market dismisses as another overhyped AI product.",
+      "mitigation_en": "Focus on concrete use cases and measurable outcomes."
+    }
+  ]
+}

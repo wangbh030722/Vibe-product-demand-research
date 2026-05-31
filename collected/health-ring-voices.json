@@ -1,0 +1,154 @@
+{
+  "category": "智能戒指",
+  "target_market": "US + CN",
+  "players": [
+    {
+      "id": "oura",
+      "name": "Oura Ring 4"
+    },
+    {
+      "id": "samsung",
+      "name": "Samsung Galaxy Ring"
+    },
+    {
+      "id": "ringconn",
+      "name": "RingConn Gen 2"
+    },
+    {
+      "id": "ultrahuman",
+      "name": "Ultrahuman Ring Air"
+    },
+    {
+      "id": "apple",
+      "name": "Apple Ring (假设)"
+    }
+  ],
+  "voices": [
+    {
+      "id": "v01",
+      "player": "oura",
+      "title": "Oura saved my life",
+      "score": 2903,
+      "url": "https://www.reddit.com/r/ouraring/comments/1nh3tze/oura_saved_my_life/",
+      "excerpt": "Oura saved my life",
+      "sentiment_hint": "pos"
+    },
+    {
+      "id": "v02",
+      "player": "oura",
+      "title": "Caught cancer early postpartum",
+      "score": 2507,
+      "url": "https://www.reddit.com/r/ouraring/comments/1nyt25l/my_oura_ring_data_legiti/",
+      "excerpt": "Caught cancer early postpartum",
+      "sentiment_hint": "pos"
+    },
+    {
+      "id": "v03",
+      "player": "oura",
+      "title": "Leaving Oura over Palantir",
+      "score": 3968,
+      "url": "https://www.reddit.com/r/ouraring/comments/1n3f33w/leaving_oura_ring_after_/",
+      "excerpt": "Leaving Oura over Palantir",
+      "sentiment_hint": "neg"
+    },
+    {
+      "id": "v04",
+      "player": "ringconn",
+      "title": "RingConn Gen 2 exploded on finger",
+      "score": 105,
+      "url": "https://www.reddit.com/r/RingConn/comments/1r5eqo6/my_ringconn_ge/",
+      "excerpt": "RingConn Gen 2 exploded on finger",
+      "sentiment_hint": "neg"
+    },
+    {
+      "id": "v05",
+      "player": "samsung",
+      "title": "Galaxy Ring battery swelling stuck on finger",
+      "score": 8,
+      "url": "https://9to5google.com/2025/09/29/swollen-galaxy-ring-battery/",
+      "excerpt": "Galaxy Ring battery swelling stuck on finger",
+      "sentiment_hint": "neg"
+    },
+    {
+      "id": "v06",
+      "player": "ringconn",
+      "title": "I returned my Oura, got RingConn Air",
+      "score": 118,
+      "url": "https://www.reddit.com/r/RingConn/comments/1q9kbc8/got_my_new_rin/",
+      "excerpt": "I returned my Oura, got RingConn Air",
+      "sentiment_hint": "pos"
+    },
+    {
+      "id": "v07",
+      "player": "ringconn",
+      "title": "Not supporting Oura!",
+      "score": 184,
+      "url": "https://www.reddit.com/r/RingConn/comments/1my1deg/not_supporting/",
+      "excerpt": "Not supporting Oura!",
+      "sentiment_hint": "neg"
+    },
+    {
+      "id": "v08",
+      "player": "ringconn",
+      "title": "Wish there was an 'I'm sick' button",
+      "score": 114,
+      "url": "https://www.reddit.com/r/RingConn/comments/1s9ixa2/wish_there_was/",
+      "excerpt": "Wish there was an 'I'm sick' button",
+      "sentiment_hint": "neg"
+    },
+    {
+      "id": "v09",
+      "player": "ringconn",
+      "title": "I cried for an hour, my ring thought I was biking",
+      "score": 184,
+      "url": "https://www.reddit.com/r/RingConn/comments/1t1xksd/i_cried_for_al/",
+      "excerpt": "I cried for an hour, my ring thought I was biking",
+      "sentiment_hint": "pos"
+    },
+    {
+      "id": "v10",
+      "player": "oura",
+      "title": "Ring stuck on finger → ER",
+      "score": 1740,
+      "url": "https://www.reddit.com/r/ouraring/comments/1qtx7tt/finale_update_help_my_ri/",
+      "excerpt": "Ring stuck on finger → ER",
+      "sentiment_hint": "neg"
+    },
+    {
+      "id": "v11",
+      "player": "oura",
+      "title": "Charging in the shower workaround",
+      "score": 1635,
+      "url": "https://www.reddit.com/r/ouraring/comments/1suis9d/i_almost_had_to_get_nake/",
+      "excerpt": "Charging in the shower workaround",
+      "sentiment_hint": "pos"
+    },
+    {
+      "id": "v12",
+      "player": "oura",
+      "title": "Give us a 'bitchy/funny/ironic' toggle",
+      "score": 940,
+      "url": "https://www.reddit.com/r/ouraring/comments/1ta568e/ate_a_family_sized_bag_o/",
+      "excerpt": "Give us a 'bitchy/funny/ironic' toggle",
+      "sentiment_hint": "neg"
+    },
+    {
+      "id": "v13",
+      "player": "oura",
+      "title": "$5.99/月 不值",
+      "score": 1761,
+      "url": "https://www.reddit.com/r/ouraring/comments/1qx13mj/if_you_were_on_the_fence/",
+      "excerpt": "$5.99/月 不值",
+      "sentiment_hint": "neg"
+    },
+    {
+      "id": "v14",
+      "player": "samsung",
+      "title": "Samsung Community: 'Worst Samsung product ever'",
+      "score": 40,
+      "url": "https://us.community.samsung.com/t5/Galaxy-Ring/Worst-Samsung-product-ever/m-p/3568427",
+      "excerpt": "Samsung Community: 'Worst Samsung product ever'",
+      "sentiment_hint": "neg"
+    }
+  ]
+}

@@ -1,2 +1,13 @@
-.DS_Store
-*.log
+evidence/
+demo-ai-glasses-report.html
+
+# Secrets — never commit. Real keys live in .env (gitignored);
+# .env.example is the committed template with placeholders only.
+.env
+.env.local
+*.key
+collected/
+.playwright-mcp/
+
+# downloaded share tooling
+/bin/

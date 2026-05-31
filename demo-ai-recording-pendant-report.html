@@ -1,0 +1,1604 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Always-On AI 录音设备 · 品类研究 · NON-STOCK 模式</title>
+<style>
+  :root {
+    --bg: #fafaf7; --ink: #14171c; --muted: #5a606a; --soft: #9aa0aa;
+    --line: #e1e3e7; --line-strong: #1f242c;
+    --paper: #ffffff;
+    --bg-warm: #f5f1ea;
+    --accent: #c2410c; --accent-soft: #fdf3ed;
+    --good: #14532d; --good-soft: #ecf3ef;
+    --amber: #92400e; --amber-soft: #fdf5e9;
+    --serif: "Source Han Serif SC","Noto Serif SC","Songti SC",Georgia,serif;
+    --sans: "PingFang SC","Hiragino Sans GB","Microsoft YaHei",Inter,system-ui,sans-serif;
+    --mono: "SFMono-Regular","Roboto Mono",Consolas,monospace;
+    --en: "Iowan Old Style","Source Serif Pro",Georgia,serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  html { font-family: var(--sans); font-size: 14.5px; line-height: 1.7; }
+  a { color: inherit; }
+  a.ref { border-bottom: 1px solid var(--line); text-decoration: none; }
+  a.ref:hover { border-color: var(--ink); }
+  .doc { max-width: 1100px; margin: 0 auto; padding: 32px 48px 80px; }
+
+  /* Masthead */
+  .masthead { display: grid; grid-template-columns: 1fr auto; gap: 24px; padding: 16px 0 14px; border-bottom: 1px solid var(--line); margin-bottom: 48px; }
+  .masthead .firm { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+  .masthead .firm strong { color: var(--ink); }
+  .masthead .meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; color: var(--soft); text-align: right; line-height: 1.7; }
+  .masthead .meta strong { color: var(--ink); }
+
+  /* Cover */
+  .cover { padding: 0 0 56px; border-bottom: 1px solid var(--line); }
+  .cover .kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 20px; }
+  h1.cover-title { font-family: var(--serif); font-weight: 700; font-size: clamp(32px, 4vw, 44px); line-height: 1.18; letter-spacing: -0.01em; margin: 0 0 16px; max-width: 920px; }
+  .cover-deck { font-family: var(--serif); font-style: italic; font-size: clamp(16px, 1.5vw, 19px); line-height: 1.55; color: var(--muted); margin: 0 0 28px; max-width: 800px; }
+  .cover-tags { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cover-audience { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--muted); padding: 6px 12px; border: 1px solid var(--line); }
+  .cover-audience strong { color: var(--ink); }
+  .mode-tag { background: var(--accent); color: #fff; padding: 6px 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+
+  /* TLDR */
+  .tldr { background: var(--paper); border: 1px solid var(--line); padding: 28px 32px; margin: 36px 0 0; border-left: 4px solid var(--accent); }
+  .tldr .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
+  .tldr h3 { font-family: var(--serif); font-weight: 700; font-size: 19px; margin: 0 0 18px; }
+  .tldr .verdict-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 0 18px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .tldr .verdict-grid .vg-cell .lblmini { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); margin-bottom: 4px; }
+  .tldr .verdict-grid .vg-cell .vgval { font-family: var(--serif); font-weight: 700; font-size: 15px; }
+  .tldr .verdict-grid .vg-cell .vgval.warn { color: var(--accent); }
+  .tldr .verdict-grid .vg-cell .vgval.good { color: var(--good); }
+  .tldr .verdict-grid .vg-cell .vgval.amber { color: var(--amber); }
+  .tldr ol { margin: 0; padding-left: 0; counter-reset: pt; list-style: none; }
+  .tldr li { counter-increment: pt; padding: 12px 0 12px 36px; position: relative; border-top: 1px dashed var(--line); line-height: 1.6; }
+  .tldr li:first-child { border-top: 0; }
+  .tldr li::before { content: counter(pt); position: absolute; left: 0; top: 14px; width: 22px; height: 22px; border: 1.5px solid var(--accent); border-radius: 50%; text-align: center; line-height: 19px; font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--accent); }
+  .tldr li strong { color: var(--ink); }
+  .tldr li em { font-style: normal; color: var(--accent); font-weight: 600; }
+
+  /* Sections */
+  section.chapter { padding: 64px 0 0; }
+  h2.h2 { font-family: var(--serif); font-weight: 700; font-size: clamp(22px, 2.6vw, 28px); line-height: 1.3; margin: 0 0 8px; }
+  h2.h2 .secnum { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--accent); letter-spacing: 0.1em; margin-right: 12px; }
+  .h2-sub { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--muted); margin: 0 0 26px; }
+  .h2-rule { height: 1px; background: var(--ink); width: 100%; margin: 14px 0 28px; }
+  h3.h3 { font-family: var(--sans); font-weight: 700; font-size: 16.5px; margin: 32px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  h3.h3 .secnum { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--accent); margin-right: 10px; }
+  p { margin: 0 0 14px; max-width: 820px; }
+
+  /* Timeline (起源叙事) */
+  .timeline { margin: 24px 0; padding: 24px 28px; background: var(--paper); border: 1px solid var(--line); }
+  .timeline h4 { font-family: var(--serif); font-weight: 700; font-size: 17px; margin: 0 0 18px; }
+  .tl-row { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 12px 0; border-top: 1px solid var(--line); align-items: start; }
+  .tl-row:first-of-type { border-top: 0; padding-top: 0; }
+  .tl-row .tl-date { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--accent); font-weight: 700; padding-top: 2px; }
+  .tl-row .tl-event strong { font-size: 14.5px; font-weight: 700; display: block; margin-bottom: 4px; }
+  .tl-row .tl-event { font-size: 13.5px; line-height: 1.6; }
+  .tl-row.warn .tl-date { color: var(--accent); }
+  .tl-row.good .tl-date { color: var(--good); }
+  .tl-row.amber .tl-date { color: var(--amber); }
+  .tl-row.acq .tl-date { color: #1e4d8a; }
+
+  /* Signal cards (早期信号) */
+  .signals { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 24px 0; }
+  .signal-card { background: var(--paper); border: 1px solid var(--line); padding: 18px; }
+  .signal-card .figure { font-family: var(--serif); font-weight: 700; font-size: 26px; line-height: 1; margin-bottom: 8px; }
+  .signal-card .figure sub { font-size: 11px; vertical-align: 3px; margin-left: 3px; color: var(--muted); font-weight: 400; }
+  .signal-card .figure.warn { color: var(--accent); }
+  .signal-card .figure.good { color: var(--good); }
+  .signal-card .lbl { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); margin-bottom: 4px; }
+  .signal-card .desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+
+  /* Personas (假设性) */
+  .personas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 28px 0; }
+  .persona { background: var(--paper); border: 1px solid var(--line); padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+  .persona .ptag { display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; padding: 3px 8px; background: var(--amber-soft); color: var(--amber); width: max-content; }
+  .persona h4 { margin: 4px 0 0; font-family: var(--serif); font-weight: 700; font-size: 17px; }
+  .persona .summary { font-size: 13px; color: var(--muted); font-style: italic; margin: 0 0 4px; }
+  .persona .row { display: grid; grid-template-columns: 56px 1fr; gap: 8px; font-size: 12.5px; line-height: 1.5; padding: 6px 0; border-top: 1px solid var(--line); }
+  .persona .row:first-of-type { border-top: 0; }
+  .persona .row .k { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); padding-top: 2px; }
+
+  /* Data tables */
+  .dt-wrap { margin: 20px 0; border: 1px solid var(--line); background: var(--paper); }
+  .dt-head, details.drow > summary { display: grid; align-items: center; gap: 16px; padding: 11px 18px; }
+  .dt-head { background: var(--ink); color: var(--bg); font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; }
+  .voice-table .dt-head, .voice-table details.drow > summary { grid-template-columns: 90px 1fr 200px 80px 22px; }
+  .mkt-table .dt-head, .mkt-table details.drow > summary { grid-template-columns: 70px 1fr 110px 110px 130px 22px; }
+  details.drow { border-top: 1px solid var(--line); background: var(--paper); }
+  details.drow > summary { cursor: pointer; list-style: none; transition: background 160ms; font-family: var(--sans); }
+  details.drow > summary:hover { background: var(--bg-warm); }
+  details.drow[open] > summary { background: var(--bg-warm); }
+  details.drow > summary::-webkit-details-marker { display: none; }
+  .sent-dot { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+  .sent-dot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: var(--muted); }
+  .sent-dot.pos { color: var(--good); } .sent-dot.pos::before { background: var(--good); }
+  .sent-dot.neg { color: var(--accent); } .sent-dot.neg::before { background: var(--accent); }
+  .sent-dot.acq { color: #1e4d8a; } .sent-dot.acq::before { background: #1e4d8a; }
+  .sent-dot.dead { color: #5a606a; } .sent-dot.dead::before { background: #5a606a; }
+  .dt-title { font-size: 13.5px; font-weight: 600; line-height: 1.45; }
+  .dt-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.03em; }
+  .dt-num { font-family: var(--mono); font-size: 12px; font-weight: 700; text-align: right; color: var(--ink); }
+  .dt-exp { font-family: var(--mono); font-size: 16px; color: var(--soft); text-align: center; transition: transform 180ms; }
+  details.drow[open] > summary .dt-exp { transform: rotate(45deg); }
+  details.drow > .dt-body { padding: 4px 24px 20px 24px; border-top: 1px dashed var(--line); }
+  .dt-lang-row { display: grid; grid-template-columns: 90px 1fr; gap: 18px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .dt-lang-row:first-child { border-top: 0; }
+  .dt-lang-lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); padding-top: 2px; }
+  .dt-en { font-family: var(--en); font-style: italic; font-size: 13.5px; line-height: 1.65; color: var(--ink); margin: 0; }
+  .dt-cn { font-family: var(--sans); font-size: 13px; line-height: 1.75; color: var(--ink); margin: 0; }
+  .dt-sig { font-size: 12.5px; line-height: 1.6; color: var(--muted); margin: 0; padding: 10px 14px; background: var(--bg-warm); }
+  .dt-sig strong { color: var(--ink); }
+  .dt-src { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--soft); text-transform: uppercase; }
+  .dt-src a { color: var(--muted); border-bottom: 1px solid var(--line); text-decoration: none; }
+  .toggle-bar { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+  .toggle-btn { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; background: var(--paper); border: 1px solid var(--line); color: var(--muted); padding: 5px 11px; cursor: pointer; }
+  .toggle-btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .toggle-hint { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.04em; color: var(--soft); margin-left: auto; }
+
+  /* Failure cases */
+  .fail-table { width: 100%; border-collapse: collapse; font-size: 12.5px; background: var(--paper); margin: 18px 0; }
+  .fail-table th, .fail-table td { padding: 10px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); line-height: 1.5; }
+  .fail-table thead th { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); font-weight: 600; border-bottom: 1px solid var(--line-strong); }
+  .fail-table tbody td:first-child { font-weight: 600; }
+  .fail-table .tag { font-family: var(--mono); font-size: 10.5px; padding: 2px 6px; display: inline-block; }
+  .fail-table .tag.dead { background: #ececec; color: #555; }
+  .fail-table .tag.acq { background: #e6efff; color: #1e4d8a; }
+  .fail-table .tag.live { background: var(--good-soft); color: var(--good); }
+
+  /* Positioning chart */
+  .positioning-chart { background: var(--paper); border: 1px solid var(--line); padding: 24px; margin: 24px 0; }
+  .chart-legend { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 24px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  .chart-legend .lg-row { display: flex; align-items: center; gap: 10px; }
+  .chart-legend .lg-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .chart-legend .lg-ring { background: transparent !important; border: 2px dashed; }
+  .positioning-chart .chart-caption { margin-top: 16px; padding: 12px 16px; background: var(--bg-warm); font-size: 12.5px; line-height: 1.7; color: var(--muted); }
+  .positioning-chart .chart-caption strong { color: var(--ink); }
+
+  /* Three forms (替代 paths) */
+  .forms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+  .form-card { background: var(--paper); border: 1px solid var(--line); padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+  .form-card.win { border-top: 3px solid var(--good); }
+  .form-card.risk { border-top: 3px solid var(--accent); }
+  .form-card.unknown { border-top: 3px solid var(--amber); }
+  .form-card .ftag { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--soft); font-weight: 700; }
+  .form-card .ftag.win { color: var(--good); }
+  .form-card .ftag.risk { color: var(--accent); }
+  .form-card .ftag.unknown { color: var(--amber); }
+  .form-card h4 { margin: 4px 0 8px; font-family: var(--serif); font-weight: 700; font-size: 17px; line-height: 1.35; }
+  .form-card .row { font-size: 12.5px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .form-card .row:first-of-type { border-top: 0; }
+  .form-card .row .k { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); display: block; margin-bottom: 3px; }
+
+  /* Capability stack */
+  .cap-stack { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 24px 0; }
+  .cap-block { background: var(--paper); border: 1px solid var(--line); padding: 18px 22px; border-top: 3px solid var(--ink); }
+  .cap-block.must { border-top-color: var(--accent); }
+  .cap-block.partner { border-top-color: var(--amber); }
+  .cap-block h5 { margin: 0 0 4px; font-family: var(--sans); font-weight: 700; font-size: 14.5px; }
+  .cap-block .ctag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); margin-bottom: 8px; display: block; }
+  .cap-block ul { margin: 0; padding-left: 16px; font-size: 13px; line-height: 1.6; }
+  .cap-block li { margin: 4px 0; }
+  .cap-block li strong { color: var(--ink); }
+
+  /* Risks */
+  .risk-row { display: grid; grid-template-columns: 80px 1fr 110px; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .risk-row:first-of-type { border-top: 0; }
+  .risk-row .rno { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+  .risk-row .rdesc { font-size: 13px; line-height: 1.6; }
+  .risk-row .rdesc strong { display: block; margin-bottom: 4px; font-size: 13.5px; }
+  .risk-row .rsev { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; text-align: right; color: var(--muted); }
+  .risk-row .rsev strong { color: var(--ink); display: block; font-size: 12px; margin-bottom: 2px; }
+
+  /* Appendix */
+  details.app { border: 1px solid var(--line); padding: 16px 22px; margin-top: 12px; background: var(--paper); }
+  details.app summary { cursor: pointer; list-style: none; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); font-weight: 700; display: flex; justify-content: space-between; }
+  details.app summary::-webkit-details-marker { display: none; }
+  details.app summary::after { content: "+"; font-family: var(--mono); font-size: 18px; }
+  details.app[open] summary::after { content: "−"; }
+  details.app > div { padding-top: 14px; margin-top: 12px; border-top: 1px solid var(--line); }
+  table.data { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.data th, table.data td { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--line); }
+  table.data thead th { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); font-weight: 500; }
+  .en-q { font-family: var(--en); font-style: italic; }
+
+  .method { margin-top: 56px; padding: 22px 0 0; border-top: 2px solid var(--ink); font-family: var(--mono); font-size: 10.5px; line-height: 1.75; color: var(--muted); letter-spacing: 0.02em; }
+  .method strong { color: var(--ink); }
+
+  @media (max-width: 820px) {
+    .doc { padding: 24px 20px 60px; }
+    .signals, .personas, .forms, .cap-stack { grid-template-columns: 1fr; }
+    .tldr .verdict-grid { grid-template-columns: repeat(2, 1fr); }
+    .voice-table .dt-head, .voice-table details.drow > summary { grid-template-columns: 80px 1fr 60px 22px; gap: 8px; padding: 10px 12px; }
+    .voice-table .dt-head > div:nth-child(3), .voice-table details.drow > summary > *:nth-child(3) { display: none; }
+    .mkt-table .dt-head, .mkt-table details.drow > summary { grid-template-columns: 70px 1fr 90px 22px; gap: 8px; padding: 10px 12px; }
+    .mkt-table .dt-head > div:nth-child(3), .mkt-table .dt-head > div:nth-child(5), .mkt-table details.drow > summary > *:nth-child(3), .mkt-table details.drow > summary > *:nth-child(5) { display: none; }
+    .dt-lang-row { grid-template-columns: 1fr; gap: 6px; }
+  }
+
+  /* ======================================================
+     INTERACTIVE LAYER (MiroFish-inspired)
+     ====================================================== */
+  .process-bar { position: sticky; top: 0; z-index: 100; background: var(--ink); color: var(--bg); border-bottom: 1px solid var(--line-strong); }
+  .pb-inner { max-width: 1100px; margin: 0 auto; padding: 12px 48px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; align-items: center; }
+  .pb-step { position: relative; display: flex; align-items: center; gap: 10px; padding: 6px 0; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(250,250,247,0.45); cursor: pointer; transition: color 200ms; text-decoration: none; }
+  .pb-step:hover { color: rgba(250,250,247,0.85); }
+  .pb-step.active { color: var(--bg); }
+  .pb-step .pb-num { width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; flex-shrink: 0; }
+  .pb-step.active .pb-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .pb-step .pb-lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pb-step::after { content: ""; position: absolute; right: -6px; top: 50%; width: 12px; height: 1px; background: rgba(250,250,247,0.2); transform: translateY(-50%); }
+  .pb-step:last-child::after { display: none; }
+
+  .kg-section { padding: 56px 0 0; border-top: 1px solid var(--line); }
+  .kg-section h3.h3 .secnum { color: #1e4d8a; }
+  .kg-wrap { margin: 16px 0; border: 1px solid var(--line-strong); background: var(--paper); display: grid; grid-template-columns: 1fr 320px; gap: 0; min-height: 520px; }
+  .kg-graph { position: relative; overflow: hidden; }
+  .kg-svg { width: 100%; height: 520px; display: block; cursor: grab; }
+  .kg-node circle { transition: r 200ms, opacity 200ms, stroke-width 200ms; cursor: pointer; }
+  .kg-node text { pointer-events: none; user-select: none; font-family: var(--sans); font-size: 11px; font-weight: 600; fill: var(--ink); }
+  .kg-node.kg-faded circle { opacity: 0.18; } .kg-node.kg-faded text { opacity: 0.25; }
+  .kg-node.kg-active circle { stroke-width: 3; }
+  .kg-edge { stroke: #c9cdd2; stroke-width: 1; transition: stroke 200ms, opacity 200ms; }
+  .kg-edge.kg-faded { opacity: 0.1; }
+  .kg-edge.kg-active { stroke: var(--accent); stroke-width: 1.5; opacity: 1; }
+  .kg-side { border-left: 1px solid var(--line); padding: 20px 22px; overflow-y: auto; max-height: 520px; font-size: 13px; line-height: 1.6; }
+  .kg-side .kg-empty { color: var(--soft); font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.7; }
+  .kg-side h5 { font-family: var(--serif); font-weight: 700; font-size: 17px; margin: 0 0 6px; line-height: 1.3; }
+  .kg-side .kg-tag { display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; background: var(--bg-warm); color: var(--muted); margin-bottom: 14px; }
+  .kg-side .kg-tag.player { background: #e6efff; color: #1e4d8a; }
+  .kg-side .kg-tag.theme { background: var(--good-soft); color: var(--good); }
+  .kg-side .kg-tag.voice { background: var(--accent-soft); color: var(--accent); }
+  .kg-side .kg-tag.oppor { background: var(--good-soft); color: var(--good); border: 1px dashed var(--good); }
+  .kg-side .kg-meta { font-family: var(--mono); font-size: 11px; color: var(--soft); margin-bottom: 12px; }
+  .kg-side .kg-related { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .kg-side .kg-related-lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); margin-bottom: 6px; }
+  .kg-side .kg-related a { display: block; font-size: 12.5px; padding: 4px 0; color: var(--ink); text-decoration: none; border-bottom: 1px dotted var(--line); }
+  .kg-side .kg-related a:hover { color: var(--accent); }
+  .kg-controls { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; z-index: 5; }
+  .kg-btn { background: var(--paper); border: 1px solid var(--line); font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 9px; cursor: pointer; color: var(--muted); }
+  .kg-btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .kg-legend { display: flex; gap: 18px; padding: 12px 18px; border-top: 1px solid var(--line); background: var(--bg-warm); font-size: 11px; color: var(--muted); font-family: var(--mono); letter-spacing: 0.04em; }
+  .kg-legend-item { display: flex; align-items: center; gap: 6px; }
+  .kg-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .kg-legend-dot.player { background: #1e4d8a; }
+  .kg-legend-dot.theme { background: var(--good); }
+  .kg-legend-dot.voice { background: var(--accent); }
+  .kg-legend-dot.oppor { background: transparent; border: 2px dashed var(--good); }
+  .kg-legend-dot.dead { background: #9aa0aa; }
+
+  .filter-bar { background: var(--paper); border: 1px solid var(--line); padding: 12px 16px; margin: 14px 0; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .filter-bar .fb-lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); padding-right: 4px; }
+  .filter-chip { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; padding: 5px 10px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); cursor: pointer; transition: all 150ms; text-transform: uppercase; }
+  .filter-chip:hover { border-color: var(--ink); color: var(--ink); }
+  .filter-chip.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .filter-chip.pos.active { background: var(--good); border-color: var(--good); }
+  .filter-chip.neg.active { background: var(--accent); border-color: var(--accent); }
+  .filter-search { flex: 1; min-width: 200px; padding: 6px 12px; border: 1px solid var(--line); font-family: var(--mono); font-size: 12px; background: var(--bg); color: var(--ink); }
+  .filter-search:focus { outline: none; border-color: var(--ink); background: #fff; }
+  .filter-count { font-family: var(--mono); font-size: 11px; color: var(--soft); }
+  details.drow.fb-hidden { display: none; }
+  details.drow.fb-match-search summary { background: #fff8e6 !important; }
+
+  .whatif-panel { margin-top: 14px; background: repeating-linear-gradient(45deg, transparent, transparent 12px, rgba(194,65,12,0.025) 12px, rgba(194,65,12,0.025) 13px), #fffaf6; border: 1.5px solid var(--accent); }
+  .whatif-banner { background: var(--accent); color: #fff; padding: 8px 16px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+  .whatif-banner .wi-warn::before { content: "⚠ "; }
+  .whatif-banner .wi-note { font-size: 9.5px; letter-spacing: 0.08em; opacity: 0.9; font-weight: 500; }
+  .whatif-toggle { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.4); color: #fff; font-family: var(--mono); font-size: 10px; padding: 3px 8px; cursor: pointer; letter-spacing: 0.06em; }
+  .whatif-toggle:hover { background: rgba(0,0,0,0.4); }
+  .whatif-body { padding: 18px 22px; }
+  .whatif-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .whatif-card { background: var(--paper); border: 1px dashed var(--accent); padding: 14px 16px; font-family: var(--mono); font-size: 11.5px; line-height: 1.55; display: flex; flex-direction: column; gap: 8px; }
+  .whatif-card .wc-scenario { font-family: var(--sans); font-weight: 700; font-size: 13px; color: var(--ink); line-height: 1.4; }
+  .whatif-card .wc-row { display: grid; grid-template-columns: 56px 1fr; gap: 8px; padding-top: 6px; border-top: 1px solid var(--line); }
+  .whatif-card .wc-row:first-of-type { border-top: 0; padding-top: 0; }
+  .whatif-card .wc-k { font-size: 9.5px; letter-spacing: 0.12em; color: var(--soft); text-transform: uppercase; padding-top: 1px; }
+  .whatif-card .wc-v { color: var(--muted); font-family: var(--sans); font-size: 12px; line-height: 1.6; }
+  .whatif-card .wc-conf { align-self: flex-start; padding: 2px 7px; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; background: var(--accent-soft); color: var(--accent); font-weight: 600; margin-top: auto; }
+  .whatif-card .wc-conf.lo { background: #fceee6; color: var(--amber); }
+  .whatif-card .wc-conf.hi { background: var(--good-soft); color: var(--good); }
+  .whatif-panel.wi-collapsed .whatif-body { display: none; }
+
+  @media (max-width: 820px) {
+    .pb-inner { padding: 10px 16px; gap: 2px; }
+    .pb-step .pb-lbl { display: none; }
+    .kg-wrap { grid-template-columns: 1fr; }
+    .kg-side { border-left: 0; border-top: 1px solid var(--line); }
+    .whatif-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ===== PROCESS BAR ===== -->
+<nav class="process-bar" id="processBar">
+  <div class="pb-inner">
+    <a class="pb-step active" data-target="#sec-meta" href="#sec-meta"><span class="pb-num">1</span><span class="pb-lbl">信号扫描 · NON-STOCK</span></a>
+    <a class="pb-step" data-target="#sec-collect" href="#sec-collect"><span class="pb-num">2</span><span class="pb-lbl">早期信号 · §1-2</span></a>
+    <a class="pb-step" data-target="#sec-clean" href="#sec-clean"><span class="pb-num">3</span><span class="pb-lbl">竞品 + 失败 · §3</span></a>
+    <a class="pb-step" data-target="#sec-analyze" href="#sec-analyze"><span class="pb-num">4</span><span class="pb-lbl">三种形态 · §4-5</span></a>
+    <a class="pb-step" data-target="#sec-verdict" href="#sec-verdict"><span class="pb-num">5</span><span class="pb-lbl">风险 + 附录 · §6+</span></a>
+  </div>
+</nav>
+
+<div class="doc" id="sec-meta">
+
+  <!-- ===== MASTHEAD ===== -->
+  <div class="masthead">
+    <div class="firm"><strong>VIBE DEMAND RESEARCH</strong> · CATEGORY DEEP DIVE · AI WEARABLES</div>
+    <div class="meta">
+      <div>Brief №<strong>VDR-CAT-027</strong> · NON-STOCK</div>
+      <div>2026 / 05 / 19</div>
+    </div>
+  </div>
+
+  <!-- ===== COVER ===== -->
+  <div class="cover">
+    <div class="kicker">Always-On AI 录音设备 · 北美 / 全球 · 非存量市场</div>
+    <h1 class="cover-title">错的形态正在被收购,<br>对的形态在闷声赚钱。</h1>
+    <p class="cover-deck">Meta 收 Limitless,Amazon 收 Bee,Friend.com 进 Museum of Failure,Humane 早死。但 Plaud Note Pro 还在卖,而且评测说"2026 最佳"。整个"AI ambient capture"品类在 6 个月内被巨头洗牌——收购的不是赢家,只是不工作的项链。真正赢的形态可能根本不戴在身上。</p>
+    <div class="cover-tags">
+      <span class="cover-audience">读者 · <strong>新进入者产品团队 / 创始人</strong></span>
+      <span class="mode-tag">NON-STOCK 模式</span>
+    </div>
+  </div>
+
+  <!-- ===== TLDR ===== -->
+  <div class="tldr">
+    <div class="lbl">TL;DR · 给产品团队的速读</div>
+    <h3>这个品类真的值得切吗?切哪种形态?何时?</h3>
+
+    <div class="verdict-grid">
+      <div class="vg-cell">
+        <div class="lblmini">品类是否真实</div>
+        <div class="vgval amber">是 · 但形态战未定</div>
+      </div>
+      <div class="vg-cell">
+        <div class="lblmini">是否值得切入</div>
+        <div class="vgval amber">是 · 但窗口非常窄</div>
+      </div>
+      <div class="vg-cell">
+        <div class="lblmini">推荐切入形态</div>
+        <div class="vgval good">口袋录音设备(非项链)</div>
+      </div>
+      <div class="vg-cell">
+        <div class="lblmini">窗口期</div>
+        <div class="vgval warn">6-12 个月</div>
+      </div>
+    </div>
+
+    <ol>
+      <li><strong>巨头收购潮是"未来形态焦虑",不是品类成立信号。</strong>Meta 收 Limitless / Amazon 收 Bee 看似品类被巨头认可,实际是<em>买未来的工程师 + 期权对赌</em>,不是买现成的胜利。两个被收购的项链/胸针产品在收购前都没有 PMF。</li>
+      <li><strong>口袋设备(Plaud Note)默默赢了第一回合。</strong>Plaud Note Pro 评测公认为"2026 最佳 AI 录音笔",30 小时电池 + 4 麦克风 + 不戴脖子上 = 形态社会摩擦最小。<em>当所有人盯着"项链"叙事时,真正卖钱的是 $199 的口袋录音笔。</em></li>
+      <li><strong>"AI 项链 / 胸针"形态是品类的真死亡之吻,不是 AI 能力问题。</strong>Friend.com 广告被涂鸦 "AI is not your friend"。Humane 死。Limitless 卖给 Meta 后用户喊 "Mine just got bricked"。<em>形态可见度决定社会接受度——能藏在口袋的设备 → 没有社会摩擦;戴在脖子/胸前的 → 立刻引发"你在录我吗"反应。</em></li>
+      <li><strong>新进入者的窗口在右上 + 端到端栈,不在新硬件形态。</strong>不要再做一个"项链"。做"口袋 / 卡片 / 笔 + 端到端 AI 后端 + 法律证据级转录"才有空间。Plaud 走通了硬件,但 API/integration 18 个月没出(用户自建 n8n webhook 等)——后端集成是开口。</li>
+    </ol>
+  </div>
+
+  <!-- ===== §1 品类拆解 ===== -->
+  <section class="chapter" id="sec-collect">
+    <h2 class="h2"><span class="secnum">1</span>品类拆解</h2>
+    <p class="h2-sub">什么是"Always-On AI 录音设备"、起源、当前状态、早期信号。</p>
+    <div class="h2-rule"></div>
+
+    <h3 class="h3"><span class="secnum">1.1</span>品类定义</h3>
+    <p>"Always-On AI ambient capture" 是一类<strong>佩戴或随身的小型设备</strong>,它<strong>持续被动录音/采集环境信息</strong>,通过 AI 后端转录、总结、检索,目的是"<strong>替代人类记忆 / 笔记 / 会议纪要</strong>"。和传统录音笔的根本区别:不是按需启动,而是 always-on;不是录给自己听,是 AI 总结给自己看。</p>
+    <p>形态变体:① <strong>项链 / 挂件</strong>(Friend.com, Limitless)② <strong>胸针 / 别针</strong>(Humane AI Pin)③ <strong>口袋 / 卡片 / 笔</strong>(Plaud Note, Plaud NotePin)④ <strong>手环</strong>(Bee)。这<strong>不是同一个产品的不同壳</strong>——形态决定社会接受度,决定使用场景,决定盈利模式。</p>
+
+    <h3 class="h3"><span class="secnum">1.2</span>起源叙事 · 18 个月品类时间线</h3>
+    <div class="timeline">
+      <h4>从 Humane 死亡 到 Plaud 默默赢:18 个月里发生了什么</h4>
+
+      <div class="tl-row warn">
+        <div class="tl-date">2024-04</div>
+        <div class="tl-event"><strong>Humane AI Pin 上市,$699 + $24/月</strong>市场反响极差。评测均评"无用"。订阅经济遭抵制,基本功能(查询天气、定时器)经常出错。</div>
+      </div>
+
+      <div class="tl-row warn">
+        <div class="tl-date">2024-08</div>
+        <div class="tl-event"><strong>Friend.com 项链上市,$129 一次性</strong>22 岁创始人 Avi Schiffmann。"AI 是你的朋友"叙事。$1M 广告活动遭到大量涂鸦。Wired 评"annoying personality"。</div>
+      </div>
+
+      <div class="tl-row warn">
+        <div class="tl-date">2025-02</div>
+        <div class="tl-event"><strong>Humane 停产 · HP 收购 $116M</strong>低于估值。HP 只要技术与团队,产品消失。Ars 报道"退货速度比销售快"。</div>
+      </div>
+
+      <div class="tl-row good">
+        <div class="tl-date">2025-Q3</div>
+        <div class="tl-event"><strong>Plaud Note Pro 预购 · $199</strong>4 麦克风阵列 + 30 小时电池 + 卡片大小。<strong>不戴在身上</strong> — 装口袋 / 夹衣领 / 桌面。社区活跃,n8n webhook 由用户自建。</div>
+      </div>
+
+      <div class="tl-row acq">
+        <div class="tl-date">2025-12</div>
+        <div class="tl-event"><strong>Limitless 被 Meta 收购,停止新售</strong>用户在 r/limitlessai 喊:"Dead company. Mine just got bricked." 应用慢慢失去支持。"slightly less shady Kickstarter rug pull"。</div>
+      </div>
+
+      <div class="tl-row acq">
+        <div class="tl-date">2026-01</div>
+        <div class="tl-event"><strong>Bee Pioneer 被 Amazon 收购</strong>TechCrunch hands-on:"not for pro users yet"。3 小时课程电池死;创造"Abbott Elementary 剧情记忆"等 AI 幻觉。$50 + $19/月。</div>
+      </div>
+
+      <div class="tl-row warn">
+        <div class="tl-date">2026-Q1</div>
+        <div class="tl-event"><strong>Friend.com 进 Museum of Failure</strong>CNN 头条:"How this tiny device became a symbol for the backlash against AI"。CEO 公开承认 "lobotomized" 了产品的 personality。</div>
+      </div>
+
+      <div class="tl-row good">
+        <div class="tl-date">2026-05</div>
+        <div class="tl-event"><strong>Plaud Note Pro 评为"2026 最佳 AI 录音笔"</strong>多家测评一致正面。Trustpilot 高频"genuinely useful"。<strong>但 API 18 月延期</strong>,1600 评论催 — 用户开始自建集成(n8n webhook by community)。</div>
+      </div>
+    </div>
+
+    <h3 class="h3"><span class="secnum">1.3</span>早期信号</h3>
+    <p>非存量市场没有可信的 TAM 估算。下面 4 个早期信号是<strong>品类是否真实</strong>的代理指标:</p>
+    <div class="signals">
+      <div class="signal-card">
+        <div class="lbl">巨头收购</div>
+        <div class="figure warn">3<sub>家</sub></div>
+        <div class="desc">Humane → HP / Limitless → Meta / Bee → Amazon。<strong>18 个月内 3 家被收。</strong>意味品类有人觊觎,但被收的都不是赢家。</div>
+      </div>
+      <div class="signal-card">
+        <div class="lbl">公开失败案例</div>
+        <div class="figure warn">3<sub>个</sub></div>
+        <div class="desc">Humane 退货潮、Friend.com Museum of Failure、Limitless 用户喊"bricked"。<strong>失败率 ≈ 50%。</strong></div>
+      </div>
+      <div class="signal-card">
+        <div class="lbl">活下来的玩家</div>
+        <div class="figure good">1-2<sub>家</sub></div>
+        <div class="desc">Plaud(口袋录音笔)+ Omi(小众开放)。<strong>非佩戴形态</strong>。其他都死或被收购。</div>
+      </div>
+      <div class="signal-card">
+        <div class="lbl">用户自建集成</div>
+        <div class="figure good">1,600<sub>条</sub></div>
+        <div class="desc">Plaud 用户在反馈帖催 API 1,600 条评论,然后自建 n8n webhook。<strong>真实需求 + 厂商响应慢 = 第三方机会窗口。</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== KNOWLEDGE GRAPH ===== -->
+  <section class="chapter kg-section">
+    <h2 class="h2"><span class="secnum">★</span>品类关系网络(交互式 · NON-STOCK)</h2>
+    <p class="h2-sub">玩家 · 主题 · voice · 机会区 — 灰色节点 = 已死或被收购(NON-STOCK 特征)</p>
+    <div class="h2-rule"></div>
+    <p>非存量市场的图谱特征:玩家少但其中 3/7 已经死或被巨头收编(灰色节点)。绿虚线 = 空白机会区,目前唯一在售并增长的 Plaud 系靠近这一区。</p>
+    <div class="kg-wrap">
+      <div class="kg-graph">
+        <div class="kg-controls">
+          <button class="kg-btn" id="kgReset" title="重置">↻ 重置</button>
+        </div>
+        <svg class="kg-svg" id="kgSvg" viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <aside class="kg-side" id="kgSide">
+        <div class="kg-empty">
+          ← 点击或 hover 左侧任意节点查看详情<br><br>
+          <strong style="color:var(--ink); font-family:var(--serif); font-size:14px;">读图提示</strong><br>
+          · 蓝大圆 = 在售 / 已收购玩家<br>
+          · 灰大圆 = 已死(Humane / Friend Museum)<br>
+          · 绿中圆 = 主题<br>
+          · 红小圆 = 顶帖 voice / 评测<br>
+          · 绿虚线圆 = 空白机会区
+        </div>
+      </aside>
+    </div>
+    <div class="kg-legend">
+      <div class="kg-legend-item"><span class="kg-legend-dot player"></span>在售/被收购玩家</div>
+      <div class="kg-legend-item"><span class="kg-legend-dot dead"></span>死/退场玩家</div>
+      <div class="kg-legend-item"><span class="kg-legend-dot theme"></span>主题</div>
+      <div class="kg-legend-item"><span class="kg-legend-dot voice"></span>voice / 评测</div>
+      <div class="kg-legend-item"><span class="kg-legend-dot oppor"></span>机会区</div>
+    </div>
+  </section>
+
+  <!-- ===== §2 用户洞察 ===== -->
+  <section class="chapter">
+    <h2 class="h2"><span class="secnum">2</span>用户洞察</h2>
+    <p class="h2-sub">谁在用、用什么场景、痛点信号、跨产品 voice。</p>
+    <div class="h2-rule"></div>
+
+    <h3 class="h3"><span class="secnum">2.1</span>三类假设性用户(待验证)</h3>
+    <div class="personas">
+      <div class="persona">
+        <span class="ptag">推测 · 待验证</span>
+        <h4>知识工作者 / 会议密集型</h4>
+        <p class="summary">咨询师 / 法律 / 销售 / 学术,日均 3+ 会议。</p>
+        <div class="row"><div class="k">买点</div><div>"我不想再边开会边记笔记"</div></div>
+        <div class="row"><div class="k">场景</div><div>会议、客户访谈、备审、法庭证据准备</div></div>
+        <div class="row"><div class="k">付费</div><div>高($200+硬件 + $20/月可接受)</div></div>
+        <div class="row"><div class="k">证据</div><div>Plaud 社区高频"博士项目"、"临床培训"、"法庭证据"用例</div></div>
+      </div>
+
+      <div class="persona">
+        <span class="ptag">推测 · 待验证</span>
+        <h4>记忆辅助 / 失忆焦虑型</h4>
+        <p class="summary">早期阿尔茨海默 / ADHD / 高压人群。</p>
+        <div class="row"><div class="k">买点</div><div>"我想'再'听到那段对话"</div></div>
+        <div class="row"><div class="k">场景</div><div>家庭对话、孩子第一句话、长期回忆检索</div></div>
+        <div class="row"><div class="k">付费</div><div>中高,但极度厌恶巨头数据收集</div></div>
+        <div class="row"><div class="k">证据</div><div>Limitless 评测:"听到女儿第一次说 I love you,几天后找到录音"</div></div>
+      </div>
+
+      <div class="persona">
+        <span class="ptag">推测 · 待验证</span>
+        <h4>Quantified Self / 个人助理控</h4>
+        <p class="summary">追求"second brain"、Obsidian / Notion 重度用户。</p>
+        <div class="row"><div class="k">买点</div><div>"把日常输入自动喂给我的知识库"</div></div>
+        <div class="row"><div class="k">场景</div><div>个人日志、灵感捕捉、技术学习</div></div>
+        <div class="row"><div class="k">付费</div><div>中,但要求 API / 集成 / 数据导出</div></div>
+        <div class="row"><div class="k">证据</div><div>r/PlaudNote 多帖讨论 Obsidian / n8n / Claude 集成工作流</div></div>
+      </div>
+    </div>
+
+    <h3 class="h3"><span class="secnum">2.2</span>用户原话精选 · 跨玩家 + 跨数据源(点击展开)</h3>
+    <div style="margin: 14px 0; padding: 12px 16px; background: var(--bg-warm); font-family: var(--mono); font-size: 11px; line-height: 1.7; color: var(--muted); letter-spacing: 0.02em;">
+      <strong style="color: var(--ink);">样本透明度 · </strong>NON-STOCK 模式下,r/PlaudNote 是唯一有真实用户日常讨论的 sub;r/limitlessai 数据稀疏(产品已停售)。其他玩家(Friend / Bee / Humane)的真实用户原话主要来自<strong>评测博客 + Twitter + Fortune / CNN / Wired 报道</strong>,而非自有社区。下表已用"用户" / "评测" / "创始人" 三种 source-type 区分。
+    </div>
+
+    <div class="toggle-bar">
+      <button class="toggle-btn" onclick="document.querySelectorAll('.voice-table details').forEach(d=>d.open=true)">全部展开</button>
+      <button class="toggle-btn" onclick="document.querySelectorAll('.voice-table details').forEach(d=>d.open=false)">全部收起</button>
+      <span class="toggle-hint">9 行 · 4 类来源 · 5 个玩家</span>
+    </div>
+
+    <!-- ===== FILTER BAR · VOICE TABLE ===== -->
+    <div class="filter-bar" data-filter-target=".voice-table">
+      <span class="fb-lbl">产品</span>
+      <button class="filter-chip active" data-filter-group="player" data-filter-value="all">全部</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Plaud">Plaud</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Limitless">Limitless</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Friend">Friend</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Bee">Bee</button>
+      <span class="fb-lbl" style="margin-left:8px;">情绪</span>
+      <button class="filter-chip active" data-filter-group="sent" data-filter-value="all">全部</button>
+      <button class="filter-chip pos" data-filter-group="sent" data-filter-value="pos">● 正面</button>
+      <button class="filter-chip neg" data-filter-group="sent" data-filter-value="neg">● 负面</button>
+      <input type="search" class="filter-search" placeholder="搜索原文或主题..." data-filter-search>
+      <span class="filter-count" data-filter-count>9 / 9</span>
+    </div>
+
+    <div class="dt-wrap voice-table">
+      <div class="dt-head">
+        <div>产品</div>
+        <div>用户原话主题</div>
+        <div>来源类型 / 时间</div>
+        <div style="text-align:right;">分数</div>
+        <div></div>
+      </div>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">Plaud</span>
+          <span class="dt-title">"30 小时电池 + 4 麦克风 + 卡片大小 · 2026 最佳"</span>
+          <span class="dt-meta">评测 / Krisp.ai / 2026-Q1</span>
+          <span class="dt-num">评测</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"The Plaud Note Pro is the best overall AI note taking device in 2026 for most users. Its four-microphone array, 30-hour battery, and ultra-thin design make it the most capable pocket recorder available."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"Plaud Note Pro 是 2026 年面向大多数用户最佳的 AI 笔记设备。四麦克风阵列 + 30 小时电池 + 超薄设计,是当前最强的口袋录音设备。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">这条是<strong>品类胜出叙事</strong>。注意三个特征:口袋形态(不戴脖子)+ 硬件参数扎实(不是 AI 噱头)+ 多家媒体一致口径(不是单一软文)。这是非存量市场里"已经形成共识的胜出形态"的典型信号。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://krisp.ai/blog/best-ai-note-taking-devices/">Krisp.ai · 2026 AI 录音设备评测</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">Plaud</span>
+          <span class="dt-title">"18 个月催 API 无果,自建 n8n webhook"</span>
+          <span class="dt-meta">用户 / r/PlaudNote / 2025-Q4</span>
+          <span class="dt-num">5</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"It's been 18 months since Plaud said they were working on API support and there are 1,600 comments on the feedback thread asking for it. I was tired of waiting, so I built webhook support for Plaud so it can be hooked up to n8n or any other custom integration."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"Plaud 说在做 API 支持已经 18 个月了,反馈帖下有 1600 条评论催。我等不及了,自己写了 webhook 让 Plaud 能接 n8n 和别的自定义集成。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig"><strong>典型的"赢家创造的开口"</strong>。Plaud 硬件赢了,但 API / 后端集成做不出来 → 用户自建。这正是新进入者的入场口:不做硬件,做"Plaud-compatible 集成 + 工作流 + 后端"层。1,600 评论是真实需求量化信号。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/PlaudNote/comments/1sj4oi1/n8n_support_for_plaud_i/">r/PlaudNote · n8n 集成自建</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">Plaud</span>
+          <span class="dt-title">"电话录音作为法庭证据"</span>
+          <span class="dt-meta">用户 / r/PlaudNote / 2026-Q1</span>
+          <span class="dt-num">2</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"I have recorded a telephone conversation with a company and would like to use this recording as legal evidence to strengthen my case. The recording was made lawfully and may be used for legal purposes. I am currently using Plaud Note Pro, but I am unsure what template…"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"我用 Plaud Note Pro 录了一通和公司的电话,想用作法律证据强化我的案子。录音是合法的,可以作为法庭证据。但我不确定用哪种模板…"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">"法庭证据"用例频繁出现在 Plaud 社区。这暗示一个被忽视的 vertical:<strong>法律 / 合规级转录</strong>(timestamps + 说话人识别 + 元数据 metadata + 防篡改链)。Plaud 没专门做,新进入者可以切。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/PlaudNote/comments/1pyjj1g/what_template_for_legal/">r/PlaudNote · 法律证据模板</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot dead">Limitless</span>
+          <span class="dt-title">"Mine just got bricked · Dead company"</span>
+          <span class="dt-meta">用户 / r/limitlessai / 2025-12</span>
+          <span class="dt-num">2</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"No point. Dead company. They sold to meta. The apps slowly failing with no more support. The playback is erroring out. This was a slightly less shady Kickstarter rug pull type deal. Fk this company." · "Mine just got bricked."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"没意义。死公司。他们卖给 meta 了。app 慢慢崩,没人支持了,回放也出错。这本质上是个'稍微干净点的众筹跑路'。去他妈的。" · "我的刚 brick 掉了。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig"><strong>巨头收购对用户来说不是好消息。</strong>Limitless 被 Meta 收购后,产品停止开发,用户感觉"被 rug pull"。这是新进入者的<strong>反向叙事素材</strong>:"我们不会卖给巨头丢下你"是有共鸣的卖点(类似 Signal vs WhatsApp 叙事)。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/limitlessai/comments/1pihggx/looking_for_two_limit/">r/limitlessai · post-acquisition 用户反弹</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">Limitless</span>
+          <span class="dt-title">"听到女儿第一次说 I love you,几天后找到录音"</span>
+          <span class="dt-meta">评测 / jock.pl 博客 / 2025-Q4</span>
+          <span class="dt-num">评测</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"A user heard his daughter say 'I love you' for the first time, forgot he was wearing the pendant, and found the recording days later."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"一位用户听到女儿第一次说'I love you',当时忘了自己戴着这个挂件,几天后找到了录音。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">这是品类的"救命叙事"等价物——一个<strong>足够强的情感锚点</strong>足以让用户接受所有缺点。健康戒指有"Oura saved my life",录音设备有"caught my daughter's first I love you"。新进入者要找的就是这个层级的 emotional jobs-to-be-done。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://thoughts.jock.pl/p/voice-ai-hardware-limitless-pendant-real-world-review-automation-experiments">jock.pl · Limitless 一年实测</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">Friend</span>
+          <span class="dt-title">"It's like wearing your senile, anxious grandmother around your neck"</span>
+          <span class="dt-meta">评测 / Fortune / 2025-10</span>
+          <span class="dt-num">评测</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"I tried the viral AI 'Friend' necklace everyone's talking about — and it's like wearing your senile, anxious grandmother around your neck. … When a user tried to ask the pendant for advice during a difficult moment, it asked them to explain what happened — it had only caught 'fragments.'"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"我试了大家在讨论的那条爆款 AI'Friend'项链——感觉像挂着一个老年痴呆 + 焦虑症的奶奶在脖子上。…… 用户在情绪低谷时向项链求助,它问'发生了什么',因为它只听到了'片段'。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig"><strong>主流媒体 Fortune 用这种调侃语气写产品评测,信号意义大于内容。</strong>Friend.com 没在和竞品争——它在和"AI 是不是好东西"这个公共问题争,而且输了。新进入者必须避免被卷入这场叙事战:不做"AI 朋友"做"AI 工具",不做项链做口袋设备。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://fortune.com/2025/10/03/friend-ai-necklace-review-avi-schiffmann/">Fortune · Friend AI 项链评测</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">Friend</span>
+          <span class="dt-title">"AI is not your friend" — 广告被涂鸦</span>
+          <span class="dt-meta">公共反应 / CNN / 2025-11</span>
+          <span class="dt-num">CNN</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"Posters for AI companionship were vandalized with messages like 'AI is not your friend' and 'Stop profiting off of loneliness.' How this tiny device became a symbol for the backlash against AI."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"AI 陪伴的广告海报被涂鸦上 'AI is not your friend' 和 'Stop profiting off of loneliness'。这枚小设备如何变成了'反 AI 浪潮'的象征。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig"><strong>"AI 戴在身上"这件事在公共空间是有抵抗的。</strong>不仅是 Friend——任何可见的 AI 录音项链 / 胸针都会触发"你在录我吗 / AI 是不是好东西"这两层社会摩擦。这是<strong>形态级别</strong>的死亡之吻,不是营销问题。Plaud 之所以活,是因为<em>看不见</em>。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.cnn.com/2025/11/16/tech/friend-ai-device-backlash-ceo-avi-schiffmann">CNN · AI 抵抗叙事 · 2025-11</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">Bee</span>
+          <span class="dt-title">"3 小时课程电池死;创造 Abbott Elementary 剧情记忆"</span>
+          <span class="dt-meta">评测 / TechCrunch / 2026-01</span>
+          <span class="dt-num">评测</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"One user reported that the device died during a 3-hour lecture and switched to an alternative. … Bee created what reviewers call 'fanfiction' based on background TV shows and music, such as assuming a plot from Abbott Elementary was a personal memory."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"一位用户报告设备在 3 小时课程中电池死,换了别的产品。…… Bee 会基于背景电视声和音乐'创作 fanfiction',比如把 Abbott Elementary 的剧情当作用户的个人记忆。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig"><strong>AI 幻觉在 always-on 场景下是品类杀手</strong>——把背景电视当成"用户记忆"。这是核心 trust 问题:如果设备记错了关键事实,用户就再也无法信任它。新进入者的 R&D 重点必须包括"<em>知道自己不知道</em>"的能力(uncertainty awareness)而不是更多 transcription。Bee 被 Amazon 收购也救不了这个 PMF 问题。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://techcrunch.com/2026/01/12/hands-on-with-bee-amazons-latest-ai-wearable/">TechCrunch · Bee hands-on 2026</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">Otter.ai</span>
+          <span class="dt-title">"Otter bot recording meetings without consent · 619 HN 赞"</span>
+          <span class="dt-meta">用户 / Hacker News / 2022(仍高度相关)</span>
+          <span class="dt-num">612</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"Tell HN: Otter.ai bot recording meetings without consent. I occasionally use Otter.ai to transcribe when I'm multitasking. Recently they made an update, which I carefully opted out of, to automatically join every meeting through my Google Calendar and transcribe it. Screenshots prove I had th[is opt-out]…"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"告诉 HN:Otter.ai 在我没同意的情况下加入会议录音。我偶尔用 Otter 转录,但他们最近的一次更新——我明确退订过的——自动通过 Google Calendar 加入我的所有会议并转录。我有截图证明我已退订。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">关键启示</span><p class="dt-sig">虽然是软件级例子,但<strong>映射到硬件录音设备一样致命</strong>。Always-on 设备的核心信任契约是"我对录音过程有完全控制"——任何"自动加入 / 默认开启 / 不可关"功能都会引发集体抵制。新进入者的产品设计必须把<strong>显式 consent UX</strong>作为第一公民,不是事后补救。</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://news.ycombinator.com/item?id=32751071">HN · Otter.ai 同意问题 · 612 赞</a></p></div>
+        </div>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- ===== §3 竞品全景 + 失败案例 ===== -->
+  <section class="chapter" id="sec-clean">
+    <h2 class="h2"><span class="secnum">3</span>竞品全景 + 失败案例对比</h2>
+    <p class="h2-sub">玩家定位 · 早期评测聚合 · 失败案例诊断 — 非存量市场比"市场份额"更重要的是"谁还活着"。</p>
+    <div class="h2-rule"></div>
+
+    <h3 class="h3"><span class="secnum">3.1</span>玩家定位与当前状态</h3>
+    <table class="fail-table">
+      <thead>
+        <tr><th>玩家</th><th>主力产品</th><th>定价</th><th>形态</th><th>当前状态</th><th>核心问题 / 优势</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Plaud</td>
+          <td>Note Pro / NotePin</td>
+          <td>$169-199</td>
+          <td>口袋 / 卡片 / 笔</td>
+          <td><span class="tag live">在售 · 增长</span></td>
+          <td>30h 电池 + 4 麦 · 隐形 = 社会摩擦小 · API 延迟 18 月</td>
+        </tr>
+        <tr>
+          <td>Limitless</td>
+          <td>Pendant</td>
+          <td>$199(已停售)</td>
+          <td>项链</td>
+          <td><span class="tag acq">Meta 收购 · 停售</span></td>
+          <td>2025-12 被 Meta 收。用户喊"bricked",app 慢慢失效。</td>
+        </tr>
+        <tr>
+          <td>Bee</td>
+          <td>Pioneer</td>
+          <td>$50 + $19/月</td>
+          <td>手环</td>
+          <td><span class="tag acq">Amazon 收购</span></td>
+          <td>$50 硬件 + 强订阅。AI 幻觉(Abbott Elementary 案例)。续航虚标。</td>
+        </tr>
+        <tr>
+          <td>Friend</td>
+          <td>Friend Pendant</td>
+          <td>$129</td>
+          <td>项链</td>
+          <td><span class="tag live">在售 · 公开崩坏</span></td>
+          <td>"Museum of Failure"入选。CEO 承认"lobotomized"了 AI。广告被涂鸦。</td>
+        </tr>
+        <tr>
+          <td>Humane</td>
+          <td>AI Pin</td>
+          <td>$699 + $24/月</td>
+          <td>胸针</td>
+          <td><span class="tag dead">2025-02 停产</span></td>
+          <td>HP 收购仅 $116M(低于估值)。退货比销售快。</td>
+        </tr>
+        <tr>
+          <td>Omi AI</td>
+          <td>Omi</td>
+          <td>$89 (开源硬件)</td>
+          <td>项链(开放)</td>
+          <td><span class="tag live">小众 · 在售</span></td>
+          <td>开源硬件路线 · 让用户接自己的 AI 后端。社区小但忠诚。</td>
+        </tr>
+        <tr>
+          <td>Avi</td>
+          <td>recording necklace</td>
+          <td>~$200</td>
+          <td>项链</td>
+          <td><span class="tag live">小众</span></td>
+          <td>简化版录音项链 · 不带 AI 后端 · 主打硬件简单。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="h3"><span class="secnum">3.2</span>早期评测聚合 · 主流媒体怎么说(点击展开)</h3>
+    <div style="margin: 12px 0; padding: 12px 16px; background: var(--bg-warm); font-family: var(--mono); font-size: 11px; line-height: 1.7; color: var(--muted); letter-spacing: 0.02em;">
+      <strong style="color: var(--ink);">数据透明度 · </strong>NON-STOCK 模式下,大部分产品没有 Amazon 评论页(DTC 销售为主),改用<strong>主流科技媒体评测 + Trustpilot + 厂商社区 + 时事媒体</strong>混合源。来源类型用 tag 区分:<code>评测</code>(测评博客 / TechCrunch / The Verge)<code>报道</code>(Fortune / CNN / Wired)<code>用户</code>(Reddit / Trustpilot)<code>创始人</code>(采访 / 公开声明)。
+    </div>
+    <div class="toggle-bar">
+      <button class="toggle-btn" onclick="document.querySelectorAll('.mkt-table details').forEach(d=>d.open=true)">全部展开</button>
+      <button class="toggle-btn" onclick="document.querySelectorAll('.mkt-table details').forEach(d=>d.open=false)">全部收起</button>
+      <span class="toggle-hint">4 正 + 6 负 · 跨 5 玩家 + 4 类来源</span>
+    </div>
+
+    <!-- ===== FILTER BAR · MARKETPLACE TABLE ===== -->
+    <div class="filter-bar" data-filter-target=".mkt-table">
+      <span class="fb-lbl">产品</span>
+      <button class="filter-chip active" data-filter-group="player" data-filter-value="all">全部</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Plaud">Plaud</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Limitless">Limitless</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Friend">Friend</button>
+      <button class="filter-chip" data-filter-group="player" data-filter-value="Bee">Bee</button>
+      <span class="fb-lbl" style="margin-left:8px;">评价</span>
+      <button class="filter-chip active" data-filter-group="sent" data-filter-value="all">全部</button>
+      <button class="filter-chip pos" data-filter-group="sent" data-filter-value="pos">● 好评</button>
+      <button class="filter-chip neg" data-filter-group="sent" data-filter-value="neg">● 差评</button>
+      <input type="search" class="filter-search" placeholder="搜索主题或来源..." data-filter-search>
+      <span class="filter-count" data-filter-count>10 / 10</span>
+    </div>
+
+    <div class="dt-wrap mkt-table">
+      <div class="dt-head">
+        <div>评价</div>
+        <div>主题</div>
+        <div>产品</div>
+        <div>关键数据</div>
+        <div>来源</div>
+        <div></div>
+      </div>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">好评</span>
+          <span class="dt-title">硬件 + 转录质量(2026 公认最佳)</span>
+          <span class="dt-meta">Plaud Note Pro</span>
+          <span class="dt-meta">30h / 4 麦</span>
+          <span class="dt-meta">Krisp / 评测</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"The Plaud Note Pro is the best overall AI note taking device in 2026 … its four-microphone array, 30-hour battery, and ultra-thin design make it the most capable pocket recorder available."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"Plaud Note Pro 是 2026 年综合最佳的 AI 笔记设备 …… 4 麦克风 + 30 小时电池 + 超薄设计,最强口袋录音器。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://krisp.ai/blog/best-ai-note-taking-devices/">Krisp · 2026 最佳 AI 录音设备</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">好评</span>
+          <span class="dt-title">Trustpilot 高频 "genuinely useful"</span>
+          <span class="dt-meta">Plaud</span>
+          <span class="dt-meta">"saves real time"</span>
+          <span class="dt-meta">Trustpilot / 用户</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"The AI output saves real time if you record regularly. Users find they're able to listen attentively because they know it will be recorded and can analyze it later."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"如果你经常录,AI 输出真的省时间。用户反映因为知道会被录下来可以之后再分析,所以能更专心听。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.trustpilot.com/review/plaud.ai">Trustpilot · plaud.ai</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">好评</span>
+          <span class="dt-title">"听到女儿第一次说 I love you"</span>
+          <span class="dt-meta">Limitless Pendant</span>
+          <span class="dt-meta">情感锚点</span>
+          <span class="dt-meta">jock.pl / 评测</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"A user heard his daughter say 'I love you' for the first time, forgot he was wearing the pendant, and found the recording days later."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"用户听到女儿第一次说'I love you',忘了戴着挂件,几天后找到了录音。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://thoughts.jock.pl/p/voice-ai-hardware-limitless-pendant-real-world-review-automation-experiments">jock.pl · Limitless 一年实测</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot pos">好评</span>
+          <span class="dt-title">"被动捕获层 · 替换了 patchwork 笔记应用"</span>
+          <span class="dt-meta">Limitless</span>
+          <span class="dt-meta">use case 替代</span>
+          <span class="dt-meta">jock.pl / 评测</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"A passive capture layer that quietly replaced a patchwork of note apps, meeting bots, and awkward follow-up emails."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"一个被动捕获层,悄悄取代了一堆笔记 app、会议 bot 和尴尬的后续邮件。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://thoughts.jock.pl/p/voice-ai-hardware-limitless-pendant-real-world-review-automation-experiments">jock.pl · Limitless 一年实测</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">"AI is not your friend" 广告涂鸦</span>
+          <span class="dt-meta">Friend.com</span>
+          <span class="dt-meta">公共反应</span>
+          <span class="dt-meta">CNN / 报道</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"Posters for AI companionship were vandalized with messages like 'AI is not your friend' and 'Stop profiting off of loneliness.'"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"AI 陪伴的广告海报被涂鸦上'AI is not your friend'和'Stop profiting off of loneliness'。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.cnn.com/2025/11/16/tech/friend-ai-device-backlash-ceo-avi-schiffmann">CNN · 2025-11</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">"像戴一个老年痴呆 + 焦虑的奶奶在脖子上"</span>
+          <span class="dt-meta">Friend.com</span>
+          <span class="dt-meta">主流媒体调侃</span>
+          <span class="dt-meta">Fortune / 报道</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"I tried the viral AI 'Friend' necklace — and it's like wearing your senile, anxious grandmother around your neck."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"我试了这条爆款 AI'Friend'项链,感觉像在脖子上挂了一个老年痴呆 + 焦虑症的奶奶。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://fortune.com/2025/10/03/friend-ai-necklace-review-avi-schiffmann/">Fortune · Friend AI 项链评测</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">"创造 Abbott Elementary 剧情记忆 · AI 幻觉"</span>
+          <span class="dt-meta">Bee Pioneer</span>
+          <span class="dt-meta">AI 幻觉</span>
+          <span class="dt-meta">TechCrunch / 评测</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"Bee created what reviewers call 'fanfiction' based on background TV shows and music, such as assuming a plot from Abbott Elementary was a personal memory to remember."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"Bee 会基于背景电视和音乐'创作 fanfiction',比如把 Abbott Elementary 的剧情当作用户的个人记忆。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://techcrunch.com/2026/01/12/hands-on-with-bee-amazons-latest-ai-wearable/">TechCrunch · Bee hands-on</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">"3 小时课程电池死 · 续航虚标"</span>
+          <span class="dt-meta">Bee Pioneer</span>
+          <span class="dt-meta">7d 宣传 / 1.5d 实际</span>
+          <span class="dt-meta">UMEVO / 评测</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"The device died during a 3-hour lecture and switched to an alternative for school. Real-world testing suggests heavy users achieve only 1.5 to 2 days maximum when active listening is engaged."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"设备在 3 小时课程中电池死了,换了别的产品上学用。实测显示重度用户的电池只能撑 1.5-2 天,active 监听开启的话。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.umevo.ai/blogs/ume-all-posts/bee-ai-pendant-complete-review-features-battery-life-and-pricing-2026">UMEVO · Bee 完整测评</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">"Mine just got bricked · 死公司"</span>
+          <span class="dt-meta">Limitless</span>
+          <span class="dt-meta">acquired → 用户被坑</span>
+          <span class="dt-meta">r/limitlessai / 用户</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"No point. Dead company. They sold to meta. The apps slowly failing with no more support … Mine just got bricked."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"没意义。死公司。卖给 meta 了。app 慢慢崩,没人支持 …… 我的刚 brick 掉。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://www.reddit.com/r/limitlessai/comments/1pihggx/looking_for_two_limit/">r/limitlessai · 收购后用户反弹</a></p></div>
+        </div>
+      </details>
+
+      <details class="drow">
+        <summary>
+          <span class="sent-dot neg">差评</span>
+          <span class="dt-title">"surveillance waiver onboarding"</span>
+          <span class="dt-meta">Friend</span>
+          <span class="dt-meta">biometric data 条款</span>
+          <span class="dt-meta">Fortune / 报道</span>
+          <span class="dt-exp">+</span>
+        </summary>
+        <div class="dt-body">
+          <div class="dt-lang-row"><span class="dt-lang-lbl">English</span><p class="dt-en">"Friend's terms force disputes into arbitration in San Francisco and bury clauses about 'biometric data consent,' giving the company permission to collect audio, video, and voice data — and to use it to train AI. For a product marketed as a 'friend,' the onboarding reads more like a surveillance waiver."</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">中文</span><p class="dt-cn">"Friend 的条款强制所有争议进入旧金山仲裁,并埋了'生物特征数据同意'条款,授权公司收集音频、视频、语音数据,并用于训练 AI。对一个号称'朋友'的产品来说,onboarding 读起来像一份'监控授权书'。"</p></div>
+          <div class="dt-lang-row"><span class="dt-lang-lbl">来源</span><p class="dt-src"><a href="https://fortune.com/2025/10/03/friend-ai-necklace-review-avi-schiffmann/">Fortune · Friend 条款分析</a></p></div>
+        </div>
+      </details>
+    </div>
+
+    <h3 class="h3"><span class="secnum">3.3</span>失败案例对比 · 三家死法</h3>
+    <table class="fail-table">
+      <thead>
+        <tr><th>产品</th><th>死亡 / 收购时间</th><th>失败模式</th><th>共享前提(新进入者不要复用)</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Humane AI Pin</td>
+          <td>2025-02 停产 · HP $116M</td>
+          <td>硬件不可靠 + 订阅过重 + 无生态</td>
+          <td>"独立 AI 设备替代手机" · 形态难看 · $24/月 · 没 app store</td>
+        </tr>
+        <tr>
+          <td>Limitless Pendant</td>
+          <td>2025-12 · Meta 收购停售</td>
+          <td>plug-pulled · 用户感觉被弃</td>
+          <td>"被收购"是早期硬件公司的默认结局 · 没退出策略对用户友好</td>
+        </tr>
+        <tr>
+          <td>Friend.com</td>
+          <td>持续中,但已 Museum of Failure</td>
+          <td>社会接受度危机 + AI 性格问题</td>
+          <td>"AI 是你的朋友"叙事 + 项链可见形态 + creator-modeled AI personality</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top: 14px;"><strong>三家共享的死前提:</strong>① <strong>新形态 + 高可见度</strong>(用户必须戴在身上让别人看到);② <strong>"AI 替代某种关系"的高叙事野心</strong>(替代手机 / 朋友 / 助手),野心越大,失败越响;③ <strong>没有合理的"什么时候关掉它"的物理设计</strong>(always-on 但没有显著的 on/off 状态指示)。</p>
+  </section>
+
+  <!-- ===== §4 机会缝隙 ===== -->
+  <section class="chapter" id="sec-analyze">
+    <h2 class="h2"><span class="secnum">4</span>机会缝隙与切入策略</h2>
+    <p class="h2-sub">玩家位置图 · 三种可能形态 · 推荐切入点。</p>
+    <div class="h2-rule"></div>
+
+    <h3 class="h3"><span class="secnum">4.1</span>定位散点图 · 现有玩家分布</h3>
+    <p>用<strong>形态社会接受度(X)× AI 能力交付(Y)</strong>把玩家定位。右上是机会区。</p>
+
+    <div class="positioning-chart">
+      <svg viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto; background:#fff; display:block;">
+        <defs>
+          <pattern id="grid2" width="56" height="38" patternUnits="userSpaceOnUse">
+            <path d="M 56 0 L 0 0 0 38" fill="none" stroke="#eee" stroke-width="0.5"/>
+          </pattern>
+          <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+            <polygon points="0 0, 9 4, 0 8" fill="#14532d"/>
+          </marker>
+        </defs>
+        <rect x="100" y="40" width="560" height="380" fill="url(#grid2)"/>
+
+        <!-- OPPORTUNITY zone -->
+        <rect x="440" y="60" width="200" height="160" fill="#ecf3ef" stroke="#14532d" stroke-width="1" stroke-dasharray="4 3"/>
+        <text x="540" y="92" fill="#14532d" font-family="PingFang SC,sans-serif" font-size="13" font-weight="700" text-anchor="middle">★ 机会区</text>
+        <text x="540" y="110" fill="#14532d" font-family="PingFang SC,sans-serif" font-size="11" text-anchor="middle">高社会接受度 + 端到端 AI 栈</text>
+        <text x="540" y="126" fill="#14532d" font-family="PingFang SC,sans-serif" font-size="11" text-anchor="middle">"看不见的录音 + 法律级转录"</text>
+
+        <line x1="380" y1="40" x2="380" y2="420" stroke="#bbb" stroke-width="1" stroke-dasharray="2 4"/>
+        <line x1="100" y1="230" x2="660" y2="230" stroke="#bbb" stroke-width="1" stroke-dasharray="2 4"/>
+        <line x1="100" y1="420" x2="660" y2="420" stroke="#111" stroke-width="1.5"/>
+        <line x1="100" y1="40" x2="100" y2="420" stroke="#111" stroke-width="1.5"/>
+
+        <text x="105" y="442" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11">高可见</text>
+        <text x="220" y="442" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11">项链</text>
+        <text x="350" y="442" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11">胸针</text>
+        <text x="480" y="442" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11">手环</text>
+        <text x="630" y="442" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11">口袋 / 笔</text>
+        <text x="380" y="470" fill="#111" font-family="PingFang SC,sans-serif" font-size="12" font-weight="600" text-anchor="middle">形态社会接受度(可见度 →)</text>
+
+        <text x="92" y="423" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11" text-anchor="end">无 AI</text>
+        <text x="92" y="335" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11" text-anchor="end">基础转录</text>
+        <text x="92" y="232" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11" text-anchor="end">AI 总结</text>
+        <text x="92" y="140" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11" text-anchor="end">智能检索 + 集成</text>
+        <text x="92" y="50" fill="#5a606a" font-family="SFMono-Regular,monospace" font-size="11" text-anchor="end">端到端栈</text>
+        <text transform="translate(40,230) rotate(-90)" fill="#111" font-family="PingFang SC,sans-serif" font-size="12" font-weight="600" text-anchor="middle">AI 能力交付 →</text>
+
+        <text x="118" y="58" fill="#aaa" font-family="SFMono-Regular,monospace" font-size="10" letter-spacing="0.06em">可见 · 强 AI</text>
+        <text x="642" y="58" fill="#aaa" font-family="SFMono-Regular,monospace" font-size="10" letter-spacing="0.06em" text-anchor="end">隐形 · 强 AI ★</text>
+        <text x="118" y="410" fill="#aaa" font-family="SFMono-Regular,monospace" font-size="10" letter-spacing="0.06em">可见 · 弱 AI(死区)</text>
+        <text x="642" y="410" fill="#aaa" font-family="SFMono-Regular,monospace" font-size="10" letter-spacing="0.06em" text-anchor="end">隐形 · 弱 AI</text>
+
+        <!-- ====== PLAYERS ====== -->
+        <!-- Humane AI Pin: visible (chest pin), low AI -->
+        <g>
+          <circle cx="290" cy="385" r="8" fill="#9aa0aa" stroke="#9aa0aa" stroke-width="2" stroke-dasharray="2 2" opacity="0.55"/>
+          <text x="305" y="380" fill="#5a606a" font-family="PingFang SC,sans-serif" font-size="11">Humane AI Pin · $699 · 已死</text>
+          <line x1="282" y1="377" x2="298" y2="393" stroke="#5a606a" stroke-width="1"/>
+          <line x1="298" y1="377" x2="282" y2="393" stroke="#5a606a" stroke-width="1"/>
+        </g>
+
+        <!-- Friend.com: visible (necklace), low AI (lobotomized) -->
+        <g>
+          <circle cx="225" cy="320" r="9" fill="#c2410c" stroke="#fff" stroke-width="2"/>
+          <text x="240" y="316" fill="#111" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600">Friend.com · $129</text>
+          <text x="240" y="330" fill="#c2410c" font-family="PingFang SC,sans-serif" font-size="10">Museum of Failure · 持续崩坏</text>
+        </g>
+
+        <!-- Limitless: necklace, mid AI -->
+        <g>
+          <circle cx="245" cy="200" r="10" fill="#1e4d8a" stroke="#fff" stroke-width="2" stroke-dasharray="3 2"/>
+          <text x="260" y="196" fill="#111" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600">Limitless · $199</text>
+          <text x="260" y="210" fill="#1e4d8a" font-family="PingFang SC,sans-serif" font-size="10">Meta 收购 · 已停售</text>
+        </g>
+
+        <!-- Bee: bracelet (medium visibility), mid AI -->
+        <g>
+          <circle cx="450" cy="285" r="9" fill="#1e4d8a" stroke="#fff" stroke-width="2" stroke-dasharray="3 2"/>
+          <text x="465" y="280" fill="#111" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600">Bee Pioneer · $50</text>
+          <text x="465" y="294" fill="#1e4d8a" font-family="PingFang SC,sans-serif" font-size="10">Amazon 收购 · AI 幻觉</text>
+        </g>
+
+        <!-- Omi: necklace, mid AI, open source -->
+        <g>
+          <circle cx="280" cy="245" r="7" fill="#5a606a" stroke="#fff" stroke-width="2"/>
+          <text x="295" y="248" fill="#111" font-family="PingFang SC,sans-serif" font-size="11">Omi · $89 · 开源</text>
+        </g>
+
+        <!-- Avi: necklace, low AI -->
+        <g>
+          <circle cx="220" cy="365" r="6" fill="#9aa0aa" stroke="#fff" stroke-width="2"/>
+          <text x="235" y="368" fill="#111" font-family="PingFang SC,sans-serif" font-size="11">Avi · ~$200</text>
+        </g>
+
+        <!-- Plaud Note Pro: pocket (low visibility = high accept), strong AI -->
+        <g>
+          <circle cx="600" cy="190" r="12" fill="#14532d" stroke="#fff" stroke-width="2"/>
+          <text x="615" y="187" fill="#111" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600">Plaud Note Pro · $199</text>
+          <text x="615" y="201" fill="#14532d" font-family="PingFang SC,sans-serif" font-size="10">在售 · 2026 公认最佳 · 30h</text>
+        </g>
+
+        <!-- Plaud Note (基础款) -->
+        <g>
+          <circle cx="610" cy="245" r="8" fill="#14532d" stroke="#fff" stroke-width="2"/>
+          <text x="625" y="248" fill="#111" font-family="PingFang SC,sans-serif" font-size="11">Plaud NotePin · $169</text>
+        </g>
+
+        <!-- Ideal position: pocket + 端到端 (上方机会区) -->
+        <g>
+          <circle cx="585" cy="120" r="11" fill="none" stroke="#14532d" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <text x="585" y="106" fill="#14532d" font-family="PingFang SC,sans-serif" font-size="11" font-weight="600" text-anchor="middle">"新进入者应在这里"</text>
+          <text x="585" y="148" fill="#14532d" font-family="PingFang SC,sans-serif" font-size="10" text-anchor="middle">隐形形态 + 法律级 + 端到端</text>
+        </g>
+
+        <!-- Arrow: Plaud current → opportunity -->
+        <line x1="600" y1="178" x2="588" y2="135" stroke="#14532d" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrowhead2)"/>
+
+      </svg>
+
+      <div class="chart-legend">
+        <div class="lg-row"><span class="lg-dot" style="background:#14532d;"></span><span>Plaud 系 · 当前实质上的赢家 · 隐形形态</span></div>
+        <div class="lg-row"><span class="lg-dot" style="background:#1e4d8a; border:2px dashed; background:transparent;"></span><span>已被巨头收购 · 用户层面"被弃"</span></div>
+        <div class="lg-row"><span class="lg-dot" style="background:#c2410c;"></span><span>持续公开崩坏 · Museum of Failure</span></div>
+        <div class="lg-row"><span class="lg-dot" style="background:#9aa0aa;"></span><span>已死 / 小众边缘</span></div>
+        <div class="lg-row"><span class="lg-dot lg-ring" style="border-color:#14532d;"></span><span>新进入者推荐位置 · 绿虚线箭头从 Plaud 当前 → 应去位置</span></div>
+      </div>
+
+      <div class="chart-caption"><strong>读图:</strong>5 家"可见形态"玩家集中在左半边,要么死要么被收购。<strong>右上的"隐形 + 强 AI"区只有 Plaud 系一家。</strong>Plaud 已经走到这一格,但 API / 端到端集成做得慢(18 月没出 API,用户自建 n8n)。机会区是再往上一格:同样隐形形态 + 法律级 / 集成完整 / 端到端栈。Plaud 自己应该走过去,但还没。新进入者可以走 Plaud 当前位置之上、之外的差异化路径。</div>
+    </div>
+
+    <h3 class="h3"><span class="secnum">4.2</span>三种可能的产品形态 + 各自的 win condition</h3>
+    <p>非存量市场的"切入策略"不是选哪个象限,是<strong>赌哪种形态会胜出</strong>。三种独立的赢家假设:</p>
+    <div class="forms">
+
+      <article class="form-card win">
+        <div class="ftag win">推荐 · 高概率</div>
+        <h4>形态 A · 隐形录音器 + 端到端 AI 栈</h4>
+        <div class="row"><div class="k">代表</div>Plaud 已经走通硬件</div>
+        <div class="row"><div class="k">差异化</div>API + n8n / Zapier / Obsidian 直连 + 法律级转录(timestamps + 说话人 + 防篡改)</div>
+        <div class="row"><div class="k">Win condition</div>新进入者比 Plaud 早 12 个月出 API + 集成生态 + vertical(法律 / 医疗 / 教育)</div>
+        <div class="row"><div class="k">证伪</div>Plaud 12 月内推出官方 API + 完整集成,空白被关</div>
+      </article>
+
+      <article class="form-card unknown">
+        <div class="ftag unknown">中等概率 · 待验证</div>
+        <h4>形态 B · 嵌入既有日用品(耳机 / 眼镜)</h4>
+        <div class="row"><div class="k">代表</div>Apple AirPods Pro 录音功能(2025 已加)</div>
+        <div class="row"><div class="k">差异化</div>不增加新设备,让已有设备承担录音 + AI 后端</div>
+        <div class="row"><div class="k">Win condition</div>Apple / Google / Samsung 把录音作为 OS 级功能开放 → 第三方在其上做 AI 后端层</div>
+        <div class="row"><div class="k">证伪</div>巨头闭源不放 API · 用户对"日常耳机变录音器"的隐私接受度低于预期</div>
+      </article>
+
+      <article class="form-card risk">
+        <div class="ftag risk">低概率 · 高风险</div>
+        <h4>形态 C · 可见 AI 项链 / 胸针</h4>
+        <div class="row"><div class="k">代表</div>Friend / Humane / Limitless(已死或被收)</div>
+        <div class="row"><div class="k">差异化</div>把"AI 是你的伙伴"叙事产品化</div>
+        <div class="row"><div class="k">Win condition</div>社会对"AI 戴在身上"接受度大幅提升 · 至少 36-48 月</div>
+        <div class="row"><div class="k">证伪</div>已被反复证伪 · 三家失败 · 公共空间涂鸦抵制</div>
+      </article>
+
+    </div>
+    <p style="margin-top: 16px;"><strong>本研究强烈推荐形态 A,警告慎入形态 C。</strong>形态 B 是"押注巨头开放"的赌局,适合有 Apple / Google 关系的团队,不适合独立创业者。</p>
+
+    <!-- ===== WHAT-IF SIMULATED PANELS ===== -->
+    <div class="whatif-panel">
+      <div class="whatif-banner">
+        <span class="wi-warn">SIMULATED · 形态 A 模拟推演</span>
+        <span class="wi-note">本块为 LLM 模拟 · 非真用户证据</span>
+        <button class="whatif-toggle" onclick="this.closest('.whatif-panel').classList.toggle('wi-collapsed'); this.textContent=this.closest('.whatif-panel').classList.contains('wi-collapsed')?'展开 ▼':'收起 ▲';">收起 ▲</button>
+      </div>
+      <div class="whatif-body">
+        <div style="font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:14px; line-height:1.6;">假设走 <strong style="color:var(--ink);">形态 A · 隐形录音器 + 端到端 AI 栈</strong>:</div>
+        <div class="whatif-grid">
+          <div class="whatif-card">
+            <div class="wc-scenario">抢在 Plaud 之前出官方 API + 法律垂直</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">9 个月内推 webhook + 法律证据模板 + 2 家律所背书</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">vertical 锁仓 · 律所采购合同 · $5-12M ARR 第二年可达</span></div>
+            <span class="wc-conf hi">置信 · 中高</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">Plaud 突然推出官方 API · 空白被关</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">Plaud 在 6-9 月内补完积累 1,600 评论的 API 缺口</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">必须深耕单一 vertical(法律 / 医疗)避开正面竞争 · 大众市场死</span></div>
+            <span class="wc-conf">置信 · 中</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">巨头收购报价 · 退出窗口</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">Meta / Amazon 看到 vertical 增长 · 收购洽谈 12-18 月</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">$50-150M 退出 · 但 Limitless 案例显示用户对收购反弹 · 品牌损伤</span></div>
+            <span class="wc-conf lo">置信 · 中低</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="whatif-panel">
+      <div class="whatif-banner">
+        <span class="wi-warn">SIMULATED · 形态 B 模拟推演</span>
+        <span class="wi-note">押注巨头开放</span>
+        <button class="whatif-toggle" onclick="this.closest('.whatif-panel').classList.toggle('wi-collapsed'); this.textContent=this.closest('.whatif-panel').classList.contains('wi-collapsed')?'展开 ▼':'收起 ▲';">收起 ▲</button>
+      </div>
+      <div class="whatif-body">
+        <div style="font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:14px; line-height:1.6;">走 <strong style="color:var(--ink);">形态 B · 嵌入既有日用品</strong>(耳机 / 眼镜):</div>
+        <div class="whatif-grid">
+          <div class="whatif-card">
+            <div class="wc-scenario">Apple 开放 AirPods 录音 API</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">WWDC 2026 / 2027 推出 Audio Recording API + Privacy framework</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">硬件中立的 AI 后端层迎来爆发 · 不需要做硬件 · 但巨头紧握用户关系</span></div>
+            <span class="wc-conf">置信 · 中</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">巨头继续闭源 · 形态 B 死</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">Apple / Google 把录音视为 OS 级私有能力,不开放</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">所有押 OS 集成的项目归零 · 资金断 · 团队解散</span></div>
+            <span class="wc-conf hi">置信 · 中高(基于历史)</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">用户对"耳机录音"接受度低</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">Otter.ai 同意问题映射到硬件 · 消费者抵制日常物品被"录音化"</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">商业模式被舆论顶住 · 与 Friend.com 同样命运</span></div>
+            <span class="wc-conf lo">置信 · 中低</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="whatif-panel">
+      <div class="whatif-banner">
+        <span class="wi-warn">SIMULATED · 形态 C 模拟推演</span>
+        <span class="wi-note">已被证伪三次,仍推演完整</span>
+        <button class="whatif-toggle" onclick="this.closest('.whatif-panel').classList.toggle('wi-collapsed'); this.textContent=this.closest('.whatif-panel').classList.contains('wi-collapsed')?'展开 ▼':'收起 ▲';">收起 ▲</button>
+      </div>
+      <div class="whatif-body">
+        <div style="font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:14px; line-height:1.6;">走 <strong style="color:var(--ink);">形态 C · 可见 AI 项链 / 胸针</strong>(Friend / Humane / Limitless 已死路径):</div>
+        <div class="whatif-grid">
+          <div class="whatif-card">
+            <div class="wc-scenario">社会接受度突变 · 项链复兴</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">某顶流文化时刻让"可见 AI"重新获得认可 · 大概率不发生</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">新窗口期 36-48 月 · 但需要重塑公共叙事</span></div>
+            <span class="wc-conf lo">置信 · 极低</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">重复 Humane / Friend 死法</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">公共空间涂鸦 · 主流媒体调侃 · 退货高</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">12-18 月内停产或低价被收购 · 创始人品牌损伤</span></div>
+            <span class="wc-conf hi">置信 · 高(基于已发生 3 次)</span>
+          </div>
+          <div class="whatif-card">
+            <div class="wc-scenario">即使产品好,被 Apple Ring 吃掉</div>
+            <div class="wc-row"><span class="wc-k">触发</span><span class="wc-v">如果 Apple 推出 AI 项链类配饰 · 概率低但非零</span></div>
+            <div class="wc-row"><span class="wc-k">后果</span><span class="wc-v">原本就薄的差异化空间归零</span></div>
+            <span class="wc-conf lo">置信 · 低</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="h3"><span class="secnum">4.3</span>MVP 范围建议</h3>
+    <ul style="padding-left: 18px;">
+      <li><strong>硬件:</strong>不要重新设计形态——直接选用 Plaud 系参数(卡片 / 笔 / NotePin),关键投入在<strong>麦克风阵列质量</strong>和<strong>真实电池寿命</strong>(Bee 3 小时事故是反面教材)。形状不可见是关键卖点,不可优化。</li>
+      <li><strong>转录:</strong>把"timestamps + 说话人识别 + 元数据 + 防篡改链"作为差异化卖点,瞄准<strong>法律 / 医疗 / 教育</strong> vertical。Plaud 的法律证据模板用户证明这个 vertical 存在。</li>
+      <li><strong>AI 后端:</strong>不要试图自己做 LLM,做 <strong>summarization + categorization + integration 层</strong>。瞄准 Plaud 18 月没出 API 的开口——day 1 就有 webhook / Zapier / n8n / Obsidian / Notion 直连。</li>
+      <li><strong>隐私 UX:</strong>显式 consent first-citizen——物理开关(不是软件 toggle)+ LED 状态指示(谁都看得见在录)+ Otter.ai 事件的反面案例研究。每一次启动录音都要明确的物理动作。</li>
+      <li><strong>定价:</strong>$169-249 一次性硬件 + 可选<strong>vertical pro 订阅</strong>($9.99/月,法律 / 医疗模板 + 高级集成),不强制订阅(避开 Bee $19/月的反面教训)。</li>
+      <li><strong>不做:</strong>① 不戴脖子上 / 胸前 ② 不做"AI 朋友 / 伴侣"定位 ③ 不做 always-on(给用户精确控制) ④ 不收音频用于 AI 训练。</li>
+    </ul>
+  </section>
+
+  <!-- ===== §5 能力栈 ===== -->
+  <section class="chapter">
+    <h2 class="h2"><span class="secnum">5</span>入场所需能力栈</h2>
+    <p class="h2-sub">切形态 A 需要什么。</p>
+    <div class="h2-rule"></div>
+
+    <div class="cap-stack">
+      <div class="cap-block must">
+        <span class="ctag">Must · 内部能力</span>
+        <h5>音频信号 + AI 后端</h5>
+        <ul>
+          <li><strong>音频工程师</strong>(MEMS 麦克风阵列 / 远场拾音 / 降噪)1-2 人</li>
+          <li><strong>LLM 集成工程师</strong>(prompt + summarization + 自定义模板)</li>
+          <li><strong>vertical PM</strong> 优先法律 / 医疗背景</li>
+          <li><strong>隐私 / 合规专家</strong>(GDPR / HIPAA / 各州 wiretap 法)</li>
+        </ul>
+      </div>
+
+      <div class="cap-block partner">
+        <span class="ctag">Critical · 合作伙伴</span>
+        <h5>分销 + 集成</h5>
+        <ul>
+          <li><strong>1-2 家律所</strong>提供使用场景验证 + 法律证据模板共同设计</li>
+          <li><strong>n8n / Zapier / Make</strong>官方 partner program</li>
+          <li><strong>Obsidian / Notion / Mem.ai</strong>插件层合作</li>
+          <li><strong>OEM 合作</strong>:Goertek / 立讯类(成熟 BOM)</li>
+        </ul>
+      </div>
+
+      <div class="cap-block">
+        <span class="ctag">Standard · 基础</span>
+        <h5>消费电子基础</h5>
+        <ul>
+          <li><strong>iOS + Android app</strong>(关键!Friend 没做 Android 是大坑)</li>
+          <li><strong>云后端:</strong>SOC 2 + HIPAA-ready 存储 + 端到端加密</li>
+          <li><strong>App + 模板生态</strong>(用户自定义 prompt template)</li>
+          <li><strong>customer support:</strong>SaaS-grade,non-disposable</li>
+        </ul>
+      </div>
+
+      <div class="cap-block">
+        <span class="ctag">Optional · 加速器</span>
+        <h5>规模化</h5>
+        <ul>
+          <li><strong>渠道:</strong>DTC 起步 + Amazon · 不进 Apple Store(避开 Apple 整合诱惑)</li>
+          <li><strong>内容:</strong>vertical KOL(法律博主 / 医生 / 教授)</li>
+          <li><strong>开源策略:</strong>开放 webhook 协议吸引开发者(参考 Omi 路径)</li>
+          <li><strong>启动团队:</strong>15-25 人,Series A 40-60 人</li>
+        </ul>
+      </div>
+    </div>
+
+    <p><strong>时间与资金预算:</strong>形态 A 从 0 到 GA 典型 12-18 个月。硬件 + 软件 + 集成 + 合规预算约 USD 3-6M(基于 Plaud 现有公开数据回推)。<strong>关键资源 ≠ 钱,是时间</strong> — Plaud 出 API 的 12 个月内必须建立分销壁垒。</p>
+  </section>
+
+  <!-- ===== §6 风险 ===== -->
+  <section class="chapter" id="sec-verdict">
+    <h2 class="h2"><span class="secnum">6</span>关键风险与挑战</h2>
+    <p class="h2-sub">如果切入,会在哪里翻车。</p>
+    <div class="h2-rule"></div>
+
+    <div class="risk-row">
+      <div class="rno">R-01</div>
+      <div class="rdesc"><strong>品类被一两家巨头压死</strong>Meta + Amazon 已经各拿了一张牌。如果 Apple 在 12-18 个月内把 OS 级 ambient capture 推到 AirPods / Watch / iPhone,整个独立硬件赛道收窗。新进入者必须在 OS 级解决方案推出前形成 vertical 壁垒。</div>
+      <div class="rsev"><strong>高</strong>时间竞赛</div>
+    </div>
+    <div class="risk-row">
+      <div class="rno">R-02</div>
+      <div class="rdesc"><strong>Plaud 自己推出 API · 抢占空白</strong>Plaud 已经积累 1,600 条 API 催促评论。一旦它做出 official API + 集成生态,空白被关。新进入者必须押注 Plaud 继续慢于市场——这是一个公司组织能力的赌局。</div>
+      <div class="rsev"><strong>高</strong>核心假设</div>
+    </div>
+    <div class="risk-row">
+      <div class="rno">R-03</div>
+      <div class="rdesc"><strong>各州 wiretap 法的合规噩梦</strong>美国 12 个州是"two-party consent"州(California / Florida / Pennsylvania 等),不允许在他人不知情下录音。Always-on 设备在这些州默认违法。Friend.com 已经在条款里埋了 SF 仲裁条款规避这个问题——但司法判决可能转向。一次集体诉讼足以结束公司。</div>
+      <div class="rsev"><strong>高</strong>法律风险</div>
+    </div>
+    <div class="risk-row">
+      <div class="rno">R-04</div>
+      <div class="rdesc"><strong>Friend.com / Humane / Bee 把品类名搞臭了</strong>"AI pendant"现在已经是负面联想词。新进入者必须重新发明品类描述(<em>不要</em>叫 pendant / AI necklace / AI companion),否则被前辈失败拖累。"Note-taking device"、"AI 工作助手"、"Pocket recorder"等 framing 更安全。</div>
+      <div class="rsev"><strong>中高</strong>品牌叙事</div>
+    </div>
+    <div class="risk-row">
+      <div class="rno">R-05</div>
+      <div class="rdesc"><strong>样本偏差与数据稀疏</strong>本报告 voice 数据来自 r/PlaudNote(60 帖 / 9 评论级别)、r/limitlessai(零碎)、HN / 媒体评测,样本远不如健康戒指报告丰富。"用户已经认知 Plaud 是赢家"的判断主要来自评测媒体而非用户基数。如果接 Twitter / TikTok / YouTube 评论,可能发现更多负面信号。</div>
+      <div class="rsev"><strong>中</strong>方法论限制</div>
+    </div>
+    <div class="risk-row">
+      <div class="rno">R-06</div>
+      <div class="rdesc"><strong>巨头收购是真实退出路径,但 timing 难判</strong>Meta / Amazon 还在收购阶段,意味独立公司还有退出窗口。但被收的都是技术 / 团队 / 期权,产品停。如果新进入者目标是被收购退出,formate 选择应该更倾向"有 Meta / Amazon 想要的硬件能力"——而不是 PMF。这是不同的产品决策。</div>
+      <div class="rsev"><strong>中</strong>战略选择</div>
+    </div>
+  </section>
+
+  <!-- ===== APPENDIX ===== -->
+  <section class="chapter">
+    <h2 class="h2"><span class="secnum">附</span>附录 · 数据与方法</h2>
+    <div class="h2-rule"></div>
+
+    <details class="app">
+      <summary>Appendix A · 数据采集方法</summary>
+      <div style="font-family: var(--mono); font-size: 12px; line-height: 1.7; color: var(--muted);">
+        <strong>第一手 voice 采集</strong> · time window = trailing 1 year (2025-05 至 2026-04)<br>
+        &nbsp;&nbsp;Reddit · /.json endpoint;subreddits: r/PlaudNote · r/limitlessai · r/HumaneAIPin · r/Friend · r/wearables · r/LocalLLaMA<br>
+        &nbsp;&nbsp;Hacker News · Algolia API · queries: "Limitless pendant" / "AI pendant" / "Plaud Note" / "Bee AI" / "Friend AI necklace" / "AI recording" 等<br>
+        <br>
+        <strong>Marketplace / 媒体评测数据(§3.2)</strong> · 来源混合:Krisp.ai · TechCrunch · Fortune · CNN · The Verge · Android Central · UMEVO · Trustpilot · Sypnotix · jock.pl 等<br>
+        <br>
+        <strong>样本</strong> · 一手 voice 60 (Reddit 32 + HN 28);评测聚合 10 主题,跨 5 玩家<br>
+        <strong>引用</strong> · 所有 quote 逐字提取,permalinks 已逐条验证<br>
+        <strong>中文翻译</strong> · 分析师自译,保留原语气
+      </div>
+    </details>
+
+    <details class="app">
+      <summary>Appendix B · 一手 voice 完整清单</summary>
+      <div>
+        <table class="data">
+          <thead><tr><th>用途</th><th>原文片段</th><th>来源 / 分</th></tr></thead>
+          <tbody>
+            <tr><td>赢家叙事 · 评测</td><td class="en-q">"The Plaud Note Pro is the best overall AI note taking device in 2026"</td><td>Krisp · 评测</td></tr>
+            <tr><td>API 自建</td><td class="en-q">"I built webhook support for Plaud so it can be hooked up to n8n"</td><td>r/PlaudNote · 5</td></tr>
+            <tr><td>法律证据</td><td class="en-q">"would like to use this recording as legal evidence to strengthen my case"</td><td>r/PlaudNote · 2</td></tr>
+            <tr><td>收购 → 用户被弃</td><td class="en-q">"Dead company. They sold to meta … Mine just got bricked."</td><td>r/limitlessai · 2</td></tr>
+            <tr><td>救命级情感锚</td><td class="en-q">"heard his daughter say 'I love you' for the first time, forgot he was wearing the pendant"</td><td>jock.pl · 评测</td></tr>
+            <tr><td>主流媒体调侃</td><td class="en-q">"like wearing your senile, anxious grandmother around your neck"</td><td>Fortune · 报道</td></tr>
+            <tr><td>公共抵制</td><td class="en-q">"'AI is not your friend' and 'Stop profiting off of loneliness'"</td><td>CNN · 报道</td></tr>
+            <tr><td>AI 幻觉</td><td class="en-q">"assuming a plot from Abbott Elementary was a personal memory"</td><td>TechCrunch · 评测</td></tr>
+            <tr><td>电池虚标</td><td class="en-q">"The device died during a 3-hour lecture"</td><td>UMEVO · 评测</td></tr>
+            <tr><td>同意问题</td><td class="en-q">"Otter.ai bot recording meetings without consent"</td><td>HN · 612</td></tr>
+            <tr><td>条款问题</td><td class="en-q">"Friend's terms … bury clauses about 'biometric data consent'"</td><td>Fortune · 报道</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===== INLINE JSON DATA ===== -->
+  <script type="application/json" id="report-data">
+{
+  "meta": { "idea": "AI 录音设备", "mode": "NON_STOCK", "timestamp": "2026-05-19" },
+  "players": [
+    { "id": "plaud",     "name": "Plaud Note Pro",    "color": "#14532d", "size": 18, "x": 0.72, "y": 0.30, "summary": "$199 · 30h 电池 · 4 麦 · 卡片形态 · 2026 公认最佳 · 在售增长", "status": "live" },
+    { "id": "limitless", "name": "Limitless Pendant", "color": "#1e4d8a", "size": 13, "x": 0.40, "y": 0.30, "summary": "$199 · Meta 收购停售 · 用户喊'bricked' · 死叙事", "status": "acquired" },
+    { "id": "bee",       "name": "Bee Pioneer",       "color": "#1e4d8a", "size": 12, "x": 0.55, "y": 0.55, "summary": "$50 + $19/月 · Amazon 收购 · AI 幻觉 + 电池虚标", "status": "acquired" },
+    { "id": "friend",    "name": "Friend.com",        "color": "#5a606a", "size": 11, "x": 0.22, "y": 0.55, "summary": "$129 · 公开崩坏 · Museum of Failure · 'AI is not your friend'", "status": "live-failing" },
+    { "id": "humane",    "name": "Humane AI Pin",     "color": "#5a606a", "size": 10, "x": 0.18, "y": 0.78, "summary": "$699 + $24/月 · 2025-02 停产 · HP $116M · 退货比销售快", "status": "dead" },
+    { "id": "omi",       "name": "Omi AI",            "color": "#5a606a", "size": 8,  "x": 0.32, "y": 0.40, "summary": "$89 开源硬件 · 小众但忠诚社区" }
+  ],
+  "themes": [
+    { "id": "t.winner",   "label": "口袋形态胜出",       "color": "#14532d", "size": 13, "x": 0.62, "y": 0.18, "polarity": "win",  "summary": "Plaud 占据 · 不戴脖子 → 社会接受度最高 · 品类实际赢家" },
+    { "id": "t.api",      "label": "API / 集成空白",     "color": "#14532d", "size": 12, "x": 0.78, "y": 0.45, "polarity": "win",  "summary": "Plaud 18 月催 API 无果 · 1,600 条评论 · 第三方机会窗口" },
+    { "id": "t.acquisition","label": "巨头收购潮",       "color": "#5a606a", "size": 12, "x": 0.45, "y": 0.42, "polarity": "neutral", "summary": "Meta 收 Limitless / Amazon 收 Bee / HP 收 Humane · 收购的都不是赢家" },
+    { "id": "t.privacy",  "label": "公共抵制 · 形态危机", "color": "#c2410c", "size": 14, "x": 0.20, "y": 0.42, "polarity": "pain", "summary": "Friend.com 广告涂鸦 · Otter.ai consent 案件 · 形态级死亡之吻" },
+    { "id": "t.legal",    "label": "法律证据 vertical",  "color": "#14532d", "size": 11, "x": 0.85, "y": 0.30, "polarity": "win",  "summary": "Plaud 用户社区高频法律 / 临床 / 教育用例 · vertical 空白" },
+    { "id": "t.hallucination", "label": "AI 幻觉",        "color": "#c2410c", "size": 10, "x": 0.55, "y": 0.70, "polarity": "pain", "summary": "Bee 把电视剧情认作个人记忆 · 品类信任杀手" },
+    { "id": "t.consent",  "label": "知情录制 · 法规",    "color": "#c2410c", "size": 11, "x": 0.30, "y": 0.65, "polarity": "pain", "summary": "12 州 two-party consent · Always-on 默认违法 · 集体诉讼风险" }
+  ],
+  "voices": [
+    { "id": "v01", "player": "plaud",     "title": "2026 最佳 AI 录音设备",                "score": 0, "url": "https://krisp.ai/blog/best-ai-note-taking-devices/", "sentiment": "pos", "themes": ["t.winner"],          "x": 0.65, "y": 0.22 },
+    { "id": "v02", "player": "plaud",     "title": "18 月催 API · 自建 n8n webhook",       "score": 5, "url": "https://www.reddit.com/r/PlaudNote/comments/1sj4oi1/n8n_support_for_plaud_i/", "sentiment": "pos", "themes": ["t.api"],            "x": 0.80, "y": 0.38 },
+    { "id": "v03", "player": "plaud",     "title": "电话录音作为法庭证据",                  "score": 2, "url": "https://www.reddit.com/r/PlaudNote/comments/1pyjj1g/what_template_for_legal/", "sentiment": "pos", "themes": ["t.legal"],          "x": 0.88, "y": 0.32 },
+    { "id": "v04", "player": "limitless", "title": "Mine just got bricked · Dead company", "score": 2, "url": "https://www.reddit.com/r/limitlessai/comments/1pihggx/looking_for_two_limit/", "sentiment": "neg", "themes": ["t.acquisition"],   "x": 0.42, "y": 0.36 },
+    { "id": "v05", "player": "limitless", "title": "听到女儿第一次说 I love you",          "score": 0, "url": "https://thoughts.jock.pl/p/voice-ai-hardware-limitless-pendant-real-world-review-automation-experiments", "sentiment": "pos", "themes": ["t.winner"], "x": 0.50, "y": 0.30 },
+    { "id": "v06", "player": "friend",    "title": "像戴一个老年痴呆的奶奶在脖子上",         "score": 0, "url": "https://fortune.com/2025/10/03/friend-ai-necklace-review-avi-schiffmann/", "sentiment": "neg", "themes": ["t.privacy"],       "x": 0.18, "y": 0.50 },
+    { "id": "v07", "player": "friend",    "title": "'AI is not your friend' 广告涂鸦",      "score": 0, "url": "https://www.cnn.com/2025/11/16/tech/friend-ai-device-backlash-ceo-avi-schiffmann", "sentiment": "neg", "themes": ["t.privacy"],       "x": 0.15, "y": 0.42 },
+    { "id": "v08", "player": "bee",       "title": "Abbott Elementary 剧情认作个人记忆",   "score": 0, "url": "https://techcrunch.com/2026/01/12/hands-on-with-bee-amazons-latest-ai-wearable/", "sentiment": "neg", "themes": ["t.hallucination"], "x": 0.58, "y": 0.65 },
+    { "id": "v09", "player": "bee",       "title": "3 小时课程电池死 · 续航虚标",          "score": 0, "url": "https://www.umevo.ai/blogs/ume-all-posts/bee-ai-pendant-complete-review-features-battery-life-and-pricing-2026", "sentiment": "neg", "themes": ["t.hallucination"], "x": 0.50, "y": 0.62 },
+    { "id": "v10", "player": "plaud",     "title": "Otter.ai bot 未经同意录音 · 612 HN",   "score":612,"url": "https://news.ycombinator.com/item?id=32751071", "sentiment": "neg", "themes": ["t.consent"],     "x": 0.32, "y": 0.60 }
+  ],
+  "opportunity": {
+    "id": "opp", "label": "★ 隐形+端到端 机会区", "color": "#14532d", "size": 22, "x": 0.85, "y": 0.18,
+    "summary": "隐形形态 + 法律级转录 + 端到端集成栈 · Plaud 走到这一格但 API 慢 · 新进入者切口"
+  },
+  "edges": [
+    {"from":"plaud","to":"t.winner","w":3},{"from":"plaud","to":"t.api","w":3},{"from":"plaud","to":"t.legal","w":2},{"from":"plaud","to":"opp","w":3},
+    {"from":"limitless","to":"t.acquisition","w":3},{"from":"limitless","to":"t.winner","w":1},
+    {"from":"bee","to":"t.acquisition","w":2},{"from":"bee","to":"t.hallucination","w":3},
+    {"from":"friend","to":"t.privacy","w":3},
+    {"from":"humane","to":"t.privacy","w":2},{"from":"humane","to":"t.acquisition","w":2},
+    {"from":"omi","to":"t.api","w":1},
+    {"from":"v01","to":"t.winner","w":1},{"from":"v05","to":"t.winner","w":1},
+    {"from":"v02","to":"t.api","w":1},
+    {"from":"v03","to":"t.legal","w":1},
+    {"from":"v04","to":"t.acquisition","w":1},
+    {"from":"v06","to":"t.privacy","w":1},{"from":"v07","to":"t.privacy","w":1},
+    {"from":"v08","to":"t.hallucination","w":1},{"from":"v09","to":"t.hallucination","w":1},
+    {"from":"v10","to":"t.consent","w":1},
+    {"from":"t.winner","to":"opp","w":3},{"from":"t.api","to":"opp","w":3},{"from":"t.legal","to":"opp","w":2}
+  ]
+}
+  </script>
+
+  <!-- ===== INTERACTIVE JS (shared template) ===== -->
+  <script>
+  (function(){
+    'use strict';
+    const DATA = JSON.parse(document.getElementById('report-data').textContent);
+    const pbSteps = document.querySelectorAll('.process-bar .pb-step');
+    const targets = Array.from(pbSteps).map(s => document.querySelector(s.dataset.target)).filter(Boolean);
+    function updatePB() { const y = window.scrollY + 100; let idx=0; targets.forEach((el,i) => { if (el && el.offsetTop <= y) idx=i; }); pbSteps.forEach((s,i) => s.classList.toggle('active', i===idx)); }
+    window.addEventListener('scroll', updatePB, {passive:true}); updatePB();
+
+    const svg = document.getElementById('kgSvg');
+    if (svg) buildGraph();
+
+    function buildGraph() {
+      const W=760,H=520;
+      const nodes=[];
+      DATA.players.forEach(p => nodes.push({...p, kind:'player'}));
+      DATA.themes.forEach(t => nodes.push({...t, kind:'theme', name:t.label}));
+      DATA.voices.forEach(v => nodes.push({...v, name:v.title, color: v.sentiment==='pos'?'#14532d':'#c2410c', size: 6 + Math.min(8, Math.log10((v.score||1)+1)*2), kind:'voice'}));
+      nodes.push({...DATA.opportunity, kind:'oppor'});
+      nodes.forEach(n => { n.px=60+n.x*(W-120); n.py=40+n.y*(H-80); n.vx=0; n.vy=0; });
+      const edges = DATA.edges.map(e => ({source:nodes.find(n=>n.id===e.from), target:nodes.find(n=>n.id===e.to), weight:e.w})).filter(e=>e.source&&e.target);
+      const REPEL=1200, SPRING=0.035, CENTER=0.008, DAMP=0.78;
+      for (let it=0; it<90; it++) {
+        for (let i=0;i<nodes.length;i++) for (let j=i+1;j<nodes.length;j++) {
+          const a=nodes[i],b=nodes[j]; const dx=a.px-b.px,dy=a.py-b.py; const d2=dx*dx+dy*dy+50; const d=Math.sqrt(d2); const f=REPEL/d2; const fx=(dx/d)*f, fy=(dy/d)*f;
+          a.vx+=fx; a.vy+=fy; b.vx-=fx; b.vy-=fy;
+        }
+        edges.forEach(e => { const dx=e.target.px-e.source.px,dy=e.target.py-e.source.py; const d=Math.sqrt(dx*dx+dy*dy)||1; const rl=90/e.weight; const f=(d-rl)*SPRING; const fx=(dx/d)*f,fy=(dy/d)*f; e.source.vx+=fx; e.source.vy+=fy; e.target.vx-=fx; e.target.vy-=fy; });
+        nodes.forEach(n => { n.vx+=(W/2-n.px)*CENTER; n.vy+=(H/2-n.py)*CENTER; n.px+=n.vx; n.py+=n.vy; n.vx*=DAMP; n.vy*=DAMP; n.px=Math.max(40,Math.min(W-40,n.px)); n.py=Math.max(30,Math.min(H-30,n.py)); });
+      }
+      const NS="http://www.w3.org/2000/svg";
+      edges.forEach(e => { const l=document.createElementNS(NS,'line'); l.setAttribute('x1',e.source.px); l.setAttribute('y1',e.source.py); l.setAttribute('x2',e.target.px); l.setAttribute('y2',e.target.py); l.setAttribute('class','kg-edge'); l.setAttribute('stroke-width', Math.max(0.6,e.weight*0.6)); l.dataset.from=e.source.id; l.dataset.to=e.target.id; svg.appendChild(l); });
+      const nodeMap=new Map();
+      nodes.forEach(n => {
+        const g=document.createElementNS(NS,'g'); g.setAttribute('class','kg-node'); g.setAttribute('transform',`translate(${n.px},${n.py})`); g.dataset.id=n.id;
+        const c=document.createElementNS(NS,'circle'); c.setAttribute('r',n.size);
+        c.setAttribute('fill', n.kind==='oppor'?'transparent':n.color);
+        c.setAttribute('stroke', n.kind==='oppor'?'#14532d':'#fff');
+        c.setAttribute('stroke-width', n.kind==='oppor'?2:1.5);
+        if (n.kind==='oppor') c.setAttribute('stroke-dasharray','4 3');
+        if (n.kind==='voice') c.setAttribute('fill-opacity',0.85);
+        g.appendChild(c);
+        if (n.kind!=='voice') { const t=document.createElementNS(NS,'text'); t.setAttribute('y',n.size+12); t.setAttribute('text-anchor','middle'); t.setAttribute('font-size',n.kind==='player'?11:10); t.setAttribute('fill', n.kind==='player'?'#14171c':'#5a606a'); t.textContent=n.name||n.label; g.appendChild(t); }
+        svg.appendChild(g); nodeMap.set(n.id,{g,data:n});
+        g.addEventListener('mouseenter', () => highlight(n.id));
+        g.addEventListener('mouseleave', () => unhighlight());
+        g.addEventListener('click', () => showDetail(n));
+      });
+      function adj(id) { const s=new Set([id]); edges.forEach(e => { if (e.source.id===id) s.add(e.target.id); if (e.target.id===id) s.add(e.source.id); }); return s; }
+      function highlight(id) { const a=adj(id); nodeMap.forEach((v,k) => { v.g.classList.toggle('kg-faded', !a.has(k)); v.g.classList.toggle('kg-active', k===id); }); edges.forEach((e,i) => { const l=svg.querySelectorAll('.kg-edge')[i]; const inv=e.source.id===id||e.target.id===id; l.classList.toggle('kg-active', inv); l.classList.toggle('kg-faded', !inv && !(a.has(e.source.id)&&a.has(e.target.id))); }); }
+      function unhighlight() { nodeMap.forEach(v => v.g.classList.remove('kg-faded','kg-active')); svg.querySelectorAll('.kg-edge').forEach(l => l.classList.remove('kg-faded','kg-active')); }
+      window.kgHighlight=highlight; window.kgUnhighlight=unhighlight;
+      window._kgNodes=nodes; window._kgEdges=edges;
+    }
+
+    const side = document.getElementById('kgSide');
+    function showDetail(n) {
+      if (!side) return;
+      const tc = n.kind==='voice'?'voice':(n.kind==='theme'?'theme':(n.kind==='oppor'?'oppor':'player'));
+      const tl = n.kind==='voice'?'顶帖/评测':(n.kind==='theme'?('主题 · '+(n.polarity==='win'?'正面':n.polarity==='pain'?'负面':'中性')):(n.kind==='oppor'?'空白机会区':('玩家 · '+(n.status||'在售'))));
+      let html = `<span class="kg-tag ${tc}">${tl}</span><h5>${n.name||n.label}</h5>`;
+      if (n.kind==='voice') {
+        html += `<div class="kg-meta">${n.player.toUpperCase()} · ${n.score>0?'▲ '+n.score.toLocaleString():'评测/报道'} · <a href="${n.url}" target="_blank" rel="noopener" style="color:var(--muted);border-bottom:1px solid var(--line);text-decoration:none;">来源 ↗</a></div>`;
+        html += `<p style="font-size:13px;color:var(--muted);">在 §2.2 voice 表查看完整双语原文 + 关键启示。</p>`;
+      } else if (n.kind==='player') {
+        html += `<p style="font-size:13px;color:var(--muted);">${n.summary||''}</p>`;
+        const lt = DATA.themes.filter(t => DATA.edges.find(e => (e.from===n.id && e.to===t.id) || (e.to===n.id && e.from===t.id)));
+        const lv = DATA.voices.filter(v => v.player===n.id);
+        if (lt.length) { html += `<div class="kg-related"><div class="kg-related-lbl">关联主题</div>`; lt.forEach(t => { html += `<a href="#" data-jump-node="${t.id}">→ ${t.label}</a>`; }); html += `</div>`; }
+        if (lv.length) { html += `<div class="kg-related"><div class="kg-related-lbl">该玩家 ${lv.length} 条 voice</div>`; lv.forEach(v => { html += `<a href="#" data-jump-node="${v.id}">${v.score>0?'▲'+v.score.toLocaleString()+' · ':''}${v.title}</a>`; }); html += `</div>`; }
+      } else if (n.kind==='theme') {
+        html += `<p style="font-size:13px;color:var(--muted);">${n.summary||''}</p>`;
+        const lv = DATA.voices.filter(v => v.themes && v.themes.includes(n.id));
+        const lp = DATA.players.filter(p => DATA.edges.find(e => (e.from===p.id && e.to===n.id) || (e.to===p.id && e.from===n.id)));
+        if (lp.length) { html += `<div class="kg-related"><div class="kg-related-lbl">涉及玩家</div>`; lp.forEach(p => { html += `<a href="#" data-jump-node="${p.id}">→ ${p.name}</a>`; }); html += `</div>`; }
+        if (lv.length) { html += `<div class="kg-related"><div class="kg-related-lbl">证据 (${lv.length})</div>`; lv.forEach(v => { html += `<a href="#" data-jump-node="${v.id}">${v.title}</a>`; }); html += `</div>`; }
+      } else if (n.kind==='oppor') {
+        html += `<p style="font-size:13px;color:var(--muted);">${n.summary||''}</p><p style="font-size:12px;color:var(--good);margin-top:10px;"><strong>本报告核心战略推荐位置 · 见 §4.2。</strong></p>`;
+      }
+      side.innerHTML = html;
+      side.querySelectorAll('[data-jump-node]').forEach(a => { a.addEventListener('click', ev => { ev.preventDefault(); const id=a.dataset.jumpNode; const target=window._kgNodes.find(x => x.id===id); if (target) { window.kgHighlight(id); showDetail(target); } }); });
+    }
+
+    document.querySelectorAll('.filter-bar').forEach(bar => {
+      const target = document.querySelector(bar.dataset.filterTarget); if (!target) return;
+      const rows = Array.from(target.querySelectorAll('details.drow'));
+      const state = { player:'all', sent:'all', search:'' };
+      const countEl = bar.querySelector('[data-filter-count]');
+      const total = rows.length;
+      const searchEl = bar.querySelector('[data-filter-search]');
+      function apply() {
+        let vis = 0; const q = state.search.toLowerCase().trim();
+        rows.forEach(r => {
+          const dot = r.querySelector('.sent-dot');
+          const player = dot ? dot.textContent.trim() : '';
+          const sc = dot ? Array.from(dot.classList).find(c => ['pos','neg','acq','dead'].includes(c)) : '';
+          const sm = state.sent==='all' || (state.sent==='pos' && sc==='pos') || (state.sent==='neg' && (sc==='neg'||sc==='dead'||sc==='acq'));
+          const pm = state.player==='all' || player.toLowerCase().includes(state.player.toLowerCase());
+          const text = r.textContent.toLowerCase();
+          const search = !q || text.includes(q);
+          const v = pm && sm && search;
+          r.classList.toggle('fb-hidden', !v);
+          r.classList.toggle('fb-match-search', !!q && v);
+          if (v) vis++;
+        });
+        if (countEl) countEl.textContent = vis + ' / ' + total;
+      }
+      bar.querySelectorAll('.filter-chip').forEach(chip => { chip.addEventListener('click', () => { const g=chip.dataset.filterGroup; bar.querySelectorAll(`.filter-chip[data-filter-group="${g}"]`).forEach(c => c.classList.remove('active')); chip.classList.add('active'); state[g]=chip.dataset.filterValue; apply(); }); });
+      if (searchEl) searchEl.addEventListener('input', () => { state.search=searchEl.value; apply(); });
+    });
+
+    const resetBtn = document.getElementById('kgReset');
+    if (resetBtn) resetBtn.addEventListener('click', () => { if (window.kgUnhighlight) window.kgUnhighlight(); if (side) side.innerHTML = side.dataset.original || ''; });
+    if (side) side.dataset.original = side.innerHTML;
+  })();
+  </script>
+
+  <div class="method">
+    <strong>VIBE DEMAND RESEARCH · NON-STOCK 模式</strong> · 本报告为产品团队 / 创始人决策参考,不构成投资建议。<br>
+    <strong>NON-STOCK 模式特点:</strong>没有可信的 TAM 估算(品类太年轻),改用早期信号(收购数 / 失败案例 / 在售玩家 / 用户自建集成)替代;marketplace VOC 数据稀疏,改用媒体评测聚合;personas 标"待验证"而非确认。<br>
+    数据来源 · 一手 voice from Reddit + HN;评测 from Krisp / TechCrunch / Fortune / CNN / UMEVO / jock.pl 等;所有 quote 逐字,permalinks 已验证。
+  </div>
+
+</div>
+
+</body>
+</html>
