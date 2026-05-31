@@ -8,3 +8,6 @@ demo-ai-glasses-report.html
 *.key
 collected/
 .playwright-mcp/
+
+# downloaded share tooling
+/bin/
