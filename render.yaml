@@ -7,6 +7,7 @@ services:
     name: vibe-demand-research
     runtime: python
     plan: free                      # free tier sleeps after ~15min idle (cold start ~30s)
+    region: singapore               # close to DeepSeek (CN) → far fewer cross-border timeouts
     buildCommand: pip install -r requirements.txt
     startCommand: python3 scripts/app.py
     autoDeploy: true
