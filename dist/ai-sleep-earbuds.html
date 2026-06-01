@@ -327,6 +327,19 @@
   }
   .legend .lg-row{display:flex;align-items:center;gap:6px}
   .legend .lg-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+  /* mobile "scroll down for the full report" floating cue (desktop hides it) */
+  .scroll-cue{display:none}
+  @media (max-width:999px){
+    .scroll-cue{position:fixed;left:50%;bottom:16px;z-index:60;transform:translateX(-50%);
+      display:inline-flex;align-items:center;gap:7px;background:rgba(10,107,67,.93);color:#fff;border:0;
+      border-radius:999px;padding:9px 17px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;
+      box-shadow:0 8px 22px -6px rgba(10,107,67,.55);animation:cueBob 1.7s ease-in-out infinite}
+    .scroll-cue .cue-arrow{font-size:14px;line-height:1;animation:cueArrow 1.2s ease-in-out infinite}
+    .scroll-cue.hide{opacity:0;pointer-events:none;animation:none;transform:translate(-50%,12px)}
+  }
+  @keyframes cueBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-4px)}}
+  @keyframes cueArrow{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+  @media print{.scroll-cue{display:none!important}}
   .kg-svg{width:100%;height:100%;display:block}
   .kg-svg .node{cursor:pointer;transition:opacity .35s ease}
   .kg-svg .node circle{transition:stroke-width .25s ease}
@@ -582,8 +595,16 @@
        verdict card right below, and they collided with the top sector labels. */
     .evidence-counter { display: none }
     .radar-hud { display: none }
-    .center-hint { font-size: 9px; bottom: 8px; left: 10px; padding: 4px 8px }
-    .legend { font-size: 9px; bottom: 8px; right: 10px; padding: 6px 9px; line-height: 1.5 }
+    .center-hint { display: none }   /* hover-oriented text, useless on touch + it collided */
+    .legend { font-size: 9px; bottom: 8px; right: 8px; padding: 5px 8px; line-height: 1.5 }
+    /* radar buttons: compact, pinned to the bottom edge, with a solid frosted
+       backdrop so they read cleanly above the blips instead of looking occluded */
+    .radar-controls { bottom: 8px; gap: 6px }
+    .radar-btn { padding: 6px 11px; font-size: 11px;
+      background: rgba(255,255,255,.86); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      box-shadow: 0 2px 10px -3px rgba(0,0,0,.18) }
+    .radar-btn.ghost { background: rgba(255,255,255,.8) }
+    .radar-scanmsg { bottom: 44px; font-size: 10.5px }
     .kg-zoom-controls { top: 30px; left: 10px }
     .kg-zoom-controls button { width: 34px; height: 34px; font-size: 14px }
     .zoom-level { top: 30px; left: 50px; font-size: 9.5px }
@@ -900,6 +921,11 @@
 <footer class="report-fallback" id="fbFooter">
   <article class="fb-body" id="fbBody"></article>
 </footer>
+
+<!-- mobile: floating hint that the full report is further down -->
+<button class="scroll-cue" id="scrollCue" type="button">
+  <span data-i18n="cue.text">下滑查看完整报告</span><span class="cue-arrow">↓</span>
+</button>
 
 <!-- ============ DATA ============ -->
 <script type="application/json" id="report-data">
@@ -4942,7 +4968,7 @@
       'st.dirs':'可能的切入方向','st.bet':'赌的假设','st.evidence':'支撑证据','st.openq':'待验证问题','st.risk':'不确定性',
       'st.dirsNote':'这些是「方向 + 待验证假设」,不是拍板的推荐 —— 判断权留给你。',
       'sel.current':'当前选中','sel.clear':'清除选择',
-      'report.divider':'完整报告',
+      'report.divider':'完整报告','cue.text':'下滑查看完整报告',
       'verdict.real':'✓ 真实需求','verdict.partial':'◐ 部分支持','verdict.insufficient':'⚠ 证据不足',
       'ov.findings':'核心发现','ov.counts.raw':'真实原话','ov.counts.themes':'需求主题','ov.counts.mkt':'电商评论','ov.counts.ed':'媒体测评','ov.counts.players':'玩家',
       'pl.topVoices':'高赞原话','pl.mkt':'电商口碑','pl.smallSample':'本玩家社区规模较小,样本不足以形成主题级证据。',
@@ -4999,7 +5025,7 @@
       'st.dirs':'Possible directions','st.bet':'Hypothesis','st.evidence':'Evidence','st.openq':'Open questions','st.risk':'Risk',
       'st.dirsNote':'These are directions + assumptions to validate, not a definitive recommendation — the call is yours.',
       'sel.current':'Selected','sel.clear':'Clear',
-      'report.divider':'Full Report',
+      'report.divider':'Full Report','cue.text':'Scroll for full report',
       'verdict.real':'✓ Real demand','verdict.partial':'◐ Partial','verdict.insufficient':'⚠ Insufficient',
       'ov.findings':'Key Findings','ov.counts.raw':'raw voices','ov.counts.themes':'demand themes','ov.counts.mkt':'marketplace','ov.counts.ed':'editorials','ov.counts.players':'players',
       'pl.topVoices':'Top Voices','pl.mkt':'Marketplace VOC','pl.smallSample':'Community too small for theme-level evidence.',
@@ -6480,6 +6506,19 @@
   // (initial language already set above, before the switcher was built)
   renderAll();
   syncTabs();
+
+  // ---- mobile scroll cue: tap to jump to the full report; fades once scrolling ----
+  (function(){
+    const cue = document.getElementById('scrollCue');
+    if (!cue) return;
+    cue.addEventListener('click', () => {
+      const t = document.querySelector('.report-divider') || document.getElementById('fbFooter');
+      if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      cue.classList.add('hide');
+    });
+    const onScroll = () => { if (window.scrollY > 60) { cue.classList.add('hide'); window.removeEventListener('scroll', onScroll); } };
+    window.addEventListener('scroll', onScroll, { passive: true });
+  })();
 
   // ============ URL Deeplink + browser history ============
   // Public state lives on body[data-*]. Keep URL hash in sync both ways.
