@@ -956,7 +956,7 @@
       'ins.communities':'社区','ins.shareOfVoice':'声量占比','ins.heatmap':'主题 × 情绪 · 痛点图',
       'ins.brandTable':'玩家对比','ins.mentions':'被提及','ins.quoteWall':'真实原声墙','ins.deepdive':'最受关注的主题 · Top 3',
       'ins.measured':'实测数据','ins.judgment':'分析判断',
-      'ins.btBrand':'玩家','ins.btShare':'声量占比','ins.btSent':'口碑(好 / 差)','ins.btMeta':'价格 / 状态','ins.btSite':'官网搜索','ins.btMore':'更多玩家(本次未采集到讨论)','ins.btThin':'信息量过少','ins.btThinUnit':' 条',
+      'ins.btBrand':'玩家','ins.btShare':'声量占比','ins.btSent':'口碑(好 / 差)','ins.btMeta':'价格 / 状态','ins.btSite':'官网搜索','ins.btSiteDirect':'官网','ins.btMore':'更多玩家(本次未采集到讨论)','ins.btThin':'信息量过少','ins.btThinUnit':' 条',
       'ins.rnSplit':'读法:按真实原声<b>条数</b>统计的正负向占比;数字为条数,不是赞数累加。',
       'ins.rnTheme':'读法:每个需求主题被多少条真实原声提及(占总数的百分比)。条越长 = 讨论越集中。',
       'ins.rnHeat':'读法:颜色越深 = 该主题下该情绪的原声越多。<b>颜色是信号,数字是次要标注</b>。',
@@ -1013,7 +1013,7 @@
       'ins.communities':'communities','ins.shareOfVoice':'Share of voice','ins.heatmap':'Theme × sentiment · pain map',
       'ins.brandTable':'Brand comparison','ins.mentions':'mentions','ins.quoteWall':'Voice wall','ins.deepdive':'Top themes by attention · Top 3',
       'ins.measured':'measured data','ins.judgment':'analyst judgment',
-      'ins.btBrand':'Brand','ins.btShare':'Share of voice','ins.btSent':'Sentiment (pos / neg)','ins.btMeta':'Price / status','ins.btSite':'Find site','ins.btMore':'More players (no discussion captured this run)','ins.btThin':'too few to judge','ins.btThinUnit':' voices',
+      'ins.btBrand':'Brand','ins.btShare':'Share of voice','ins.btSent':'Sentiment (pos / neg)','ins.btMeta':'Price / status','ins.btSite':'Find site','ins.btSiteDirect':'Official site','ins.btMore':'More players (no discussion captured this run)','ins.btThin':'too few to judge','ins.btThinUnit':' voices',
       'ins.rnSplit':'How to read: positive/negative split by <b>number of real voices</b> — counts, not summed upvotes.',
       'ins.rnTheme':'How to read: how many real voices mention each demand theme (% of total). Longer = more concentrated.',
       'ins.rnHeat':'How to read: darker = more voices for that theme×sentiment. <b>Color is the signal; the number is secondary</b>.',
@@ -1072,6 +1072,12 @@
   const subOf = url => { const m = /reddit\.com\/r\/([A-Za-z0-9_]+)/.exec(url || ''); return m ? 'r/' + m[1] : (/(news\.)?ycombinator/.test(url||'') ? 'HN' : 'web'); };
   // Brand official-site SEARCH link (no LLM-emitted URLs → zero dead links).
   const brandSearch = name => 'https://duckduckgo.com/?q=' + encodeURIComponent((name || '') + ' official site');
+  // prefer the brand's real official site (LLM-provided p.website); else a search link
+  const siteOf = p => {
+    let w = ((p && p.website) || '').trim();
+    if (w) { if (!/^https?:\/\//i.test(w)) w = 'https://' + w.replace(/^\/+/, ''); return { url: w, direct: true }; }
+    return { url: brandSearch(p && (p.name || '')), direct: false };
+  };
   function applyI18n(){
     document.querySelectorAll('[data-i18n]').forEach(el => {
       el.textContent = T(el.dataset.i18n);
@@ -1374,13 +1380,13 @@
           : `<span class="bt-thin">${T('ins.btThin')} · ${tot}${T('ins.btThinUnit')}</span>`;
         return `<tr>
           <td><span class="bt-name">${esc(tf(s.p,'name'))}</span><br>
-            <a class="bt-link" href="${brandSearch(tf(s.p,'name'))}" target="_blank" rel="noopener">${T('ins.btSite')} ↗</a></td>
+            <a class="bt-link" href="${esc(siteOf(s.p).url)}" target="_blank" rel="noopener">${siteOf(s.p).direct?T('ins.btSiteDirect'):T('ins.btSite')} ↗</a></td>
           <td><b style="font-size:15px;color:var(--ink)">${sharePct(s.n)}%</b> <span class="bt-num" style="font-size:11px">· ${s.n} ${T('ins.mentions')}</span></td>
           <td>${sentCell}</td>
           <td style="font-size:12.5px;color:var(--ink-2)">${esc(s.p.price||'')||'—'}${s.p.status?` · ${esc(s.p.status)}`:''}</td></tr>`; }).join('')}
     </tbody></table>
     ${morePlayers.length ? `<div class="bt-more"><p class="bt-more-h">${T('ins.btMore')} · ${morePlayers.length}</p>
-      <div class="bt-chips">${morePlayers.map(s=>`<span class="bt-chip"><span class="nm">${esc(tf(s.p,'name'))}</span>${s.p.price?`<span class="pr">${esc(s.p.price)}</span>`:''}<a href="${brandSearch(tf(s.p,'name'))}" target="_blank" rel="noopener">${T('ins.btSite')} ↗</a></span>`).join('')}</div></div>` : ''}`;
+      <div class="bt-chips">${morePlayers.map(s=>`<span class="bt-chip"><span class="nm">${esc(tf(s.p,'name'))}</span>${s.p.price?`<span class="pr">${esc(s.p.price)}</span>`:''}<a href="${esc(siteOf(s.p).url)}" target="_blank" rel="noopener">${siteOf(s.p).direct?T('ins.btSiteDirect'):T('ins.btSite')} ↗</a></span>`).join('')}</div></div>` : ''}`;
 
     // deep-dive trio (top 3 themes, each with linked stories + objective takeaway)
     const dvQuote = x => `<div class="ins-q ${x.sentiment==='pos'?'pos':'neg'}">"${esc(tf(x,'title'))}"${zhLine(x)}

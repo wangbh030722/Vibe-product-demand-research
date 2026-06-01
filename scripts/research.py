@@ -107,7 +107,7 @@ Decide research scope. Output JSON:
                                       // category leaders, adjacent alternatives, and what
                                       // people hack together — NOT only literal matches of
                                       // every adjective (include e.g. Loop for sleep earbuds).
-    {{"id": "<lowercase_slug>", "name": "<English Brand Name>", "price": "<approx retail, e.g. ~$60 or $40-90; '' if truly unknown>"}}
+    {{"id": "<lowercase_slug>", "name": "<English Brand Name>", "price": "<approx retail, e.g. ~$60 or $40-90; '' if truly unknown>", "website": "<the brand's OFFICIAL site domain you are confident about, e.g. loopearplugs.com or bose.com; '' if unsure — do NOT guess>"}}
   ],
   "rationale": "<one sentence why this mode>"
 }}
@@ -348,8 +348,10 @@ def stage_discover_brands(idea: str, scope: dict, pool: list[dict], wd: Path,
             "a shopper in this category would consider or compare — direct competitors "
             "AND adjacent alternatives people compare against (even if they don't match "
             "every adjective of the idea). EXCLUDE generic words, subreddit names, "
-            "feature words, and non-products. Count how many titles mention each.\n"
-            'Return JSON: {"brands":[{"name":"<Brand/Product>","count":<int>}]}')
+            "feature words, and non-products. Count how many titles mention each. "
+            "Also give each brand's OFFICIAL site domain if you are confident "
+            "(e.g. loopearplugs.com), else '' — do NOT guess.\n"
+            'Return JSON: {"brands":[{"name":"<Brand/Product>","count":<int>,"website":"<domain or \'\'>"}]}')
     try:
         res = chat_json(sys_msg, user, temperature=0.2, max_tokens=1500)
     except Exception as e:
@@ -369,7 +371,8 @@ def stage_discover_brands(idea: str, scope: dict, pool: list[dict], wd: Path,
         if not sid or name.lower() in existing or sid in existing:
             continue
         existing.add(name.lower()); existing.add(sid)
-        new.append({"id": sid, "name": name, "price": ""})
+        web = (b.get("website") or "").strip()
+        new.append({"id": sid, "name": name, "price": "", "website": web})
     if new:
         scope["players"] = players + new
         save(wd / "01-scope.json", scope)
@@ -921,6 +924,8 @@ def stage_assemble(slug: str, idea: str, target_market: str, scope: dict,
         }
         if p.get("price"):
             pl["price"] = p["price"]
+        if p.get("website"):
+            pl["website"] = p["website"]
         players.append(pl)
 
     # Themes from cluster (ensure colors + polarity normalization)
