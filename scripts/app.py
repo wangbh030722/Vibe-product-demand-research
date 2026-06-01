@@ -336,6 +336,7 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   .recent{margin-top:30px;border-top:1px solid var(--line);padding-top:18px}
   .recent-h{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);
     font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase;margin-bottom:10px}
+  .recent-h .recent-actions{display:inline-flex;gap:4px}
   .recent-h a{color:var(--ink-3);text-decoration:none;cursor:pointer;font-size:14px;line-height:1;padding:2px 6px;border-radius:6px}
   .recent-h a:hover{background:var(--surface);color:var(--accent)}
   .recent-list{display:flex;flex-direction:column;gap:6px}
@@ -429,9 +430,12 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     <div class="prog-elapsed" id="elapsed"></div>
   </div>
 
-  <!-- plan B: recently generated reports -->
+  <!-- plan B: recently generated reports (private to this browser) -->
   <div class="recent" id="recentWrap" hidden>
-    <div class="recent-h"><span>最近生成的报告 / Recent reports</span><a id="recentRefresh" title="刷新">↻</a></div>
+    <div class="recent-h">
+      <span>最近生成的报告(本机) / My recent</span>
+      <span class="recent-actions"><a id="recentRefresh" title="刷新">↻</a><a id="recentClear" title="清除本机历史">✕</a></span>
+    </div>
     <div class="recent-list" id="recentList"></div>
   </div>
 
@@ -442,18 +446,29 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   const $ = id => document.getElementById(id);
   document.querySelectorAll('.samples button').forEach(b => b.onclick = () => $('idea').value = b.dataset.s);
 
-  // plan B: load + render the "recent reports" list. Server-side history (from
-  // dist/<slug>.html + data/<slug>.json), so it's the same view for everyone using
-  // this site. Quiet failure if /api/recent isn't available.
+  // plan B (per-browser private history):
+  // History is stored in THIS browser's localStorage, NOT on the server, so each
+  // person only sees their own runs. Server is only asked to resolve idea/timestamp
+  // for the slugs the browser already knows. A and B don't see each other's lists.
+  // (Report URLs themselves remain public — that's needed for sharing.)
   const _esc = s => String(s||'').replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;"}[c]));
+  const HKEY = 'vibe.history.v1';
+  const _slugs = () => { try { return JSON.parse(localStorage.getItem(HKEY) || '[]').filter(s=>typeof s==='string'); } catch { return []; } };
+  function recordSlug(slug){
+    if (!slug || !/^[a-z0-9][a-z0-9-]{1,60}$/.test(slug)) return;
+    const list = _slugs().filter(s => s !== slug);   // newest first; no dups
+    list.unshift(slug);
+    try { localStorage.setItem(HKEY, JSON.stringify(list.slice(0, 24))); } catch {}
+  }
   async function loadRecent(){
+    const slugs = _slugs(); const wrap = $('recentWrap');
+    if (!slugs.length) { wrap.hidden = true; return; }
     try {
-      const r = await fetch('/api/recent', { cache: 'no-store' });
+      const r = await fetch('/api/recent?slugs=' + encodeURIComponent(slugs.join(',')), { cache: 'no-store' });
       if (!r.ok) return;
       const { items } = await r.json();
-      if (!items || !items.length) return;
-      const wrap = $('recentWrap'); const list = $('recentList');
-      list.innerHTML = items.map(it => `<a href="${_esc(it.url)}" target="_blank" rel="noopener">
+      if (!items || !items.length) { wrap.hidden = true; return; }
+      $('recentList').innerHTML = items.map(it => `<a href="${_esc(it.url)}" target="_blank" rel="noopener">
         <span class="r-idea">${_esc(it.idea)}</span>
         <span class="r-meta">${_esc(it.target_market)} · ${_esc(it.timestamp)}</span>
       </a>`).join('');
@@ -461,6 +476,12 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     } catch {}
   }
   document.getElementById('recentRefresh').addEventListener('click', e => { e.preventDefault(); loadRecent(); });
+  document.getElementById('recentClear').addEventListener('click', e => { e.preventDefault();
+    if (confirm('清除这个浏览器记录的历史?(不会删除已发布的报告)')) {
+      try { localStorage.removeItem(HKEY); } catch {}
+      loadRecent();
+    }
+  });
   loadRecent();
 
   // Cursor-following glow: reveal the fluorescent-outline layer in a soft circle
@@ -573,6 +594,8 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
       setActive('RENDER', '渲染报告…');
       allDone();
       const url = finalData._report_url;
+      const slug = (finalData.meta && finalData.meta.slug) || (url && url.split('/').pop().replace(/\.html$/,''));
+      if (slug) recordSlug(slug);     // private to this browser
       if (url) {
         window.open(url, '_blank', 'noopener');
         // briefly show a "done — opened in new tab" state, then reset the form for
@@ -617,18 +640,22 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path in ("/", "/index.html"):
             return self._send(200, FORM_HTML)
-        # /api/recent — list previously generated reports (plan B): scans dist/ for
-        # ready-to-serve report HTMLs and reads each one's idea + timestamp from the
-        # matching data/<slug>.json. Best-effort; tiny payload.
+        # /api/recent?slugs=a,b,c — resolve THIS browser's history to metadata.
+        # Per-browser privacy: the slug list lives in the user's localStorage; the
+        # server only fills in {idea, timestamp, market} for the slugs the browser
+        # already knows. No server-side global history → A can't see B's reports.
+        # (Report HTMLs themselves are still public URLs — that's how "share link"
+        # works; "history" is just personal.)
         if path == "/api/recent":
+            from urllib.parse import parse_qs
+            qs = parse_qs(urlparse(self.path).query)
+            wanted = [s for s in (qs.get("slugs") or [""])[0].split(",")
+                      if s and re.match(r"^[a-z0-9][a-z0-9-]{1,60}$", s)][:24]
             items = []
-            for d in sorted((ROOT / "dist").glob("*.html"),
-                            key=lambda p: p.stat().st_mtime, reverse=True):
-                slug = d.stem
-                if slug in ("_template", "index"):
-                    continue
+            for slug in wanted:
+                d = ROOT / "dist" / f"{slug}.html"
                 j = ROOT / "data" / f"{slug}.json"
-                if not j.exists():
+                if not d.exists() or not j.exists():
                     continue
                 try:
                     meta = json.loads(j.read_text(encoding="utf-8")).get("meta", {})
@@ -638,8 +665,6 @@ class Handler(BaseHTTPRequestHandler):
                                   "target_market": meta.get("target_market", "")})
                 except Exception:
                     continue
-                if len(items) >= 12:
-                    break
             return self._send(200, json.dumps({"items": items}, ensure_ascii=False),
                               "application/json")
         # serve dist/ + templates/ static
