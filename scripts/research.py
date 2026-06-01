@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -36,6 +37,33 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from llm_client import chat_json  # type: ignore
 
 STAGES = ["scope", "collect", "curate", "cluster", "synth", "render"]
+
+
+# --------------------------------------------------------------------------- #
+# Data-quality helpers (used by collect + curate)                             #
+# --------------------------------------------------------------------------- #
+
+def _norm_title(t: str) -> str:
+    """Normalized title for near-duplicate collapse (lowercase, alnum-only, capped)."""
+    return re.sub(r"[^a-z0-9]+", " ", (t or "").lower()).strip()[:90]
+
+# Marks a product LISTING / ad / affiliate-spam post (not a real user discussion).
+# These flooded a hosted run: "DEESS ... ipl hair remover ... 350000 flashes",
+# "Painless Hair Removal ... Portable Waterproof Electric ...".
+_LISTING_RE = re.compile(
+    r"(\b\d{3,}\s*(flash|flashes|mah|lumens|pcs|count|sheets|pack)\b"
+    r"|for\s+face\s*&?\s*body|home\s+use|portable\s+waterproof|waterproof\s+electric"
+    r"|free\s+shipping|best\s*seller|on\s+sale|buy\s+now|coupon|discount\s+code"
+    r"|\bseries\s+\d|amazon\.com|aliexpress|\bsku\b)", re.I)
+
+def _looks_like_listing(title: str) -> bool:
+    t = title or ""
+    if _LISTING_RE.search(t):
+        return True
+    # very long, comma-spec-heavy titles read like catalog entries, not posts
+    if len(t) > 110 and t.count(",") >= 3:
+        return True
+    return False
 
 
 def work_dir(slug: str) -> Path:
@@ -308,11 +336,29 @@ def stage_collect(scope: dict, wd: Path, skip: bool, log=None) -> list[dict]:
         deduped.append(r)
     deduped.sort(key=lambda r: (kw_hits(r), abs(r.get("score") or 0)), reverse=True)
 
+    # Clean the ranked pool BEFORE it's used anywhere downstream, so both the LLM
+    # curation AND its keyword-fallback draw from clean data:
+    #   1. drop product-listing / ad / affiliate spam (real run got flooded by them);
+    #   2. collapse near-identical TITLES (reposts/crossposts/spam share a title but
+    #      have different post ids, so id-dedup alone left e.g. the SAME item 11x).
+    # Done after ranking so the kept copy of each title is the strongest one.
+    seen_t, cleaned, n_drop = set(), [], 0
+    for r in deduped:
+        if _looks_like_listing(r.get("title")):
+            n_drop += 1; continue
+        nt = _norm_title(r.get("title"))
+        if nt and nt in seen_t:
+            n_drop += 1; continue
+        if nt:
+            seen_t.add(nt)
+        cleaned.append(r)
+
     # The pool is on-topic BY CONSTRUCTION (product-specific queries + product
-    # subreddits), so it counts as the relevant base. It's ranked by keyword
-    # relevance, so the strongest signal is first; CURATE then makes the strict
-    # per-item relevance call on the top slice. Cap at the 999 target.
-    pool = deduped[:TARGET_POOL]
+    # subreddits). Ranked by keyword relevance; CURATE then makes the strict
+    # per-item relevance call. Cap at the 999 target.
+    pool = cleaned[:TARGET_POOL]
+    if n_drop:
+        _log(f"已剔除 {n_drop} 条重复/广告 listing")
     n_kw = sum(1 for r in pool if kw_hits(r) >= 1)
     save(out, pool)
     _log(f"已锁定 {len(pool)} 条相关 Reddit 真实评论(其中 {n_kw} 条命中产品关键词)")
@@ -570,6 +616,10 @@ RELEVANCE:
   1 = same broad area but not about this product's job.
   (omit anything that's noise: memes, theft, shipping rants, unboxing, jokes,
    unrelated off-topic — just don't include them.)
+  HARD REJECT (never keep): product LISTINGS / ad copy / affiliate spam — titles
+  that read like a shop catalog entry (model/series numbers, spec dumps like
+  "350000 flashes", "for face & body home use", "portable waterproof electric",
+  promo phrases). We want real user discussion, not marketplace listings.
 
 SENTIMENT — classify honestly, do NOT default to "pos":
   neg = a complaint, problem, disappointment, defect, leak, return, "wish it
@@ -638,16 +688,22 @@ Keep up to {min(max_voices, 160)} items, fair not stingy — real on-topic items
     target = min(min_voices, len(ranked)) if min_voices else 0
     if len(voices) < target:
         have = {v.get("url") for v in voices}
+        have_t = {_norm_title(v.get("title")) for v in voices}
         NEG = ("problem", "issue", "broke", "broken", "leak", "disappoint", "return",
                "refund", "worst", "hate", "complaint", "weak", "fail", "stuck",
                "defect", "scam", "avoid", "annoying", "frustrat")
         for r in ranked:
             if len(voices) >= target:
                 break
-            u = r.get("url")
-            if not u or u in have or kw_hits(r) < 1:
+            u = r.get("url"); nt = _norm_title(r.get("title"))
+            # this is the no-LLM fallback, so be STRICT: stronger keyword relevance
+            # (>=2, not >=1), no listings, no duplicate titles — otherwise off-topic
+            # ad spam floods the report when the curate LLM call failed (e.g. hosted
+            # cross-border timeout, the exact failure a tester hit).
+            if (not u or u in have or kw_hits(r) < 2
+                    or _looks_like_listing(r.get("title")) or (nt and nt in have_t)):
                 continue
-            have.add(u)
+            have.add(u); have_t.add(nt)
             title = (r.get("title") or "")[:120]
             tl = title.lower()
             pl = next((pid for pid in player_ids if pid and pid in tl), "other")
