@@ -141,6 +141,12 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
         data["trend"] = trend
         data["trend_source"] = "reddit"
 
+    # Data-quality self-check (plan C): flag repeated/listing/single-source spam so
+    # a bad run is caught rather than silently shipped.
+    data["quality"] = research.compute_quality(data)
+    for w in data["quality"]["warnings"]:
+        log("ASSEMBLE", f"⚠ 数据质量:{w}")
+
     # validate
     schema = load_schema()
     errs = validate_schema(data, schema) + check_cross_refs(data)

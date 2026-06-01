@@ -246,7 +246,8 @@
     },
     "trend_source": { "type": "string", "enum": ["reddit", "google"] },
     "section_insights": { "type": "object" },
-    "user_demand": { "type": "object" }
+    "user_demand": { "type": "object" },
+    "quality": { "type": "object", "description": "Post-generation data-quality self-check (dup/listing/source-concentration + warnings)." }
   },
 
   "additionalProperties": false
