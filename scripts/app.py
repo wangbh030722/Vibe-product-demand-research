@@ -58,7 +58,7 @@ _PIPELINE_LOCK = threading.Lock()
 
 
 def run_pipeline(idea: str, target_market: str, mode: str | None,
-                 log, creds: dict | None = None, target_lang: str = "zh") -> dict:
+                 log, creds: dict | None = None, target_lang: str = "zh", emit=None) -> dict:
     creds = creds or {}
     with _PIPELINE_LOCK:
         # Apply per-request key override (falls back to .env default), restore after.
@@ -67,7 +67,7 @@ def run_pipeline(idea: str, target_market: str, mode: str | None,
             if creds.get("api_key"):    os.environ["OPENAI_API_KEY"]  = creds["api_key"]
             if creds.get("base_url"):   os.environ["OPENAI_BASE_URL"] = creds["base_url"]
             if creds.get("model"):      os.environ["OPENAI_MODEL"]    = creds["model"]
-            return _run_pipeline_inner(idea, target_market, mode, log, target_lang=target_lang)
+            return _run_pipeline_inner(idea, target_market, mode, log, target_lang=target_lang, emit=emit)
         finally:
             for k, v in saved.items():
                 if v is None:
@@ -77,7 +77,7 @@ def run_pipeline(idea: str, target_market: str, mode: str | None,
 
 
 def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
-                        log, target_lang: str = "zh") -> dict:
+                        log, target_lang: str = "zh", emit=None) -> dict:
     slug = slugify(idea)
     wd = research.work_dir(slug)
 
@@ -108,6 +108,19 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
     max_voices = max(100, min(150, len(pool) // 2))
     voices = research.stage_curate(idea, scope, pool, wd, max_voices, False, min_voices=100)
     log("CURATE", f"保留 {len(voices)} 条真实原声(从 {len(pool)} 条池子)")
+    # Live voices feed (plan #2): push the real curated voices to the UI NOW so the
+    # user can start reading actual content while the slower synthesis runs. The
+    # voices ARE what users care about most — surface them first, not after 5 min.
+    if emit and voices:
+        import re as _re_sub
+        def _sub(u):
+            m = _re_sub.search(r"/r/([A-Za-z0-9_]+)", u or "")
+            return ("r/" + m.group(1)) if m else "web"
+        emit("voices", {"voices": [
+            {"title": v.get("title", ""), "url": v.get("url", ""),
+             "score": int(v.get("score") or 0), "sentiment": v.get("sentiment", "pos"),
+             "sub": _sub(v.get("url"))}
+            for v in voices]})
     if not voices:
         raise RuntimeError(
             f"收集到 {len(pool)} 条原始内容,但没有一条与「{idea}」强相关 "
@@ -214,6 +227,18 @@ def expand_pipeline(slug: str, idea: str, market: str, mode: str | None,
                  "hn_queries": [idea]}
     scope["_idea"] = idea
 
+    # Each click goes DEEPER: persist a round counter in a sidecar (no schema impact)
+    # so successive expands widen pagination + rotate queries instead of re-spinning.
+    rc_file = wd / "_expand.count"
+    try:
+        rnd = int(rc_file.read_text().strip()) + 1
+    except Exception:
+        rnd = 1
+    try:
+        rc_file.write_text(str(rnd))
+    except Exception:
+        pass
+
     with _PIPELINE_LOCK:
         saved = {k: os.environ.get(k) for k in ("OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_MODEL")}
         try:
@@ -221,7 +246,7 @@ def expand_pipeline(slug: str, idea: str, market: str, mode: str | None,
             if creds.get("base_url"): os.environ["OPENAI_BASE_URL"] = creds["base_url"]
             if creds.get("model"):    os.environ["OPENAI_MODEL"]    = creds["model"]
             new = research.stage_expand(idea, market, scope, data.get("voices", []),
-                                        data.get("themes", []), wd, log=None, depth=1)
+                                        data.get("themes", []), wd, log=None, depth=rnd)
         finally:
             for k, v in saved.items():
                 if v is None: os.environ.pop(k, None)
@@ -234,7 +259,17 @@ def expand_pipeline(slug: str, idea: str, market: str, mode: str | None,
             for tid in v.get("themes", []):
                 data.setdefault("edges", []).append({"from": v["id"], "to": tid, "w": 1})
         data.setdefault("verdict", {}).setdefault("evidence_counts", {})["raw_voices"] = len(data["voices"])
+        if "quality" in data:
+            data["quality"] = research.compute_quality(data)
         data_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        # re-render the persistent HTML so the shareable URL reflects the grown corpus
+        try:
+            tpl = (ROOT / "templates" / "lens-report-template.html").read_text(encoding="utf-8")
+            (ROOT / "dist" / f"{slug}.html").write_text(
+                tpl.replace("{{REPORT_DATA_JSON}}", json.dumps(data, ensure_ascii=False)),
+                encoding="utf-8")
+        except Exception:
+            pass
     return {"new_voices": new, "total": len(data.get("voices", []))}
 
 
@@ -331,6 +366,18 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   .step.active{animation:breathe 1.8s ease-in-out infinite}
   @keyframes breathe{0%,100%{opacity:1}50%{opacity:.72}}
   .prog-elapsed{font-family:var(--mono);font-size:10px;color:var(--ink-3);text-align:right;margin-top:10px;letter-spacing:.06em}
+  /* live real-voices feed during generation */
+  .livevoices{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+  .livevoices .lv-h{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--accent);margin-bottom:10px}
+  .lv-list{display:flex;flex-direction:column;gap:7px;max-height:340px;overflow-y:auto}
+  .lv-item{display:flex;gap:9px;align-items:baseline;padding:8px 11px;border:1px solid var(--line);border-radius:8px;
+    background:rgba(255,255,255,.6);backdrop-filter:blur(10px);font-size:13px;line-height:1.4;
+    animation:lvIn .4s ease both}
+  @keyframes lvIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .lv-item .lv-dot{width:7px;height:7px;border-radius:50%;flex:none;align-self:center;background:var(--accent)}
+  .lv-item .lv-dot.neg{background:var(--neg)}
+  .lv-item .lv-t{flex:1;min-width:0;color:var(--ink)}
+  .lv-item .lv-m{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap;flex:none}
   .hint{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:26px;line-height:1.7;border-top:1px solid var(--line);padding-top:18px}
   /* recent-reports panel (plan B) */
   .recent{margin-top:30px;border-top:1px solid var(--line);padding-top:18px}
@@ -428,6 +475,11 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     <div class="prog-bar"><i id="progBar"></i></div>
     <div id="steps"></div>
     <div class="prog-elapsed" id="elapsed"></div>
+    <!-- live real-voices feed (plan #2): real content to read while synthesis runs -->
+    <div class="livevoices" id="liveVoices" hidden>
+      <div class="lv-h">实时读到的真实原声 <span id="lvCount"></span> · 完整报告稍后自动打开</div>
+      <div class="lv-list" id="lvList"></div>
+    </div>
   </div>
 
   <!-- plan B: recently generated reports (private to this browser) -->
@@ -474,6 +526,28 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
       </a>`).join('');
       wrap.hidden = false;
     } catch {}
+  }
+  // plan #2: render the live real-voices feed as they stream in, revealing them
+  // one-by-one (staggered) so it feels like content is arriving in real time.
+  let _lvTimer = null;
+  function showLiveVoices(voices){
+    if (!voices || !voices.length) return;
+    const wrap = $('liveVoices'), list = $('lvList');
+    wrap.hidden = false;
+    $('lvCount').textContent = '· ' + voices.length + ' 条';
+    list.innerHTML = '';
+    let i = 0;
+    clearInterval(_lvTimer);
+    _lvTimer = setInterval(() => {
+      if (i >= voices.length || i >= 60) { clearInterval(_lvTimer); return; }
+      const v = voices[i++];
+      const el = document.createElement('div');
+      el.className = 'lv-item';
+      el.innerHTML = `<span class="lv-dot ${v.sentiment==='neg'?'neg':''}"></span>`
+        + `<span class="lv-t">"${_esc(v.title)}"</span>`
+        + `<span class="lv-m">${_esc(v.sub)} · ↑${v.score}</span>`;
+      list.appendChild(el);
+    }, 55);
   }
   document.getElementById('recentRefresh').addEventListener('click', e => { e.preventDefault(); loadRecent(); });
   document.getElementById('recentClear').addEventListener('click', e => { e.preventDefault();
@@ -548,6 +622,7 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     $('go').disabled = true; $('go').textContent = '研究中…(可看下方进度)';
     $('stop').style.display = 'block';
     $('prog').className = 'prog show'; buildSteps(); setActive('SCOPE','提交:'+idea);
+    clearInterval(_lvTimer); $('liveVoices').hidden = true; $('lvList').innerHTML = '';
 
     const t0 = Date.now();
     clearInterval(elapsedTimer);
@@ -578,6 +653,7 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
           if (!dm) continue;
           let payload; try { payload = JSON.parse(dm); } catch { continue; }
           if (ev === 'progress') { lastTag = payload.stage; setActive(payload.stage, payload.msg); }
+          else if (ev === 'voices') { showLiveVoices(payload.voices || []); }
           else if (ev === 'done') { finalData = payload.data; }
           else if (ev === 'error') { errMsg = payload.error; }
         }
@@ -762,7 +838,8 @@ class Handler(BaseHTTPRequestHandler):
         _hb = _thr.Thread(target=_heartbeat, daemon=True)
         _hb.start()
         try:
-            data = run_pipeline(idea, market, mode, log=log, creds=creds, target_lang=target_lang)
+            data = run_pipeline(idea, market, mode, log=log, creds=creds,
+                                target_lang=target_lang, emit=sse)
             sse("done", {"ok": True, "data": data})
         except Exception as e:
             print(f"  ✗ {e}", flush=True)

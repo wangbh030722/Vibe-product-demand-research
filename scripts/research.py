@@ -1180,12 +1180,19 @@ def stage_expand(idea: str, target_market: str, scope: dict,
             except Exception: pass
 
     base = scope.get("_idea") or idea
-    mods = ["review", "problem", "alternative", "worth it", "complaint",
-            "setup", "battery life", "vs", "recommendation", "issues"]
+    # Big intent vocabulary; ROTATE the emphasis by round (depth) so each expand
+    # explores NEW angles — repeating the same queries is exactly why it felt fake.
+    MODS = ["review", "problem", "alternative", "worth it", "complaint", "setup",
+            "battery life", "vs", "recommendation", "issues", "best", "cheap",
+            "durability", "leak", "warranty", "return", "comparison", "experience",
+            "upgrade", "regret", "love it", "hate", "waste of money", "tips",
+            "which one", "long term", "honest", "before you buy"]
+    k = ((depth - 1) * 9) % len(MODS)
+    mods = (MODS + MODS)[k:k + 14]            # rotating 14-mod window per round
     queries = list(scope.get("hn_queries") or [])
     queries += [f"{base} {m}" for m in mods]
     queries += [p.get("name", "") for p in scope.get("players", []) if p.get("name")]
-    queries = [q for q in dict.fromkeys(queries) if q][:10]
+    queries = [q for q in dict.fromkeys(queries) if q][:18]
     subs = scope.get("subreddits", [])
 
     # Light live collect: Arctic Shift (primary) → pullpush (fallback) + HN.
@@ -1195,9 +1202,9 @@ def stage_expand(idea: str, target_market: str, scope: dict,
     if subs:
         try:
             subprocess.run([sys_exe(), str(ROOT / "core/collect/arcticshift.py"),
-                            "--subs", *subs, "--queries", *queries[:6],
-                            "--size", "100", "--pages", "2", "--out", str(asj)],
-                           check=False, capture_output=True, timeout=150)
+                            "--subs", *subs, "--queries", *queries[:10],
+                            "--size", "100", "--pages", str(2 + depth), "--out", str(asj)],
+                           check=False, capture_output=True, timeout=210)
         except subprocess.TimeoutExpired:
             pass
         pool += read_jsonl(asj, source="reddit")
@@ -1232,7 +1239,10 @@ def stage_expand(idea: str, target_market: str, scope: dict,
         return []
 
     # Curate the new pool in an isolated cache dir (don't clobber canonical stages).
-    cap = min(12, 4 + depth * 4)
+    # Big batch per click (user wants a real jump, accepts the token cost): ~100 new
+    # the first round, more each deeper round — bounded only by what's actually out
+    # there after dedup against what's already shown.
+    cap = 60 + depth * 40
     xwd = wd / "_expand"
     xwd.mkdir(exist_ok=True)
     new = stage_curate(idea, scope, uniq, xwd, cap, False)
