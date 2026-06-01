@@ -731,28 +731,31 @@ Keep every genuinely relevant item in THIS batch (real on-topic items are 2-3); 
         NEG = ("problem", "issue", "broke", "broken", "leak", "disappoint", "return",
                "refund", "worst", "hate", "complaint", "weak", "fail", "stuck",
                "defect", "scam", "avoid", "annoying", "frustrat")
-        for r in ranked:
-            if len(voices) >= target:
-                break
-            u = r.get("url"); nt = _norm_title(r.get("title"))
-            # this is the no-LLM fallback, so be STRICT: stronger keyword relevance
-            # (>=2, not >=1), no listings, no duplicate titles — otherwise off-topic
-            # ad spam floods the report when the curate LLM call failed (e.g. hosted
-            # cross-border timeout, the exact failure a tester hit).
-            if (not u or u in have or kw_hits(r) < 2
-                    or _looks_like_listing(r.get("title")) or (nt and nt in have_t)):
-                continue
-            have.add(u); have_t.add(nt)
-            title = (r.get("title") or "")[:120]
-            tl = title.lower()
-            pl = next((pid for pid in player_ids if pid and pid in tl), "other")
-            voices.append({
-                "id": "", "player": pl, "title": title,
-                "score": int(r.get("score") or 0), "url": u,
-                "created_utc": r.get("created_utc"),
-                "sentiment": "neg" if any(w in tl for w in NEG) else "pos",
-                "themes": [],
-            })
+        def _pad(min_kw):
+            for r in ranked:
+                if len(voices) >= target:
+                    break
+                u = r.get("url"); nt = _norm_title(r.get("title"))
+                # NEVER pad with listings or duplicate titles — that's the junk we
+                # cleaned out. Only the keyword-relevance bar is relaxed in tiers.
+                if (not u or u in have or kw_hits(r) < min_kw
+                        or _looks_like_listing(r.get("title")) or (nt and nt in have_t)):
+                    continue
+                have.add(u); have_t.add(nt)
+                title = (r.get("title") or "")[:120]; tl = title.lower()
+                pl = next((pid for pid in player_ids if pid and pid in tl), "other")
+                voices.append({
+                    "id": "", "player": pl, "title": title,
+                    "score": int(r.get("score") or 0), "url": u,
+                    "created_utc": r.get("created_utc"),
+                    "sentiment": "neg" if any(w in tl for w in NEG) else "pos",
+                    "themes": [],
+                })
+        # TIERED to honour the floor without re-adding junk: prefer strongly-relevant
+        # (>=2 keyword hits); only if still short, relax to weaker-but-clean (>=1).
+        _pad(2)
+        if len(voices) < target:
+            _pad(1)
 
     for i, v in enumerate(voices, 1):
         v["id"] = f"v{i:02d}"

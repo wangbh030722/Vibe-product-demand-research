@@ -6,34 +6,34 @@
     "mode": "EXISTING",
     "timestamp": "2026-06-01",
     "target_market": "US",
-    "thesis": "便携咖啡机市场看似拥挤，但核心矛盾“便携与品质”尚未被完美解决。",
-    "deck": "现有产品在便携性、咖啡品质和耐用性上各有短板，用户对“真正便携且好喝”的需求强烈，存在差异化机会。",
+    "thesis": "便携咖啡机市场看似拥挤，但用户对“真浓缩”与“真便携”的兼得仍未被满足。",
+    "deck": "用户频繁对比产品，抱怨手动款费力、电动款体积大，核心矛盾在于便携性与咖啡品质的平衡。",
     "target_lang": "zh",
-    "idea_en": "Portable coffee maker",
-    "thesis_en": "The portable coffee maker market appears crowded, but the core contradiction between portability and quality has not been perfectly resolved.",
-    "deck_en": "Existing products each have shortcomings in portability, coffee quality, and durability. Users have a strong demand for 'truly portable and delicious' coffee, presenting a differentiation opportunity."
+    "idea_en": "Portable Coffee Machine",
+    "thesis_en": "The portable coffee machine market seems crowded, but users' need for both 'real espresso' and 'true portability' remains unmet.",
+    "deck_en": "Users frequently compare products, complaining that manual models are labor-intensive and electric ones are bulky; the core conflict is the balance between portability and coffee quality."
   },
   "verdict": {
     "status": "real",
-    "rationale": "用户声音中便携性和咖啡品质是高频话题，且对现有产品有明确抱怨。",
+    "rationale": "用户讨论热烈，需求真实，但现有产品各有短板，存在差异化空间。",
     "evidence_counts": {
-      "raw_voices": 119,
+      "raw_voices": 124,
       "marketplace": 0,
       "editorials": 0,
       "simulated": 0
     },
     "key_findings": [
-      "便携性（18%）和咖啡品质（17%）是用户最关注的两大主题，且均为正面评价。",
-      "耐用性（12%）和清洁维护（11%）是主要痛点，用户抱怨在户外易损坏、清洗困难。",
-      "电动 vs 手动（15%）和性价比（14%）是中性讨论，用户各执一词。",
-      "材质安全（10%）虽占比小，但用户对塑料和特氟龙有健康担忧。"
+      "便携性（18次提及）和咖啡品质（17次）是用户最关注的两个主题，且常被对立讨论。",
+      "价格敏感（15次）但用户愿意为品质支付溢价，如Flair Espresso（~$150）仍有市场。",
+      "材质安全（12次）是痛点，用户担心塑料部件，偏好金属或环保材料。",
+      "产品对比（16次）频繁，用户在不同品牌间犹豫，说明缺乏明确的首选方案。"
     ],
-    "rationale_en": "Portability and coffee quality are high-frequency topics in user voices, with clear complaints about existing products.",
+    "rationale_en": "User discussions are lively and demand is real, but existing products each have shortcomings, leaving room for differentiation.",
     "key_findings_en": [
-      "Portability (18%) and coffee quality (17%) are the two most concerned themes, both with positive reviews.",
-      "Durability (12%) and cleaning/maintenance (11%) are major pain points, with users complaining about easy damage outdoors and difficult cleaning.",
-      "Electric vs. manual (15%) and value for money (14%) are neutral discussions, with users holding different opinions.",
-      "Material safety (10%) has a small share, but users have health concerns about plastic and Teflon."
+      "Portability (18 mentions) and coffee quality (17) are the two most concerned themes, often discussed as trade-offs.",
+      "Price sensitivity (15 mentions) exists, but users are willing to pay a premium for quality, e.g., Flair Espresso (~$150) still has a market.",
+      "Material safety (12 mentions) is a pain point; users worry about plastic parts and prefer metal or eco-friendly materials.",
+      "Product comparisons (16 mentions) are frequent; users hesitate among brands, indicating a lack of a clear first choice."
     ]
   },
   "players": [
@@ -45,7 +45,7 @@
       "x": 0.82,
       "y": 0.45,
       "summary": "",
-      "price": "~$70-130",
+      "price": "~$80",
       "website": "wacaco.com",
       "name_en": "Wacaco"
     },
@@ -54,32 +54,20 @@
       "name": "Staresso",
       "color": "#4a4e5b",
       "size": 24,
-      "x": 0.777,
-      "y": 0.6,
+      "x": 0.769,
+      "y": 0.612,
       "summary": "",
-      "price": "~$60-80",
+      "price": "~$60",
       "website": "staresso.com",
       "name_en": "Staresso"
     },
     {
-      "id": "handpresso",
-      "name": "Handpresso",
-      "color": "#4a4e5b",
-      "size": 22,
-      "x": 0.66,
-      "y": 0.71,
-      "summary": "",
-      "price": "~$100-150",
-      "website": "handpresso.com",
-      "name_en": "Handpresso"
-    },
-    {
       "id": "aeropress",
       "name": "AeroPress",
-      "color": "#6b6f7c",
-      "size": 20,
-      "x": 0.5,
-      "y": 0.75,
+      "color": "#4a4e5b",
+      "size": 22,
+      "x": 0.633,
+      "y": 0.723,
       "summary": "",
       "price": "~$40",
       "website": "aeropress.com",
@@ -89,11 +77,11 @@
       "id": "minipresso",
       "name": "Minipresso",
       "color": "#6b6f7c",
-      "size": 18,
-      "x": 0.34,
-      "y": 0.71,
+      "size": 20,
+      "x": 0.454,
+      "y": 0.747,
       "summary": "",
-      "price": "~$50-70",
+      "price": "~$50",
       "website": "wacaco.com",
       "name_en": "Minipresso"
     },
@@ -101,80 +89,84 @@
       "id": "picopresso",
       "name": "Picopresso",
       "color": "#6b6f7c",
-      "size": 16,
-      "x": 0.223,
-      "y": 0.6,
+      "size": 18,
+      "x": 0.29,
+      "y": 0.677,
       "summary": "",
       "price": "~$100",
       "website": "wacaco.com",
       "name_en": "Picopresso"
     },
     {
-      "id": "outin",
-      "name": "Outin",
+      "id": "handpresso",
+      "name": "Handpresso",
       "color": "#6b6f7c",
       "size": 16,
-      "x": 0.18,
-      "y": 0.45,
+      "x": 0.193,
+      "y": 0.535,
       "summary": "",
-      "price": "~$100-150",
-      "website": "outin.com",
-      "name_en": "Outin"
+      "price": "~$80",
+      "website": "handpresso.com",
+      "name_en": "Handpresso"
     },
     {
-      "id": "espro",
-      "name": "Espro",
+      "id": "flair-espresso",
+      "name": "Flair Espresso",
       "color": "#6b6f7c",
       "size": 16,
-      "x": 0.223,
-      "y": 0.3,
+      "x": 0.193,
+      "y": 0.365,
       "summary": "",
-      "price": "~$40-60",
-      "website": "espro.com",
-      "name_en": "Espro"
+      "price": "~$150",
+      "website": "flairespresso.com",
+      "name_en": "Flair Espresso"
     },
     {
-      "id": "moka_pot",
+      "id": "rok-espresso",
+      "name": "Rok Espresso",
+      "color": "#6b6f7c",
+      "size": 16,
+      "x": 0.29,
+      "y": 0.223,
+      "summary": "",
+      "price": "~$120",
+      "website": "rokespresso.com",
+      "name_en": "Rok Espresso"
+    },
+    {
+      "id": "nespresso",
+      "name": "Nespresso",
+      "color": "#6b6f7c",
+      "size": 16,
+      "x": 0.454,
+      "y": 0.153,
+      "summary": "",
+      "price": "~$150",
+      "website": "nespresso.com",
+      "name_en": "Nespresso"
+    },
+    {
+      "id": "moka-pot",
       "name": "Moka Pot",
       "color": "#6b6f7c",
       "size": 16,
-      "x": 0.34,
-      "y": 0.19,
+      "x": 0.633,
+      "y": 0.177,
       "summary": "",
-      "price": "~$20-40",
+      "price": "~$25",
+      "website": "bialetti.com",
       "name_en": "Moka Pot"
     },
     {
-      "id": "french_press",
-      "name": "French Press",
+      "id": "outin_nano",
+      "name": "OutIn Nano",
       "color": "#6b6f7c",
       "size": 16,
-      "x": 0.5,
-      "y": 0.15,
+      "x": 0.769,
+      "y": 0.288,
       "summary": "",
-      "price": "~$15-30",
-      "name_en": "French Press"
-    },
-    {
-      "id": "nanopresso",
-      "name": "Nanopresso",
-      "color": "#6b6f7c",
-      "size": 16,
-      "x": 0.66,
-      "y": 0.19,
-      "summary": "",
-      "website": "wacaco.com",
-      "name_en": "Nanopresso"
-    },
-    {
-      "id": "maestri_house",
-      "name": "Maestri House",
-      "color": "#6b6f7c",
-      "size": 16,
-      "x": 0.777,
-      "y": 0.3,
-      "summary": "",
-      "name_en": "Maestri House"
+      "website": "outin.com",
+      "name_en": "OutIn Nano"
     }
   ],
   "themes": [
@@ -186,9 +178,9 @@
       "x": 0.2,
       "y": 0.8,
       "polarity": "win",
-      "summary": "用户强调便携咖啡机在旅行、露营等场景中的便利性",
+      "summary": "用户强调便携咖啡机在旅行、露营等场景中的便利性。",
       "label_en": "Portability",
-      "summary_en": "Users emphasize the convenience of portable coffee makers in travel, camping, etc."
+      "summary_en": "Users emphasize the convenience of portable coffee machines in travel, camping, etc."
     },
     {
       "id": "t.quality",
@@ -198,93 +190,93 @@
       "x": 0.8,
       "y": 0.7,
       "polarity": "win",
-      "summary": "用户关注便携咖啡机制作浓缩咖啡的口感和品质",
-      "label_en": "Coffee quality",
-      "summary_en": "Users focus on the taste and quality of espresso made by portable coffee makers."
+      "summary": "用户关注便携咖啡机制作的咖啡口感是否接近专业意式浓缩。",
+      "label_en": "Coffee Quality",
+      "summary_en": "Users care whether the coffee from portable machines approaches professional espresso."
     },
     {
-      "id": "t.electric_vs_manual",
-      "label": "电动vs手动",
+      "id": "t.price",
+      "label": "价格敏感",
       "color": "#80766a",
       "size": 15,
       "x": 0.5,
       "y": 0.9,
       "polarity": "neutral",
-      "summary": "用户比较电动和手动便携咖啡机的优缺点",
-      "label_en": "Electric vs. manual",
-      "summary_en": "Users compare the pros and cons of electric and manual portable coffee makers."
+      "summary": "用户频繁提及预算范围，寻求性价比高的产品。",
+      "label_en": "Price Sensitivity",
+      "summary_en": "Users frequently mention budget ranges, seeking cost-effective products."
     },
     {
-      "id": "t.price_value",
-      "label": "性价比",
+      "id": "t.electric_vs_manual",
+      "label": "电动 vs 手动",
       "color": "#80766a",
       "size": 14,
       "x": 0.3,
       "y": 0.3,
       "polarity": "neutral",
-      "summary": "用户讨论便携咖啡机的价格与性能是否匹配",
-      "label_en": "Value for money",
-      "summary_en": "Users discuss whether the price matches the performance of portable coffee makers."
-    },
-    {
-      "id": "t.durability",
-      "label": "耐用性",
-      "color": "#a0533c",
-      "size": 12,
-      "x": 0.7,
-      "y": 0.2,
-      "polarity": "pain",
-      "summary": "用户抱怨便携咖啡机在恶劣环境下易损坏或故障",
-      "label_en": "Durability",
-      "summary_en": "Users complain that portable coffee makers are prone to damage or malfunction in harsh environments."
-    },
-    {
-      "id": "t.cleaning",
-      "label": "清洁维护",
-      "color": "#a0533c",
-      "size": 11,
-      "x": 0.1,
-      "y": 0.5,
-      "polarity": "pain",
-      "summary": "用户询问或抱怨便携咖啡机在旅行中的清洁问题",
-      "label_en": "Cleaning and maintenance",
-      "summary_en": "Users ask about or complain about cleaning issues of portable coffee makers during travel."
-    },
-    {
-      "id": "t.grinder",
-      "label": "磨豆机搭配",
-      "color": "#80766a",
-      "size": 13,
-      "x": 0.6,
-      "y": 0.5,
-      "polarity": "neutral",
-      "summary": "用户讨论便携磨豆机与咖啡机的搭配使用",
-      "label_en": "Grinder pairing",
-      "summary_en": "Users discuss pairing portable grinders with coffee makers."
+      "summary": "用户对比电动和手动便携咖啡机的优缺点。",
+      "label_en": "Electric vs Manual",
+      "summary_en": "Users compare pros and cons of electric and manual portable coffee machines."
     },
     {
       "id": "t.material",
       "label": "材质安全",
       "color": "#a0533c",
-      "size": 10,
-      "x": 0.4,
-      "y": 0.1,
+      "size": 12,
+      "x": 0.7,
+      "y": 0.2,
       "polarity": "pain",
-      "summary": "用户关注便携咖啡机是否使用塑料或特氟龙等不健康材质",
-      "label_en": "Material safety",
-      "summary_en": "Users are concerned about whether portable coffee makers use unhealthy materials like plastic or Teflon."
+      "summary": "用户担心塑料部件，偏好金属或环保材料。",
+      "label_en": "Material Safety",
+      "summary_en": "Users worry about plastic parts, preferring metal or eco-friendly materials."
+    },
+    {
+      "id": "t.ease_of_use",
+      "label": "易用性",
+      "color": "#5b7a52",
+      "size": 13,
+      "x": 0.6,
+      "y": 0.5,
+      "polarity": "win",
+      "summary": "用户看重操作简单、清洁方便的特性。",
+      "label_en": "Ease of Use",
+      "summary_en": "Users value simple operation and easy cleaning."
+    },
+    {
+      "id": "t.durability",
+      "label": "耐用性",
+      "color": "#80766a",
+      "size": 11,
+      "x": 0.4,
+      "y": 0.6,
+      "polarity": "neutral",
+      "summary": "用户关注产品在户外环境中的耐用性和可靠性。",
+      "label_en": "Durability",
+      "summary_en": "Users care about product durability and reliability in outdoor environments."
+    },
+    {
+      "id": "t.comparison",
+      "label": "产品对比",
+      "color": "#80766a",
+      "size": 16,
+      "x": 0.1,
+      "y": 0.5,
+      "polarity": "neutral",
+      "summary": "用户经常比较不同品牌和型号的便携咖啡机。",
+      "label_en": "Product Comparison",
+      "summary_en": "Users often compare different brands and models of portable coffee machines."
     },
     {
       "id": "t.other",
-      "label": "其他讨论",
+      "label": "其他",
       "color": "#80766a",
       "size": 9,
       "x": 0.9,
       "y": 0.1,
       "polarity": "neutral",
-      "summary": "其他未归类的一般性讨论或询问",
-      "label_en": "Other discussions",
-      "summary_en": "Other unclassified general discussions or inquiries."
+      "summary": "涵盖未归类的杂项讨论。",
+      "label_en": "Other",
+      "summary_en": "Covers miscellaneous discussions not categorized elsewhere."
     }
   ],
   "voices": [
@@ -312,8 +304,8 @@
       "url": "https://www.reddit.com/r/espresso/comments/1p4xrpp/i_dragged_15_portable_espresso_makers_up_a/",
       "sentiment": "pos",
       "themes": [
-        "t.durability",
-        "t.portability"
+        "t.portability",
+        "t.durability"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1763931500,
@@ -328,8 +320,8 @@
       "url": "https://www.reddit.com/r/espresso/comments/1o907hy/skipping_the_hype_for_those_whove_tested_multiple/",
       "sentiment": "pos",
       "themes": [
-        "t.quality",
-        "t.price_value"
+        "t.comparison",
+        "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1760704836,
@@ -345,7 +337,7 @@
       "sentiment": "pos",
       "themes": [
         "t.quality",
-        "t.portability"
+        "t.comparison"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1653064703,
@@ -354,7 +346,7 @@
     },
     {
       "id": "v05",
-      "player": "outin",
+      "player": "outin_nano",
       "title": "Thoughts on OutIn Mino Portable Electric Espresso Machine?",
       "score": 6,
       "url": "https://www.reddit.com/r/espresso/comments/1r24ofm/thoughts_on_outin_mino_portable_electric_espresso/",
@@ -370,253 +362,14 @@
     },
     {
       "id": "v06",
-      "player": "maestri_house",
-      "title": "Has anyone tried the Maestri House Portable Travel Espresso Coffee Maker? [$200]",
-      "score": 3,
-      "url": "https://www.reddit.com/r/espresso/comments/1gitzoi/has_anyone_tried_the_maestri_house_portable/",
-      "sentiment": "pos",
-      "themes": [
-        "t.price_value",
-        "t.quality"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1730659526,
-      "title_en": "Has anyone tried the Maestri House Portable Travel Espresso Coffee Maker? [$200]",
-      "title_zh": "有人试过Maestri House便携旅行意式咖啡机吗？[$200]"
-    },
-    {
-      "id": "v07",
-      "player": "maestri_house",
-      "title": "Has anyone tried the Maestri House Portable Travel Espresso Coffee Maker? [$200]",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1gitywb/has_anyone_tried_the_maestri_house_portable/",
-      "sentiment": "pos",
-      "themes": [
-        "t.price_value",
-        "t.quality"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1730659472,
-      "title_en": "Has anyone tried the Maestri House Portable Travel Espresso Coffee Maker? [$200]",
-      "title_zh": "有人试过Maestri House便携旅行意式咖啡机吗？[$200]"
-    },
-    {
-      "id": "v08",
-      "player": "maestri_house",
-      "title": "Has anyone tried the Maestri House Portable Travel Espresso Coffee Maker?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1gitxaq/has_anyone_tried_the_maestri_house_portable/",
-      "sentiment": "pos",
-      "themes": [
-        "t.price_value",
-        "t.quality"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1730659358,
-      "title_en": "Has anyone tried the Maestri House Portable Travel Espresso Coffee Maker?",
-      "title_zh": "有人试过Maestri House便携旅行意式咖啡机吗？"
-    },
-    {
-      "id": "v09",
-      "player": "outin",
-      "title": "Water not dispensing from tank [OutIn Nano Portable Espresso Machine]",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1gjfcuo/water_not_dispensing_from_tank_outin_nano/",
-      "sentiment": "neg",
-      "themes": [
-        "t.durability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1730730051,
-      "title_en": "Water not dispensing from tank [OutIn Nano Portable Espresso Machine]",
-      "title_zh": "水箱不出水 [OutIn Nano便携意式咖啡机]"
-    },
-    {
-      "id": "v10",
-      "player": "other",
-      "title": "I dragged 15 portable espresso makers up a Scottish mountain in the pouring rain – only 5 actually worked (no electricit",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1p4xpkr/i_dragged_15_portable_espresso_makers_up_a/",
-      "sentiment": "pos",
-      "themes": [
-        "t.durability",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1763931350,
-      "title_en": "I dragged 15 portable espresso makers up a Scottish mountain in the pouring rain – only 5 actually worked (no electricit",
-      "title_zh": "我拖着15台便携意式咖啡机冒雨爬上苏格兰山——只有5台能用（无电）"
-    },
-    {
-      "id": "v11",
-      "player": "picopresso",
-      "title": "Tested 600+ Shots: My 2025 Top 10 Portable Espresso Makers (UK/Europe Edition) – Picopresso Still King?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1p406ix/tested_600_shots_my_2025_top_10_portable_espresso/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1763835470,
-      "title_en": "Tested 600+ Shots: My 2025 Top 10 Portable Espresso Makers (UK/Europe Edition) – Picopresso Still King?",
-      "title_zh": "测试600+杯：2025年十大便携意式咖啡机（英国/欧洲版）——Picopresso仍是王者？"
-    },
-    {
-      "id": "v12",
-      "player": "outin",
-      "title": "OutIn portable espresso machine",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1odc4f7/outin_portable_espresso_machine/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1761148449,
-      "title_en": "OutIn portable espresso machine",
-      "title_zh": "OutIn便携意式咖啡机"
-    },
-    {
-      "id": "v13",
-      "player": "other",
-      "title": "Has Anyone Tried a Portable Pneumatic Espresso Maker?",
-      "score": 57,
-      "url": "https://www.reddit.com/r/espresso/comments/1ijqz61/has_anyone_tried_a_portable_pneumatic_espresso/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1738919620,
-      "title_en": "Has Anyone Tried a Portable Pneumatic Espresso Maker?",
-      "title_zh": "有人试过便携气动意式咖啡机吗？"
-    },
-    {
-      "id": "v14",
-      "player": "outin",
-      "title": "Review: OutIn Portable Electric Vacuum Coffee Canister",
-      "score": 38,
-      "url": "https://www.reddit.com/r/espresso/comments/1nimjqb/review_outin_portable_electric_vacuum_coffee/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability",
-        "t.quality"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1758040731,
-      "title_en": "Review: OutIn Portable Electric Vacuum Coffee Canister",
-      "title_zh": "评测：OutIn便携电动真空咖啡罐"
-    },
-    {
-      "id": "v15",
-      "player": "other",
-      "title": "Portable, battery-powered grinder comparison: Timemore Whirly, Femobook A2, CERA+ CGE01, Outin Fino",
-      "score": 31,
-      "url": "https://www.reddit.com/r/espresso/comments/1t3sbzk/portable_batterypowered_grinder_comparison/",
-      "sentiment": "pos",
-      "themes": [
-        "t.grinder",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1777923677,
-      "title_en": "Portable, battery-powered grinder comparison: Timemore Whirly, Femobook A2, CERA+ CGE01, Outin Fino",
-      "title_zh": "便携电池供电磨豆机对比：Timemore Whirly、Femobook A2、CERA+ CGE01、Outin Fino"
-    },
-    {
-      "id": "v16",
-      "player": "nanopresso",
-      "title": "Aldi portable espresso maker £22.99 - nanopresso style",
-      "score": 27,
-      "url": "https://www.reddit.com/r/espresso/comments/1ld0uiz/aldi_portable_espresso_maker_2299_nanopresso_style/",
-      "sentiment": "pos",
-      "themes": [
-        "t.price_value",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1750098954,
-      "title_en": "Aldi portable espresso maker £22.99 - nanopresso style",
-      "title_zh": "Aldi便携意式咖啡机£22.99 - 类似Nanopresso"
-    },
-    {
-      "id": "v17",
-      "player": "other",
-      "title": "Looking for a portable espresso maker that actually looks good, teal or blue?",
-      "score": 23,
-      "url": "https://www.reddit.com/r/espresso/comments/1mczgmh/looking_for_a_portable_espresso_maker_that/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability",
-        "t.material"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1753857717,
-      "title_en": "Looking for a portable espresso maker that actually looks good, teal or blue?",
-      "title_zh": "寻找外观好看的便携意式咖啡机，青色或蓝色？"
-    },
-    {
-      "id": "v18",
-      "player": "outin",
-      "title": "OutIn Fino Portable Electric Coffee Grinder Review",
-      "score": 17,
-      "url": "https://www.reddit.com/r/espresso/comments/1n2hq1q/outin_fino_portable_electric_coffee_grinder_review/",
-      "sentiment": "pos",
-      "themes": [
-        "t.grinder",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1756400203,
-      "title_en": "OutIn Fino Portable Electric Coffee Grinder Review",
-      "title_zh": "OutIn Fino便携电动咖啡磨豆机评测"
-    },
-    {
-      "id": "v19",
-      "player": "other",
-      "title": "Portable espresso machines and shelf life of ground espresso coffee",
-      "score": 8,
-      "url": "https://www.reddit.com/r/Coffee/comments/yvqqmu/portable_espresso_machines_and_shelf_life_of/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1668499921,
-      "title_en": "Portable espresso machines and shelf life of ground espresso coffee",
-      "title_zh": "便携意式咖啡机与研磨咖啡粉的保质期"
-    },
-    {
-      "id": "v20",
-      "player": "other",
-      "title": "Hibrew h4c portable espresso maker done right?",
-      "score": 7,
-      "url": "https://www.reddit.com/r/espresso/comments/1m3cy5w/hibrew_h4c_portable_espresso_maker_done_right/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.price_value"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1752870213,
-      "title_en": "Hibrew h4c portable espresso maker done right?",
-      "title_zh": "Hibrew h4c便携意式咖啡机做对了吗？"
-    },
-    {
-      "id": "v21",
       "player": "other",
       "title": "Portable Espresso maker advice or reviews, up to [£150]",
       "score": 6,
       "url": "https://www.reddit.com/r/espresso/comments/1khqq4d/portable_espresso_maker_advice_or_reviews_up_to/",
       "sentiment": "pos",
       "themes": [
-        "t.price_value",
-        "t.portability"
+        "t.price",
+        "t.comparison"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1746712545,
@@ -624,31 +377,15 @@
       "title_zh": "便携意式咖啡机建议或评测，预算£150以内"
     },
     {
-      "id": "v22",
-      "player": "other",
-      "title": "Considering a portable espresso option for travel and outdoor use — what to expect? [$100]",
-      "score": 5,
-      "url": "https://www.reddit.com/r/espresso/comments/1qci8pl/considering_a_portable_espresso_option_for_travel/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability",
-        "t.price_value"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1768380198,
-      "title_en": "Considering a portable espresso option for travel and outdoor use — what to expect? [$100]",
-      "title_zh": "考虑旅行和户外使用的便携意式咖啡机——期望什么？[$100]"
-    },
-    {
-      "id": "v23",
-      "player": "other",
+      "id": "v07",
+      "player": "aeropress",
       "title": "Portable coffee makers - pipamoka vs nanopresso vs aeropress?",
       "score": 4,
       "url": "https://www.reddit.com/r/Coffee/comments/fgyw3y/portable_coffee_makers_pipamoka_vs_nanopresso_vs/",
       "sentiment": "pos",
       "themes": [
-        "t.portability",
-        "t.quality"
+        "t.comparison",
+        "t.portability"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1583940468,
@@ -656,102 +393,23 @@
       "title_zh": "便携咖啡机 - pipamoka vs nanopresso vs aeropress？"
     },
     {
-      "id": "v24",
-      "player": "other",
-      "title": "Looking for portable 12V battery operated water heater to control water temperature in my manual espresso coffee machine",
-      "score": 3,
-      "url": "https://www.reddit.com/r/Coffee/comments/13s9yju/looking_for_portable_12v_battery_operated_water/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1685098720,
-      "title_en": "Looking for portable 12V battery operated water heater to control water temperature in my manual espresso coffee machine",
-      "title_zh": "寻找便携12V电池供电热水器，用于控制手动意式咖啡机水温"
-    },
-    {
-      "id": "v25",
-      "player": "other",
-      "title": "Which is the best portable electric grinder for espresso",
-      "score": 3,
-      "url": "https://www.reddit.com/r/espresso/comments/1egz45y/which_is_the_best_portable_electric_grinder_for/",
-      "sentiment": "pos",
-      "themes": [
-        "t.grinder",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1722461651,
-      "title_en": "Which is the best portable electric grinder for espresso",
-      "title_zh": "哪款便携电动磨豆机最适合意式咖啡"
-    },
-    {
-      "id": "v26",
-      "player": "outin",
+      "id": "v08",
+      "player": "outin_nano",
       "title": "OutIn portable espresso [$100]",
       "score": 3,
       "url": "https://www.reddit.com/r/espresso/comments/1s1mltn/outin_portable_espresso_100/",
       "sentiment": "pos",
       "themes": [
-        "t.electric_vs_manual",
-        "t.price_value"
+        "t.price",
+        "t.electric_vs_manual"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1774285226,
       "title_en": "OutIn portable espresso [$100]",
-      "title_zh": "OutIn便携意式咖啡机 [$100]"
+      "title_zh": "OutIn便携意式咖啡机，$100"
     },
     {
-      "id": "v27",
-      "player": "other",
-      "title": "Looking for a decent quality portable, self heating espresso maker [$250]",
-      "score": 3,
-      "url": "https://www.reddit.com/r/espresso/comments/1qqwm9g/looking_for_a_decent_quality_portable_self/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1769750572,
-      "title_en": "Looking for a decent quality portable, self heating espresso maker [$250]",
-      "title_zh": "寻找质量不错的便携自热意式咖啡机 [$250]"
-    },
-    {
-      "id": "v28",
-      "player": "other",
-      "title": "Portable Espresso Machine & TSA",
-      "score": 3,
-      "url": "https://www.reddit.com/r/espresso/comments/1ipk9by/portable_espresso_machine_tsa/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1739565234,
-      "title_en": "Portable Espresso Machine & TSA",
-      "title_zh": "便携意式咖啡机与TSA"
-    },
-    {
-      "id": "v29",
-      "player": "other",
-      "title": "Portable pneumatic espresso machines",
-      "score": 3,
-      "url": "https://www.reddit.com/r/espresso/comments/1i7qqt6/portable_pneumatic_espresso_machines/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1737592413,
-      "title_en": "Portable pneumatic espresso machines",
-      "title_zh": "便携气动意式咖啡机"
-    },
-    {
-      "id": "v30",
+      "id": "v09",
       "player": "other",
       "title": "Looking for The Best Electric Portable Espresso Maker [Up to $350]",
       "score": 2,
@@ -759,102 +417,39 @@
       "sentiment": "pos",
       "themes": [
         "t.electric_vs_manual",
-        "t.price_value"
+        "t.price"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1728938505,
       "title_en": "Looking for The Best Electric Portable Espresso Maker [Up to $350]",
-      "title_zh": "寻找最佳电动便携意式咖啡机 [预算$350以内]"
+      "title_zh": "寻找最佳电动便携意式咖啡机，预算$350以内"
     },
     {
-      "id": "v31",
-      "player": "minipresso",
-      "title": "Minipresso Portable Coffee Maker",
-      "score": 2,
-      "url": "https://www.reddit.com/r/Coffee/comments/jjhebz/minipresso_portable_coffee_maker/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability",
-        "t.quality"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1603859682,
-      "title_en": "Minipresso Portable Coffee Maker",
-      "title_zh": "Minipresso便携咖啡机"
-    },
-    {
-      "id": "v32",
-      "player": "other",
-      "title": "Anyone try/trying the CoffeeJack V2 hand-crank portable espresso machine? [CoffeeJack V2]",
-      "score": 2,
-      "url": "https://www.reddit.com/r/espresso/comments/1t34vly/anyone_trytrying_the_coffeejack_v2_handcrank/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1777861440,
-      "title_en": "Anyone try/trying the CoffeeJack V2 hand-crank portable espresso machine? [CoffeeJack V2]",
-      "title_zh": "有人试过CoffeeJack V2手摇便携意式咖啡机吗？[CoffeeJack V2]"
-    },
-    {
-      "id": "v33",
+      "id": "v10",
       "player": "other",
       "title": "Best portable espresso machine [under $100]",
       "score": 2,
       "url": "https://www.reddit.com/r/espresso/comments/1syyysa/best_portable_espresso_machine_under_100/",
       "sentiment": "pos",
       "themes": [
-        "t.price_value",
-        "t.portability"
+        "t.price",
+        "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1777469611,
       "title_en": "Best portable espresso machine [under $100]",
-      "title_zh": "最佳便携意式咖啡机 [预算$100以内]"
+      "title_zh": "最佳便携意式咖啡机，$100以内"
     },
     {
-      "id": "v34",
-      "player": "other",
-      "title": "Opinions on MiiCoffee Eon Portable Espresso Machine?",
-      "score": 2,
-      "url": "https://www.reddit.com/r/espresso/comments/1oz2quh/opinions_on_miicoffee_eon_portable_espresso/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.price_value"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1763341437,
-      "title_en": "Opinions on MiiCoffee Eon Portable Espresso Machine?",
-      "title_zh": "MiiCoffee Eon便携意式咖啡机怎么样？"
-    },
-    {
-      "id": "v35",
-      "player": "other",
-      "title": "How do you keep your portable espresso machines clean during your travels?",
-      "score": 2,
-      "url": "https://www.reddit.com/r/espresso/comments/1l2bil6/how_do_you_keep_your_portable_espresso_machines/",
-      "sentiment": "pos",
-      "themes": [
-        "t.cleaning"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1748956268,
-      "title_en": "How do you keep your portable espresso machines clean during your travels?",
-      "title_zh": "旅行中如何保持便携意式咖啡机清洁？"
-    },
-    {
-      "id": "v36",
+      "id": "v11",
       "player": "other",
       "title": "Best portable espresso makers you’ve tested?",
       "score": 2,
       "url": "https://www.reddit.com/r/espresso/comments/1l299d3/best_portable_espresso_makers_youve_tested/",
       "sentiment": "pos",
       "themes": [
-        "t.quality",
-        "t.portability"
+        "t.comparison",
+        "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1748949496,
@@ -862,110 +457,15 @@
       "title_zh": "你测试过的最佳便携意式咖啡机？"
     },
     {
-      "id": "v37",
-      "player": "other",
-      "title": "Recommendation Please: Timemore Whirly 01s or OutIn Fino Portable Electric Coffee Grinder [No budget]",
-      "score": 2,
-      "url": "https://www.reddit.com/r/espresso/comments/1ncedbw/recommendation_please_timemore_whirly_01s_or/",
-      "sentiment": "pos",
-      "themes": [
-        "t.grinder",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1757410567,
-      "title_en": "Recommendation Please: Timemore Whirly 01s or OutIn Fino Portable Electric Coffee Grinder [No budget]",
-      "title_zh": "求推荐：Timemore Whirly 01s还是OutIn Fino便携电动咖啡磨豆机 [无预算限制]"
-    },
-    {
-      "id": "v38",
-      "player": "picopresso",
-      "title": "IKAPE KAPO K2 Pro or MHW press58x or picopresso Portable Espresso experiences",
-      "score": 2,
-      "url": "https://www.reddit.com/r/espresso/comments/1tcr09j/ikape_kapo_k2_pro_or_mhw_press58x_or_picopresso/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1778744292,
-      "title_en": "IKAPE KAPO K2 Pro or MHW press58x or picopresso Portable Espresso experiences",
-      "title_zh": "IKAPE KAPO K2 Pro或MHW press58x或picopresso便携意式咖啡机体验"
-    },
-    {
-      "id": "v39",
-      "player": "other",
-      "title": "Easiest portable espresso machines? [Budget flexible]",
-      "score": 2,
-      "url": "https://www.reddit.com/r/espresso/comments/1sq83j8/easiest_portable_espresso_machines_budget_flexible/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1776640074,
-      "title_en": "Easiest portable espresso machines? [Budget flexible]",
-      "title_zh": "最简单的便携意式咖啡机？[预算灵活]"
-    },
-    {
-      "id": "v40",
-      "player": "other",
-      "title": "Best portable milk or creamer options for espresso on the go?",
-      "score": 2,
-      "url": "https://www.reddit.com/r/espresso/comments/1lkb4py/best_portable_milk_or_creamer_options_for/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1750870757,
-      "title_en": "Best portable milk or creamer options for espresso on the go?",
-      "title_zh": "便携式牛奶或奶精选项，适合外出意式咖啡？"
-    },
-    {
-      "id": "v41",
-      "player": "other",
-      "title": "Manual portable espresso press made of metal",
-      "score": 2,
-      "url": "https://www.reddit.com/r/espresso/comments/1g20kr4/manual_portable_espresso_press_made_of_metal/",
-      "sentiment": "pos",
-      "themes": [
-        "t.material",
-        "t.durability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1728741099,
-      "title_en": "Manual portable espresso press made of metal",
-      "title_zh": "金属材质的手动便携意式咖啡压榨机"
-    },
-    {
-      "id": "v42",
-      "player": "aeropress",
-      "title": "AeroPress Original Coffee Press - All-in-One French Press, Pour-Over & Espresso Style Manual Brewer, 2 Min Brew for Less",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1qgwnm9/aeropress_original_coffee_press_allinone_french/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability",
-        "t.quality"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1768804062,
-      "title_en": "AeroPress Original Coffee Press - All-in-One French Press, Pour-Over & Espresso Style Manual Brewer, 2 Min Brew for Less",
-      "title_zh": "AeroPress Original咖啡压榨机 - 一体式法压壶、手冲壶和意式风格手动冲泡器，2分钟冲泡更少"
-    },
-    {
-      "id": "v43",
-      "player": "outin",
+      "id": "v12",
+      "player": "outin_nano",
       "title": "OutIn Nano Portable Electric Espresso Machine vs Aeropress",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1ntqwqy/outin_nano_portable_electric_espresso_machine_vs/",
       "sentiment": "pos",
       "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
+        "t.comparison",
+        "t.electric_vs_manual"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1759172770,
@@ -973,123 +473,79 @@
       "title_zh": "OutIn Nano便携电动意式咖啡机 vs Aeropress"
     },
     {
-      "id": "v44",
-      "player": "outin",
+      "id": "v13",
+      "player": "outin_nano",
       "title": "OutIn Nano Portable Electric Espresso Machine vs Aeropress [$250]",
       "score": 1,
       "url": "https://www.reddit.com/r/espresso/comments/1ntqvuw/outin_nano_portable_electric_espresso_machine_vs/",
       "sentiment": "pos",
       "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
+        "t.comparison",
+        "t.price"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1759172715,
       "title_en": "OutIn Nano Portable Electric Espresso Machine vs Aeropress [$250]",
-      "title_zh": "OutIn Nano便携电动意式咖啡机 vs Aeropress [$250]"
+      "title_zh": "OutIn Nano便携电动意式咖啡机 vs Aeropress，$250"
     },
     {
-      "id": "v45",
-      "player": "moka_pot",
-      "title": "Best Travel-Friendly Grinder for Moka Pot, and maybe Pour Over and Portable Espresso?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1mltups/best_travelfriendly_grinder_for_moka_pot_and/",
-      "sentiment": "pos",
-      "themes": [
-        "t.grinder",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1754757423,
-      "title_en": "Best Travel-Friendly Grinder for Moka Pot, and maybe Pour Over and Portable Espresso?",
-      "title_zh": "最适合旅行携带的磨豆机，用于摩卡壶、手冲和便携意式咖啡？"
-    },
-    {
-      "id": "v46",
+      "id": "v14",
       "player": "other",
       "title": "What’s your favorite compact espresso gadget? Moka pot, aeropress or other portable espresso machines?",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1kakgix/whats_your_favorite_compact_espresso_gadget_moka/",
       "sentiment": "pos",
       "themes": [
-        "t.portability",
-        "t.quality"
+        "t.comparison",
+        "t.portability"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1745921801,
       "title_en": "What’s your favorite compact espresso gadget? Moka pot, aeropress or other portable espresso machines?",
-      "title_zh": "你最喜欢的紧凑型咖啡工具是什么？摩卡壶、Aeropress还是其他便携意式咖啡机？"
+      "title_zh": "你最喜欢的紧凑型意式咖啡工具？摩卡壶、Aeropress还是其他便携意式咖啡机？"
     },
     {
-      "id": "v47",
+      "id": "v15",
       "player": "other",
       "title": "Best Portable Espresso Maker for Camping/Travelling?",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1fwz2o9/best_portable_espresso_maker_for_campingtravelling/",
       "sentiment": "pos",
       "themes": [
-        "t.portability"
+        "t.portability",
+        "t.durability"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1728158756,
       "title_en": "Best Portable Espresso Maker for Camping/Travelling?",
-      "title_zh": "最适合露营/旅行的便携意式咖啡机？"
+      "title_zh": "露营/旅行最佳便携意式咖啡机？"
     },
     {
-      "id": "v48",
+      "id": "v16",
       "player": "other",
       "title": "Anyone tried portable espresso machines for travel or camping?",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1tcw7ds/anyone_tried_portable_espresso_machines_for/",
       "sentiment": "pos",
       "themes": [
-        "t.portability"
+        "t.portability",
+        "t.durability"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1778760459,
       "title_en": "Anyone tried portable espresso machines for travel or camping?",
-      "title_zh": "有人试过便携意式咖啡机用于旅行或露营吗？"
+      "title_zh": "有人试过旅行或露营用的便携意式咖啡机吗？"
     },
     {
-      "id": "v49",
-      "player": "other",
-      "title": "Anyone tried portable espresso machines for travel or camping?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1tcw4dv/anyone_tried_portable_espresso_machines_for/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1778760236,
-      "title_en": "Anyone tried portable espresso machines for travel or camping?",
-      "title_zh": "有人试过便携意式咖啡机用于旅行或露营吗？"
-    },
-    {
-      "id": "v50",
-      "player": "other",
-      "title": "Anyone tried portable espresso machines for travel or camping?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1tcvzme/anyone_tried_portable_espresso_machines_for/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1778759926,
-      "title_en": "Anyone tried portable espresso machines for travel or camping?",
-      "title_zh": "有人试过便携意式咖啡机用于旅行或露营吗？"
-    },
-    {
-      "id": "v51",
+      "id": "v17",
       "player": "other",
       "title": "Found a portable espresso maker that doesn’t need electricity – perfect for travel!",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1m493b4/found_a_portable_espresso_maker_that_doesnt_need/",
       "sentiment": "pos",
       "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
+        "t.portability",
+        "t.electric_vs_manual"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1752964643,
@@ -1097,23 +553,7 @@
       "title_zh": "找到一款无需电力的便携意式咖啡机——旅行完美！"
     },
     {
-      "id": "v52",
-      "player": "wacaco",
-      "title": "Wacaco Cuppamoka Review: A Portable Pour Over Coffee Maker",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/kroq8p/wacaco_cuppamoka_review_a_portable_pour_over/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability",
-        "t.quality"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1609942759,
-      "title_en": "Wacaco Cuppamoka Review: A Portable Pour Over Coffee Maker",
-      "title_zh": "Wacaco Cuppamoka评测：便携手冲咖啡机"
-    },
-    {
-      "id": "v53",
+      "id": "v18",
       "player": "other",
       "title": "Best portable/travel espresso machine",
       "score": 1,
@@ -1129,12 +569,12 @@
       "title_zh": "最佳便携/旅行意式咖啡机"
     },
     {
-      "id": "v54",
+      "id": "v19",
       "player": "other",
       "title": "What is the best portable espresso makes like the picopresso & staresso that doesn't have plastic?",
       "score": 1,
       "url": "https://www.reddit.com/r/espresso/comments/1og4czf/what_is_the_best_portable_espresso_makes_like_the/",
-      "sentiment": "pos",
+      "sentiment": "neg",
       "themes": [
         "t.material",
         "t.quality"
@@ -1142,10 +582,10 @@
       "collected_at": "2026-06-01",
       "created_utc": 1761430823,
       "title_en": "What is the best portable espresso makes like the picopresso & staresso that doesn't have plastic?",
-      "title_zh": "像Picopresso和Staresso那样不含塑料的最佳便携意式咖啡机是什么？"
+      "title_zh": "像Picopresso和Staresso这样无塑料的最佳便携意式咖啡机是什么？"
     },
     {
-      "id": "v55",
+      "id": "v20",
       "player": "other",
       "title": "Best beginner portable electric espresso maker? (Below 150- 200)",
       "score": 1,
@@ -1153,15 +593,15 @@
       "sentiment": "pos",
       "themes": [
         "t.electric_vs_manual",
-        "t.price_value"
+        "t.price"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1750212254,
       "title_en": "Best beginner portable electric espresso maker? (Below 150- 200)",
-      "title_zh": "最佳入门便携电动意式咖啡机？（预算150-200）"
+      "title_zh": "最佳入门便携电动意式咖啡机？（150-200美元以下）"
     },
     {
-      "id": "v56",
+      "id": "v21",
       "player": "other",
       "title": "Best Electric Portable Espresso Maker",
       "score": 1,
@@ -1169,7 +609,7 @@
       "sentiment": "pos",
       "themes": [
         "t.electric_vs_manual",
-        "t.portability"
+        "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1728938404,
@@ -1177,31 +617,815 @@
       "title_zh": "最佳电动便携意式咖啡机"
     },
     {
-      "id": "v57",
-      "player": "other",
-      "title": "Best Electric Portable Espresso Maker",
+      "id": "v22",
+      "player": "outin_nano",
+      "title": "Water not dispensing from tank [OutIn Nano Portable Espresso Machine]",
       "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1g3q2pd/best_electric_portable_espresso_maker/",
+      "url": "https://www.reddit.com/r/espresso/comments/1gjfcuo/water_not_dispensing_from_tank_outin_nano/",
+      "sentiment": "neg",
+      "themes": [
+        "t.durability",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1730730051,
+      "title_en": "Water not dispensing from tank [OutIn Nano Portable Espresso Machine]",
+      "title_zh": "水箱不出水 [OutIn Nano便携意式咖啡机]"
+    },
+    {
+      "id": "v23",
+      "player": "picopresso",
+      "title": "Tested 600+ Shots: My 2025 Top 10 Portable Espresso Makers (UK/Europe Edition) – Picopresso Still King?",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1p406ix/tested_600_shots_my_2025_top_10_portable_espresso/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1763835470,
+      "title_en": "Tested 600+ Shots: My 2025 Top 10 Portable Espresso Makers (UK/Europe Edition) – Picopresso Still King?",
+      "title_zh": "测试600+杯：我的2025年十大便携意式咖啡机（英国/欧洲版）——Picopresso仍是王者？"
+    },
+    {
+      "id": "v24",
+      "player": "other",
+      "title": "What is the best portable espresso maker",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1lmls2f/what_is_the_best_portable_espresso_maker/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1751114135,
+      "title_en": "What is the best portable espresso maker",
+      "title_zh": "最佳便携意式咖啡机是什么？"
+    },
+    {
+      "id": "v25",
+      "player": "other",
+      "title": "Best beginner portable electric espresso make?",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1le5axo/best_beginner_portable_electric_espresso_make/",
+      "sentiment": "pos",
+      "themes": [
+        "t.electric_vs_manual",
+        "t.price"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1750211921,
+      "title_en": "Best beginner portable electric espresso make?",
+      "title_zh": "最佳入门便携电动意式咖啡机？"
+    },
+    {
+      "id": "v26",
+      "player": "other",
+      "title": "Best portable espresso machine!?",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1k4wh8h/best_portable_espresso_machine/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1745291783,
+      "title_en": "Best portable espresso machine!?",
+      "title_zh": "最佳便携意式咖啡机！"
+    },
+    {
+      "id": "v27",
+      "player": "other",
+      "title": "Best Portable Espresso Maker?",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1fwz0ll/best_portable_espresso_maker/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1728158603,
+      "title_en": "Best Portable Espresso Maker?",
+      "title_zh": "最佳便携意式咖啡机？"
+    },
+    {
+      "id": "v28",
+      "player": "other",
+      "title": "Best portable coffee maker",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1facu3y/best_portable_coffee_maker/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.comparison"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1725622203,
+      "title_en": "Best portable coffee maker",
+      "title_zh": "最佳便携咖啡机"
+    },
+    {
+      "id": "v29",
+      "player": "other",
+      "title": "Looking for portable machine options. Outin Mino or Wacaco Pixapresso? [$200]",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1pmgobk/looking_for_portable_machine_options_outin_mino/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.electric_vs_manual"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1765726008,
+      "title_en": "Looking for portable machine options. Outin Mino or Wacaco Pixapresso? [$200]",
+      "title_zh": "寻找便携机器选项：Outin Mino还是Wacaco Pixapresso？$200"
+    },
+    {
+      "id": "v30",
+      "player": "other",
+      "title": "Looking for portable machine options. Outin Mino or Wacaco Pixapresso?",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1pmgikh/looking_for_portable_machine_options_outin_mino/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.electric_vs_manual"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1765725594,
+      "title_en": "Looking for portable machine options. Outin Mino or Wacaco Pixapresso?",
+      "title_zh": "寻找便携机器选项：Outin Mino还是Wacaco Pixapresso？"
+    },
+    {
+      "id": "v31",
+      "player": "outin_nano",
+      "title": "OutIn portable espresso machine",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1odc4f7/outin_portable_espresso_machine/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.electric_vs_manual"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1761148449,
+      "title_en": "OutIn portable espresso machine",
+      "title_zh": "OutIn便携意式咖啡机"
+    },
+    {
+      "id": "v32",
+      "player": "outin_nano",
+      "title": "Portable gateway into espresso brewing Outin Nano/Mino",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1p2f0e0/portable_gateway_into_espresso_brewing_outin/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1763672545,
+      "title_en": "Portable gateway into espresso brewing Outin Nano/Mino",
+      "title_zh": "便携入门意式咖啡：Outin Nano/Mino"
+    },
+    {
+      "id": "v33",
+      "player": "other",
+      "title": "Best beginner portable electric espresso maker? [Below or at 150-200]",
+      "score": 0,
+      "url": "https://www.reddit.com/r/espresso/comments/1le5g0d/best_beginner_portable_electric_espresso_maker/",
+      "sentiment": "pos",
+      "themes": [
+        "t.electric_vs_manual",
+        "t.price"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1750212345,
+      "title_en": "Best beginner portable electric espresso maker? [Below or at 150-200]",
+      "title_zh": "最佳入门便携电动意式咖啡机？[150-200美元或以下]"
+    },
+    {
+      "id": "v34",
+      "player": "outin_nano",
+      "title": "If you were considering a portable espresso machine and grinder, I recommend the Ikape Kapo K2 and Outin Fino",
+      "score": 0,
+      "url": "https://www.reddit.com/r/espresso/comments/1tc44x8/if_you_were_considering_a_portable_espresso/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1778688369,
+      "title_en": "If you were considering a portable espresso machine and grinder, I recommend the Ikape Kapo K2 and Outin Fino",
+      "title_zh": "如果你考虑便携意式咖啡机和磨豆机，我推荐Ikape Kapo K2和Outin Fino"
+    },
+    {
+      "id": "v35",
+      "player": "outin_nano",
+      "title": "Outin Nano- anyone have experience using pods? Makes gear portable espresso shots with my own grind but pods not?",
+      "score": 0,
+      "url": "https://www.reddit.com/r/espresso/comments/1i4lus6/outin_nano_anyone_have_experience_using_pods/",
+      "sentiment": "neg",
+      "themes": [
+        "t.material",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1737247106,
+      "title_en": "Outin Nano- anyone have experience using pods? Makes gear portable espresso shots with my own grind but pods not?",
+      "title_zh": "Outin Nano——有人用过胶囊吗？用自己的研磨做便携意式咖啡，但胶囊不行？"
+    },
+    {
+      "id": "v36",
+      "player": "other",
+      "title": "Helix camping / travel coffee brewer",
+      "score": 155,
+      "url": "https://www.reddit.com/r/Coffee/comments/37qb8j/helix_camping_travel_coffee_brewer/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.durability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1432913623,
+      "title_en": "Helix camping / travel coffee brewer",
+      "title_zh": "Helix露营/旅行咖啡冲泡器"
+    },
+    {
+      "id": "v37",
+      "player": "other",
+      "title": "Best coffee methods for camping?",
+      "score": 71,
+      "url": "https://www.reddit.com/r/Coffee/comments/1n779md/best_coffee_methods_for_camping/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.durability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1756880358,
+      "title_en": "Best coffee methods for camping?",
+      "title_zh": "最佳露营咖啡方法？"
+    },
+    {
+      "id": "v38",
+      "player": "other",
+      "title": "Has Anyone Tried a Portable Pneumatic Espresso Maker?",
+      "score": 57,
+      "url": "https://www.reddit.com/r/espresso/comments/1ijqz61/has_anyone_tried_a_portable_pneumatic_espresso/",
+      "sentiment": "pos",
+      "themes": [
+        "t.electric_vs_manual",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1738919620,
+      "title_en": "Has Anyone Tried a Portable Pneumatic Espresso Maker?",
+      "title_zh": "有人试过便携气动意式咖啡机吗？"
+    },
+    {
+      "id": "v39",
+      "player": "other",
+      "title": "Aldi portable espresso maker £22.99 - nanopresso style",
+      "score": 27,
+      "url": "https://www.reddit.com/r/espresso/comments/1ld0uiz/aldi_portable_espresso_maker_2299_nanopresso_style/",
+      "sentiment": "pos",
+      "themes": [
+        "t.price",
+        "t.comparison"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1750098954,
+      "title_en": "Aldi portable espresso maker £22.99 - nanopresso style",
+      "title_zh": "Aldi便携意式咖啡机£22.99——类似nanopresso"
+    },
+    {
+      "id": "v40",
+      "player": "other",
+      "title": "Looking for a portable espresso maker that actually looks good, teal or blue?",
+      "score": 23,
+      "url": "https://www.reddit.com/r/espresso/comments/1mczgmh/looking_for_a_portable_espresso_maker_that/",
+      "sentiment": "pos",
+      "themes": [
+        "t.material",
+        "t.portability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1753857717,
+      "title_en": "Looking for a portable espresso maker that actually looks good, teal or blue?",
+      "title_zh": "寻找一款外观好看的便携意式咖啡机，蓝绿色或蓝色？"
+    },
+    {
+      "id": "v41",
+      "player": "other",
+      "title": "Best portable coffee setup?",
+      "score": 16,
+      "url": "https://www.reddit.com/r/Coffee/comments/l9feh1/best_portable_coffee_setup/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.comparison"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1612109605,
+      "title_en": "Best portable coffee setup?",
+      "title_zh": "最佳便携咖啡方案？"
+    },
+    {
+      "id": "v42",
+      "player": "other",
+      "title": "Best practices for a percolator - the best camping coffee that can be had.",
+      "score": 11,
+      "url": "https://www.reddit.com/r/Coffee/comments/4dhaou/best_practices_for_a_percolator_the_best_camping/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.durability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1459874956,
+      "title_en": "Best practices for a percolator - the best camping coffee that can be had.",
+      "title_zh": "渗滤壶最佳实践——最好的露营咖啡。"
+    },
+    {
+      "id": "v43",
+      "player": "other",
+      "title": "Best coffee gear for camping?",
+      "score": 11,
+      "url": "https://www.reddit.com/r/Coffee/comments/3avjyj/best_coffee_gear_for_camping/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.durability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1435093781,
+      "title_en": "Best coffee gear for camping?",
+      "title_zh": "最佳露营咖啡装备？"
+    },
+    {
+      "id": "v44",
+      "player": "other",
+      "title": "Looking for a portable coffee machine",
+      "score": 10,
+      "url": "https://www.reddit.com/r/Coffee/comments/meng80/looking_for_a_portable_coffee_machine/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.comparison"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1616881502,
+      "title_en": "Looking for a portable coffee machine",
+      "title_zh": "寻找便携咖啡机"
+    },
+    {
+      "id": "v45",
+      "player": "other",
+      "title": "Coffee maker for camping",
+      "score": 10,
+      "url": "https://www.reddit.com/r/Coffee/comments/te1ceo/coffee_maker_for_camping/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.durability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1647275048,
+      "title_en": "Coffee maker for camping",
+      "title_zh": "露营用咖啡机"
+    },
+    {
+      "id": "v46",
+      "player": "other",
+      "title": "Portable espresso machines and shelf life of ground espresso coffee",
+      "score": 8,
+      "url": "https://www.reddit.com/r/Coffee/comments/yvqqmu/portable_espresso_machines_and_shelf_life_of/",
+      "sentiment": "pos",
+      "themes": [
+        "t.quality",
+        "t.portability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1668499921,
+      "title_en": "Portable espresso machines and shelf life of ground espresso coffee",
+      "title_zh": "便携意式咖啡机与研磨咖啡的保质期"
+    },
+    {
+      "id": "v47",
+      "player": "other",
+      "title": "Is there any type of portable coffee maker / mug that will allow you to make cold brew coffee on the go?",
+      "score": 8,
+      "url": "https://www.reddit.com/r/Coffee/comments/d5wzkw/is_there_any_type_of_portable_coffee_maker_mug/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1568809410,
+      "title_en": "Is there any type of portable coffee maker / mug that will allow you to make cold brew coffee on the go?",
+      "title_zh": "有没有一种便携咖啡机/杯子可以让你在路上制作冷萃咖啡？"
+    },
+    {
+      "id": "v48",
+      "player": "other",
+      "title": "Hibrew h4c portable espresso maker done right?",
+      "score": 7,
+      "url": "https://www.reddit.com/r/espresso/comments/1m3cy5w/hibrew_h4c_portable_espresso_maker_done_right/",
+      "sentiment": "pos",
+      "themes": [
+        "t.quality",
+        "t.comparison"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1752870213,
+      "title_en": "Hibrew h4c portable espresso maker done right?",
+      "title_zh": "Hibrew h4c便携意式咖啡机做对了吗？"
+    },
+    {
+      "id": "v49",
+      "player": "other",
+      "title": "Portable coffee maker?",
+      "score": 6,
+      "url": "https://www.reddit.com/r/Coffee/comments/106r2kp/portable_coffee_maker/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.comparison"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1673204328,
+      "title_en": "Portable coffee maker?",
+      "title_zh": "便携咖啡机？"
+    },
+    {
+      "id": "v50",
+      "player": "other",
+      "title": "Is there a good portable coffee machine brand recommendation?",
+      "score": 6,
+      "url": "https://www.reddit.com/r/Coffee/comments/102ys3y/is_there_a_good_portable_coffee_machine_brand/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.portability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1672823021,
+      "title_en": "Is there a good portable coffee machine brand recommendation?",
+      "title_zh": "有好的便携咖啡机品牌推荐吗？"
+    },
+    {
+      "id": "v51",
+      "player": "other",
+      "title": "Portable coffee maker that heats the water too?",
+      "score": 5,
+      "url": "https://www.reddit.com/r/Coffee/comments/ledcqu/portable_coffee_maker_that_heats_the_water_too/",
       "sentiment": "pos",
       "themes": [
         "t.electric_vs_manual",
         "t.portability"
       ],
       "collected_at": "2026-06-01",
-      "created_utc": 1728938182,
-      "title_en": "Best Electric Portable Espresso Maker",
-      "title_zh": "最佳电动便携意式咖啡机"
+      "created_utc": 1612665363,
+      "title_en": "Portable coffee maker that heats the water too?",
+      "title_zh": "也能加热水的便携咖啡机？"
+    },
+    {
+      "id": "v52",
+      "player": "other",
+      "title": "My compact travel/camping setup that makes good pour over coffee (+ fresh local beans)",
+      "score": 5,
+      "url": "https://www.reddit.com/r/Coffee/comments/vpxjy3/my_compact_travelcamping_setup_that_makes_good/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1656785268,
+      "title_en": "My compact travel/camping setup that makes good pour over coffee (+ fresh local beans)",
+      "title_zh": "我的紧凑旅行/露营方案，可制作好喝的手冲咖啡（+新鲜本地豆）"
+    },
+    {
+      "id": "v53",
+      "player": "other",
+      "title": "Considering a portable espresso option for travel and outdoor use — what to expect? [$100]",
+      "score": 5,
+      "url": "https://www.reddit.com/r/espresso/comments/1qci8pl/considering_a_portable_espresso_option_for_travel/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.price"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1768380198,
+      "title_en": "Considering a portable espresso option for travel and outdoor use — what to expect? [$100]",
+      "title_zh": "考虑旅行和户外使用的便携意式咖啡机——期待什么？$100"
+    },
+    {
+      "id": "v54",
+      "player": "other",
+      "title": "All in one portable coffee maker with heater?",
+      "score": 4,
+      "url": "https://www.reddit.com/r/Coffee/comments/dfprpo/all_in_one_portable_coffee_maker_with_heater/",
+      "sentiment": "pos",
+      "themes": [
+        "t.electric_vs_manual",
+        "t.portability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1570665744,
+      "title_en": "All in one portable coffee maker with heater?",
+      "title_zh": "带加热功能的一体式便携咖啡机？"
+    },
+    {
+      "id": "v55",
+      "player": "other",
+      "title": "Has anyone tried the Maestri House Portable Travel Espresso Coffee Maker? [$200]",
+      "score": 3,
+      "url": "https://www.reddit.com/r/espresso/comments/1gitzoi/has_anyone_tried_the_maestri_house_portable/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.electric_vs_manual"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1730659526,
+      "title_en": "Has anyone tried the Maestri House Portable Travel Espresso Coffee Maker? [$200]",
+      "title_zh": "有人试过Maestri House便携旅行意式咖啡机吗？$200"
+    },
+    {
+      "id": "v56",
+      "player": "other",
+      "title": "Looking for a decent quality portable, self heating espresso maker [$250]",
+      "score": 3,
+      "url": "https://www.reddit.com/r/espresso/comments/1qqwm9g/looking_for_a_decent_quality_portable_self/",
+      "sentiment": "pos",
+      "themes": [
+        "t.electric_vs_manual",
+        "t.price"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1769750572,
+      "title_en": "Looking for a decent quality portable, self heating espresso maker [$250]",
+      "title_zh": "寻找一款质量不错的便携自热意式咖啡机，$250"
+    },
+    {
+      "id": "v57",
+      "player": "other",
+      "title": "58mm portable coffee maker and adjustable basket combination",
+      "score": 3,
+      "url": "https://www.reddit.com/r/espresso/comments/1o81aqj/58mm_portable_coffee_maker_and_adjustable_basket/",
+      "sentiment": "pos",
+      "themes": [
+        "t.quality",
+        "t.material"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1760605823,
+      "title_en": "58mm portable coffee maker and adjustable basket combination",
+      "title_zh": "58mm便携咖啡机和可调粉碗组合"
     },
     {
       "id": "v58",
       "player": "other",
+      "title": "Portable Espresso Machine & TSA",
+      "score": 3,
+      "url": "https://www.reddit.com/r/espresso/comments/1ipk9by/portable_espresso_machine_tsa/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1739565234,
+      "title_en": "Portable Espresso Machine & TSA",
+      "title_zh": "便携意式咖啡机与TSA"
+    },
+    {
+      "id": "v59",
+      "player": "other",
+      "title": "Portable pneumatic espresso machines",
+      "score": 3,
+      "url": "https://www.reddit.com/r/espresso/comments/1i7qqt6/portable_pneumatic_espresso_machines/",
+      "sentiment": "pos",
+      "themes": [
+        "t.electric_vs_manual",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1737592413,
+      "title_en": "Portable pneumatic espresso machines",
+      "title_zh": "便携气动意式咖啡机"
+    },
+    {
+      "id": "v60",
+      "player": "minipresso",
+      "title": "Minipresso Portable Coffee Maker",
+      "score": 2,
+      "url": "https://www.reddit.com/r/Coffee/comments/jjhebz/minipresso_portable_coffee_maker/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1603859682,
+      "title_en": "Minipresso Portable Coffee Maker",
+      "title_zh": "Minipresso便携咖啡机"
+    },
+    {
+      "id": "v61",
+      "player": "other",
+      "title": "Anyone try/trying the CoffeeJack V2 hand-crank portable espresso machine? [CoffeeJack V2]",
+      "score": 2,
+      "url": "https://www.reddit.com/r/espresso/comments/1t34vly/anyone_trytrying_the_coffeejack_v2_handcrank/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.electric_vs_manual"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1777861440,
+      "title_en": "Anyone try/trying the CoffeeJack V2 hand-crank portable espresso machine? [CoffeeJack V2]",
+      "title_zh": "有人试过或用过CoffeeJack V2手摇便携意式咖啡机吗？[CoffeeJack V2]"
+    },
+    {
+      "id": "v62",
+      "player": "other",
+      "title": "Opinions on MiiCoffee Eon Portable Espresso Machine?",
+      "score": 2,
+      "url": "https://www.reddit.com/r/espresso/comments/1oz2quh/opinions_on_miicoffee_eon_portable_espresso/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1763341437,
+      "title_en": "Opinions on MiiCoffee Eon Portable Espresso Machine?",
+      "title_zh": "对MiiCoffee Eon便携意式咖啡机有何看法？"
+    },
+    {
+      "id": "v63",
+      "player": "other",
+      "title": "How do you keep your portable espresso machines clean during your travels?",
+      "score": 2,
+      "url": "https://www.reddit.com/r/espresso/comments/1l2bil6/how_do_you_keep_your_portable_espresso_machines/",
+      "sentiment": "pos",
+      "themes": [
+        "t.ease_of_use",
+        "t.durability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1748956268,
+      "title_en": "How do you keep your portable espresso machines clean during your travels?",
+      "title_zh": "旅行时如何保持便携意式咖啡机清洁？"
+    },
+    {
+      "id": "v64",
+      "player": "picopresso",
+      "title": "IKAPE KAPO K2 Pro or MHW press58x or picopresso Portable Espresso experiences",
+      "score": 2,
+      "url": "https://www.reddit.com/r/espresso/comments/1tcr09j/ikape_kapo_k2_pro_or_mhw_press58x_or_picopresso/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1778744292,
+      "title_en": "IKAPE KAPO K2 Pro or MHW press58x or picopresso Portable Espresso experiences",
+      "title_zh": "IKAPE KAPO K2 Pro、MHW press58x或picopresso便携意式咖啡机体验"
+    },
+    {
+      "id": "v65",
+      "player": "other",
+      "title": "Easiest portable espresso machines? [Budget flexible]",
+      "score": 2,
+      "url": "https://www.reddit.com/r/espresso/comments/1sq83j8/easiest_portable_espresso_machines_budget_flexible/",
+      "sentiment": "pos",
+      "themes": [
+        "t.ease_of_use",
+        "t.comparison"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1776640074,
+      "title_en": "Easiest portable espresso machines? [Budget flexible]",
+      "title_zh": "最简单的便携意式咖啡机？[预算灵活]"
+    },
+    {
+      "id": "v66",
+      "player": "other",
+      "title": "Best portable milk or creamer options for espresso on the go?",
+      "score": 2,
+      "url": "https://www.reddit.com/r/espresso/comments/1lkb4py/best_portable_milk_or_creamer_options_for/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1750870757,
+      "title_en": "Best portable milk or creamer options for espresso on the go?",
+      "title_zh": "最佳便携牛奶或奶精选项，用于外出意式咖啡？"
+    },
+    {
+      "id": "v67",
+      "player": "other",
+      "title": "Manual portable espresso press made of metal",
+      "score": 2,
+      "url": "https://www.reddit.com/r/espresso/comments/1g20kr4/manual_portable_espresso_press_made_of_metal/",
+      "sentiment": "pos",
+      "themes": [
+        "t.material",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1728741099,
+      "title_en": "Manual portable espresso press made of metal",
+      "title_zh": "金属材质的手动便携意式咖啡压榨机"
+    },
+    {
+      "id": "v68",
+      "player": "moka-pot",
+      "title": "Best Travel-Friendly Grinder for Moka Pot, and maybe Pour Over and Portable Espresso?",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/1mltups/best_travelfriendly_grinder_for_moka_pot_and/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.portability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1754757423,
+      "title_en": "Best Travel-Friendly Grinder for Moka Pot, and maybe Pour Over and Portable Espresso?",
+      "title_zh": "适合摩卡壶、可能还有手冲和便携意式咖啡的最佳旅行磨豆机？"
+    },
+    {
+      "id": "v69",
+      "player": "wacaco",
+      "title": "Wacaco Cuppamoka Review: A Portable Pour Over Coffee Maker",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/kroq8p/wacaco_cuppamoka_review_a_portable_pour_over/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1609942759,
+      "title_en": "Wacaco Cuppamoka Review: A Portable Pour Over Coffee Maker",
+      "title_zh": "Wacaco Cuppamoka评测：便携式手冲咖啡机"
+    },
+    {
+      "id": "v70",
+      "player": "other",
+      "title": "Has anyone tried the Maestri House Portable Travel Espresso Coffee Maker?",
+      "score": 1,
+      "url": "https://www.reddit.com/r/espresso/comments/1gitxaq/has_anyone_tried_the_maestri_house_portable/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.electric_vs_manual"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1730659358,
+      "title_en": "Has anyone tried the Maestri House Portable Travel Espresso Coffee Maker?",
+      "title_zh": "有人试过Maestri House便携旅行意式咖啡机吗？"
+    },
+    {
+      "id": "v71",
+      "player": "wacaco",
+      "title": "Best manual grinder for Wacaco Nanopresso",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/1bjlf9o/best_manual_grinder_for_wacaco_nanopresso/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1710961432,
+      "title_en": "Best manual grinder for Wacaco Nanopresso",
+      "title_zh": "Wacaco Nanopresso的最佳手摇磨豆机"
+    },
+    {
+      "id": "v72",
+      "player": "outin_nano",
       "title": "[Equipment] Its not Outin nano: Caramelly Fikapresso Pro Portable Espresso Maker",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1nhi2b6/equipment_its_not_outin_nano_caramelly_fikapresso/",
       "sentiment": "pos",
       "themes": [
-        "t.quality",
-        "t.portability"
+        "t.comparison",
+        "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1757931760,
@@ -1209,86 +1433,55 @@
       "title_zh": "[设备] 不是Outin nano：Caramelly Fikapresso Pro便携意式咖啡机"
     },
     {
-      "id": "v59",
-      "player": "wacaco",
-      "title": "Best manual grinder for Wacaco Nanopresso",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1bjlf9o/best_manual_grinder_for_wacaco_nanopresso/",
-      "sentiment": "pos",
-      "themes": [
-        "t.grinder",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1710961432,
-      "title_en": "Best manual grinder for Wacaco Nanopresso",
-      "title_zh": "Wacaco Nanopresso的最佳手动磨豆机"
-    },
-    {
-      "id": "v60",
-      "player": "wacaco",
-      "title": "Best manual grinder for Wacaco Nanopresso",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1bjlevn/best_manual_grinder_for_wacaco_nanopresso/",
-      "sentiment": "pos",
-      "themes": [
-        "t.grinder",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1710961411,
-      "title_en": "Best manual grinder for Wacaco Nanopresso",
-      "title_zh": "Wacaco Nanopresso的最佳手动磨豆机"
-    },
-    {
-      "id": "v61",
-      "player": "other",
+      "id": "v73",
+      "player": "outin_nano",
       "title": "Its not Outin nano: Caramelly Fikapresso Pro Portable Espresso Maker",
       "score": 1,
       "url": "https://www.reddit.com/r/espresso/comments/1nd9vvp/its_not_outin_nano_caramelly_fikapresso_pro/",
       "sentiment": "pos",
       "themes": [
-        "t.quality",
-        "t.portability"
+        "t.comparison",
+        "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1757497931,
       "title_en": "Its not Outin nano: Caramelly Fikapresso Pro Portable Espresso Maker",
-      "title_zh": "不是Outin nano：Caramelly Fikapresso Pro便携式浓缩咖啡机"
+      "title_zh": "不是Outin nano：Caramelly Fikapresso Pro便携意式咖啡机"
     },
     {
-      "id": "v62",
-      "player": "other",
+      "id": "v74",
+      "player": "nespresso",
       "title": "Comparison of new portable espresso machines to Nespresso",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1qvt70j/comparison_of_new_portable_espresso_machines_to/",
       "sentiment": "pos",
       "themes": [
-        "t.quality",
-        "t.portability"
+        "t.comparison",
+        "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1770222551,
       "title_en": "Comparison of new portable espresso machines to Nespresso",
-      "title_zh": "新型便携式浓缩咖啡机与Nespresso的对比"
+      "title_zh": "新型便携意式咖啡机与Nespresso的对比"
     },
     {
-      "id": "v63",
+      "id": "v75",
       "player": "other",
       "title": "Favorite manual espresso machine for camping?",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1f7oi18/favorite_manual_espresso_machine_for_camping/",
       "sentiment": "pos",
       "themes": [
-        "t.portability"
+        "t.portability",
+        "t.durability"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1725329195,
       "title_en": "Favorite manual espresso machine for camping?",
-      "title_zh": "露营时最喜爱的手动浓缩咖啡机？"
+      "title_zh": "露营时最喜欢的手动意式咖啡机？"
     },
     {
-      "id": "v64",
+      "id": "v76",
       "player": "other",
       "title": "Plastic and Teflon free portable espresso maker… too good to be true? Viesimple M5 manual espresso",
       "score": 1,
@@ -1301,106 +1494,58 @@
       "collected_at": "2026-06-01",
       "created_utc": 1767766023,
       "title_en": "Plastic and Teflon free portable espresso maker… too good to be true? Viesimple M5 manual espresso",
-      "title_zh": "无塑料和特氟龙的便携式浓缩咖啡机……好得难以置信？Viesimple M5手动浓缩咖啡"
+      "title_zh": "无塑料和特氟龙的便携意式咖啡机……好得难以置信？Viesimple M5手动意式咖啡机"
     },
     {
-      "id": "v65",
-      "player": "other",
-      "title": "Looking for portable machine options. Outin Mino or Wacaco Pixapresso? [$200]",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1pmgobk/looking_for_portable_machine_options_outin_mino/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1765726008,
-      "title_en": "Looking for portable machine options. Outin Mino or Wacaco Pixapresso? [$200]",
-      "title_zh": "寻找便携式机器选项。Outin Mino还是Wacaco Pixapresso？[$200]"
-    },
-    {
-      "id": "v66",
-      "player": "other",
-      "title": "Looking for portable machine options. Outin Mino or Wacaco Pixapresso?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1pmgikh/looking_for_portable_machine_options_outin_mino/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1765725594,
-      "title_en": "Looking for portable machine options. Outin Mino or Wacaco Pixapresso?",
-      "title_zh": "寻找便携式机器选项。Outin Mino还是Wacaco Pixapresso？"
-    },
-    {
-      "id": "v67",
+      "id": "v77",
       "player": "other",
       "title": "Opinions on Miicoffee's EON Portable Espresso Machine?",
       "score": 1,
       "url": "https://www.reddit.com/r/espresso/comments/1oyum3a/opinions_on_miicoffees_eon_portable_espresso/",
       "sentiment": "pos",
       "themes": [
-        "t.quality",
-        "t.price_value"
+        "t.comparison",
+        "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1763321134,
       "title_en": "Opinions on Miicoffee's EON Portable Espresso Machine?",
-      "title_zh": "对Miicoffee EON便携式浓缩咖啡机的看法？"
+      "title_zh": "对Miicoffee EON便携意式咖啡机的看法？"
     },
     {
-      "id": "v68",
-      "player": "other",
-      "title": "Opinions on Miicoffee's EON Portable Espresso Machine?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1oyujyk/opinions_on_miicoffees_eon_portable_espresso/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.price_value"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1763320992,
-      "title_en": "Opinions on Miicoffee's EON Portable Espresso Machine?",
-      "title_zh": "对Miicoffee EON便携式浓缩咖啡机的看法？"
-    },
-    {
-      "id": "v69",
+      "id": "v78",
       "player": "other",
       "title": "Has anyone tried cheaper alternative to Maespresso 58? Portable Pneumatic espresso maker?",
       "score": 1,
       "url": "https://www.reddit.com/r/espresso/comments/1oynxyo/has_anyone_tried_cheaper_alternative_to/",
       "sentiment": "pos",
       "themes": [
-        "t.price_value",
-        "t.portability"
+        "t.price",
+        "t.comparison"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1763305433,
       "title_en": "Has anyone tried cheaper alternative to Maespresso 58? Portable Pneumatic espresso maker?",
-      "title_zh": "有人试过Maespresso 58的廉价替代品吗？便携式气动浓缩咖啡机？"
+      "title_zh": "有人试过Maespresso 58的廉价替代品吗？便携气动意式咖啡机？"
     },
     {
-      "id": "v70",
-      "player": "outin",
-      "title": "Outin Espresso maker's matching portable grinder.",
+      "id": "v79",
+      "player": "other",
+      "title": "My little beachside coffee setup, now I won't travel anywhere without this portable coffee maker. My precious.",
       "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1oijsnz/outin_espresso_makers_matching_portable_grinder/",
+      "url": "https://www.reddit.com/r/espresso/comments/1loedu2/my_little_beachside_coffee_setup_now_i_wont/",
       "sentiment": "pos",
       "themes": [
-        "t.grinder",
-        "t.portability"
+        "t.portability",
+        "t.ease_of_use"
       ],
       "collected_at": "2026-06-01",
-      "created_utc": 1761681748,
-      "title_en": "Outin Espresso maker's matching portable grinder.",
-      "title_zh": "Outin浓缩咖啡机的配套便携式研磨机。"
+      "created_utc": 1751306189,
+      "title_en": "My little beachside coffee setup, now I won't travel anywhere without this portable coffee maker. My precious.",
+      "title_zh": "我的小海滩咖啡装备，现在没有这个便携咖啡机我哪儿也不去。我的宝贝。"
     },
     {
-      "id": "v71",
+      "id": "v80",
       "player": "other",
       "title": "Is switching coffee beans worth it when using portable espresso machines? [no budget]",
       "score": 1,
@@ -1408,31 +1553,15 @@
       "sentiment": "pos",
       "themes": [
         "t.quality",
-        "t.portability"
+        "t.comparison"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1751219209,
       "title_en": "Is switching coffee beans worth it when using portable espresso machines? [no budget]",
-      "title_zh": "使用便携式浓缩咖啡机时更换咖啡豆值得吗？[无预算]"
+      "title_zh": "使用便携意式咖啡机时更换咖啡豆值得吗？[无预算]"
     },
     {
-      "id": "v72",
-      "player": "other",
-      "title": "What is the best portable espresso maker",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1lmls2f/what_is_the_best_portable_espresso_maker/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1751114135,
-      "title_en": "What is the best portable espresso maker",
-      "title_zh": "最好的便携式浓缩咖啡机是什么"
-    },
-    {
-      "id": "v73",
+      "id": "v81",
       "player": "other",
       "title": "Is switching coffee beans worth it when using portable espresso machines?",
       "score": 1,
@@ -1440,77 +1569,15 @@
       "sentiment": "pos",
       "themes": [
         "t.quality",
-        "t.portability"
+        "t.comparison"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1750699545,
       "title_en": "Is switching coffee beans worth it when using portable espresso machines?",
-      "title_zh": "使用便携式浓缩咖啡机时更换咖啡豆值得吗？"
+      "title_zh": "使用便携意式咖啡机时更换咖啡豆值得吗？"
     },
     {
-      "id": "v74",
-      "player": "other",
-      "title": "Best beginner portable electric espresso make?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1le5axo/best_beginner_portable_electric_espresso_make/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.price_value"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1750211921,
-      "title_en": "Best beginner portable electric espresso make?",
-      "title_zh": "最适合初学者的便携式电动浓缩咖啡机？"
-    },
-    {
-      "id": "v75",
-      "player": "other",
-      "title": "How do you keep your portable espresso machines clean during your travels?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1kz7iil/how_do_you_keep_your_portable_espresso_machines/",
-      "sentiment": "pos",
-      "themes": [
-        "t.cleaning"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1748619834,
-      "title_en": "How do you keep your portable espresso machines clean during your travels?",
-      "title_zh": "旅行时如何保持便携式浓缩咖啡机清洁？"
-    },
-    {
-      "id": "v76",
-      "player": "other",
-      "title": "How do you keep your portable espresso machines clean during your travels?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1kwsei1/how_do_you_keep_your_portable_espresso_machines/",
-      "sentiment": "pos",
-      "themes": [
-        "t.cleaning"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1748364923,
-      "title_en": "How do you keep your portable espresso machines clean during your travels?",
-      "title_zh": "旅行时如何保持便携式浓缩咖啡机清洁？"
-    },
-    {
-      "id": "v77",
-      "player": "other",
-      "title": "Best portable espresso machine!?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1k4wh8h/best_portable_espresso_machine/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1745291783,
-      "title_en": "Best portable espresso machine!?",
-      "title_zh": "最好的便携式浓缩咖啡机！？"
-    },
-    {
-      "id": "v78",
+      "id": "v82",
       "player": "other",
       "title": "New Year Gift from my wife-Portable espresso machine. who know this and if it can brew great coffee",
       "score": 1,
@@ -1523,154 +1590,106 @@
       "collected_at": "2026-06-01",
       "created_utc": 1735883877,
       "title_en": "New Year Gift from my wife-Portable espresso machine. who know this and if it can brew great coffee",
-      "title_zh": "妻子送的新年礼物——便携式浓缩咖啡机。谁知道这个，它能做出好咖啡吗"
+      "title_zh": "妻子送的新年礼物——便携意式咖啡机。谁知道这个，它能煮出好咖啡吗？"
     },
     {
-      "id": "v79",
-      "player": "other",
-      "title": "Best Portable Espresso Maker?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1fwz0ll/best_portable_espresso_maker/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1728158603,
-      "title_en": "Best Portable Espresso Maker?",
-      "title_zh": "最好的便携式浓缩咖啡机？"
-    },
-    {
-      "id": "v80",
+      "id": "v83",
       "player": "other",
       "title": "Which electric portable grinder should I get: OutIn Fino or Staresso?",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1lkcgna/which_electric_portable_grinder_should_i_get/",
       "sentiment": "pos",
       "themes": [
-        "t.grinder",
-        "t.portability"
+        "t.comparison",
+        "t.electric_vs_manual"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1750873749,
       "title_en": "Which electric portable grinder should I get: OutIn Fino or Staresso?",
-      "title_zh": "应该买哪个电动便携式研磨机：OutIn Fino还是Staresso？"
+      "title_zh": "我应该买哪个电动便携磨豆机：OutIn Fino还是Staresso？"
     },
     {
-      "id": "v81",
-      "player": "other",
-      "title": "nano portable espresso machine available now at 50%off",
+      "id": "v84",
+      "player": "outin_nano",
+      "title": "Outin Espresso maker's matching portable grinder.",
       "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1hy9fgv/nano_portable_espresso_machine_available_now_at/",
+      "url": "https://www.reddit.com/r/espresso/comments/1oijsnz/outin_espresso_makers_matching_portable_grinder/",
       "sentiment": "pos",
       "themes": [
-        "t.price_value",
-        "t.portability"
+        "t.comparison",
+        "t.electric_vs_manual"
       ],
       "collected_at": "2026-06-01",
-      "created_utc": 1736529341,
-      "title_en": "nano portable espresso machine available now at 50%off",
-      "title_zh": "nano便携式浓缩咖啡机现五折优惠"
+      "created_utc": 1761681748,
+      "title_en": "Outin Espresso maker's matching portable grinder.",
+      "title_zh": "Outin意式咖啡机的配套便携磨豆机。"
     },
     {
-      "id": "v82",
-      "player": "outin",
-      "title": "Portable gateway into espresso brewing Outin Nano/Mino",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1p2f0e0/portable_gateway_into_espresso_brewing_outin/",
-      "sentiment": "pos",
-      "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1763672545,
-      "title_en": "Portable gateway into espresso brewing Outin Nano/Mino",
-      "title_zh": "便携式入门浓缩咖啡冲泡：Outin Nano/Mino"
-    },
-    {
-      "id": "v83",
-      "player": "other",
+      "id": "v85",
+      "player": "outin_nano",
       "title": "Recommendation Please: Timemore Whirly 01s or OutIn Fino Portable Electric Coffee Grinder",
       "score": 1,
       "url": "https://www.reddit.com/r/espresso/comments/1ncebpg/recommendation_please_timemore_whirly_01s_or/",
       "sentiment": "pos",
       "themes": [
-        "t.grinder",
-        "t.portability"
+        "t.comparison",
+        "t.electric_vs_manual"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1757410391,
       "title_en": "Recommendation Please: Timemore Whirly 01s or OutIn Fino Portable Electric Coffee Grinder",
-      "title_zh": "推荐：Timemore Whirly 01s还是OutIn Fino便携式电动咖啡研磨机"
+      "title_zh": "推荐：Timemore Whirly 01s还是OutIn Fino便携电动咖啡磨豆机？"
     },
     {
-      "id": "v84",
-      "player": "other",
+      "id": "v86",
+      "player": "staresso",
       "title": "Which electric portable grinder should I get: OutIn Fino or Staresso? [ $150 ]",
       "score": 1,
       "url": "https://www.reddit.com/r/espresso/comments/1lo4dit/which_electric_portable_grinder_should_i_get/",
       "sentiment": "pos",
       "themes": [
-        "t.grinder",
-        "t.portability"
+        "t.comparison",
+        "t.electric_vs_manual"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1751280482,
       "title_en": "Which electric portable grinder should I get: OutIn Fino or Staresso? [ $150 ]",
-      "title_zh": "应该买哪个电动便携式研磨机：OutIn Fino还是Staresso？[$150]"
+      "title_zh": "我应该买哪个电动便携磨豆机：OutIn Fino还是Staresso？[150美元]"
     },
     {
-      "id": "v85",
+      "id": "v87",
       "player": "other",
       "title": "How does a portable espresso machine work? Like this one (more info under the picture)",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1t4po5g/how_does_a_portable_espresso_machine_work_like/",
       "sentiment": "pos",
       "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
+        "t.ease_of_use",
+        "t.electric_vs_manual"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1778009140,
       "title_en": "How does a portable espresso machine work? Like this one (more info under the picture)",
-      "title_zh": "便携式浓缩咖啡机如何工作？像这个（图片下有更多信息）"
+      "title_zh": "便携意式咖啡机如何工作？像这个（图片下方更多信息）"
     },
     {
-      "id": "v86",
+      "id": "v88",
       "player": "other",
       "title": "Seeking Expert Opinions: Came Across the Flaremore Manual Hand Press - Legit Portable Espresso Solution or Just a Gimmic",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1pj42pz/seeking_expert_opinions_came_across_the_flaremore/",
       "sentiment": "pos",
       "themes": [
-        "t.quality",
-        "t.portability"
+        "t.comparison",
+        "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1765377220,
       "title_en": "Seeking Expert Opinions: Came Across the Flaremore Manual Hand Press - Legit Portable Espresso Solution or Just a Gimmic",
-      "title_zh": "寻求专家意见：发现Flaremore手动手压机——合法的便携式浓缩咖啡解决方案还是噱头"
+      "title_zh": "寻求专家意见：偶然发现Flaremore手动手压机——合法的便携意式咖啡解决方案还是噱头？"
     },
     {
-      "id": "v87",
-      "player": "other",
-      "title": "Seeking Expert Opinions: Came Across the Flaremore Manual Hand Press - Legit Portable Espresso Solution or Just a Gimmic",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1pj1mgx/seeking_expert_opinions_came_across_the_flaremore/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1765370584,
-      "title_en": "Seeking Expert Opinions: Came Across the Flaremore Manual Hand Press - Legit Portable Espresso Solution or Just a Gimmic",
-      "title_zh": "寻求专家意见：发现Flaremore手动手压机——合法的便携式浓缩咖啡解决方案还是噱头"
-    },
-    {
-      "id": "v88",
+      "id": "v89",
       "player": "other",
       "title": "Portable espresso machines - any good?",
       "score": 1,
@@ -1683,25 +1702,26 @@
       "collected_at": "2026-06-01",
       "created_utc": 1762076537,
       "title_en": "Portable espresso machines - any good?",
-      "title_zh": "便携式浓缩咖啡机——好用吗？"
+      "title_zh": "便携意式咖啡机——好用吗？"
     },
     {
-      "id": "v89",
+      "id": "v90",
       "player": "other",
       "title": "Is it normal for a portable espresso maker to get hot during charging?",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1n461kj/is_it_normal_for_a_portable_espresso_maker_to_get/",
       "sentiment": "neg",
       "themes": [
-        "t.durability"
+        "t.durability",
+        "t.ease_of_use"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1756571577,
       "title_en": "Is it normal for a portable espresso maker to get hot during charging?",
-      "title_zh": "便携式浓缩咖啡机充电时发热正常吗？"
+      "title_zh": "便携意式咖啡机充电时变热正常吗？"
     },
     {
-      "id": "v90",
+      "id": "v91",
       "player": "other",
       "title": "Should I finally get a portable espresso machine?",
       "score": 1,
@@ -1714,10 +1734,10 @@
       "collected_at": "2026-06-01",
       "created_utc": 1756558716,
       "title_en": "Should I finally get a portable espresso machine?",
-      "title_zh": "我应该最终买一台便携式浓缩咖啡机吗？"
+      "title_zh": "我应该最终买一台便携意式咖啡机吗？"
     },
     {
-      "id": "v91",
+      "id": "v92",
       "player": "other",
       "title": "Battery powered, portable espresso machine!",
       "score": 1,
@@ -1730,41 +1750,122 @@
       "collected_at": "2026-06-01",
       "created_utc": 1755275718,
       "title_en": "Battery powered, portable espresso machine!",
-      "title_zh": "电池供电的便携式浓缩咖啡机！"
+      "title_zh": "电池供电的便携意式咖啡机！"
     },
     {
-      "id": "v92",
+      "id": "v93",
       "player": "other",
       "title": "Portable Espresso Machine?",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1kxr6ex/portable_espresso_machine/",
       "sentiment": "pos",
       "themes": [
-        "t.portability"
+        "t.portability",
+        "t.comparison"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1748463087,
       "title_en": "Portable Espresso Machine?",
-      "title_zh": "便携式浓缩咖啡机？"
-    },
-    {
-      "id": "v93",
-      "player": "other",
-      "title": "Best portable coffee machine",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1k4wex7/best_portable_coffee_machine/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability",
-        "t.quality"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1745291575,
-      "title_en": "Best portable coffee machine",
-      "title_zh": "最好的便携式咖啡机"
+      "title_zh": "便携意式咖啡机？"
     },
     {
       "id": "v94",
+      "player": "other",
+      "title": "Portable coffee machine",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/1k4wqih/portable_coffee_machine/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.comparison"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1745292617,
+      "title_en": "Portable coffee machine",
+      "title_zh": "便携咖啡机"
+    },
+    {
+      "id": "v95",
+      "player": "other",
+      "title": "Portable coffee maker for store bought pre-ground coffee",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/1jgisaq/portable_coffee_maker_for_store_bought_preground/",
+      "sentiment": "pos",
+      "themes": [
+        "t.ease_of_use",
+        "t.portability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1742569116,
+      "title_en": "Portable coffee maker for store bought pre-ground coffee",
+      "title_zh": "用于商店购买的预磨咖啡粉的便携咖啡机"
+    },
+    {
+      "id": "v96",
+      "player": "other",
+      "title": "Plastic-Free portable coffee makers",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/1jeazou/plasticfree_portable_coffee_makers/",
+      "sentiment": "pos",
+      "themes": [
+        "t.material",
+        "t.portability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1742319973,
+      "title_en": "Plastic-Free portable coffee makers",
+      "title_zh": "无塑料便携咖啡机"
+    },
+    {
+      "id": "v97",
+      "player": "other",
+      "title": "Looking for a Portable Coffee Maker",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/1iajjzg/looking_for_a_portable_coffee_maker/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.comparison"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1737910428,
+      "title_en": "Looking for a Portable Coffee Maker",
+      "title_zh": "寻找便携咖啡机"
+    },
+    {
+      "id": "v98",
+      "player": "other",
+      "title": "Portable Coffeemaker for daily, single use",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/1gjwybd/portable_coffeemaker_for_daily_single_use/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1730775518,
+      "title_en": "Portable Coffeemaker for daily, single use",
+      "title_zh": "日常单次使用的便携咖啡机"
+    },
+    {
+      "id": "v99",
+      "player": "other",
+      "title": "Looking for a Portable Coffee Machine with Pro-Level Quality",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/1gfg09t/looking_for_a_portable_coffee_machine_with/",
+      "sentiment": "pos",
+      "themes": [
+        "t.quality",
+        "t.price"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1730268746,
+      "title_en": "Looking for a Portable Coffee Machine with Pro-Level Quality",
+      "title_zh": "寻找专业级品质的便携咖啡机"
+    },
+    {
+      "id": "v100",
       "player": "other",
       "title": "Are there any decent portable espresso machines that make espresso that actually tastes like espresso under $300?",
       "score": 1,
@@ -1772,15 +1873,15 @@
       "sentiment": "pos",
       "themes": [
         "t.quality",
-        "t.price_value"
+        "t.price"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1728434415,
       "title_en": "Are there any decent portable espresso machines that make espresso that actually tastes like espresso under $300?",
-      "title_zh": "有没有300美元以下、能做出真正浓缩咖啡味道的便携式浓缩咖啡机？"
+      "title_zh": "有没有300美元以下、能做出真正意式咖啡味道的便携意式咖啡机？"
     },
     {
-      "id": "v95",
+      "id": "v101",
       "player": "other",
       "title": "Are there any portable espresso machines that make espresso that actually tastes like espresso under $300?",
       "score": 1,
@@ -1788,215 +1889,223 @@
       "sentiment": "pos",
       "themes": [
         "t.quality",
-        "t.price_value"
+        "t.price"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1728434289,
       "title_en": "Are there any portable espresso machines that make espresso that actually tastes like espresso under $300?",
-      "title_zh": "有没有能做出真正浓缩咖啡味道的便携式浓缩咖啡机，价格在300美元以下？"
+      "title_zh": "有没有300美元以下、能做出真正意式咖啡味道的便携意式咖啡机？"
     },
     {
-      "id": "v96",
+      "id": "v102",
       "player": "other",
       "title": "Portable Espresso Maker",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/1cjtfu7/portable_espresso_maker/",
       "sentiment": "pos",
       "themes": [
-        "t.portability"
+        "t.portability",
+        "t.comparison"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1714802513,
       "title_en": "Portable Espresso Maker",
-      "title_zh": "便携式浓缩咖啡机"
+      "title_zh": "便携意式咖啡机"
     },
     {
-      "id": "v97",
+      "id": "v103",
+      "player": "other",
+      "title": "Looking for a portable coffee maker and grinder to take to work. What do people recommend?",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/18z1t00/looking_for_a_portable_coffee_maker_and_grinder/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.comparison"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1704442356,
+      "title_en": "Looking for a portable coffee maker and grinder to take to work. What do people recommend?",
+      "title_zh": "寻找带去工作的便携咖啡机和磨豆机。大家推荐什么？"
+    },
+    {
+      "id": "v104",
       "player": "other",
       "title": "Am after a portable espresso maker for work",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/zxghif/am_after_a_portable_espresso_maker_for_work/",
       "sentiment": "pos",
       "themes": [
-        "t.portability"
+        "t.portability",
+        "t.ease_of_use"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1672251013,
       "title_en": "Am after a portable espresso maker for work",
-      "title_zh": "我在找一款上班用的便携式浓缩咖啡机"
+      "title_zh": "我在找一款工作用的便携意式咖啡机"
     },
     {
-      "id": "v98",
+      "id": "v105",
       "player": "other",
-      "title": "I’m a flight attendant and saw a coworker make her own coffee while we were in the plane a couple years ago but can’t re",
+      "title": "With a thermos/pot of hot water and coffee grounds, what is your ideal portable pour-over set-up?",
       "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/si2n1b/im_a_flight_attendant_and_saw_a_coworker_make_her/",
+      "url": "https://www.reddit.com/r/Coffee/comments/uyiu35/with_a_thermospot_of_hot_water_and_coffee_grounds/",
       "sentiment": "pos",
       "themes": [
+        "t.portability",
+        "t.quality"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1653602840,
+      "title_en": "With a thermos/pot of hot water and coffee grounds, what is your ideal portable pour-over set-up?",
+      "title_zh": "用保温瓶/壶的热水和咖啡粉，你理想的手冲便携套装是什么？"
+    },
+    {
+      "id": "v106",
+      "player": "other",
+      "title": "Manual, portable coffee bean crusher - Help me find it",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/qvd9gg/manual_portable_coffee_bean_crusher_help_me_find/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.ease_of_use"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1637084219,
+      "title_en": "Manual, portable coffee bean crusher - Help me find it",
+      "title_zh": "手动便携咖啡豆研磨机——帮我找到它"
+    },
+    {
+      "id": "v107",
+      "player": "other",
+      "title": "Anyone had a chance to look at the Atonce Portable Coffee Maker",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/p9ntuk/anyone_had_a_chance_to_look_at_the_atonce/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
         "t.portability"
       ],
       "collected_at": "2026-06-01",
-      "created_utc": 1643742089,
-      "title_en": "I’m a flight attendant and saw a coworker make her own coffee while we were in the plane a couple years ago but can’t re",
-      "title_zh": "我是一名空乘，几年前看到同事在飞机上自己做咖啡，但记不清了"
+      "created_utc": 1629676016,
+      "title_en": "Anyone had a chance to look at the Atonce Portable Coffee Maker",
+      "title_zh": "有人看过Atonce便携咖啡机吗？"
     },
     {
-      "id": "v99",
+      "id": "v108",
       "player": "other",
-      "title": "Portable espresso maker",
+      "title": "Portable mini coffee maker- Take your coffee with you on trip",
       "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/j8l99s/portable_espresso_maker/",
+      "url": "https://www.reddit.com/r/Coffee/comments/nvunu8/portable_mini_coffee_maker_take_your_coffee_with/",
       "sentiment": "pos",
       "themes": [
-        "t.portability"
+        "t.portability",
+        "t.ease_of_use"
       ],
       "collected_at": "2026-06-01",
-      "created_utc": 1602339562,
-      "title_en": "Portable espresso maker",
-      "title_zh": "便携式浓缩咖啡机"
+      "created_utc": 1623241490,
+      "title_en": "Portable mini coffee maker- Take your coffee with you on trip",
+      "title_zh": "便携迷你咖啡机——旅行时带上你的咖啡"
     },
     {
-      "id": "v100",
+      "id": "v109",
+      "player": "other",
+      "title": "Want to buy a portable coffee maker for outdoor adventures",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/k6e1q3/want_to_buy_a_portable_coffee_maker_for_outdoor/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.durability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1607056976,
+      "title_en": "Want to buy a portable coffee maker for outdoor adventures",
+      "title_zh": "想买一款户外探险用的便携咖啡机"
+    },
+    {
+      "id": "v110",
       "player": "other",
       "title": "1Zpresso Portable Espresso Maker",
       "score": 1,
       "url": "https://www.reddit.com/r/Coffee/comments/eg8rie/1zpresso_portable_espresso_maker/",
       "sentiment": "pos",
       "themes": [
-        "t.portability",
+        "t.comparison",
         "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1577436384,
       "title_en": "1Zpresso Portable Espresso Maker",
-      "title_zh": "1Zpresso便携式浓缩咖啡机"
+      "title_zh": "1Zpresso便携意式咖啡机"
     },
     {
-      "id": "v101",
-      "player": "other",
-      "title": "French Press or Bialetti Moka Express for Travel? Looking for advice!",
+      "id": "v111",
+      "player": "flair-espresso",
+      "title": "Please help me for my first espresso machine - Flair Neo Flex or Delonghi CP3420?",
       "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1l26kli/french_press_or_bialetti_moka_express_for_travel/",
+      "url": "https://www.reddit.com/r/Coffee/comments/1tjm2cr/please_help_me_for_my_first_espresso_machine/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.price"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1779373346,
+      "title_en": "Please help me for my first espresso machine - Flair Neo Flex or Delonghi CP3420?",
+      "title_zh": "请帮我选择第一台意式咖啡机——Flair Neo Flex还是Delonghi CP3420？"
+    },
+    {
+      "id": "v112",
+      "player": "other",
+      "title": "Who makes the best travel coffee solution?",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/1sgh4qb/who_makes_the_best_travel_coffee_solution/",
       "sentiment": "pos",
       "themes": [
         "t.portability",
-        "t.quality"
+        "t.comparison"
       ],
       "collected_at": "2026-06-01",
-      "created_utc": 1748939076,
-      "title_en": "French Press or Bialetti Moka Express for Travel? Looking for advice!",
-      "title_zh": "旅行用：法压壶还是Bialetti Moka Express？寻求建议！"
+      "created_utc": 1775713913,
+      "title_en": "Who makes the best travel coffee solution?",
+      "title_zh": "谁做最好的旅行咖啡解决方案？"
     },
     {
-      "id": "v102",
-      "player": "other",
-      "title": "What’s your favorite compact espresso gadget for travel or camping?",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1kfiln1/whats_your_favorite_compact_espresso_gadget_for/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1746468745,
-      "title_en": "What’s your favorite compact espresso gadget for travel or camping?",
-      "title_zh": "你最喜欢的旅行或露营紧凑型咖啡设备是什么？"
-    },
-    {
-      "id": "v103",
-      "player": "other",
-      "title": "Anyone with a Portable espresso machine. What are you carrying it in ? [$50]",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1sydh12/anyone_with_a_portable_espresso_machine_what_are/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1777408598,
-      "title_en": "Anyone with a Portable espresso machine. What are you carrying it in ? [$50]",
-      "title_zh": "有便携式浓缩咖啡机的人，你们用什么装它？[$50]"
-    },
-    {
-      "id": "v104",
-      "player": "other",
-      "title": "Anyone with a Portable espresso machine. What are you carrying it in ? [$50}",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1sydg40/anyone_with_a_portable_espresso_machine_what_are/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1777408541,
-      "title_en": "Anyone with a Portable espresso machine. What are you carrying it in ? [$50}",
-      "title_zh": "有便携式浓缩咖啡机的人，你们用什么装它？[$50}"
-    },
-    {
-      "id": "v105",
-      "player": "other",
-      "title": "Good portable espresso machine? [$1000 budget]",
-      "score": 1,
-      "url": "https://www.reddit.com/r/espresso/comments/1shx9dx/good_portable_espresso_machine_1000_budget/",
-      "sentiment": "pos",
-      "themes": [
-        "t.price_value",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1775850774,
-      "title_en": "Good portable espresso machine? [$1000 budget]",
-      "title_zh": "好的便携式浓缩咖啡机？[$1000预算]"
-    },
-    {
-      "id": "v106",
+      "id": "v113",
       "player": "aeropress",
       "title": "I'll be travelling to Thailand in a few months. Should I bother bringing an aeropress or other portable coffee maker, or",
       "score": 0,
       "url": "https://www.reddit.com/r/Coffee/comments/xwap58/ill_be_travelling_to_thailand_in_a_few_months/",
       "sentiment": "pos",
       "themes": [
-        "t.portability"
+        "t.portability",
+        "t.comparison"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1664976518,
       "title_en": "I'll be travelling to Thailand in a few months. Should I bother bringing an aeropress or other portable coffee maker, or",
-      "title_zh": "几个月后我要去泰国旅行。应该带Aeropress或其他便携式咖啡机吗，还是"
+      "title_zh": "几个月后我要去泰国旅行。我应该带一个Aeropress或其他便携咖啡机吗，还是……"
     },
     {
-      "id": "v107",
-      "player": "other",
-      "title": "Best beginner portable electric espresso maker? [Below or at 150-200]",
+      "id": "v114",
+      "player": "moka-pot",
+      "title": "Moka Pot on portable electric/induction stove",
       "score": 0,
-      "url": "https://www.reddit.com/r/espresso/comments/1le5g0d/best_beginner_portable_electric_espresso_maker/",
+      "url": "https://www.reddit.com/r/Coffee/comments/qw755r/moka_pot_on_portable_electricinduction_stove/",
       "sentiment": "pos",
       "themes": [
-        "t.electric_vs_manual",
-        "t.price_value"
+        "t.portability",
+        "t.ease_of_use"
       ],
       "collected_at": "2026-06-01",
-      "created_utc": 1750212345,
-      "title_en": "Best beginner portable electric espresso maker? [Below or at 150-200]",
-      "title_zh": "最适合初学者的便携式电动浓缩咖啡机？[150-200美元或以下]"
+      "created_utc": 1637177928,
+      "title_en": "Moka Pot on portable electric/induction stove",
+      "title_zh": "摩卡壶在便携电/电磁炉上使用"
     },
     {
-      "id": "v108",
-      "player": "other",
-      "title": "If you were considering a portable espresso machine and grinder, I recommend the Ikape Kapo K2 and Outin Fino",
-      "score": 0,
-      "url": "https://www.reddit.com/r/espresso/comments/1tc44x8/if_you_were_considering_a_portable_espresso/",
-      "sentiment": "pos",
-      "themes": [
-        "t.grinder",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1778688369,
-      "title_en": "If you were considering a portable espresso machine and grinder, I recommend the Ikape Kapo K2 and Outin Fino",
-      "title_zh": "如果你在考虑便携式浓缩咖啡机和研磨机，我推荐Ikape Kapo K2和Outin Fino"
-    },
-    {
-      "id": "v109",
+      "id": "v115",
       "player": "other",
       "title": "Manual portable Espresso maker?",
       "score": 0,
@@ -2009,26 +2118,74 @@
       "collected_at": "2026-06-01",
       "created_utc": 1579634984,
       "title_en": "Manual portable Espresso maker?",
-      "title_zh": "手动便携式浓缩咖啡机？"
+      "title_zh": "手动便携意式咖啡机？"
     },
     {
-      "id": "v110",
+      "id": "v116",
+      "player": "other",
+      "title": "Buy the Best Camping Espresso Maker",
+      "score": 0,
+      "url": "https://www.reddit.com/r/Coffee/comments/c5sw3v/buy_the_best_camping_espresso_maker/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.durability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1561571083,
+      "title_en": "Buy the Best Camping Espresso Maker",
+      "title_zh": "购买最佳露营意式咖啡机"
+    },
+    {
+      "id": "v117",
+      "player": "other",
+      "title": "Best Travel/Camping Coffee Setup?",
+      "score": 0,
+      "url": "https://www.reddit.com/r/Coffee/comments/6e5hbm/best_travelcamping_coffee_setup/",
+      "sentiment": "pos",
+      "themes": [
+        "t.portability",
+        "t.durability"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1496122953,
+      "title_en": "Best Travel/Camping Coffee Setup?",
+      "title_zh": "最佳旅行/露营咖啡装备？"
+    },
+    {
+      "id": "v118",
       "player": "other",
       "title": "Im new here, a student who needs espresso to wake up lol and planning to buy affordable coffee machine/portable and I'm ",
       "score": 0,
       "url": "https://www.reddit.com/r/espresso/comments/1mum9gn/im_new_here_a_student_who_needs_espresso_to_wake/",
       "sentiment": "pos",
       "themes": [
-        "t.price_value",
+        "t.price",
         "t.portability"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1755618557,
       "title_en": "Im new here, a student who needs espresso to wake up lol and planning to buy affordable coffee machine/portable and I'm ",
-      "title_zh": "我是新手，一个需要咖啡醒脑的学生，计划买一台便宜的咖啡机/便携式，而且我"
+      "title_zh": "我是新手，一个需要咖啡提神的学生，计划购买平价咖啡机/便携机，而且我……"
     },
     {
-      "id": "v111",
+      "id": "v119",
+      "player": "other",
+      "title": "What is the best portable esports maker (Grounded coffee + Pods ) [No budget]",
+      "score": 0,
+      "url": "https://www.reddit.com/r/espresso/comments/1lmltdn/what_is_the_best_portable_esports_maker_grounded/",
+      "sentiment": "pos",
+      "themes": [
+        "t.comparison",
+        "t.material"
+      ],
+      "collected_at": "2026-06-01",
+      "created_utc": 1751114251,
+      "title_en": "What is the best portable esports maker (Grounded coffee + Pods ) [No budget]",
+      "title_zh": "最佳便携意式咖啡机（咖啡粉+胶囊）[无预算]"
+    },
+    {
+      "id": "v120",
       "player": "other",
       "title": "Portable Espresso machine that electrically pressurizes but needs external heating for cheap.",
       "score": 0,
@@ -2036,15 +2193,15 @@
       "sentiment": "pos",
       "themes": [
         "t.electric_vs_manual",
-        "t.portability"
+        "t.price"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1739798835,
       "title_en": "Portable Espresso machine that electrically pressurizes but needs external heating for cheap.",
-      "title_zh": "电动加压但需外部加热的廉价便携式浓缩咖啡机。"
+      "title_zh": "电动加压但需外部加热的廉价便携意式咖啡机"
     },
     {
-      "id": "v112",
+      "id": "v121",
       "player": "other",
       "title": "Best Portable Espresso Maker with Heating? [€200]",
       "score": 0,
@@ -2052,135 +2209,72 @@
       "sentiment": "pos",
       "themes": [
         "t.electric_vs_manual",
-        "t.portability"
+        "t.price"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1739376960,
       "title_en": "Best Portable Espresso Maker with Heating? [€200]",
-      "title_zh": "最好的带加热功能的便携式浓缩咖啡机？[€200]"
+      "title_zh": "最佳便携式意式浓缩咖啡机，带加热功能？[€200]"
     },
     {
-      "id": "v113",
+      "id": "v122",
       "player": "other",
       "title": "I love coffee, missus is a barista, so Brevoy sent me their new portable espresso maker to try out - we were actually bo",
       "score": 0,
       "url": "https://www.reddit.com/r/espresso/comments/1gnsiz6/i_love_coffee_missus_is_a_barista_so_brevoy_sent/",
       "sentiment": "pos",
       "themes": [
-        "t.quality",
-        "t.portability"
+        "t.comparison",
+        "t.quality"
       ],
       "collected_at": "2026-06-01",
       "created_utc": 1731212727,
       "title_en": "I love coffee, missus is a barista, so Brevoy sent me their new portable espresso maker to try out - we were actually bo",
-      "title_zh": "我爱咖啡，老婆是咖啡师，所以Brevoy寄来了他们的新款便携式浓缩咖啡机让我们试用——我们实际上都"
+      "title_zh": "我爱咖啡，老婆是咖啡师，所以Brevoy寄了他们的新便携式意式浓缩咖啡机给我试用——我们其实挺惊"
     },
     {
-      "id": "v114",
-      "player": "outin",
-      "title": "Outin Nano- anyone have experience using pods? Makes gear portable espresso shots with my own grind but pods not?",
+      "id": "v123",
+      "player": "outin_nano",
+      "title": "Looking for a portable coffee maker (pods only): Cera+ or Outin? [~$300]",
       "score": 0,
-      "url": "https://www.reddit.com/r/espresso/comments/1i4lus6/outin_nano_anyone_have_experience_using_pods/",
+      "url": "https://www.reddit.com/r/espresso/comments/1rdfjri/looking_for_a_portable_coffee_maker_pods_only/",
       "sentiment": "pos",
       "themes": [
-        "t.electric_vs_manual",
-        "t.portability"
+        "t.comparison",
+        "t.electric_vs_manual"
       ],
       "collected_at": "2026-06-01",
-      "created_utc": 1737247106,
-      "title_en": "Outin Nano- anyone have experience using pods? Makes gear portable espresso shots with my own grind but pods not?",
-      "title_zh": "Outin Nano——有人用过胶囊吗？用自己研磨的咖啡粉可以做出便携式浓缩咖啡，但胶囊不行？"
+      "created_utc": 1771937894,
+      "title_en": "Looking for a portable coffee maker (pods only): Cera+ or Outin? [~$300]",
+      "title_zh": "寻找便携式咖啡机（仅限胶囊）：Cera+还是Outin？[~$300]"
     },
     {
-      "id": "v115",
-      "player": "french_press",
-      "title": "Brazilian portable french press-like coffee maker I bought this week",
-      "score": 2,
-      "url": "https://www.reddit.com/r/Coffee/comments/ka0t66/brazilian_portable_french_presslike_coffee_maker/",
+      "id": "v124",
+      "player": "other",
+      "title": "Which travel coffee mug is best for first timer?",
+      "score": 1,
+      "url": "https://www.reddit.com/r/Coffee/comments/1saaj8e/which_travel_coffee_mug_is_best_for_first_timer/",
       "sentiment": "pos",
       "themes": [
         "t.portability",
-        "t.quality"
+        "t.ease_of_use"
       ],
       "collected_at": "2026-06-01",
-      "created_utc": 1607548348,
-      "title_en": "Brazilian portable french press-like coffee maker I bought this week",
-      "title_zh": "这周买的巴西便携式法压壶式咖啡机"
-    },
-    {
-      "id": "v116",
-      "player": "other",
-      "title": "Headline: Barista-quality coffee, wherever you go! ☕️✈️ ​Body: Say goodbye to instant coffee! With the Auvira™ Portable ",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1s6rwou/headline_baristaquality_coffee_wherever_you_go/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability",
-        "t.quality"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1774781375,
-      "title_en": "Headline: Barista-quality coffee, wherever you go! ☕️✈️ ​Body: Say goodbye to instant coffee! With the Auvira™ Portable ",
-      "title_zh": "标题：无论去哪，都能享受咖啡师级别的咖啡！☕️✈️ 正文：告别速溶咖啡！有了Auvira™便携式"
-    },
-    {
-      "id": "v117",
-      "player": "other",
-      "title": "Best coffee espresso machine semi-automatic, fully automatic, or manual? I’m looking to invest",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1kxmb8r/best_coffee_espresso_machine_semiautomatic_fully/",
-      "sentiment": "pos",
-      "themes": [
-        "t.quality",
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1748451538,
-      "title_en": "Best coffee espresso machine semi-automatic, fully automatic, or manual? I’m looking to invest",
-      "title_zh": "最好的咖啡浓缩咖啡机：半自动、全自动还是手动？我想投资"
-    },
-    {
-      "id": "v118",
-      "player": "moka_pot",
-      "title": "Moka Pot or Manual Espresso Machine",
-      "score": 1,
-      "url": "https://www.reddit.com/r/Coffee/comments/1e0215q/moka_pot_or_manual_espresso_machine/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability",
-        "t.quality"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1720633574,
-      "title_en": "Moka Pot or Manual Espresso Machine",
-      "title_zh": "摩卡壶还是手动浓缩咖啡机"
-    },
-    {
-      "id": "v119",
-      "player": "other",
-      "title": "7 Best Portable Coffee Makers For Travelers In 2022",
-      "score": 0,
-      "url": "https://www.reddit.com/r/Coffee/comments/ssck3w/7_best_portable_coffee_makers_for_travelers_in/",
-      "sentiment": "pos",
-      "themes": [
-        "t.portability"
-      ],
-      "collected_at": "2026-06-01",
-      "created_utc": 1644850793,
-      "title_en": "7 Best Portable Coffee Makers For Travelers In 2022",
-      "title_zh": "2022年旅行者最佳7款便携式咖啡机"
+      "created_utc": 1775114401,
+      "title_en": "Which travel coffee mug is best for first timer?",
+      "title_zh": "哪款旅行咖啡杯最适合新手？"
     }
   ],
   "opportunity": {
     "id": "opp",
-    "label": "★ 耐用易清洁的高品质便携咖啡机",
+    "label": "★ 电动便携浓缩机",
     "color": "#5b7a52",
     "size": 30,
     "x": 0.42,
     "y": 0.18,
-    "summary": "全金属机身、易拆洗设计，兼顾便携与浓缩品质，解决户外耐用和清洁痛点。",
-    "label_en": "★ Durable and easy-to-clean high-quality portable coffee maker",
-    "summary_en": "All-metal body, easy-to-disassemble design, balancing portability and espresso quality, solving outdoor durability and cleaning pain points."
+    "summary": "结合电动泵、金属机身和胶囊系统，实现一键高品质浓缩，解决手动费力与电动体积大的矛盾。",
+    "label_en": "★ Electric Portable Espresso Machine",
+    "summary_en": "Combine electric pump, metal body, and capsule system for one-button high-quality espresso, solving the conflict between manual effort and electric bulk."
   },
   "edges": [
     {
@@ -2195,7 +2289,7 @@
     },
     {
       "from": "wacaco",
-      "to": "t.grinder",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
@@ -2205,7 +2299,47 @@
     },
     {
       "from": "staresso",
-      "to": "t.grinder",
+      "to": "t.comparison",
+      "w": 2
+    },
+    {
+      "from": "aeropress",
+      "to": "t.portability",
+      "w": 2
+    },
+    {
+      "from": "aeropress",
+      "to": "t.ease_of_use",
+      "w": 2
+    },
+    {
+      "from": "aeropress",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "minipresso",
+      "to": "t.portability",
+      "w": 2
+    },
+    {
+      "from": "minipresso",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
+      "from": "picopresso",
+      "to": "t.quality",
+      "w": 3
+    },
+    {
+      "from": "picopresso",
+      "to": "t.comparison",
+      "w": 2
+    },
+    {
+      "from": "picopresso",
+      "to": "t.material",
       "w": 1
     },
     {
@@ -2214,268 +2348,253 @@
       "w": 1
     },
     {
-      "from": "aeropress",
-      "to": "t.portability",
-      "w": 2
-    },
-    {
-      "from": "aeropress",
-      "to": "t.quality",
-      "w": 2
-    },
-    {
-      "from": "minipresso",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "minipresso",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "picopresso",
-      "to": "t.quality",
-      "w": 2
-    },
-    {
-      "from": "picopresso",
-      "to": "t.portability",
-      "w": 2
-    },
-    {
-      "from": "outin",
-      "to": "t.electric_vs_manual",
-      "w": 3
-    },
-    {
-      "from": "outin",
-      "to": "t.portability",
-      "w": 3
-    },
-    {
-      "from": "outin",
-      "to": "t.durability",
-      "w": 1
-    },
-    {
-      "from": "outin",
-      "to": "t.grinder",
-      "w": 2
-    },
-    {
-      "from": "espro",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "moka_pot",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "moka_pot",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "french_press",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "nanopresso",
-      "to": "t.portability",
-      "w": 2
-    },
-    {
-      "from": "nanopresso",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "maestri_house",
-      "to": "t.price_value",
-      "w": 2
-    },
-    {
-      "from": "maestri_house",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v01",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v01",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v02",
-      "to": "t.durability",
-      "w": 1
-    },
-    {
-      "from": "v02",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v03",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v03",
-      "to": "t.price_value",
-      "w": 1
-    },
-    {
-      "from": "v04",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v04",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v05",
+      "from": "handpresso",
       "to": "t.electric_vs_manual",
       "w": 1
     },
     {
-      "from": "v05",
-      "to": "t.portability",
+      "from": "flair-espresso",
+      "to": "t.quality",
+      "w": 2
+    },
+    {
+      "from": "flair-espresso",
+      "to": "t.price",
       "w": 1
     },
     {
-      "from": "v06",
-      "to": "t.price_value",
-      "w": 1
-    },
-    {
-      "from": "v06",
+      "from": "rok-espresso",
       "to": "t.quality",
       "w": 1
     },
     {
-      "from": "v07",
-      "to": "t.price_value",
-      "w": 1
-    },
-    {
-      "from": "v07",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v08",
-      "to": "t.price_value",
-      "w": 1
-    },
-    {
-      "from": "v08",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v09",
-      "to": "t.durability",
-      "w": 1
-    },
-    {
-      "from": "v10",
-      "to": "t.durability",
-      "w": 1
-    },
-    {
-      "from": "v10",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v11",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v11",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v12",
-      "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
-      "from": "v12",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v13",
-      "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
-      "from": "v13",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v14",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v14",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v15",
-      "to": "t.grinder",
-      "w": 1
-    },
-    {
-      "from": "v15",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v16",
-      "to": "t.price_value",
-      "w": 1
-    },
-    {
-      "from": "v16",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v17",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v17",
+      "from": "rok-espresso",
       "to": "t.material",
       "w": 1
     },
     {
-      "from": "v18",
-      "to": "t.grinder",
+      "from": "nespresso",
+      "to": "t.ease_of_use",
+      "w": 2
+    },
+    {
+      "from": "nespresso",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "moka-pot",
+      "to": "t.portability",
+      "w": 2
+    },
+    {
+      "from": "moka-pot",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
+      "from": "outin_nano",
+      "to": "t.electric_vs_manual",
+      "w": 3
+    },
+    {
+      "from": "outin_nano",
+      "to": "t.portability",
+      "w": 2
+    },
+    {
+      "from": "outin_nano",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "outin_nano",
+      "to": "t.durability",
+      "w": 1
+    },
+    {
+      "from": "v01",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v01",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v02",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v02",
+      "to": "t.durability",
+      "w": 1
+    },
+    {
+      "from": "v03",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v03",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v04",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v04",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v05",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v05",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v06",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v06",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v07",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v07",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v08",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v08",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v09",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v09",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v10",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v10",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v11",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v11",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v12",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v12",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v13",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v13",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v14",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v14",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v15",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v15",
+      "to": "t.durability",
+      "w": 1
+    },
+    {
+      "from": "v16",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v16",
+      "to": "t.durability",
+      "w": 1
+    },
+    {
+      "from": "v17",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v17",
+      "to": "t.electric_vs_manual",
       "w": 1
     },
     {
       "from": "v18",
       "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v18",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v19",
+      "to": "t.material",
       "w": 1
     },
     {
@@ -2484,43 +2603,38 @@
       "w": 1
     },
     {
-      "from": "v19",
-      "to": "t.portability",
+      "from": "v20",
+      "to": "t.electric_vs_manual",
       "w": 1
     },
     {
       "from": "v20",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v21",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v21",
       "to": "t.quality",
       "w": 1
     },
     {
-      "from": "v20",
-      "to": "t.price_value",
-      "w": 1
-    },
-    {
-      "from": "v21",
-      "to": "t.price_value",
-      "w": 1
-    },
-    {
-      "from": "v21",
-      "to": "t.portability",
+      "from": "v22",
+      "to": "t.durability",
       "w": 1
     },
     {
       "from": "v22",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v22",
-      "to": "t.price_value",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v23",
-      "to": "t.portability",
+      "to": "t.comparison",
       "w": 1
     },
     {
@@ -2530,42 +2644,42 @@
     },
     {
       "from": "v24",
-      "to": "t.electric_vs_manual",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v24",
-      "to": "t.portability",
+      "to": "t.quality",
       "w": 1
     },
     {
       "from": "v25",
-      "to": "t.grinder",
+      "to": "t.electric_vs_manual",
       "w": 1
     },
     {
       "from": "v25",
-      "to": "t.portability",
+      "to": "t.price",
       "w": 1
     },
     {
       "from": "v26",
-      "to": "t.electric_vs_manual",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v26",
-      "to": "t.price_value",
+      "to": "t.quality",
       "w": 1
     },
     {
       "from": "v27",
-      "to": "t.electric_vs_manual",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v27",
-      "to": "t.portability",
+      "to": "t.quality",
       "w": 1
     },
     {
@@ -2574,23 +2688,28 @@
       "w": 1
     },
     {
+      "from": "v28",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v29",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
       "from": "v29",
       "to": "t.electric_vs_manual",
       "w": 1
     },
     {
-      "from": "v29",
-      "to": "t.portability",
+      "from": "v30",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v30",
       "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
-      "from": "v30",
-      "to": "t.price_value",
       "w": 1
     },
     {
@@ -2600,11 +2719,6 @@
     },
     {
       "from": "v31",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v32",
       "to": "t.electric_vs_manual",
       "w": 1
     },
@@ -2614,68 +2728,83 @@
       "w": 1
     },
     {
-      "from": "v33",
-      "to": "t.price_value",
+      "from": "v32",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v33",
-      "to": "t.portability",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v33",
+      "to": "t.price",
       "w": 1
     },
     {
       "from": "v34",
-      "to": "t.quality",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v34",
-      "to": "t.price_value",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v35",
-      "to": "t.cleaning",
+      "to": "t.material",
+      "w": 1
+    },
+    {
+      "from": "v35",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v36",
-      "to": "t.quality",
+      "to": "t.portability",
       "w": 1
     },
     {
       "from": "v36",
+      "to": "t.durability",
+      "w": 1
+    },
+    {
+      "from": "v37",
       "to": "t.portability",
       "w": 1
     },
     {
       "from": "v37",
-      "to": "t.grinder",
-      "w": 1
-    },
-    {
-      "from": "v37",
-      "to": "t.portability",
+      "to": "t.durability",
       "w": 1
     },
     {
       "from": "v38",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v38",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v39",
       "to": "t.electric_vs_manual",
       "w": 1
     },
     {
+      "from": "v38",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
       "from": "v39",
-      "to": "t.portability",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v39",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v40",
+      "to": "t.material",
       "w": 1
     },
     {
@@ -2685,37 +2814,32 @@
     },
     {
       "from": "v41",
-      "to": "t.material",
+      "to": "t.portability",
       "w": 1
     },
     {
       "from": "v41",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v42",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v42",
       "to": "t.durability",
       "w": 1
     },
     {
-      "from": "v42",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v42",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v43",
-      "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
       "from": "v43",
       "to": "t.portability",
       "w": 1
     },
     {
-      "from": "v44",
-      "to": "t.electric_vs_manual",
+      "from": "v43",
+      "to": "t.durability",
       "w": 1
     },
     {
@@ -2724,8 +2848,8 @@
       "w": 1
     },
     {
-      "from": "v45",
-      "to": "t.grinder",
+      "from": "v44",
+      "to": "t.comparison",
       "w": 1
     },
     {
@@ -2734,13 +2858,18 @@
       "w": 1
     },
     {
-      "from": "v46",
-      "to": "t.portability",
+      "from": "v45",
+      "to": "t.durability",
       "w": 1
     },
     {
       "from": "v46",
       "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v46",
+      "to": "t.portability",
       "w": 1
     },
     {
@@ -2749,13 +2878,33 @@
       "w": 1
     },
     {
+      "from": "v47",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
       "from": "v48",
-      "to": "t.portability",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v48",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v49",
       "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v49",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v50",
+      "to": "t.comparison",
       "w": 1
     },
     {
@@ -2790,72 +2939,67 @@
     },
     {
       "from": "v53",
-      "to": "t.quality",
+      "to": "t.price",
       "w": 1
     },
     {
       "from": "v54",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v54",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v55",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v55",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v56",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v56",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v57",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v57",
       "to": "t.material",
       "w": 1
     },
     {
-      "from": "v54",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v55",
-      "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
-      "from": "v55",
-      "to": "t.price_value",
-      "w": 1
-    },
-    {
-      "from": "v56",
-      "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
-      "from": "v56",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v57",
-      "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
-      "from": "v57",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v58",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
       "from": "v58",
       "to": "t.portability",
       "w": 1
     },
     {
-      "from": "v59",
-      "to": "t.grinder",
+      "from": "v58",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v59",
-      "to": "t.portability",
+      "to": "t.electric_vs_manual",
       "w": 1
     },
     {
-      "from": "v60",
-      "to": "t.grinder",
+      "from": "v59",
+      "to": "t.quality",
       "w": 1
     },
     {
@@ -2864,83 +3008,88 @@
       "w": 1
     },
     {
-      "from": "v61",
-      "to": "t.quality",
+      "from": "v60",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v61",
-      "to": "t.portability",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v61",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v62",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v62",
       "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v62",
-      "to": "t.portability",
       "w": 1
     },
     {
       "from": "v63",
-      "to": "t.portability",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
+      "from": "v63",
+      "to": "t.durability",
       "w": 1
     },
     {
       "from": "v64",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v64",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v65",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
+      "from": "v65",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v66",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v66",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
+      "from": "v67",
       "to": "t.material",
       "w": 1
     },
     {
-      "from": "v64",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v65",
-      "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
-      "from": "v65",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v66",
-      "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
-      "from": "v66",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
       "from": "v67",
       "to": "t.quality",
       "w": 1
     },
     {
-      "from": "v67",
-      "to": "t.price_value",
+      "from": "v68",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v68",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v68",
-      "to": "t.price_value",
-      "w": 1
-    },
-    {
-      "from": "v69",
-      "to": "t.price_value",
+      "to": "t.portability",
       "w": 1
     },
     {
@@ -2949,63 +3098,83 @@
       "w": 1
     },
     {
+      "from": "v69",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
       "from": "v70",
-      "to": "t.grinder",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v70",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v71",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v71",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v72",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v72",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v73",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v73",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v74",
       "to": "t.electric_vs_manual",
       "w": 1
     },
     {
+      "from": "v71",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v71",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
+      "from": "v72",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v72",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v73",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v73",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
       "from": "v74",
-      "to": "t.price_value",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v74",
+      "to": "t.quality",
       "w": 1
     },
     {
       "from": "v75",
-      "to": "t.cleaning",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v75",
+      "to": "t.durability",
       "w": 1
     },
     {
       "from": "v76",
-      "to": "t.cleaning",
+      "to": "t.material",
+      "w": 1
+    },
+    {
+      "from": "v76",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v77",
+      "to": "t.comparison",
       "w": 1
     },
     {
@@ -3014,23 +3183,13 @@
       "w": 1
     },
     {
-      "from": "v77",
-      "to": "t.portability",
+      "from": "v78",
+      "to": "t.price",
       "w": 1
     },
     {
       "from": "v78",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v78",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v79",
-      "to": "t.quality",
+      "to": "t.comparison",
       "w": 1
     },
     {
@@ -3039,53 +3198,63 @@
       "w": 1
     },
     {
-      "from": "v80",
-      "to": "t.grinder",
+      "from": "v79",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v80",
-      "to": "t.portability",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v80",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v81",
-      "to": "t.price_value",
+      "to": "t.quality",
       "w": 1
     },
     {
       "from": "v81",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v82",
       "to": "t.portability",
       "w": 1
     },
     {
       "from": "v82",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v83",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v83",
       "to": "t.electric_vs_manual",
       "w": 1
     },
     {
-      "from": "v82",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v83",
-      "to": "t.grinder",
-      "w": 1
-    },
-    {
-      "from": "v83",
-      "to": "t.portability",
+      "from": "v84",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v84",
-      "to": "t.grinder",
+      "to": "t.electric_vs_manual",
       "w": 1
     },
     {
-      "from": "v84",
-      "to": "t.portability",
+      "from": "v85",
+      "to": "t.comparison",
       "w": 1
     },
     {
@@ -3094,33 +3263,28 @@
       "w": 1
     },
     {
-      "from": "v85",
-      "to": "t.portability",
+      "from": "v86",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v86",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v86",
-      "to": "t.portability",
+      "to": "t.electric_vs_manual",
       "w": 1
     },
     {
       "from": "v87",
-      "to": "t.quality",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v87",
-      "to": "t.portability",
+      "to": "t.electric_vs_manual",
       "w": 1
     },
     {
       "from": "v88",
-      "to": "t.portability",
+      "to": "t.comparison",
       "w": 1
     },
     {
@@ -3130,27 +3294,37 @@
     },
     {
       "from": "v89",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v89",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v90",
       "to": "t.durability",
       "w": 1
     },
     {
       "from": "v90",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
+      "from": "v91",
       "to": "t.portability",
       "w": 1
     },
     {
-      "from": "v90",
+      "from": "v91",
       "to": "t.quality",
       "w": 1
     },
     {
-      "from": "v91",
+      "from": "v92",
       "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
-      "from": "v91",
-      "to": "t.portability",
       "w": 1
     },
     {
@@ -3165,27 +3339,32 @@
     },
     {
       "from": "v93",
-      "to": "t.quality",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v94",
-      "to": "t.quality",
+      "to": "t.portability",
       "w": 1
     },
     {
       "from": "v94",
-      "to": "t.price_value",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v95",
-      "to": "t.quality",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v95",
-      "to": "t.price_value",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v96",
+      "to": "t.material",
       "w": 1
     },
     {
@@ -3199,18 +3378,28 @@
       "w": 1
     },
     {
+      "from": "v97",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
       "from": "v98",
       "to": "t.portability",
       "w": 1
     },
     {
+      "from": "v98",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
       "from": "v99",
-      "to": "t.portability",
+      "to": "t.quality",
       "w": 1
     },
     {
-      "from": "v100",
-      "to": "t.portability",
+      "from": "v99",
+      "to": "t.price",
       "w": 1
     },
     {
@@ -3219,13 +3408,18 @@
       "w": 1
     },
     {
-      "from": "v101",
-      "to": "t.portability",
+      "from": "v100",
+      "to": "t.price",
       "w": 1
     },
     {
       "from": "v101",
       "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v101",
+      "to": "t.price",
       "w": 1
     },
     {
@@ -3234,8 +3428,18 @@
       "w": 1
     },
     {
+      "from": "v102",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
       "from": "v103",
       "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v103",
+      "to": "t.comparison",
       "w": 1
     },
     {
@@ -3244,13 +3448,18 @@
       "w": 1
     },
     {
-      "from": "v105",
-      "to": "t.price_value",
+      "from": "v104",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v105",
       "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v105",
+      "to": "t.quality",
       "w": 1
     },
     {
@@ -3259,58 +3468,58 @@
       "w": 1
     },
     {
-      "from": "v107",
-      "to": "t.electric_vs_manual",
+      "from": "v106",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
       "from": "v107",
-      "to": "t.price_value",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v107",
+      "to": "t.portability",
       "w": 1
     },
     {
       "from": "v108",
-      "to": "t.grinder",
+      "to": "t.portability",
       "w": 1
     },
     {
       "from": "v108",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
+      "from": "v109",
       "to": "t.portability",
       "w": 1
     },
     {
       "from": "v109",
-      "to": "t.electric_vs_manual",
-      "w": 1
-    },
-    {
-      "from": "v109",
-      "to": "t.portability",
+      "to": "t.durability",
       "w": 1
     },
     {
       "from": "v110",
-      "to": "t.price_value",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v110",
-      "to": "t.portability",
+      "to": "t.quality",
       "w": 1
     },
     {
       "from": "v111",
-      "to": "t.electric_vs_manual",
+      "to": "t.comparison",
       "w": 1
     },
     {
       "from": "v111",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v112",
-      "to": "t.electric_vs_manual",
+      "to": "t.price",
       "w": 1
     },
     {
@@ -3319,8 +3528,8 @@
       "w": 1
     },
     {
-      "from": "v113",
-      "to": "t.quality",
+      "from": "v112",
+      "to": "t.comparison",
       "w": 1
     },
     {
@@ -3329,23 +3538,28 @@
       "w": 1
     },
     {
+      "from": "v113",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
       "from": "v114",
+      "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v114",
+      "to": "t.ease_of_use",
+      "w": 1
+    },
+    {
+      "from": "v115",
       "to": "t.electric_vs_manual",
       "w": 1
     },
     {
-      "from": "v114",
-      "to": "t.portability",
-      "w": 1
-    },
-    {
       "from": "v115",
       "to": "t.portability",
-      "w": 1
-    },
-    {
-      "from": "v115",
-      "to": "t.quality",
       "w": 1
     },
     {
@@ -3355,12 +3569,7 @@
     },
     {
       "from": "v116",
-      "to": "t.quality",
-      "w": 1
-    },
-    {
-      "from": "v117",
-      "to": "t.quality",
+      "to": "t.durability",
       "w": 1
     },
     {
@@ -3369,18 +3578,78 @@
       "w": 1
     },
     {
-      "from": "v118",
-      "to": "t.portability",
+      "from": "v117",
+      "to": "t.durability",
       "w": 1
     },
     {
       "from": "v118",
-      "to": "t.quality",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v118",
+      "to": "t.portability",
       "w": 1
     },
     {
       "from": "v119",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v119",
+      "to": "t.material",
+      "w": 1
+    },
+    {
+      "from": "v120",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v120",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v121",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v121",
+      "to": "t.price",
+      "w": 1
+    },
+    {
+      "from": "v122",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v122",
+      "to": "t.quality",
+      "w": 1
+    },
+    {
+      "from": "v123",
+      "to": "t.comparison",
+      "w": 1
+    },
+    {
+      "from": "v123",
+      "to": "t.electric_vs_manual",
+      "w": 1
+    },
+    {
+      "from": "v124",
       "to": "t.portability",
+      "w": 1
+    },
+    {
+      "from": "v124",
+      "to": "t.ease_of_use",
       "w": 1
     },
     {
@@ -3397,348 +3666,379 @@
   "paths": [
     {
       "id": "path-a",
-      "label": "方向 A · 极致便携+胶囊兼容",
-      "core": "设计超小型、兼容Nespresso胶囊的便携咖啡机，强调一键操作和极简清洁。",
-      "hypothesis": "用户愿意牺牲部分品质换取极致便携和便利。",
-      "evidence": "便携性主题占比18%且为正面，用户对清洁抱怨多（11%），胶囊方案可大幅简化清洁。",
+      "label": "方向 A · 电动胶囊机",
+      "core": "开发一款电动便携浓缩机，使用Nespresso兼容胶囊，内置电池和加热系统，体积接近保温杯。",
+      "hypothesis": "用户愿意为“一键出浓缩”的便利性放弃部分手动乐趣，且胶囊系统能保证品质一致性。",
+      "evidence": "用户对比中频繁提及Nespresso（~$150）作为品质标杆，且对操作简单（13次）有强烈需求。",
       "open_questions": [
-        "胶囊咖啡品质能否满足浓缩爱好者？",
-        "胶囊成本是否影响户外场景吸引力？"
+        "电池续航能否支撑多次使用？",
+        "胶囊成本是否影响用户接受度？",
+        "体积能否控制在500ml以内？"
       ],
-      "risk": "品质妥协可能失去核心咖啡爱好者市场。",
-      "label_en": "Direction A · Extreme portability + capsule compatibility",
-      "core_en": "Design an ultra-small portable coffee maker compatible with Nespresso capsules, emphasizing one-button operation and minimal cleaning.",
-      "hypothesis_en": "Users are willing to sacrifice some quality for extreme portability and convenience.",
-      "evidence_en": "Portability accounts for 18% and is positive; users complain about cleaning (11%); capsule solution greatly simplifies cleaning.",
-      "risk_en": "Quality compromise may lose core coffee enthusiasts.",
+      "risk": "电动系统可能增加重量和故障率，与便携性冲突。",
+      "label_en": "Path A · Electric Capsule Machine",
+      "core_en": "Develop an electric portable espresso machine using Nespresso-compatible capsules, with built-in battery and heating system, volume close to a thermos.",
+      "hypothesis_en": "Users are willing to sacrifice some manual fun for the convenience of 'one-button espresso', and the capsule system ensures consistent quality.",
+      "evidence_en": "Users frequently mention Nespresso (~$150) as a quality benchmark, and there is strong demand for simple operation (13 mentions).",
+      "risk_en": "Electric system may increase weight and failure rate, conflicting with portability.",
       "open_questions_en": [
-        "Can capsule coffee quality satisfy espresso lovers?",
-        "Does capsule cost affect attractiveness in outdoor scenarios?"
+        "Can battery life support multiple uses?",
+        "Will capsule cost affect user acceptance?",
+        "Can volume be kept under 500ml?"
       ]
     },
     {
       "id": "path-b",
-      "label": "方向 B · 高端手动浓缩+全金属耐用",
-      "core": "采用全金属材质、手动活塞加压，强调耐用性和浓缩品质，附带便携包。",
-      "hypothesis": "用户愿意为耐用性和品质支付高价（$100+）。",
-      "evidence": "耐用性（12%）和材质安全（10%）是痛点，咖啡品质（17%）是正面需求，高端产品如Handpresso存在但价格高。",
+      "label": "方向 B · 手动精品机",
+      "core": "设计一款全金属手动浓缩机，优化杠杆结构减少费力，强调材质安全和耐用性，目标高端户外爱好者。",
+      "hypothesis": "有一批用户愿意为“真浓缩”和“耐用性”接受手动操作，且对塑料反感（12次材质安全提及）。",
+      "evidence": "Flair Espresso（~$150）和Rok Espresso（~$120）有稳定受众，用户称赞其浓缩品质。",
       "open_questions": [
-        "全金属设计能否控制重量和成本？",
-        "手动操作是否影响女性用户使用？"
+        "如何降低手动操作的学习曲线？",
+        "金属机身能否控制成本在$100以内？",
+        "便携性是否足够（如放入背包）？"
       ],
-      "risk": "高价格可能限制市场规模。",
-      "label_en": "Direction B · High-end manual espresso + all-metal durability",
-      "core_en": "Use all-metal materials, manual piston press, emphasizing durability and espresso quality, with a portable bag.",
-      "hypothesis_en": "Users are willing to pay a high price ($100+) for durability and quality.",
-      "evidence_en": "Durability (12%) and material safety (10%) are pain points; coffee quality (17%) is a positive demand; high-end products like Handpresso exist but are expensive.",
-      "risk_en": "High price may limit market size.",
+      "risk": "手动市场天花板低，可能无法规模化。",
+      "label_en": "Path B · Manual Premium Machine",
+      "core_en": "Design an all-metal manual espresso machine with optimized lever mechanism to reduce effort, emphasizing material safety and durability, targeting high-end outdoor enthusiasts.",
+      "hypothesis_en": "There is a group of users willing to accept manual operation for 'real espresso' and 'durability', and who dislike plastic (12 mentions of material safety).",
+      "evidence_en": "Flair Espresso (~$150) and Rok Espresso (~$120) have a stable audience; users praise their espresso quality.",
+      "risk_en": "Manual market ceiling may be low, limiting scalability.",
       "open_questions_en": [
-        "Can all-metal design control weight and cost?",
-        "Does manual operation affect female users?"
+        "How to reduce the learning curve of manual operation?",
+        "Can metal body keep cost under $100?",
+        "Is portability sufficient (e.g., fits in a backpack)?"
       ]
     },
     {
       "id": "path-c",
-      "label": "方向 C · 模块化系统：咖啡机+磨豆机+清洁工具",
-      "core": "设计一套模块化便携咖啡系统，包括手动咖啡机、手摇磨豆机和迷你清洁刷，可收纳为一体。",
-      "hypothesis": "用户希望一站式解决户外咖啡制作全流程，且愿意为整合方案付费。",
-      "evidence": "磨豆机搭配（13%）和清洁维护（11%）是用户讨论点，现有产品缺乏系统化方案。",
+      "label": "方向 C · 模块化系统",
+      "core": "推出可拆卸模块：一个手动泵头+一个电动底座，用户根据场景组合，同时满足便携和品质需求。",
+      "hypothesis": "用户希望一机多用，且愿意为灵活性支付溢价。",
+      "evidence": "产品对比（16次）显示用户在不同场景下需求不同，模块化能减少决策成本。",
       "open_questions": [
-        "模块化是否增加体积和重量？",
-        "用户是否愿意携带多个组件？"
+        "模块连接处的密封性和耐用性如何？",
+        "总成本是否高于分别购买？",
+        "用户是否真的会切换模块？"
       ],
-      "risk": "系统复杂可能违背便携初衷。",
-      "label_en": "Direction C · Modular system: coffee maker + grinder + cleaning tools",
-      "core_en": "Design a modular portable coffee system including a manual coffee maker, hand grinder, and mini cleaning brush, storable as one unit.",
-      "hypothesis_en": "Users want a one-stop solution for the entire outdoor coffee-making process and are willing to pay for an integrated solution.",
-      "evidence_en": "Grinder pairing (13%) and cleaning/maintenance (11%) are user discussion points; existing products lack systematic solutions.",
-      "risk_en": "System complexity may contradict portability.",
+      "risk": "模块化增加复杂性和故障点，可能两头不讨好。",
+      "label_en": "Path C · Modular System",
+      "core_en": "Launch detachable modules: a manual pump head + an electric base, allowing users to combine based on scenarios, meeting both portability and quality needs.",
+      "hypothesis_en": "Users want a multi-purpose machine and are willing to pay a premium for flexibility.",
+      "evidence_en": "Product comparisons (16 mentions) show users have different needs in different scenarios; modularity reduces decision cost.",
+      "risk_en": "Modularity increases complexity and failure points, potentially pleasing no one.",
       "open_questions_en": [
-        "Does modularity increase volume and weight?",
-        "Are users willing to carry multiple components?"
+        "How is the sealing and durability at module connections?",
+        "Is total cost higher than buying separately?",
+        "Will users actually switch modules?"
       ]
     }
   ],
   "risks": [
     {
       "id": "R-01",
-      "title": "物理限制：便携与品质难以兼得",
-      "scenario": "设计无法同时满足小体积、轻重量和高浓缩压力，导致产品平庸。",
+      "title": "便携与品质的物理矛盾",
+      "scenario": "产品无法同时实现小体积和高压萃取，导致咖啡品质不如预期，用户失望。",
       "severity": "high",
-      "mitigation": "采用创新材料（如钛合金）和紧凑结构，但需控制成本。",
-      "title_en": "Physical limitations: portability and quality hard to achieve simultaneously",
-      "scenario_en": "Design cannot meet small size, light weight, and high espresso pressure simultaneously, resulting in mediocre product.",
-      "mitigation_en": "Use innovative materials (e.g., titanium alloy) and compact structure, but need to control cost."
+      "mitigation": "采用预浸泡+低压萃取技术，或接受一定妥协，明确产品定位。",
+      "title_en": "Physical Contradiction Between Portability and Quality",
+      "scenario_en": "Product cannot achieve both small size and high-pressure extraction, leading to subpar coffee quality and user disappointment.",
+      "mitigation_en": "Adopt pre-infusion + low-pressure extraction technology, or accept some compromise and clearly position the product."
     },
     {
       "id": "R-02",
-      "title": "成本过高失去价格竞争力",
-      "scenario": "全金属或高端设计导致售价超过$150，用户转向现有低价产品。",
-      "severity": "mid",
-      "mitigation": "通过众筹验证价格敏感度，或推出不同材质版本。",
-      "title_en": "High cost loses price competitiveness",
-      "scenario_en": "All-metal or high-end design leads to price over $150, users turn to existing low-cost products.",
-      "mitigation_en": "Validate price sensitivity through crowdfunding, or launch different material versions."
+      "title": "电动方案可靠性风险",
+      "scenario": "电池、电机或加热系统在户外环境下故障，导致口碑崩塌。",
+      "severity": "high",
+      "mitigation": "严格测试，提供防水防尘设计，并附赠手动备用方案。",
+      "title_en": "Electric Solution Reliability Risk",
+      "scenario_en": "Battery, motor, or heating system fails in outdoor environments, causing reputation damage.",
+      "mitigation_en": "Rigorous testing, provide waterproof and dustproof design, and include a manual backup option."
     },
     {
       "id": "R-03",
-      "title": "清洁问题难以根本解决",
-      "scenario": "即使设计易拆洗，用户仍抱怨户外清洁不便，影响口碑。",
+      "title": "价格敏感用户不买账",
+      "scenario": "目标定价$80-120，但用户对比中频繁提及低价产品（如Moka Pot $25），认为性价比不足。",
       "severity": "mid",
-      "mitigation": "提供一次性清洁湿巾或免洗胶囊方案。",
-      "title_en": "Cleaning problem hard to fundamentally solve",
-      "scenario_en": "Even with easy-to-disassemble design, users still complain about inconvenient outdoor cleaning, affecting reputation.",
-      "mitigation_en": "Provide disposable cleaning wipes or no-clean capsule solutions."
+      "mitigation": "强调品质和耐用性，提供试用或退款保证，初期以众筹验证价格接受度。",
+      "title_en": "Price-Sensitive Users Reject",
+      "scenario_en": "Target price $80-120, but users frequently mention low-cost products (e.g., Moka Pot $25) in comparisons, perceiving poor value.",
+      "mitigation_en": "Emphasize quality and durability, offer trial or money-back guarantee, validate price acceptance via crowdfunding initially."
     },
     {
       "id": "R-04",
-      "title": "市场需求被高估",
-      "scenario": "便携咖啡机是低频场景，用户实际购买后使用率低，复购差。",
-      "severity": "high",
-      "mitigation": "聚焦核心户外人群（露营、自驾），通过社区营销强化场景。",
-      "title_en": "Market demand overestimated",
-      "scenario_en": "Portable coffee maker is a low-frequency scenario; actual usage rate after purchase is low, repeat purchase poor.",
-      "mitigation_en": "Focus on core outdoor crowd (camping, self-driving), strengthen scenario marketing through community."
+      "title": "材质成本过高",
+      "scenario": "全金属机身导致成本高于预期，被迫使用塑料，失去差异化。",
+      "severity": "mid",
+      "mitigation": "探索铝合金与不锈钢混合方案，或与供应商谈判批量折扣。",
+      "title_en": "Material Cost Too High",
+      "scenario_en": "All-metal body leads to cost exceeding expectations, forcing use of plastic and losing differentiation.",
+      "mitigation_en": "Explore hybrid aluminum and stainless steel solutions, or negotiate bulk discounts with suppliers."
     }
   ],
   "section_insights": {
-    "market": "便携咖啡机市场处于成长期，驱动力来自户外活动和咖啡文化普及。核心矛盾是便携性与咖啡品质的权衡，当前产品偏向一端，尚未出现完美平衡者。",
-    "user": "用户根本任务是“在任何场景快速获得一杯好咖啡”。好评集中在便携和品质，差评暴露了耐用性差、清洁麻烦、材质不安全等未满足需求。痛点强度中等，但普遍。",
-    "competitive": "市场格局分散，Wacaco、Staresso、Handpresso等各有拥趸，但均存在结构性短板：Wacaco产品线复杂，AeroPress便携但非浓缩，Moka Pot需加热源。属于浅海，新进入者可通过差异化切入。",
-    "opportunity": "最大空白是“耐用且易清洁的高品质便携咖啡机”。现有玩家在材质和结构设计上妥协，用户对全金属、易拆洗的产品有明确需求。",
-    "risk": "根本风险是物理限制：便携性要求体积小、重量轻，与耐用性、高品质浓缩所需的结构强度矛盾。成本控制也是挑战。",
-    "market_en": "The portable coffee maker market is in a growth stage, driven by outdoor activities and coffee culture. The core contradiction is the trade-off between portability and coffee quality. Current products lean toward one side, and a perfect balance has not yet emerged.",
-    "user_en": "Users' fundamental task is to 'quickly get a good cup of coffee in any scenario.' Positive reviews focus on portability and quality, while negative reviews reveal unmet needs such as poor durability, troublesome cleaning, and unsafe materials. Pain points are moderate in intensity but widespread.",
-    "competitive_en": "The market landscape is fragmented, with Wacaco, Staresso, Handpresso, etc., each having their fans, but all have structural shortcomings: Wacaco's product line is complex, AeroPress is portable but not espresso, Moka Pot requires a heat source. It is a shallow sea, and new entrants can differentiate.",
-    "opportunity_en": "The biggest gap is a 'durable and easy-to-clean high-quality portable coffee maker.' Existing players compromise on materials and structural design, and users have a clear demand for all-metal, easy-to-disassemble products.",
-    "risk_en": "The fundamental risk is physical limitations: portability requires small size and light weight, conflicting with the structural strength needed for durability and high-quality espresso. Cost control is also a challenge."
+    "market": "便携咖啡机市场处于成长期，驱动力是户外生活与咖啡文化普及。核心矛盾：便携性 vs 浓缩品质。当前演化方向是手动向电动过渡，但电动款体积和续航仍是瓶颈。",
+    "user": "用户的根本任务是在户外或旅行中快速获得一杯接近专业水准的浓缩咖啡。好评集中在便携和口感，差评暴露了操作复杂、清洁不便、材质廉价等未满足需求。痛点强度高，用户愿意花时间对比和讨论。",
+    "competitive": "市场格局分散，无绝对主导者。Wacaco系列（Minipresso/Picopresso）覆盖中端，但材质和耐用性受质疑；AeroPress以易用和低价取胜，但非浓缩；Flair和Rok追求品质但便携性差。结构性短板：没有产品同时做到极致便携、高品质浓缩、易用和耐用。",
+    "opportunity": "最该切的空白是“真便携+真浓缩+易清洁”的三合一产品。现有玩家要么牺牲便携（Flair），要么牺牲品质（AeroPress），要么牺牲易用（手动泵）。新进入者可用电动+金属材质+胶囊系统实现差异化。",
+    "risk": "最大结构性风险是物理定律：便携与浓缩品质本质上矛盾（高压需要稳定结构，小体积难以实现）。若技术无法突破，产品可能两头不讨好。",
+    "market_en": "The portable coffee machine market is in a growth phase, driven by outdoor lifestyle and coffee culture. Core conflict: portability vs espresso quality. Current evolution is from manual to electric, but electric models still face volume and battery bottlenecks.",
+    "user_en": "Users' fundamental job is to quickly get a near-professional espresso outdoors or while traveling. Positive reviews focus on portability and taste; negative reviews reveal unmet needs like complex operation, inconvenient cleaning, and cheap materials. Pain points are intense; users spend time comparing and discussing.",
+    "competitive_en": "Market is fragmented with no absolute leader. Wacaco series (Minipresso/Picopresso) covers mid-range but faces criticism on material and durability; AeroPress wins on ease of use and low price but is not espresso; Flair and Rok pursue quality but lack portability. Structural gap: no product achieves extreme portability, high-quality espresso, ease of use, and durability simultaneously.",
+    "opportunity_en": "The biggest white space is a 'true portability + true espresso + easy cleaning' combo. Existing players either sacrifice portability (Flair), quality (AeroPress), or ease of use (manual pump). New entrants can differentiate with electric + metal + capsule system.",
+    "risk_en": "The biggest structural risk is physics: portability and espresso quality are inherently contradictory (high pressure requires stable structure, small volume is hard to achieve). If technology cannot break through, the product may please no one."
   },
   "user_demand": {
-    "jtbd": "在任何地点快速制作一杯品质接近咖啡馆的浓缩咖啡，无需依赖固定电源或专业设备。",
+    "jtbd": "在任何移动场景中快速获得一杯品质接近家用/咖啡馆的浓缩咖啡，无需依赖固定电源或专业设备。",
     "scenarios": [
       {
-        "name": "户外/露营徒步",
+        "name": "户外露营/徒步",
         "share": 35,
-        "summary": "户外爱好者、露营者在远离电源的野外，需要轻便、耐候、无需电力的设备制作浓缩咖啡。",
+        "summary": "户外爱好者（露营、徒步、登山）在无电环境下，需要轻便、耐用的咖啡设备，偏好手动或电池供电，注重便携性和坚固性。",
         "evidence": [
           "v02",
-          "v47",
-          "v63"
+          "v15",
+          "v37"
         ],
-        "name_en": "Outdoor/Camping Hiking",
-        "summary_en": "Outdoor enthusiasts and campers need lightweight, weather-resistant, power-free equipment to make espresso in the wild."
+        "name_en": "Outdoor Camping/Hiking",
+        "summary_en": "Outdoor enthusiasts (camping, hiking, climbing) need lightweight, durable coffee equipment in off-grid environments, prefer manual or battery-powered, focus on portability and robustness."
       },
       {
         "name": "差旅通勤",
         "share": 30,
-        "summary": "商务旅客、通勤者在酒店、办公室或飞机上，需要小巧、符合TSA规定、快速清洁的设备。",
+        "summary": "商务人士或通勤者需要在酒店、办公室或路上快速制作咖啡，要求体积小、易清洁、符合TSA规定，且能使用热水或自带加热。",
         "evidence": [
-          "v28",
-          "v97",
-          "v98"
+          "v16",
+          "v58",
+          "v103"
         ],
         "name_en": "Business Travel/Commuting",
-        "summary_en": "Business travelers and commuters need compact, TSA-compliant, quick-to-clean equipment in hotels, offices, or on planes."
+        "summary_en": "Business travelers or commuters need to quickly make coffee in hotels, offices, or on the go, requiring small size, easy cleaning, TSA compliance, and ability to use hot water or self-heating."
       },
       {
         "name": "日常家用/小空间",
         "share": 20,
-        "summary": "学生、租房族或厨房空间有限者，希望用便携机替代大型意式机，兼顾品质与节省空间。",
-        "evidence": [
-          "v110",
-          "v117",
-          "v118"
-        ],
-        "name_en": "Daily Home/Small Space",
-        "summary_en": "Students, renters, or those with limited kitchen space want to replace large espresso machines with portable ones for quality and space saving."
-      },
-      {
-        "name": "咖啡爱好者探索/评测",
-        "share": 15,
-        "summary": "咖啡发烧友、评测者对比多款便携机，追求极致萃取品质、可玩性和性价比。",
+        "summary": "居住空间有限或追求极简的用户，将便携机作为日常主力，看重咖啡品质、易用性和价格，常对比多种机型。",
         "evidence": [
           "v03",
           "v04",
-          "v11"
+          "v07"
         ],
-        "name_en": "Coffee Enthusiast Exploration/Review",
-        "summary_en": "Coffee geeks and reviewers compare multiple portable machines, pursuing ultimate extraction quality, playability, and value."
+        "name_en": "Daily Home/Small Space",
+        "summary_en": "Users with limited living space or minimalists use portable machines as daily drivers, valuing coffee quality, ease of use, and price, often comparing multiple models."
+      },
+      {
+        "name": "学生/预算有限",
+        "share": 10,
+        "summary": "学生或预算敏感者寻找低价入门机，希望以较低成本获得浓缩咖啡体验，常关注$100以下产品。",
+        "evidence": [
+          "v10",
+          "v20",
+          "v25"
+        ],
+        "name_en": "Students/Budget-Conscious",
+        "summary_en": "Students or budget-sensitive users seek low-cost entry machines, hoping to get espresso experience at low cost, often focusing on products under $100."
+      },
+      {
+        "name": "咖啡爱好者/发烧友",
+        "share": 5,
+        "summary": "对咖啡品质有极致追求的用户，愿意投入较高预算（$200+），关注萃取压力、温度控制、材质（如金属、无塑料）和可玩性。",
+        "evidence": [
+          "v01",
+          "v64",
+          "v76"
+        ],
+        "name_en": "Coffee Enthusiasts/Aficionados",
+        "summary_en": "Users with extreme pursuit of coffee quality, willing to invest higher budget ($200+), focusing on extraction pressure, temperature control, materials (e.g., metal, no plastic), and customizability."
       }
     ],
     "personas": [
       {
-        "name": "户外探险家",
-        "share": 30,
-        "summary": "热爱徒步、露营的户外玩家，核心诉求是极致的便携性、耐用性和无需电源。偏好手动或气动结构，对重量和体积敏感。",
+        "name": "户外探险者",
+        "share": 35,
+        "summary": "热爱户外活动，需要咖啡设备在恶劣环境下可靠工作，优先考虑手动或电池供电，对重量和体积极度敏感，愿意牺牲部分品质换取便携。",
         "evidence": [
           "v02",
-          "v47",
-          "v63"
+          "v15",
+          "v37"
         ],
         "name_en": "Outdoor Adventurer",
-        "summary_en": "Outdoor players who love hiking and camping. Core demands are extreme portability, durability, and no power source. Prefer manual or pneumatic structures, sensitive to weight and volume."
+        "summary_en": "Loves outdoor activities, needs coffee equipment to work reliably in harsh environments, prioritizes manual or battery power, extremely sensitive to weight and size, willing to sacrifice some quality for portability."
       },
       {
-        "name": "差旅咖啡控",
-        "share": 25,
-        "summary": "频繁出差或旅行的商务人士，需要设备小巧、通过TSA安检、易于清洁。对咖啡品质有要求，但愿意在便携性上妥协。",
+        "name": "商务差旅者",
+        "share": 30,
+        "summary": "频繁出差，需要快速在酒店或办公室制作咖啡，要求设备易携带、易清洁、符合航空规定，对加热功能和兼容性（如使用热水）有需求。",
         "evidence": [
-          "v28",
-          "v97",
-          "v98"
+          "v16",
+          "v58",
+          "v103"
         ],
-        "name_en": "Travel Coffee Lover",
-        "summary_en": "Frequent business travelers who need compact, TSA-friendly, easy-to-clean equipment. Have quality requirements but are willing to compromise on portability."
+        "name_en": "Business Traveler",
+        "summary_en": "Frequent traveler, needs to quickly make coffee in hotels or offices, requires easy portability, easy cleaning, airline compliance, and needs heating function and compatibility (e.g., using hot water)."
       },
       {
-        "name": "预算入门者",
+        "name": "入门/预算型用户",
         "share": 20,
-        "summary": "学生或预算有限的咖啡新手，希望以较低成本（<150美元）尝试意式浓缩，关注性价比和易用性。",
+        "summary": "首次购买便携咖啡机，预算有限（通常<$150），希望获得性价比高的产品，常对比多个品牌，关注易用性和基本咖啡品质。",
         "evidence": [
-          "v33",
-          "v55",
-          "v107"
+          "v10",
+          "v20",
+          "v25"
         ],
-        "name_en": "Budget Beginner",
-        "summary_en": "Students or budget-conscious coffee novices who want to try espresso at low cost (<$150), focusing on value and ease of use."
+        "name_en": "Entry/Budget User",
+        "summary_en": "First-time buyer of portable coffee machines, limited budget (usually <$150), wants cost-effective products, often compares multiple brands, focuses on ease of use and basic coffee quality."
       },
       {
-        "name": "品质发烧友",
-        "share": 25,
-        "summary": "咖啡爱好者、评测者，追求接近专业意式机的萃取品质，愿意投入较高预算（200-350美元），关注温控、压力稳定性和配件兼容性。",
+        "name": "品质追求者",
+        "share": 15,
+        "summary": "对咖啡品质有较高要求，愿意投入更多金钱和时间，关注萃取压力、温度、材质安全（无塑料/特氟龙），常进行深度评测和对比。",
         "evidence": [
-          "v04",
-          "v11",
-          "v30"
+          "v01",
+          "v64",
+          "v76"
         ],
-        "name_en": "Quality Enthusiast",
-        "summary_en": "Coffee lovers and reviewers who pursue extraction quality close to professional espresso machines, willing to invest higher budgets ($200-350), focusing on temperature control, pressure stability, and accessory compatibility."
+        "name_en": "Quality Seeker",
+        "summary_en": "Has high requirements for coffee quality, willing to invest more money and time, focuses on extraction pressure, temperature, material safety (no plastic/Teflon), often conducts in-depth reviews and comparisons."
       }
     ],
     "unmet_needs": [
       {
-        "need": "在无电环境下获得稳定高温萃取",
-        "summary": "现有手动或电池加热设备难以维持理想水温（90-96°C），导致萃取不足或口感酸涩。用户期望无需外接电源也能精准控温。",
+        "need": "真正便携且无需外部热源的一体化加热功能",
+        "summary": "用户希望设备自带加热系统，无需携带热水或额外加热工具，但现有产品要么加热慢、要么体积大、要么价格高。",
         "evidence": [
-          "v24",
-          "v27",
-          "v112"
+          "v51",
+          "v54",
+          "v56"
         ],
-        "need_en": "Stable high-temperature extraction without power",
-        "summary_en": "Existing manual or battery-heated devices struggle to maintain ideal water temperature (90-96°C), leading to under-extraction or sour taste. Users want precise temperature control without external power."
+        "need_en": "Truly portable all-in-one heating without external heat source",
+        "summary_en": "Users want the device to have built-in heating, eliminating the need to carry hot water or extra heating tools, but existing products are either slow to heat, bulky, or expensive."
       },
       {
-        "need": "便携机也能做出真正像样的浓缩油脂",
-        "summary": "多数便携机出品与咖啡馆差距大，用户希望便携机在压力、粉水比上更接近专业机，产生丰富油脂。",
+        "need": "高品质浓缩口感，接近家用机或咖啡馆水平",
+        "summary": "许多便携机萃取压力不足或温度不稳定，导致出品偏淡或酸涩，用户渴望在移动中也能喝到真正的浓缩。",
         "evidence": [
-          "v94",
-          "v95",
-          "v78"
+          "v100",
+          "v101",
+          "v99"
         ],
-        "need_en": "Portable machines can produce real espresso crema",
-        "summary_en": "Most portable machines' output is far from café quality. Users want pressure and coffee-to-water ratio closer to professional machines to produce rich crema."
+        "need_en": "High-quality espresso taste close to home machine or café level",
+        "summary_en": "Many portable machines have insufficient extraction pressure or unstable temperature, resulting in weak or sour output; users crave real espresso on the go."
       },
       {
-        "need": "清洁维护简单快捷",
-        "summary": "旅行中清洁不便，用户抱怨内部残留咖啡渣、密封圈难拆洗。期望设计成可快速冲洗、无死角的结构。",
+        "need": "完全无塑料/无特氟龙的材质安全",
+        "summary": "部分用户担心塑料部件在高温下释放有害物质，希望全金属或食品级硅胶材质，但市场上此类产品选择少且贵。",
+        "evidence": [
+          "v76",
+          "v96",
+          "v67"
+        ],
+        "need_en": "Completely plastic-free/Teflon-free material safety",
+        "summary_en": "Some users worry about plastic parts releasing harmful substances at high temperatures, preferring all-metal or food-grade silicone, but such products are few and expensive."
+      },
+      {
+        "need": "易清洁且不易堵塞的设计",
+        "summary": "便携机内部结构复杂，咖啡渣易残留，用户抱怨清洁麻烦，尤其旅行中缺乏工具。",
+        "evidence": [
+          "v63",
+          "v22",
+          "v35"
+        ],
+        "need_en": "Easy to clean and clog-resistant design",
+        "summary_en": "Portable machines have complex internal structures where coffee grounds easily remain; users complain about cleaning hassle, especially when traveling without tools."
+      },
+      {
+        "need": "兼容多种咖啡形态（粉、胶囊、冷萃）",
+        "summary": "用户希望一台机器既能用现磨粉，也能用胶囊，甚至能做冷萃，但现有产品往往只支持一种。",
         "evidence": [
           "v35",
-          "v75",
-          "v76"
+          "v47",
+          "v119"
         ],
-        "need_en": "Simple and quick cleaning and maintenance",
-        "summary_en": "Cleaning is inconvenient during travel. Users complain about residual coffee grounds inside and difficult-to-remove seals. Expect a structure that can be quickly rinsed with no dead corners."
-      },
-      {
-        "need": "设备材质安全无塑料/特氟龙",
-        "summary": "部分用户担忧塑料部件在高温下释放有害物质，寻找全金属或食品级硅胶的便携机。",
-        "evidence": [
-          "v41",
-          "v64"
-        ],
-        "need_en": "Safe materials without plastic/Teflon",
-        "summary_en": "Some users worry about harmful substances released from plastic parts at high temperatures, seeking all-metal or food-grade silicone portable machines."
-      },
-      {
-        "need": "兼容多种咖啡形态（粉/胶囊）",
-        "summary": "用户希望一台机器既能用现磨粉也能用胶囊，增加便利性，但现有产品多只支持一种。",
-        "evidence": [
-          "v114",
-          "v19"
-        ],
-        "need_en": "Compatibility with multiple coffee forms (grounds/capsules)",
-        "summary_en": "Users want one machine that can use both fresh grounds and capsules for added convenience, but existing products mostly support only one."
+        "need_en": "Compatible with multiple coffee forms (grounds, capsules, cold brew)",
+        "summary_en": "Users want one machine that can use fresh grounds, capsules, and even make cold brew, but existing products usually support only one."
       }
     ],
     "workarounds": [
       {
-        "approach": "使用AeroPress或Moka壶替代便携意式机",
-        "summary": "AeroPress和Moka壶便携且便宜，但出品并非真正浓缩，压力不足，油脂少。用户将其作为折中方案。",
+        "approach": "使用手动压杆或气动装置代替电动泵",
+        "summary": "用户选择手动或气动方案（如Picopresso、Nanopresso）以获得便携性和可靠性，但手动操作费力，出品一致性差。",
         "evidence": [
-          "v23",
-          "v42",
-          "v46"
+          "v07",
+          "v38",
+          "v59"
         ],
-        "approach_en": "Use AeroPress or Moka pot as a substitute for portable espresso machine",
-        "summary_en": "AeroPress and Moka pot are portable and cheap, but their output is not true espresso, lacking pressure and crema. Users use them as a compromise."
+        "approach_en": "Use manual lever or pneumatic device instead of electric pump",
+        "summary_en": "Users choose manual or pneumatic solutions (e.g., Picopresso, Nanopresso) for portability and reliability, but manual operation is labor-intensive and output consistency is poor."
       },
       {
-        "approach": "携带额外保温杯烧水或使用12V加热棒",
-        "summary": "为获得理想水温，用户需额外携带加热设备，增加负重和操作步骤，且温度控制不精确。",
+        "approach": "携带保温杯装热水，配合便携手冲或爱乐压",
+        "summary": "用户用保温杯装热水，再用手冲或爱乐压制作咖啡，但步骤繁琐，无法制作浓缩。",
         "evidence": [
-          "v24",
-          "v27"
+          "v52",
+          "v105",
+          "v114"
         ],
-        "approach_en": "Carry an extra thermos for hot water or use a 12V heating rod",
-        "summary_en": "To achieve ideal water temperature, users need to carry additional heating equipment, increasing weight and steps, with imprecise temperature control."
+        "approach_en": "Carry a thermos with hot water, paired with pour-over or AeroPress",
+        "summary_en": "Users carry hot water in a thermos and use pour-over or AeroPress to make coffee, but the process is cumbersome and cannot produce espresso."
       },
       {
-        "approach": "购买多台便携机对比后留下最合适的",
-        "summary": "因无法提前了解实际表现，用户通过购买多台、测试后退货来筛选，费时费力。",
+        "approach": "购买多个设备分别满足不同场景",
+        "summary": "用户同时拥有手动和电动、不同品牌的产品，以应对露营、旅行、家用等不同需求，但成本高且不便利。",
         "evidence": [
           "v03",
-          "v11"
+          "v07",
+          "v14"
         ],
-        "approach_en": "Buy multiple portable machines, compare, and keep the best one",
-        "summary_en": "Unable to know actual performance in advance, users buy multiple machines, test, and return, which is time-consuming and labor-intensive."
+        "approach_en": "Buy multiple devices for different scenarios",
+        "summary_en": "Users own both manual and electric, different brands to meet camping, travel, home needs, but it's costly and inconvenient."
       },
       {
-        "approach": "使用便携磨豆机搭配手动压粉器",
-        "summary": "为提升出品品质，用户额外携带磨豆机和压粉工具，牺牲便携性。",
+        "approach": "使用胶囊或预磨粉降低操作难度",
+        "summary": "用户选择胶囊或预磨粉以简化操作，但牺牲了咖啡新鲜度和风味，且胶囊成本高、不环保。",
         "evidence": [
-          "v15",
-          "v59",
-          "v80"
+          "v35",
+          "v95",
+          "v119"
         ],
-        "approach_en": "Use a portable grinder with a manual tamper",
-        "summary_en": "To improve output quality, users carry extra grinders and tamping tools, sacrificing portability."
+        "approach_en": "Use capsules or pre-ground coffee to reduce operation difficulty",
+        "summary_en": "Users choose capsules or pre-ground coffee to simplify operation, but sacrifice freshness and flavor, and capsules are costly and not eco-friendly."
       }
     ],
-    "wtp": "主流价格带在100-250美元，用户对品质提升的支付意愿较强（如OutIn Nano约100美元、Wacaco Picopresso约80美元、高端电动款可达350美元）。用户普遍认为便携机应比家用半自动机便宜，但愿意为真正的浓缩品质、耐用材质和易清洁设计多付50-100美元。性价比是关键决策因素，但品质优先的用户可接受更高预算。",
-    "jtbd_en": "Quickly make a cup of espresso with quality close to a café anywhere, without relying on a fixed power source or professional equipment.",
-    "wtp_en": "Main price range is $100-250. Users have a strong willingness to pay for quality improvement (e.g., OutIn Nano ~$100, Wacaco Picopresso ~$80, high-end electric models up to $350). Users generally believe portable machines should be cheaper than home semi-automatic machines, but are willing to pay $50-100 more for true espresso quality, durable materials, and easy cleaning. Value for money is a key decision factor, but quality-first users can accept higher budgets."
+    "wtp": "价格带集中在$50-$250，其中$100以下为入门主流，$150-$250为品质追求者愿意支付的范围。用户普遍认为便携机应比家用机便宜，但愿意为真正的便携+高品质（如自带加热、全金属、稳定萃取）支付溢价，最高可达$350。支付意愿与场景相关：户外用户更看重耐用性，差旅用户看重便携和易用，品质用户看重出品。",
+    "jtbd_en": "Quickly get a cup of espresso with quality close to home/café in any mobile scenario, without relying on fixed power or professional equipment.",
+    "wtp_en": "Price range is $50-$250, with under $100 as mainstream entry, $150-$250 for quality seekers. Users generally think portable machines should be cheaper than home machines, but are willing to pay a premium for true portability + high quality (e.g., self-heating, all-metal, stable extraction), up to $350. Willingness to pay varies by scenario: outdoor users value durability, travelers value portability and ease of use, quality users value output."
   },
   "trend": [
     {
       "period": "2022",
-      "count": 6
+      "count": 7
     },
     {
       "period": "2023",
-      "count": 1
+      "count": 2
     },
     {
       "period": "2024",
-      "count": 19
+      "count": 18
     },
     {
       "period": "2025",
-      "count": 63
+      "count": 58
     },
     {
       "period": "2026",
-      "count": 23
+      "count": 19
     }
   ],
-  "trend_source": "reddit"
+  "trend_source": "reddit",
+  "quality": {
+    "voices": 124,
+    "warnings": [],
+    "dup_title_pct": 0,
+    "listing_pct": 0,
+    "top_source": "espresso",
+    "top_source_pct": 51,
+    "other_pct": 79
+  }
 }
