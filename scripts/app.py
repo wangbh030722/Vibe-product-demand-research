@@ -241,10 +241,14 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   .basis{font-size:15.5px;color:var(--ink-2);margin:0 0 6px;line-height:1.55}
   .basis .n{font-family:var(--display);font-weight:800;font-size:1.4em;color:var(--accent);letter-spacing:-.01em}
   .deck{font-size:14.5px;color:var(--ink-3);margin:0 0 16px;line-height:1.6}
-  .topline{display:flex;gap:14px;align-items:center;margin:0 0 34px;flex-wrap:wrap}
-  .case-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--accent);
-    text-decoration:none;border-bottom:1px solid var(--accent-line);padding-bottom:1px;transition:border-color .15s}
-  .case-link:hover{border-bottom-color:var(--accent)}
+  .topline{margin:0 0 34px}
+  .topline .cases-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-3);
+    text-transform:uppercase;margin-bottom:8px}
+  .case-grid{display:flex;gap:10px;flex-wrap:wrap}
+  .case-link{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--accent);
+    text-decoration:none;background:var(--accent-soft);border:1px solid var(--accent-line);
+    border-radius:999px;padding:7px 14px;transition:background .15s,border-color .15s}
+  .case-link:hover{background:#e2efe8;border-color:var(--accent)}
   label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase;margin:18px 0 6px}
   input,select{width:100%;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:15px;background:#fff;color:var(--ink);font-family:inherit}
   input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
@@ -305,7 +309,11 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   <p class="basis">以 <span class="n">999</span> 条 Reddit 真实用户原声为依据 · 每个结论都可溯源到原帖</p>
   <p class="deck">输入一个产品想法 → 自动联网深搜真实用户原声 → 出一份可交互的洞察报告。约 1–2 分钟。</p>
   <div class="topline">
-    <a class="case-link" href="/dist/portable-espresso-maker.html" target="_blank" rel="noopener">◧ 查看案例:便携咖啡机 →</a>
+    <div class="cases-label">查看案例 / Sample reports</div>
+    <div class="case-grid">
+      <a class="case-link" href="/dist/portable-espresso-maker.html" target="_blank" rel="noopener">◧ 便携咖啡机 →</a>
+      <a class="case-link" href="/dist/ai-sleep-earbuds.html" target="_blank" rel="noopener">◧ AI 睡眠耳塞 →</a>
+    </div>
   </div>
 
   <label>产品想法</label>
