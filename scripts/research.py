@@ -66,6 +66,36 @@ def _looks_like_listing(title: str) -> bool:
     return False
 
 
+def compute_quality(data: dict) -> dict:
+    """Post-generation self-check (plan C): scan the FINAL voices for the failure
+    modes a tester hit — repeated titles, ad listings, and over-concentration on a
+    single source — and emit warnings so a bad run is caught instead of shipped."""
+    from collections import Counter
+    voices = data.get("voices", []) or []
+    n = len(voices)
+    q = {"voices": n, "warnings": []}
+    if not n:
+        q["warnings"].append("没有任何真实原声")
+        return q
+    dup = sum(c - 1 for c in Counter(_norm_title(v.get("title")) for v in voices).values() if c > 1)
+    listing = sum(1 for v in voices if _looks_like_listing(v.get("title")))
+    subs = Counter((re.search(r"/r/([A-Za-z0-9_]+)", v.get("url") or "") or [None, "other"])[1].lower()
+                   for v in voices)
+    top_sub, top_n = subs.most_common(1)[0]
+    q["dup_title_pct"]   = round(dup / n * 100)
+    q["listing_pct"]     = round(listing / n * 100)
+    q["top_source"]      = top_sub
+    q["top_source_pct"]  = round(top_n / n * 100)
+    q["other_pct"]       = round(sum(1 for v in voices if v.get("player") == "other") / n * 100)
+    if q["dup_title_pct"] > 8:
+        q["warnings"].append(f"重复标题占比 {q['dup_title_pct']}% 偏高")
+    if q["listing_pct"] > 5:
+        q["warnings"].append(f"疑似广告 listing 占比 {q['listing_pct']}% 偏高")
+    if q["top_source_pct"] > 72:
+        q["warnings"].append(f"来源过度集中:r/{q['top_source']} 占 {q['top_source_pct']}%")
+    return q
+
+
 def work_dir(slug: str) -> Path:
     d = ROOT / "collected" / slug
     d.mkdir(parents=True, exist_ok=True)
@@ -596,11 +626,13 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
     indexed = [{"i": i, "t": (r.get("title") or "")[:120], "s": r.get("score") or 0,
                 "sub": r.get("subreddit", "")} for i, r in enumerate(ranked[:over])]
     pool = ranked  # reconstruct voices from this same ranked order
-    user = f"""Product idea: {idea}
+
+    def build_user(cands):
+        return f"""Product idea: {idea}
 Player ids: {json.dumps(player_ids, ensure_ascii=False)}
 
 Candidate pool (i = index, t = title, s = score, sub = subreddit):
-{json.dumps(indexed, ensure_ascii=False)}
+{json.dumps(cands, ensure_ascii=False)}
 
 TASK: score each candidate's relevance to the product idea. Return ONLY the
 ones worth keeping, as compact JSON (NO titles/urls — just the index):
@@ -633,20 +665,27 @@ SPECIAL CASE — only if the idea EXPLICITLY combines two distinct domains
 intersection for a 3, single-domain caps at 1. For ordinary single-concept
 products, score normally.
 
-Keep up to {min(max_voices, 160)} items, fair not stingy — real on-topic items are 2-3."""
-    # Bound the keep-list so the JSON output can't overflow the model's max output
-    # tokens — when it does, json-mode providers (e.g. DeepSeek) return EMPTY content,
-    # which surfaced as "LLM returned non-JSON (char 0)" on the hosted deploy.
-    # CRITICAL: never let a flaky LLM call kill the whole run. If curation fails
-    # (cross-border timeout, empty content, etc.), fall back to the keyword-ranked
-    # pool below — a real, on-topic selection — instead of crashing at stage 3.
-    try:
-        res = chat_json(sys_msg, user, temperature=0.2, max_tokens=8000, timeout=180)
-        keep = res.get("keep", [])
-    except Exception as e:
-        print(f"    ! curate LLM failed ({e}); falling back to keyword-ranked selection",
-              file=sys.stderr)
-        keep = []
+Keep every genuinely relevant item in THIS batch (real on-topic items are 2-3); omit the rest."""
+
+    # CHUNKED curation (plan A): many small LLM calls instead of one big one. A
+    # smaller request completes far more reliably from a far region (the hosted
+    # cross-border timeout / empty-content failure a tester hit), and one bad chunk
+    # only loses that chunk — the others still curate with the LLM, so we don't
+    # collapse the whole run to the weak keyword-only fallback. Indices stay global.
+    CHUNK = 90
+    keep, chunk_fail, chunk_total = [], 0, 0
+    for s in range(0, len(indexed), CHUNK):
+        part = indexed[s:s + CHUNK]
+        chunk_total += 1
+        try:
+            res = chat_json(sys_msg, build_user(part), temperature=0.2, max_tokens=5000, timeout=150)
+            keep.extend(res.get("keep", []) or [])
+        except Exception as e:
+            chunk_fail += 1
+            print(f"    ! curate chunk {chunk_total} failed ({e})", file=sys.stderr)
+    if chunk_fail:
+        print(f"    ! {chunk_fail}/{chunk_total} 个筛选批次失败,其余批次仍由大模型筛选,"
+              f"缺口用关键词兜底", file=sys.stderr)
 
     # Reconstruct voices from the pool by index (titles/urls never altered by LLM).
     recon = []
@@ -1261,6 +1300,9 @@ def main() -> int:
 
     print("▶ ASSEMBLE")
     data = stage_assemble(args.slug, idea, args.target_market, scope, voices, cluster, synth)
+    data["quality"] = compute_quality(data)
+    for w in data["quality"]["warnings"]:
+        print(f"    ⚠ 数据质量:{w}", file=sys.stderr)
     data_path = ROOT / "data" / f"{args.slug}.json"
     save(data_path, data)
 
