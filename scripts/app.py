@@ -245,13 +245,20 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
      Aligned to the same center/cover/fixed as the base image so outlines light
      up in place. JS updates --mx/--my; the radial mask makes only the area near
      the cursor visible, fading out at the edge. */
-  body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  /* layer 1 — reveal the glowing outlines in a soft circle around the cursor */
+  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     background:url('/dist/bg-glow.png') center center / cover no-repeat fixed;
     -webkit-mask-image:radial-gradient(circle 150px at var(--mx,-1000px) var(--my,-1000px), #000 0%, rgba(0,0,0,.5) 48%, transparent 72%);
     mask-image:radial-gradient(circle 150px at var(--mx,-1000px) var(--my,-1000px), #000 0%, rgba(0,0,0,.5) 48%, transparent 72%);
     opacity:0;transition:opacity .3s ease;}
-  body.glow-on::after{opacity:1}
-  @media (hover:none){body::after{display:none}}   /* skip on touch devices */
+  /* layer 2 — a brighter spotlight core right at the cursor (screen-blended,
+     sits on top of the outlines, fades fast → the "探照灯" hotspot) */
+  body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(circle 90px at var(--mx,-1000px) var(--my,-1000px),
+      rgba(150,255,215,.45) 0%, rgba(70,230,165,.18) 40%, transparent 70%);
+    mix-blend-mode:screen;opacity:0;transition:opacity .3s ease;}
+  body.glow-on::before,body.glow-on::after{opacity:1}
+  @media (hover:none){body::before,body::after{display:none}}   /* skip on touch */
   .wrap{max-width:820px;margin:0 auto;padding:84px 40px 110px;position:relative;z-index:1}
   .brand{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase}
   h1{font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-.02em;margin:10px 0 10px;line-height:1.12}
