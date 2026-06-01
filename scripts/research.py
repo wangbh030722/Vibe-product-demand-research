@@ -606,7 +606,9 @@ Keep up to {min(max_voices, 160)} items, fair not stingy — real on-topic items
             continue
         r = pool[idx]
         rel = int(k.get("relevance", 1) or 1)
-        player = k.get("player") if k.get("player") in player_ids else (player_ids[0] if player_ids else "other")
+        # Unattributed / "other" voices stay "other" — do NOT dump them onto the
+        # first player (that falsely inflated the leading brand to ~90% share).
+        player = k.get("player") if k.get("player") in player_ids else "other"
         recon.append({
             "id": "", "player": player,
             "title": (r.get("title") or "")[:120],
@@ -645,8 +647,7 @@ Keep up to {min(max_voices, 160)} items, fair not stingy — real on-topic items
             have.add(u)
             title = (r.get("title") or "")[:120]
             tl = title.lower()
-            pl = next((pid for pid in player_ids if pid and pid in tl),
-                      player_ids[0] if player_ids else "other")
+            pl = next((pid for pid in player_ids if pid and pid in tl), "other")
             voices.append({
                 "id": "", "player": pl, "title": title,
                 "score": int(r.get("score") or 0), "url": u,
@@ -827,6 +828,72 @@ PALETTE = {
 }
 
 
+def attribute_voices_by_name(players: list[dict], voices: list[dict]):
+    """Deterministic brand attribution: a voice left 'other' by the LLM but whose
+    TITLE clearly names exactly one tracked brand gets credited to that brand (the
+    LLM under-credits). Only fills 'other' (never overrides a positive call); skips
+    titles that name two+ brands (ambiguous 'X vs Y' comparisons). Word-boundary
+    match on each brand's distinctive leading token."""
+    import re as _re
+    STOP = {"the", "app", "sleep", "earplugs", "earplug", "earbuds", "earbud",
+            "buds", "pillow", "soft", "noise", "white", "basics", "pro", "plus"}
+    def lead_token(name):
+        ts = [w for w in _re.sub(r"[^a-z0-9 ]", " ", (name or "").lower()).split()
+              if len(w) >= 3 and w not in STOP]
+        return ts[0] if ts else None
+    pmatch = [(p.get("id"), lead_token(p.get("name"))) for p in players]
+    for v in voices:
+        if v.get("player") not in ("other", None, ""):
+            continue
+        title = (v.get("title") or "").lower()
+        hits = [pid for pid, tok in pmatch
+                if tok and _re.search(r"\b" + _re.escape(tok) + r"\b", title)]
+        if len(set(hits)) == 1:
+            v["player"] = hits[0]
+    return voices
+
+
+def merge_brand_variants(players: list[dict], voices: list[dict]):
+    """Collapse near-duplicate players to one entry PER BRAND, e.g.
+    'Loop Quiet' / 'Loop' → 'Loop', 'Mack's Pillow Soft Earplugs' / 'Mack's' →
+    'Mack's'. A player is a variant of another when one's word-tokens are a prefix
+    of the other's (so 'Soundcore Sleep A30' vs 'A10' stay separate). The kept
+    canonical is the one with the most voices (tie → fewer words); the others'
+    voices are reassigned to it. Returns (deduped_players, voices)."""
+    import re as _re
+    def toks(s):
+        return [t for t in _re.sub(r"[^a-z0-9 ]", " ", (s or "").lower()).split() if t]
+    cnt = {}
+    for v in voices:
+        cnt[v.get("player")] = cnt.get(v.get("player"), 0) + 1
+    order = sorted(players, key=lambda p: (-cnt.get(p.get("id"), 0), len(toks(p.get("name")))))
+    kept, kept_toks, remap = [], [], {}
+    def same_brand(a, b):
+        n = min(len(a), len(b))
+        if n == 0:
+            return False
+        if a[:n] == b[:n]:                 # one is a prefix of the other ('Loop' ⊂ 'Loop Quiet')
+            return True
+        # same ≥2-token brand line differing only in a trailing model code
+        # ('Soundcore Sleep A10' vs 'A30'); guards against 'Loop Quiet' vs 'Loop Dream'
+        return len(a) == len(b) >= 3 and a[:-1] == b[:-1]
+    for p in order:
+        pt = toks(p.get("name"))
+        canon = None
+        for kt, kid in kept_toks:
+            if same_brand(pt, kt):
+                canon = kid; break
+        if canon:
+            remap[p.get("id")] = canon
+        else:
+            kept.append(p); kept_toks.append((pt, p.get("id")))
+    for v in voices:
+        if v.get("player") in remap:
+            v["player"] = remap[v["player"]]
+    kept_ids = {p.get("id") for p in kept}
+    return [p for p in players if p.get("id") in kept_ids], voices
+
+
 def stage_assemble(slug: str, idea: str, target_market: str, scope: dict,
                    voices: list[dict], cluster: dict, synth: dict,
                    demand: dict | None = None) -> dict:
@@ -834,7 +901,11 @@ def stage_assemble(slug: str, idea: str, target_market: str, scope: dict,
     today = datetime.date.today().isoformat()
 
     # Players with layout positions (spread on a circle)
+    # Collapse near-duplicate brands first (e.g. 'Loop Quiet' + 'Loop' → 'Loop'),
+    # reassigning their voices, so the brand table shows one row per real brand.
     players_in = scope.get("players", [])
+    voices = attribute_voices_by_name(players_in, voices)   # credit explicit brand mentions
+    players_in, voices = merge_brand_variants(players_in, voices)
     import math
     players = []
     n = max(1, len(players_in))
