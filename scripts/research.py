@@ -62,7 +62,7 @@ def stage_scope(idea: str, target_market: str, wd: Path, dry: bool,
     out = wd / "01-scope.json"
     if dry and out.exists():
         return cached(out)
-    sys = ("You are a market-research scoping assistant. Output STRICT JSON only.")
+    sys_msg = ("You are a market-research scoping assistant. Output STRICT JSON only.")
     if mode_override == "NON_STOCK":
         mode_instr = (
             '"mode": "NON_STOCK",   // FORCED: treat as new/emerging category. '
@@ -101,7 +101,7 @@ CRITICAL: Reddit/HN content is English. ALL subreddits, queries, player names, a
 search_idea MUST be in ENGLISH even if the product idea is written in another
 language — otherwise the search returns nothing. subreddit names must be plausible
 real subs. player ids lowercase a-z0-9_-."""
-    res = chat_json(sys, user, temperature=0.3)
+    res = chat_json(sys_msg, user, temperature=0.3)
     if mode_override:
         res["mode"] = mode_override   # hard-enforce even if model drifts
     save(out, res)
@@ -445,8 +445,10 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
 
     players = scope.get("players", [])
     player_ids = [p["id"] for p in players]
-    sys = ("You are a strict research analyst curating evidence. You RUTHLESSLY "
-           "reject off-topic noise. Output STRICT JSON only.")
+    # NOTE: name this sys_msg, NOT `sys` — a local `sys` would shadow the stdlib
+    # `sys` module and break `sys.stderr` later in this function.
+    sys_msg = ("You are a strict research analyst curating evidence. You RUTHLESSLY "
+               "reject off-topic noise. Output STRICT JSON only.")
 
     # Build a product-keyword set from idea + player names/ids + scope queries,
     # then RANK the pool by keyword relevance (not just upvotes) so the few
@@ -514,7 +516,7 @@ Keep up to {min(max_voices, 160)} items, fair not stingy — real on-topic items
     # (cross-border timeout, empty content, etc.), fall back to the keyword-ranked
     # pool below — a real, on-topic selection — instead of crashing at stage 3.
     try:
-        res = chat_json(sys, user, temperature=0.2, max_tokens=8000, timeout=180)
+        res = chat_json(sys_msg, user, temperature=0.2, max_tokens=8000, timeout=180)
         keep = res.get("keep", [])
     except Exception as e:
         print(f"    ! curate LLM failed ({e}); falling back to keyword-ranked selection",
@@ -680,7 +682,7 @@ def stage_synth(idea: str, target_market: str, scope: dict, voices: list[dict],
     out = wd / "05-synth.json"
     if dry and out.exists():
         return cached(out)
-    sys = "You are a senior category analyst. Output STRICT JSON only."
+    sys_msg = "You are a senior category analyst. Output STRICT JSON only."
     user = f"""Product idea: {idea}
 Target market: {target_market}
 Mode: {scope.get('mode')}
@@ -738,7 +740,7 @@ paths 写作要求(2-3 个「可能的切入方向」,不是拍板的推荐):每
 不要下「就做某某」的定论,而是给「如果相信 X 假设并验证了 Y,这条路值得一试,但要注意 Z」
 式的思考脚手架,把判断权留给读者。
 Rules: status=real only if voices clearly show real demand."""
-    res = chat_json(sys, user, temperature=0.4)
+    res = chat_json(sys_msg, user, temperature=0.4)
     save(out, res)
     return res
 
