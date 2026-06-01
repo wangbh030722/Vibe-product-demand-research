@@ -79,10 +79,21 @@ def stage_scope(idea: str, target_market: str, wd: Path, dry: bool,
     user = f"""Product idea: {idea}
 Target market: {target_market}
 
+RESEARCH BREADTH — this is demand research, so scope the WHOLE CATEGORY and the
+underlying user NEED, not just the literal words. Treat adjectives/qualifiers in the
+idea (e.g. "AI", "smart", "portable") as ONE angle, NOT a hard filter. Someone
+researching "AI sleep earbuds" wants to understand the whole "sleep audio / blocking
+noise to sleep" space — so include the qualified products AND the broader category
+AND the alternatives real users compare against or hack together (e.g. passive
+sleep earplugs like Loop, Bose Sleepbuds, white-noise apps), even if they don't have
+the qualifier. Going too narrow misses the real demand picture.
+
 Decide research scope. Output JSON:
 {{
   {mode_instr}
-  "search_idea": "<the product in 2-4 ENGLISH words>",   // Reddit is English-only
+  "search_idea": "<the CATEGORY/need in 2-4 ENGLISH words>",   // Reddit is English-only;
+                                      // prefer the broad category term (e.g. "sleep earbuds")
+                                      // over the narrow qualified one ("AI sleep earbuds").
   "subreddits": ["name", ...],        // 8-12 real ENGLISH subreddit names (no /r/).
                                       // Cast a WIDE net: the core product subs PLUS
                                       // adjacent communities where the target user
@@ -92,7 +103,10 @@ Decide research scope. Output JSON:
                                       // sleep, insomnia, tinnitus, headphones, audiophile,
                                       // SleepApnea, GetOutOfBed, ShiftWork, travel, biohackers.
   "hn_queries": ["query", ...],       // 5-8 ENGLISH search phrases (buyers/pain/alternatives/use-cases)
-  "players": [                        // 5-10 entrants/analogues in this space
+  "players": [                        // 6-10 across the WHOLE category the target user shops:
+                                      // category leaders, adjacent alternatives, and what
+                                      // people hack together — NOT only literal matches of
+                                      // every adjective (include e.g. Loop for sleep earbuds).
     {{"id": "<lowercase_slug>", "name": "<English Brand Name>", "price": "<approx retail, e.g. ~$60 or $40-90; '' if truly unknown>"}}
   ],
   "rationale": "<one sentence why this mode>"
@@ -303,6 +317,64 @@ def stage_collect(scope: dict, wd: Path, skip: bool, log=None) -> list[dict]:
     save(out, pool)
     _log(f"已锁定 {len(pool)} 条相关 Reddit 真实评论(其中 {n_kw} 条命中产品关键词)")
     return pool
+
+
+def stage_discover_brands(idea: str, scope: dict, pool: list[dict], wd: Path,
+                          dry: bool, log=None) -> dict:
+    """Data-driven players: mine the real brand/product names that actually appear in
+    the collected pool and merge the high-frequency ones the upfront LLM scoping
+    missed into scope['players']. So famous products users keep comparing to (e.g.
+    Loop for sleep earbuds) surface from the DATA, not from guesswork — and because
+    this runs BEFORE curate, those voices get attributed to the new brands.
+    Best-effort: any failure just leaves the scope players unchanged."""
+    def _log(m):
+        print(f"    {m}", flush=True)
+        if log:
+            try: log("COLLECT", m)
+            except Exception: pass
+    players = scope.get("players", []) or []
+    if not pool or len(pool) < 8:
+        return scope
+    existing = {(p.get("id") or "").lower() for p in players}
+    existing |= {(p.get("name") or "").lower() for p in players}
+    titles = [(r.get("title") or "")[:140] for r in pool[:260] if r.get("title")]
+    if len(titles) < 8:
+        return scope
+    sys_msg = ("You extract real consumer PRODUCT / BRAND names from forum post "
+               "titles. Output STRICT JSON only.")
+    user = (f"Product idea / category: {idea}\n\n"
+            "Post titles:\n" + "\n".join("- " + t for t in titles) + "\n\n"
+            "TASK: list the distinct real PRODUCT or BRAND names that appear and that "
+            "a shopper in this category would consider or compare — direct competitors "
+            "AND adjacent alternatives people compare against (even if they don't match "
+            "every adjective of the idea). EXCLUDE generic words, subreddit names, "
+            "feature words, and non-products. Count how many titles mention each.\n"
+            'Return JSON: {"brands":[{"name":"<Brand/Product>","count":<int>}]}')
+    try:
+        res = chat_json(sys_msg, user, temperature=0.2, max_tokens=1500)
+    except Exception as e:
+        _log(f"品牌挖掘跳过(LLM 失败): {e}")
+        return scope
+    found = res.get("brands", []) or []
+    import re as _re
+    MAX_PLAYERS, MIN_MENTIONS = 14, 3
+    new = []
+    for b in sorted(found, key=lambda x: -(int(x.get("count") or 0))):
+        if len(players) + len(new) >= MAX_PLAYERS:
+            break
+        name = (b.get("name") or "").strip()
+        if not name or int(b.get("count") or 0) < MIN_MENTIONS:
+            continue
+        sid = _re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")[:30]
+        if not sid or name.lower() in existing or sid in existing:
+            continue
+        existing.add(name.lower()); existing.add(sid)
+        new.append({"id": sid, "name": name, "price": ""})
+    if new:
+        scope["players"] = players + new
+        save(wd / "01-scope.json", scope)
+        _log("从真实原声补充高频品牌:" + "、".join(p["name"] for p in new))
+    return scope
 
 
 def read_jsonl(path: Path, *, source: str) -> list[dict]:
@@ -1039,6 +1111,9 @@ def main() -> int:
 
     print("▶ COLLECT")
     pool = stage_collect(scope, wd, args.skip_collect or args.dry_run)
+
+    if not args.dry_run:
+        scope = stage_discover_brands(idea, scope, pool, wd, args.dry_run)
 
     print("▶ CURATE")
     voices = stage_curate(idea, scope, pool, wd, args.max_voices, args.dry_run)
