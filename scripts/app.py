@@ -236,7 +236,10 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   html{background:#fff}
   /* device-outline texture at 50% (white veil over the image, fixed so it doesn't scroll) */
   body{margin:0;color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
-    background:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.5)),
+    /* light-gray veil, lighter at center → grayer at edges: shows the texture AND
+       makes the white glass cards pop, with a soft spotlight on the content. */
+    background:radial-gradient(125% 95% at 50% 32%, rgba(248,248,245,.40) 0%,
+               rgba(226,226,221,.60) 52%, rgba(210,210,204,.72) 100%),
                url('/dist/bg-devices.jpg') center center / cover no-repeat fixed;}
   .wrap{max-width:820px;margin:0 auto;padding:84px 40px 110px;position:relative;z-index:1}
   .brand{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase}
@@ -255,9 +258,9 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     border:1px solid rgba(255,255,255,.7);border-radius:999px;padding:7px 14px;transition:background .15s,border-color .15s}
   .case-link:hover{background:rgba(226,239,232,.8);border-color:var(--accent)}
   label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase;margin:18px 0 6px}
-  input,select{width:100%;border:1px solid rgba(255,255,255,.7);border-radius:10px;padding:12px 14px;font-size:15px;
-    background:rgba(255,255,255,.55);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);
-    color:var(--ink);font-family:inherit;box-shadow:0 4px 18px -10px rgba(0,0,0,.12)}
+  input,select{width:100%;border:1px solid rgba(255,255,255,.9);border-radius:10px;padding:12px 14px;font-size:15px;
+    background:rgba(255,255,255,.72);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);
+    color:var(--ink);font-family:inherit;box-shadow:0 8px 26px -12px rgba(40,45,40,.28)}
   input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   .two{display:flex;gap:12px}.two>div{flex:1}
   .field-note{font-size:11.5px;color:var(--ink-3);margin-top:6px;line-height:1.5}
@@ -290,11 +293,11 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   .prog-elapsed{font-family:var(--mono);font-size:10px;color:var(--ink-3);text-align:right;margin-top:10px;letter-spacing:.06em}
   .hint{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:26px;line-height:1.7;border-top:1px solid var(--line);padding-top:18px}
   .samples{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
-  .samples button{width:auto;margin:0;background:rgba(255,255,255,.55);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);border:1px solid rgba(255,255,255,.7);color:var(--ink-2);font-size:12px;padding:6px 12px;border-radius:999px;font-family:var(--sans);font-weight:500}
+  .samples button{width:auto;margin:0;background:rgba(255,255,255,.7);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border:1px solid rgba(255,255,255,.9);color:var(--ink-2);font-size:12px;padding:6px 12px;border-radius:999px;font-family:var(--sans);font-weight:500;box-shadow:0 4px 14px -8px rgba(40,45,40,.22)}
   .samples button:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
-  .adv{margin-top:18px;border:1px solid rgba(255,255,255,.7);border-radius:12px;padding:0 14px;
-    background:rgba(255,255,255,.5);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);
-    box-shadow:0 4px 18px -10px rgba(0,0,0,.12)}
+  .adv{margin-top:18px;border:1px solid rgba(255,255,255,.9);border-radius:12px;padding:0 14px;
+    background:rgba(255,255,255,.66);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);
+    box-shadow:0 8px 26px -12px rgba(40,45,40,.26)}
   .adv summary{cursor:pointer;padding:12px 0;font-family:var(--mono);font-size:12px;color:var(--ink-2);list-style:none}
   .adv summary::-webkit-details-marker{display:none}
   .adv summary:before{content:'▸ ';color:var(--ink-3)}
