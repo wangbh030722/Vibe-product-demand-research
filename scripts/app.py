@@ -90,6 +90,9 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
     pool = research.stage_collect(scope, wd, False, log=log)
 
     log("COLLECT", f"已锁定 {len(pool)} 条相关 Reddit 真实评论")
+    # Data-driven players: pull in high-frequency brands the upfront scoping missed
+    # (e.g. Loop) from the real pool BEFORE curate, so their voices get attributed.
+    scope = research.stage_discover_brands(idea, scope, pool, wd, False, log=log)
     if len(pool) < 3:
         raise RuntimeError(
             f"数据源几乎没抓到内容(原始池仅 {len(pool)} 条)。"

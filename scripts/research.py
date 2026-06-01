@@ -79,10 +79,21 @@ def stage_scope(idea: str, target_market: str, wd: Path, dry: bool,
     user = f"""Product idea: {idea}
 Target market: {target_market}
 
+RESEARCH BREADTH — this is demand research, so scope the WHOLE CATEGORY and the
+underlying user NEED, not just the literal words. Treat adjectives/qualifiers in the
+idea (e.g. "AI", "smart", "portable") as ONE angle, NOT a hard filter. Someone
+researching "AI sleep earbuds" wants to understand the whole "sleep audio / blocking
+noise to sleep" space — so include the qualified products AND the broader category
+AND the alternatives real users compare against or hack together (e.g. passive
+sleep earplugs like Loop, Bose Sleepbuds, white-noise apps), even if they don't have
+the qualifier. Going too narrow misses the real demand picture.
+
 Decide research scope. Output JSON:
 {{
   {mode_instr}
-  "search_idea": "<the product in 2-4 ENGLISH words>",   // Reddit is English-only
+  "search_idea": "<the CATEGORY/need in 2-4 ENGLISH words>",   // Reddit is English-only;
+                                      // prefer the broad category term (e.g. "sleep earbuds")
+                                      // over the narrow qualified one ("AI sleep earbuds").
   "subreddits": ["name", ...],        // 8-12 real ENGLISH subreddit names (no /r/).
                                       // Cast a WIDE net: the core product subs PLUS
                                       // adjacent communities where the target user
@@ -92,7 +103,10 @@ Decide research scope. Output JSON:
                                       // sleep, insomnia, tinnitus, headphones, audiophile,
                                       // SleepApnea, GetOutOfBed, ShiftWork, travel, biohackers.
   "hn_queries": ["query", ...],       // 5-8 ENGLISH search phrases (buyers/pain/alternatives/use-cases)
-  "players": [                        // 5-10 entrants/analogues in this space
+  "players": [                        // 6-10 across the WHOLE category the target user shops:
+                                      // category leaders, adjacent alternatives, and what
+                                      // people hack together — NOT only literal matches of
+                                      // every adjective (include e.g. Loop for sleep earbuds).
     {{"id": "<lowercase_slug>", "name": "<English Brand Name>", "price": "<approx retail, e.g. ~$60 or $40-90; '' if truly unknown>"}}
   ],
   "rationale": "<one sentence why this mode>"
@@ -303,6 +317,64 @@ def stage_collect(scope: dict, wd: Path, skip: bool, log=None) -> list[dict]:
     save(out, pool)
     _log(f"已锁定 {len(pool)} 条相关 Reddit 真实评论(其中 {n_kw} 条命中产品关键词)")
     return pool
+
+
+def stage_discover_brands(idea: str, scope: dict, pool: list[dict], wd: Path,
+                          dry: bool, log=None) -> dict:
+    """Data-driven players: mine the real brand/product names that actually appear in
+    the collected pool and merge the high-frequency ones the upfront LLM scoping
+    missed into scope['players']. So famous products users keep comparing to (e.g.
+    Loop for sleep earbuds) surface from the DATA, not from guesswork — and because
+    this runs BEFORE curate, those voices get attributed to the new brands.
+    Best-effort: any failure just leaves the scope players unchanged."""
+    def _log(m):
+        print(f"    {m}", flush=True)
+        if log:
+            try: log("COLLECT", m)
+            except Exception: pass
+    players = scope.get("players", []) or []
+    if not pool or len(pool) < 8:
+        return scope
+    existing = {(p.get("id") or "").lower() for p in players}
+    existing |= {(p.get("name") or "").lower() for p in players}
+    titles = [(r.get("title") or "")[:140] for r in pool[:260] if r.get("title")]
+    if len(titles) < 8:
+        return scope
+    sys_msg = ("You extract real consumer PRODUCT / BRAND names from forum post "
+               "titles. Output STRICT JSON only.")
+    user = (f"Product idea / category: {idea}\n\n"
+            "Post titles:\n" + "\n".join("- " + t for t in titles) + "\n\n"
+            "TASK: list the distinct real PRODUCT or BRAND names that appear and that "
+            "a shopper in this category would consider or compare — direct competitors "
+            "AND adjacent alternatives people compare against (even if they don't match "
+            "every adjective of the idea). EXCLUDE generic words, subreddit names, "
+            "feature words, and non-products. Count how many titles mention each.\n"
+            'Return JSON: {"brands":[{"name":"<Brand/Product>","count":<int>}]}')
+    try:
+        res = chat_json(sys_msg, user, temperature=0.2, max_tokens=1500)
+    except Exception as e:
+        _log(f"品牌挖掘跳过(LLM 失败): {e}")
+        return scope
+    found = res.get("brands", []) or []
+    import re as _re
+    MAX_PLAYERS, MIN_MENTIONS = 14, 3
+    new = []
+    for b in sorted(found, key=lambda x: -(int(x.get("count") or 0))):
+        if len(players) + len(new) >= MAX_PLAYERS:
+            break
+        name = (b.get("name") or "").strip()
+        if not name or int(b.get("count") or 0) < MIN_MENTIONS:
+            continue
+        sid = _re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")[:30]
+        if not sid or name.lower() in existing or sid in existing:
+            continue
+        existing.add(name.lower()); existing.add(sid)
+        new.append({"id": sid, "name": name, "price": ""})
+    if new:
+        scope["players"] = players + new
+        save(wd / "01-scope.json", scope)
+        _log("从真实原声补充高频品牌:" + "、".join(p["name"] for p in new))
+    return scope
 
 
 def read_jsonl(path: Path, *, source: str) -> list[dict]:
@@ -534,7 +606,9 @@ Keep up to {min(max_voices, 160)} items, fair not stingy — real on-topic items
             continue
         r = pool[idx]
         rel = int(k.get("relevance", 1) or 1)
-        player = k.get("player") if k.get("player") in player_ids else (player_ids[0] if player_ids else "other")
+        # Unattributed / "other" voices stay "other" — do NOT dump them onto the
+        # first player (that falsely inflated the leading brand to ~90% share).
+        player = k.get("player") if k.get("player") in player_ids else "other"
         recon.append({
             "id": "", "player": player,
             "title": (r.get("title") or "")[:120],
@@ -573,8 +647,7 @@ Keep up to {min(max_voices, 160)} items, fair not stingy — real on-topic items
             have.add(u)
             title = (r.get("title") or "")[:120]
             tl = title.lower()
-            pl = next((pid for pid in player_ids if pid and pid in tl),
-                      player_ids[0] if player_ids else "other")
+            pl = next((pid for pid in player_ids if pid and pid in tl), "other")
             voices.append({
                 "id": "", "player": pl, "title": title,
                 "score": int(r.get("score") or 0), "url": u,
@@ -755,6 +828,72 @@ PALETTE = {
 }
 
 
+def attribute_voices_by_name(players: list[dict], voices: list[dict]):
+    """Deterministic brand attribution: a voice left 'other' by the LLM but whose
+    TITLE clearly names exactly one tracked brand gets credited to that brand (the
+    LLM under-credits). Only fills 'other' (never overrides a positive call); skips
+    titles that name two+ brands (ambiguous 'X vs Y' comparisons). Word-boundary
+    match on each brand's distinctive leading token."""
+    import re as _re
+    STOP = {"the", "app", "sleep", "earplugs", "earplug", "earbuds", "earbud",
+            "buds", "pillow", "soft", "noise", "white", "basics", "pro", "plus"}
+    def lead_token(name):
+        ts = [w for w in _re.sub(r"[^a-z0-9 ]", " ", (name or "").lower()).split()
+              if len(w) >= 3 and w not in STOP]
+        return ts[0] if ts else None
+    pmatch = [(p.get("id"), lead_token(p.get("name"))) for p in players]
+    for v in voices:
+        if v.get("player") not in ("other", None, ""):
+            continue
+        title = (v.get("title") or "").lower()
+        hits = [pid for pid, tok in pmatch
+                if tok and _re.search(r"\b" + _re.escape(tok) + r"\b", title)]
+        if len(set(hits)) == 1:
+            v["player"] = hits[0]
+    return voices
+
+
+def merge_brand_variants(players: list[dict], voices: list[dict]):
+    """Collapse near-duplicate players to one entry PER BRAND, e.g.
+    'Loop Quiet' / 'Loop' → 'Loop', 'Mack's Pillow Soft Earplugs' / 'Mack's' →
+    'Mack's'. A player is a variant of another when one's word-tokens are a prefix
+    of the other's (so 'Soundcore Sleep A30' vs 'A10' stay separate). The kept
+    canonical is the one with the most voices (tie → fewer words); the others'
+    voices are reassigned to it. Returns (deduped_players, voices)."""
+    import re as _re
+    def toks(s):
+        return [t for t in _re.sub(r"[^a-z0-9 ]", " ", (s or "").lower()).split() if t]
+    cnt = {}
+    for v in voices:
+        cnt[v.get("player")] = cnt.get(v.get("player"), 0) + 1
+    order = sorted(players, key=lambda p: (-cnt.get(p.get("id"), 0), len(toks(p.get("name")))))
+    kept, kept_toks, remap = [], [], {}
+    def same_brand(a, b):
+        n = min(len(a), len(b))
+        if n == 0:
+            return False
+        if a[:n] == b[:n]:                 # one is a prefix of the other ('Loop' ⊂ 'Loop Quiet')
+            return True
+        # same ≥2-token brand line differing only in a trailing model code
+        # ('Soundcore Sleep A10' vs 'A30'); guards against 'Loop Quiet' vs 'Loop Dream'
+        return len(a) == len(b) >= 3 and a[:-1] == b[:-1]
+    for p in order:
+        pt = toks(p.get("name"))
+        canon = None
+        for kt, kid in kept_toks:
+            if same_brand(pt, kt):
+                canon = kid; break
+        if canon:
+            remap[p.get("id")] = canon
+        else:
+            kept.append(p); kept_toks.append((pt, p.get("id")))
+    for v in voices:
+        if v.get("player") in remap:
+            v["player"] = remap[v["player"]]
+    kept_ids = {p.get("id") for p in kept}
+    return [p for p in players if p.get("id") in kept_ids], voices
+
+
 def stage_assemble(slug: str, idea: str, target_market: str, scope: dict,
                    voices: list[dict], cluster: dict, synth: dict,
                    demand: dict | None = None) -> dict:
@@ -762,7 +901,11 @@ def stage_assemble(slug: str, idea: str, target_market: str, scope: dict,
     today = datetime.date.today().isoformat()
 
     # Players with layout positions (spread on a circle)
+    # Collapse near-duplicate brands first (e.g. 'Loop Quiet' + 'Loop' → 'Loop'),
+    # reassigning their voices, so the brand table shows one row per real brand.
     players_in = scope.get("players", [])
+    voices = attribute_voices_by_name(players_in, voices)   # credit explicit brand mentions
+    players_in, voices = merge_brand_variants(players_in, voices)
     import math
     players = []
     n = max(1, len(players_in))
@@ -1039,6 +1182,9 @@ def main() -> int:
 
     print("▶ COLLECT")
     pool = stage_collect(scope, wd, args.skip_collect or args.dry_run)
+
+    if not args.dry_run:
+        scope = stage_discover_brands(idea, scope, pool, wd, args.dry_run)
 
     print("▶ CURATE")
     voices = stage_curate(idea, scope, pool, wd, args.max_voices, args.dry_run)

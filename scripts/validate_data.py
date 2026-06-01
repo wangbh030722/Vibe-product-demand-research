@@ -106,9 +106,11 @@ def check_cross_refs(data: dict[str, Any]) -> list[str]:
     opp_id     = data.get("opportunity", {}).get("id")
     all_ids    = player_ids | theme_ids | voice_ids | ({opp_id} if opp_id else set())
 
-    # 1. Voice.player must reference an existing player
+    # 1. Voice.player must reference an existing player, or the "other" bucket
+    # (a real voice not about any specific tracked brand — kept in the corpus but
+    # not attributed to a player, so it never inflates a brand's share).
     for v in data.get("voices", []):
-        if v["player"] not in player_ids:
+        if v["player"] != "other" and v["player"] not in player_ids:
             errors.append(
                 f"[xref] voice {v['id']!r}.player = {v['player']!r} → not in players[]"
             )
