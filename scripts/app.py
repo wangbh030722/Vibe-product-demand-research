@@ -174,6 +174,22 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
     except Exception as e:
         log("TRANSLATE", f"跳过英文回填:{e}")
 
+    # Pre-render the self-contained HTML to dist/<slug>.html so the report has a
+    # PERSISTENT, SHAREABLE URL (plan A). Frontend then opens that URL in a new
+    # tab, leaving the search page intact so users can generate another report.
+    try:
+        log("RENDER", "渲染静态报告…")
+        tpl_path = ROOT / "templates" / "lens-report-template.html"
+        dist_path = ROOT / "dist" / f"{slug}.html"
+        dist_path.parent.mkdir(parents=True, exist_ok=True)
+        tpl = tpl_path.read_text(encoding="utf-8")
+        html = tpl.replace("{{REPORT_DATA_JSON}}",
+                           json.dumps(data, ensure_ascii=False))
+        dist_path.write_text(html, encoding="utf-8")
+        data["_report_url"] = f"/dist/{slug}.html"
+    except Exception as e:
+        log("RENDER", f"渲染静态报告失败(报告仍可用): {e}")
+
     return data
 
 
@@ -316,6 +332,21 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   @keyframes breathe{0%,100%{opacity:1}50%{opacity:.72}}
   .prog-elapsed{font-family:var(--mono);font-size:10px;color:var(--ink-3);text-align:right;margin-top:10px;letter-spacing:.06em}
   .hint{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:26px;line-height:1.7;border-top:1px solid var(--line);padding-top:18px}
+  /* recent-reports panel (plan B) */
+  .recent{margin-top:30px;border-top:1px solid var(--line);padding-top:18px}
+  .recent-h{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);
+    font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase;margin-bottom:10px}
+  .recent-h a{color:var(--ink-3);text-decoration:none;cursor:pointer;font-size:14px;line-height:1;padding:2px 6px;border-radius:6px}
+  .recent-h a:hover{background:var(--surface);color:var(--accent)}
+  .recent-list{display:flex;flex-direction:column;gap:6px}
+  .recent-list a{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    padding:9px 12px;border:1px solid rgba(255,255,255,.7);border-radius:9px;
+    background:rgba(255,255,255,.55);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);
+    box-shadow:0 4px 14px -8px rgba(40,45,40,.16);
+    text-decoration:none;color:var(--ink);font-size:14px;transition:border-color .15s,background .15s}
+  .recent-list a:hover{border-color:var(--accent);background:rgba(236,243,239,.78)}
+  .recent-list .r-idea{font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+  .recent-list .r-meta{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap;flex:none}
   .samples{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
   .samples button{width:auto;margin:0;background:rgba(255,255,255,.7);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border:1px solid rgba(255,255,255,.9);color:var(--ink-2);font-size:12px;padding:6px 12px;border-radius:999px;font-family:var(--sans);font-weight:500;box-shadow:0 4px 14px -8px rgba(40,45,40,.22)}
   .samples button:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
@@ -398,12 +429,39 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     <div class="prog-elapsed" id="elapsed"></div>
   </div>
 
-  <div class="hint">默认用站点配置的 key · 生成的数据存到 data/&lt;slug&gt;.json · 报告内可切换语言 / 导出 PDF / 导出原文</div>
+  <!-- plan B: recently generated reports -->
+  <div class="recent" id="recentWrap" hidden>
+    <div class="recent-h"><span>最近生成的报告 / Recent reports</span><a id="recentRefresh" title="刷新">↻</a></div>
+    <div class="recent-list" id="recentList"></div>
+  </div>
+
+  <div class="hint">默认用站点配置的 key · 报告生成后自动保存,可分享链接 · 报告内可切换语言 / 导出 PDF / 导出原文</div>
 </div>
 
 <script>
   const $ = id => document.getElementById(id);
   document.querySelectorAll('.samples button').forEach(b => b.onclick = () => $('idea').value = b.dataset.s);
+
+  // plan B: load + render the "recent reports" list. Server-side history (from
+  // dist/<slug>.html + data/<slug>.json), so it's the same view for everyone using
+  // this site. Quiet failure if /api/recent isn't available.
+  const _esc = s => String(s||'').replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;"}[c]));
+  async function loadRecent(){
+    try {
+      const r = await fetch('/api/recent', { cache: 'no-store' });
+      if (!r.ok) return;
+      const { items } = await r.json();
+      if (!items || !items.length) return;
+      const wrap = $('recentWrap'); const list = $('recentList');
+      list.innerHTML = items.map(it => `<a href="${_esc(it.url)}" target="_blank" rel="noopener">
+        <span class="r-idea">${_esc(it.idea)}</span>
+        <span class="r-meta">${_esc(it.target_market)} · ${_esc(it.timestamp)}</span>
+      </a>`).join('');
+      wrap.hidden = false;
+    } catch {}
+  }
+  document.getElementById('recentRefresh').addEventListener('click', e => { e.preventDefault(); loadRecent(); });
+  loadRecent();
 
   // Cursor-following glow: reveal the fluorescent-outline layer in a soft circle
   // around the pointer. rAF-throttled; fades in/out on enter/leave.
@@ -509,12 +567,23 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
       if (errMsg) { setError(lastTag, errMsg); $('go').disabled=false; $('go').textContent='重试 →'; return; }
       if (!finalData) { setError(lastTag, '未收到结果,请重试'); $('go').disabled=false; $('go').textContent='重试 →'; return; }
 
-      // RENDER step (frontend)
-      setActive('RENDER', '加载模板…');
-      const tpl = await fetch('/templates/lens-report-template.html').then(x=>x.text());
+      // Plan A: report is already a self-contained HTML at _report_url. Open it in
+      // a NEW TAB so the search page stays open — user can keep generating others.
+      // Fallback if backend rendering didn't run: fetch the template and write inline.
+      setActive('RENDER', '渲染报告…');
       allDone();
-      const filled = tpl.replace('{{REPORT_DATA_JSON}}', () => JSON.stringify(finalData));
-      document.open(); document.write(filled); document.close();
+      const url = finalData._report_url;
+      if (url) {
+        window.open(url, '_blank', 'noopener');
+        // briefly show a "done — opened in new tab" state, then reset the form for
+        // another run instead of hijacking the page.
+        $('go').disabled = false; $('go').textContent = '报告已在新标签打开 ↗ — 再生成一份 →';
+        setTimeout(() => { $('prog').className = 'prog'; $('go').textContent = '开始研究 →'; loadRecent(); }, 1800);
+      } else {
+        const tpl = await fetch('/templates/lens-report-template.html').then(x=>x.text());
+        const filled = tpl.replace('{{REPORT_DATA_JSON}}', () => JSON.stringify(finalData));
+        document.open(); document.write(filled); document.close();
+      }
     } catch(e){
       clearInterval(elapsedTimer);
       $('stop').style.display = 'none';
@@ -548,6 +617,31 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path in ("/", "/index.html"):
             return self._send(200, FORM_HTML)
+        # /api/recent — list previously generated reports (plan B): scans dist/ for
+        # ready-to-serve report HTMLs and reads each one's idea + timestamp from the
+        # matching data/<slug>.json. Best-effort; tiny payload.
+        if path == "/api/recent":
+            items = []
+            for d in sorted((ROOT / "dist").glob("*.html"),
+                            key=lambda p: p.stat().st_mtime, reverse=True):
+                slug = d.stem
+                if slug in ("_template", "index"):
+                    continue
+                j = ROOT / "data" / f"{slug}.json"
+                if not j.exists():
+                    continue
+                try:
+                    meta = json.loads(j.read_text(encoding="utf-8")).get("meta", {})
+                    items.append({"slug": slug, "url": f"/dist/{slug}.html",
+                                  "idea": meta.get("idea", slug),
+                                  "timestamp": meta.get("timestamp", ""),
+                                  "target_market": meta.get("target_market", "")})
+                except Exception:
+                    continue
+                if len(items) >= 12:
+                    break
+            return self._send(200, json.dumps({"items": items}, ensure_ascii=False),
+                              "application/json")
         # serve dist/ + templates/ static
         for prefix, base in (("/dist/", ROOT / "dist"), ("/templates/", ROOT / "templates"), ("/data/", ROOT / "data")):
             if path.startswith(prefix):
