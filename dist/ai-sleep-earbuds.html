@@ -5034,21 +5034,45 @@
         <line x1="${midX.toFixed(1)}" y1="${padT}" x2="${midX.toFixed(1)}" y2="${padT+iH}" stroke="#e6e2db" stroke-width="1"/>
         <line x1="${padL}" y1="${midY.toFixed(1)}" x2="${padL+iW}" y2="${midY.toFixed(1)}" stroke="#e6e2db" stroke-width="1"/>
         <text x="${(padL+iW-8).toFixed(1)}" y="${(padT+iH-8).toFixed(1)}" font-size="11" fill="#006c47" text-anchor="end" font-weight="700">★ ${L('空白机会','White space')}</text>`;
-      const bubbles = mThemes.map(m => {
+      // 1) initial positions from the data
+      const nodes = mThemes.map(m => {
         const r = 6 + (m.n/maxN)*13;
-        // clamp the whole bubble inside the plotting area
-        let x = Math.min(Math.max(xAt(m.demand), padL + r), padL + iW - r);
-        let y = Math.min(Math.max(yAt(m.satis),   padT + r), padT + iH - r);
-        const col = m.t.polarity==='pain' ? '168,54,42' : (m.t.polarity==='win' ? '10,107,67' : '140,139,128');
-        // label above the bubble; flip below if it would clip the top edge
-        const above = (y - r - 6) > (padT + 4);
-        const ly = above ? (y - r - 5) : (y + r + 13);
-        // flip text-anchor near the left/right edges so long labels stay inside
-        let anchor='middle', lx=x;
-        if (x < padL + 64){ anchor='start'; lx = padL + 1; }
-        else if (x > padL + iW - 64){ anchor='end'; lx = padL + iW - 1; }
-        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="rgba(${col},0.45)" stroke="rgba(${col},0.95)" stroke-width="1.5"/>
-          <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="11" fill="#444933" text-anchor="${anchor}">${esc(tf(m.t,'label'))}</text>`;
+        return { r, label: esc(tf(m.t,'label')),
+          col: m.t.polarity==='pain' ? '168,54,42' : (m.t.polarity==='win' ? '10,107,67' : '140,139,128'),
+          x: Math.min(Math.max(xAt(m.demand), padL+r), padL+iW-r),
+          y: Math.min(Math.max(yAt(m.satis),   padT+r), padT+iH-r) };
+      });
+      // 2) de-overlap the circles (relaxation): push apart any pair closer than
+      //    r1+r2+GAP, then clamp back inside the plot. Keeps bubbles legible when
+      //    many themes share similar volume/satisfaction (they used to pile up).
+      const GAP = 16;
+      for (let it=0; it<140; it++) {
+        for (let a=0; a<nodes.length; a++) for (let b=a+1; b<nodes.length; b++) {
+          const A=nodes[a], B=nodes[b];
+          let dx=B.x-A.x, dy=B.y-A.y, d=Math.hypot(dx,dy)||0.01, min=A.r+B.r+GAP;
+          if (d<min) { const p=(min-d)/2, ux=dx/d, uy=dy/d;
+            A.x-=ux*p; A.y-=uy*p; B.x+=ux*p; B.y+=uy*p; }
+        }
+        for (const n of nodes) { n.x=Math.min(Math.max(n.x,padL+n.r),padL+iW-n.r);
+          n.y=Math.min(Math.max(n.y,padT+n.r),padT+iH-n.r); }
+      }
+      // 3) labels: place above, else below; greedily avoid overlapping earlier
+      //    labels by flipping/keeping whichever box is free (rough width estimate;
+      //    CJK chars are wide so weight them ~11px, latin ~6.5px).
+      const lblW = s => [...s].reduce((w,c)=> w + (c.charCodeAt(0)>255?11:6.5), 0);
+      const placed = [];
+      const bubbles = nodes.map(n => {
+        const lw=lblW(n.label), lh=13;
+        let anchor='middle', lx=n.x, x1=n.x-lw/2, x2=n.x+lw/2;
+        if (n.x < padL+lw/2+4) { anchor='start'; lx=padL+1; x1=lx; x2=lx+lw; }
+        else if (n.x > padL+iW-lw/2-4) { anchor='end'; lx=padL+iW-1; x1=lx-lw; x2=lx; }
+        const hit = ly => placed.some(p => x1<p.x2 && x2>p.x1 && (ly-lh)<p.y2 && ly>p.y1);
+        const aboveY = n.y-n.r-5, belowY = n.y+n.r+12;
+        let ly = (aboveY-lh > padT+2 && !hit(aboveY)) ? aboveY
+               : (!hit(belowY) ? belowY : (aboveY-lh > padT+2 ? aboveY : belowY));
+        placed.push({x1, x2, y1:ly-lh, y2:ly});
+        return `<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${n.r.toFixed(1)}" fill="rgba(${n.col},0.45)" stroke="rgba(${n.col},0.95)" stroke-width="1.5"/>
+          <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="11" fill="#444933" text-anchor="${anchor}">${n.label}</text>`;
       }).join('');
       const axes = `
         <text x="${padL}" y="${(padT+iH+32).toFixed(1)}" font-size="11" font-family="var(--mono)" fill="#747a60">${L('讨论热度 →','Discussion volume →')}</text>

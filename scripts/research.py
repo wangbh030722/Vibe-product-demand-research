@@ -439,7 +439,7 @@ def stage_discover_brands(idea: str, scope: dict, pool: list[dict], wd: Path,
         return scope
     existing = {(p.get("id") or "").lower() for p in players}
     existing |= {(p.get("name") or "").lower() for p in players}
-    titles = [(r.get("title") or "")[:140] for r in pool[:260] if r.get("title")]
+    titles = [(r.get("title") or "")[:130] for r in pool[:180] if r.get("title")]
     if len(titles) < 8:
         return scope
     sys_msg = ("You extract real consumer PRODUCT / BRAND names from forum post "
@@ -455,7 +455,9 @@ def stage_discover_brands(idea: str, scope: dict, pool: list[dict], wd: Path,
             "(e.g. loopearplugs.com), else '' — do NOT guess.\n"
             'Return JSON: {"brands":[{"name":"<Brand/Product>","count":<int>,"website":"<domain or \'\'>"}]}')
     try:
-        res = chat_json(sys_msg, user, temperature=0.2, max_tokens=1500)
+        # bigger output budget — at 1500 the brand list hit finish_reason=length and
+        # came back empty (json-mode truncation) on a real run.
+        res = chat_json(sys_msg, user, temperature=0.2, max_tokens=4000, timeout=150)
     except Exception as e:
         _log(f"品牌挖掘跳过(LLM 失败): {e}")
         return scope

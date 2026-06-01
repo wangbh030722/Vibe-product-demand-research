@@ -343,7 +343,7 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   <h1>产品需求研究 Agent</h1>
 
   <p class="basis">以 <span class="n">999</span> 条 Reddit 真实用户原声为依据 · 每个结论都可溯源到原帖</p>
-  <p class="deck">输入一个产品想法 → 自动联网深搜真实用户原声 → 出一份可交互的洞察报告。约 1–2 分钟。</p>
+  <p class="deck">输入一个产品想法 → 自动联网深搜真实用户原声 → 出一份可交互的洞察报告。约 5 分钟。</p>
   <div class="topline">
     <div class="cases-label">查看案例 / Sample reports</div>
     <div class="case-grid">
