@@ -505,8 +505,11 @@ SPECIAL CASE — only if the idea EXPLICITLY combines two distinct domains
 intersection for a 3, single-domain caps at 1. For ordinary single-concept
 products, score normally.
 
-Keep up to {max_voices*2} items, fair not stingy — real on-topic items are 2-3."""
-    res = chat_json(sys, user, temperature=0.2, max_tokens=7000)
+Keep up to {min(max_voices, 160)} items, fair not stingy — real on-topic items are 2-3."""
+    # Bound the keep-list so the JSON output can't overflow the model's max output
+    # tokens — when it does, json-mode providers (e.g. DeepSeek) return EMPTY content,
+    # which surfaced as "LLM returned non-JSON (char 0)" on the hosted deploy.
+    res = chat_json(sys, user, temperature=0.2, max_tokens=8000)
     keep = res.get("keep", [])
 
     # Reconstruct voices from the pool by index (titles/urls never altered by LLM).
