@@ -466,9 +466,10 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
 
     # rank: keyword hits first, then score
     ranked = sorted(pool, key=lambda r: (kw_hits(r), abs(r.get("score") or 0)), reverse=True)
-    # Output is index-only (tiny) so we can afford a big candidate window —
-    # evaluate up to 300 candidates so more of the pool can be kept.
-    over = min(len(ranked), 300)
+    # Output is index-only (tiny) so we can afford a wide candidate window, but keep
+    # the request small enough to finish reliably from a remote host (cross-border
+    # latency to some LLM providers makes huge requests time out / return empty).
+    over = min(len(ranked), 200)
     indexed = [{"i": i, "t": (r.get("title") or "")[:120], "s": r.get("score") or 0,
                 "sub": r.get("subreddit", "")} for i, r in enumerate(ranked[:over])]
     pool = ranked  # reconstruct voices from this same ranked order
@@ -509,8 +510,16 @@ Keep up to {min(max_voices, 160)} items, fair not stingy — real on-topic items
     # Bound the keep-list so the JSON output can't overflow the model's max output
     # tokens — when it does, json-mode providers (e.g. DeepSeek) return EMPTY content,
     # which surfaced as "LLM returned non-JSON (char 0)" on the hosted deploy.
-    res = chat_json(sys, user, temperature=0.2, max_tokens=8000)
-    keep = res.get("keep", [])
+    # CRITICAL: never let a flaky LLM call kill the whole run. If curation fails
+    # (cross-border timeout, empty content, etc.), fall back to the keyword-ranked
+    # pool below — a real, on-topic selection — instead of crashing at stage 3.
+    try:
+        res = chat_json(sys, user, temperature=0.2, max_tokens=8000, timeout=180)
+        keep = res.get("keep", [])
+    except Exception as e:
+        print(f"    ! curate LLM failed ({e}); falling back to keyword-ranked selection",
+              file=sys.stderr)
+        keep = []
 
     # Reconstruct voices from the pool by index (titles/urls never altered by LLM).
     recon = []
