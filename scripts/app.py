@@ -233,10 +233,11 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
     --mono:'Inter','Noto Sans SC',ui-monospace,monospace;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
-  /* device-outline texture as a faint 50%-opacity backdrop behind everything */
-  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:url('/dist/bg-devices.jpg') center center / cover no-repeat;opacity:.5;}
+  html{background:#fff}
+  /* device-outline texture at 50% (white veil over the image, fixed so it doesn't scroll) */
+  body{margin:0;color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
+    background:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.5)),
+               url('/dist/bg-devices.jpg') center center / cover no-repeat fixed;}
   .wrap{max-width:820px;margin:0 auto;padding:84px 40px 110px;position:relative;z-index:1}
   .brand{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase}
   h1{font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-.02em;margin:10px 0 10px;line-height:1.12}
