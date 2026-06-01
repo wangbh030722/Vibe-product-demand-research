@@ -92,27 +92,42 @@ def chat_json(system: str, user: str, *, temperature: float = 0.3,
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read())
 
-    # Order: direct curl (domestic LLM) → proxied curl (foreign LLM) → urllib.
-    payload = via_curl(direct=True) or via_curl(direct=False)
-    if payload is None:
+    # Retry a few times: from a foreign datacenter (e.g. Render → DeepSeek) the
+    # API intermittently returns empty content or a transient error, and json-mode
+    # providers return EMPTY when the output is cut at max_tokens. Retrying (with a
+    # short backoff) clears the transient cases; persistent ones surface a clear
+    # error that includes finish_reason so truncation is obvious.
+    import time as _time
+    last = "unknown"
+    for attempt in range(3):
+        # Order: direct curl (domestic LLM) → proxied curl (foreign LLM) → urllib.
+        payload = via_curl(direct=True) or via_curl(direct=False)
+        if payload is None:
+            try:
+                payload = via_urllib()
+            except Exception as e:
+                last = f"request failed: {e}"
+                _time.sleep(1.5 * (attempt + 1)); continue
+        if "choices" not in payload:
+            last = f"abnormal response: {json.dumps(payload)[:300]}"
+            _time.sleep(1.5 * (attempt + 1)); continue
+        choice = payload["choices"][0] or {}
+        fr = choice.get("finish_reason")
+        text = ((choice.get("message") or {}).get("content") or "").strip()
+        # Some providers wrap JSON in ```json fences despite response_format
+        if text.startswith("```"):
+            text = text.split("```", 2)[1]
+            if text.startswith("json"):
+                text = text[4:]
+            text = text.strip()
+        if not text:
+            last = f"empty content (finish_reason={fr})"
+            print(f"    ! LLM empty content (finish_reason={fr}), retry {attempt+1}/3", file=sys.stderr)
+            _time.sleep(1.5 * (attempt + 1)); continue
         try:
-            payload = via_urllib()
-        except Exception as e:
-            raise RuntimeError(
-                f"LLM 请求失败(curl 直连/代理 + urllib 都不通): {e}. "
-                f"检查 {base_url} 是否可达、key 是否有效、代理设置。"
-            ) from e
-    if "choices" not in payload:
-        raise RuntimeError(f"LLM 返回异常: {json.dumps(payload)[:300]}")
-    text = payload["choices"][0]["message"]["content"]
-    # Some providers wrap JSON in ```json fences despite response_format
-    text = text.strip()
-    if text.startswith("```"):
-        text = text.split("```", 2)[1]
-        if text.startswith("json"):
-            text = text[4:]
-        text = text.strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError as e:
-        raise RuntimeError(f"LLM returned non-JSON ({e}):\n{text[:600]}") from e
+            return json.loads(text)
+        except json.JSONDecodeError as e:
+            last = f"non-JSON ({e}, finish_reason={fr}): {text[:400]}"
+            print(f"    ! LLM non-JSON (finish_reason={fr}), retry {attempt+1}/3", file=sys.stderr)
+            _time.sleep(1.5 * (attempt + 1)); continue
+    raise RuntimeError(f"LLM returned {last}")
