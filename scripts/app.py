@@ -552,23 +552,42 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("X-Accel-Buffering", "no")
         self.end_headers()
 
+        import threading as _thr
+        _wlock = _thr.Lock()
+        def _write(chunk: bytes) -> bool:
+            with _wlock:
+                try:
+                    self.wfile.write(chunk); self.wfile.flush()
+                    return True
+                except (BrokenPipeError, ConnectionResetError, ValueError, OSError):
+                    return False
+
         def sse(event, payload):
-            try:
-                self.wfile.write(f"event: {event}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n".encode("utf-8"))
-                self.wfile.flush()
-            except (BrokenPipeError, ConnectionResetError):
-                pass
+            _write(f"event: {event}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n".encode("utf-8"))
 
         def log(stage, msg):
             print(f"  {stage}: {msg}", flush=True)
             sse("progress", {"stage": stage, "msg": msg})
 
+        # Keepalive: emit an SSE comment every 15s so the connection never goes idle
+        # during the long, silent LLM stages. Without this, the platform/browser cuts
+        # the idle connection and the UI shows "未收到结果". Comments (": ...") are
+        # ignored by the EventSource/stream parser on the client.
+        _stop = _thr.Event()
+        def _heartbeat():
+            while not _stop.wait(15):
+                if not _write(b": keepalive\n\n"):
+                    break
+        _hb = _thr.Thread(target=_heartbeat, daemon=True)
+        _hb.start()
         try:
             data = run_pipeline(idea, market, mode, log=log, creds=creds, target_lang=target_lang)
             sse("done", {"ok": True, "data": data})
         except Exception as e:
             print(f"  ✗ {e}", flush=True)
             sse("error", {"ok": False, "error": str(e)})
+        finally:
+            _stop.set()
 
 
 def main():
