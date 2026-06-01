@@ -102,11 +102,11 @@ def _run_pipeline_inner(idea: str, target_market: str, mode: str | None,
         )
 
     log("CURATE", f"从 {len(pool)} 条相关评论里筛选强相关原声…")
-    # Floor of 99 real voices (padded from the most keyword-relevant pool items
-    # if the LLM keeps fewer), ceiling 150, scaling with pool size. Bounded by
-    # what the pool actually contains.
-    max_voices = max(99, min(150, len(pool) // 2))
-    voices = research.stage_curate(idea, scope, pool, wd, max_voices, False, min_voices=99)
+    # Floor of 100 real voices (tiered padding from the most keyword-relevant CLEAN
+    # pool items — never listings/duplicates — if the LLM keeps fewer), ceiling 150,
+    # scaling with pool size. Bounded by what the clean pool actually contains.
+    max_voices = max(100, min(150, len(pool) // 2))
+    voices = research.stage_curate(idea, scope, pool, wd, max_voices, False, min_voices=100)
     log("CURATE", f"保留 {len(voices)} 条真实原声(从 {len(pool)} 条池子)")
     if not voices:
         raise RuntimeError(
