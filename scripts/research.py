@@ -66,6 +66,32 @@ def _looks_like_listing(title: str) -> bool:
     return False
 
 
+def _sub_of(url: str) -> str:
+    m = re.search(r"/r/([A-Za-z0-9_]+)", url or "")
+    return m.group(1).lower() if m else "other"
+
+def _balance_sources_idx(records: list, limit: int, cap_frac: float = 0.55) -> list:
+    """Source balancing: pick up to `limit` indices from `records` (kept in their
+    existing rank order) but cap any single subreddit at cap_frac of the output, so
+    one community can't dominate (a real run was 99% r/sleep). Overflow from a capped
+    sub is appended only if there's room — quality order is otherwise preserved."""
+    cap = max(1, int(cap_frac * limit))
+    out, used, overflow = [], {}, []
+    for i, r in enumerate(records):
+        if len(out) >= limit:
+            break
+        s = _sub_of(r.get("url"))
+        if used.get(s, 0) < cap:
+            out.append(i); used[s] = used.get(s, 0) + 1
+        else:
+            overflow.append(i)
+    for i in overflow:
+        if len(out) >= limit:
+            break
+        out.append(i)
+    return out
+
+
 def compute_quality(data: dict) -> dict:
     """Post-generation self-check (plan C): scan the FINAL voices for the failure
     modes a tester hit — repeated titles, ad listings, and over-concentration on a
@@ -623,8 +649,13 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
     # the request small enough to finish reliably from a remote host (cross-border
     # latency to some LLM providers makes huge requests time out / return empty).
     over = min(len(ranked), 200)
-    indexed = [{"i": i, "t": (r.get("title") or "")[:120], "s": r.get("score") or 0,
-                "sub": r.get("subreddit", "")} for i, r in enumerate(ranked[:over])]
+    # Source-balanced candidate window: cap any single subreddit at 55% so the LLM
+    # sees a mix of communities (one run was 99% r/sleep), NOT just the dominant one.
+    # The LLM still gates relevance, so balancing the input can't pull in off-topic.
+    cand_idx = _balance_sources_idx(ranked, over, cap_frac=0.55)
+    indexed = [{"i": i, "t": (ranked[i].get("title") or "")[:120],
+                "s": ranked[i].get("score") or 0, "sub": _sub_of(ranked[i].get("url"))}
+               for i in cand_idx]
     pool = ranked  # reconstruct voices from this same ranked order
 
     def build_user(cands):
@@ -731,8 +762,10 @@ Keep every genuinely relevant item in THIS batch (real on-topic items are 2-3); 
         NEG = ("problem", "issue", "broke", "broken", "leak", "disappoint", "return",
                "refund", "worst", "hate", "complaint", "weak", "fail", "stuck",
                "defect", "scam", "avoid", "annoying", "frustrat")
+        # iterate a source-balanced order so the fallback also spans communities
+        ranked_bal = [ranked[i] for i in _balance_sources_idx(ranked, len(ranked), cap_frac=0.55)]
         def _pad(min_kw):
-            for r in ranked:
+            for r in ranked_bal:
                 if len(voices) >= target:
                     break
                 u = r.get("url"); nt = _norm_title(r.get("title"))
