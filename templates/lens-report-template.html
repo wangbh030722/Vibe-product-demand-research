@@ -102,6 +102,15 @@
     background:rgba(253,251,245,.85);padding:3px 10px;border-radius:12px}
   .radar-scanmsg.show{opacity:1}
   .radar-scanmsg b{font-weight:700}
+  /* deep-search progress bar — gives the 30–60s wait a real sense of motion */
+  .radar-progress{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);z-index:8;
+    width:240px;max-width:72%;display:none;flex-direction:column;gap:6px;align-items:center}
+  .radar-progress.show{display:flex}
+  .radar-progress .rprog-label{font-size:11px;color:#006c47;letter-spacing:.3px;background:rgba(253,251,245,.92);
+    padding:3px 11px;border-radius:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .radar-progress .rprog-track{width:100%;height:4px;background:rgba(0,108,71,.16);border-radius:3px;overflow:hidden}
+  .radar-progress .rprog-fill{height:100%;width:0;background:#006c47;border-radius:3px;
+    transition:width .4s ease;box-shadow:0 0 8px rgba(0,108,71,.55)}
   /* ---- detailed-report insight visuals ---- */
   .ins-mode{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;
     color:var(--ink-2);background:var(--surface);border:1px solid var(--line);padding:3px 10px;border-radius:6px;margin-bottom:10px}
@@ -860,6 +869,10 @@
     </div>
     <div class="kg-tooltip" id="kgTip"></div>
     <div class="radar-scanmsg" id="radarScan"></div>
+    <div class="radar-progress" id="radarProg">
+      <div class="rprog-label" id="radarProgLabel"></div>
+      <div class="rprog-track"><div class="rprog-fill" id="radarProgFill"></div></div>
+    </div>
     <div class="radar-controls">
       <button class="radar-btn" id="radarExpand"><span data-i18n="radar.expand">⊕ 扩大扫描范围</span></button>
       <button class="radar-btn ghost" id="radarPause"><span data-i18n="radar.pause">⏸ 暂停</span></button>
@@ -2147,23 +2160,57 @@
   // Appends NEW real voices (no synthetic blips). Static/downloaded reports have
   // no backend → we say so honestly instead of faking data.
   let expanding = false;
+  const _LX = (zh,en) => LANG()==='zh' ? zh : en;
+  function expProg(pct, label){
+    const box = document.getElementById('radarProg'); box.classList.add('show');
+    document.getElementById('radarScan').classList.remove('show');   // hand off from the flash msg
+    if (label != null) document.getElementById('radarProgLabel').textContent = label;
+    if (pct != null) document.getElementById('radarProgFill').style.width = Math.max(0,Math.min(100,pct))+'%';
+  }
+  const expProgHide = () => document.getElementById('radarProg').classList.remove('show');
   document.getElementById('radarExpand').addEventListener('click', async () => {
     if (expanding) return;
     const meta = data.meta || {};
     if (!meta.slug){ flashScan('无法定位报告(缺 slug),无法深搜'); return; }
     const btn = document.getElementById('radarExpand');
     const span = btn.querySelector('span'); const orig = span.textContent;
-    expanding = true; btn.disabled = true; span.textContent = '● 深度搜索中…';
-    flashScan('继续联网深搜真实信号 · 约 30–60s…');
+    expanding = true; btn.disabled = true; span.textContent = _LX('● 深度搜索中…','● Deep searching…');
+    // time-based creep so the bar ALWAYS appears to move (it eases toward 92% and
+    // never completes until the real 'done' arrives); stage labels come from SSE.
+    let pct = 4; expProg(pct, _LX('联网深搜真实信号…','Searching the web for real signals…'));
+    const tw = setInterval(() => { pct += Math.max(0.22,(92-pct)*0.012); expProg(Math.min(92,pct)); }, 360);
+    let added = null, errd = false;
     try {
-      const seen = (data.voices || []).map(v => v.url).filter(Boolean);
       const r = await fetch('/api/expand', { method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ slug: meta.slug, idea: meta.idea, market: meta.target_market,
-          mode: meta.mode, seen_urls: seen }) });
-      if (!r.ok) throw new Error('backend');
-      const res = await r.json();
-      const nv = (res && res.new_voices) || [];
-      if (!nv.length){ flashScan('本轮没有捕获到新的强相关信号 · 可再试一次或换措辞'); return; }
+        body: JSON.stringify({ slug: meta.slug, idea: meta.idea, market: meta.target_market, mode: meta.mode }) });
+      if (!r.ok || !r.body) throw new Error('backend');
+      const reader = r.body.getReader(); const dec = new TextDecoder(); let buf = '';
+      while (true) {
+        const { value, done } = await reader.read(); if (done) break;
+        buf += dec.decode(value, { stream:true }); let sep;
+        while ((sep = buf.indexOf('\n\n')) >= 0) {
+          const chunk = buf.slice(0, sep); buf = buf.slice(sep + 2);
+          const ev = (chunk.match(/^event: (.+)$/m) || [])[1];
+          const dm = (chunk.match(/^data: (.+)$/m) || [])[1];
+          if (!dm) continue; let p; try { p = JSON.parse(dm); } catch { continue; }
+          if (ev === 'progress') { expProg(null, LANG()==='zh' ? (p.msg||'深搜中…') : 'Searching deeper…'); }
+          else if (ev === 'done') { added = p.new_voices || []; }
+          else if (ev === 'error') { errd = p.error || true; }
+        }
+      }
+    } catch (e) { errd = true; }
+    clearInterval(tw);
+    if (errd && added == null) {
+      expProgHide();
+      flashScan('扩大量程需在本地 app 内运行(下载的静态报告无法联网深搜)');
+      expanding = false; btn.disabled = false; span.textContent = orig; return;
+    }
+    const nv = added || [];
+    expProg(100, _LX(`完成 · 新增 ${nv.length} 条`, `Done · +${nv.length}`));
+    setTimeout(expProgHide, 1300);
+    if (!nv.length) {
+      flashScan('本轮没有捕获到新的强相关信号 · 可再试一次或换措辞');
+    } else {
       nv.forEach(v => { data.voices.push(v); nodes[v.id] = Object.assign({ kind:'voice' }, v); });
       if (data.verdict && data.verdict.evidence_counts) data.verdict.evidence_counts.raw_voices = data.voices.length;
       buildBlips(); pickOpp();
@@ -2171,11 +2218,8 @@
       updateRadarHud();
       renderEvidenceCounter(); renderOverview(); renderVoicesScaffold(); renderVoices(); renderFallback();
       flashScan(`⊕ 深搜完成 · 新增 <b>${nv.length}</b> 条真实原声 · 现共 <b>${data.voices.length}</b> 条`);
-    } catch (e) {
-      flashScan('扩大量程需在本地 app 内运行(下载的静态报告无法联网深搜)');
-    } finally {
-      expanding = false; btn.disabled = false; span.textContent = orig;
     }
+    expanding = false; btn.disabled = false; span.textContent = orig;
   });
   document.getElementById('radarPause').addEventListener('click', function(){
     radarPaused = !radarPaused;
@@ -2684,6 +2728,185 @@
     applyState(hashToState());
     setTimeout(() => { suppressHashUpdate = false; }, 30);
   }
+
+  // ============================================================= //
+  //  Floating research pet — context-aware Q&A over the real      //
+  //  voices in THIS report. Idles in the corner, occasionally      //
+  //  nudges you with a localized bubble, opens a small chat that    //
+  //  answers from the embedded voices via /api/ask.                 //
+  // ============================================================= //
+  (function initPet(){
+    const PET = {
+      zh:{ title:'问问这份报告', ph:'基于真实原声提问…', send:'发送', think:'正在翻原声…',
+           greet: n => `我刚读完这 ${n} 条真实用户原声。关于「${IDEA}」想问什么都可以 —— 痛点、对比、机会、谁在抱怨…`,
+           bubbles:['还有更多问题？点我问问 →','想知道用户最常抱怨什么吗？','要不要我帮你对比一下竞品口碑？','点我，基于真实原声答你'],
+           off:'问答需要在线运行(本地或 Render)。报告本身可离线查看。', err:'出错了,稍后再试 🙏' },
+      en:{ title:'Ask this report', ph:'Ask about the real voices…', send:'Send', think:'Reading the voices…',
+           greet: n => `I just read all ${n} real user voices. Ask me anything about “${IDEA}” — pains, comparisons, gaps, who's complaining…`,
+           bubbles:['More questions? Click to ask →','Curious what users complain about most?','Want me to compare the rivals\' reviews?','Click me — answers from real voices'],
+           off:'Q&A needs to run online (local or Render). The report itself works offline.', err:'Something went wrong, try again 🙏' },
+      ja:{ title:'このレポートに質問', ph:'実際の声について質問…', send:'送信', think:'声を読んでいます…',
+           greet: n => `${n} 件のリアルな声を読みました。「${IDEA}」について何でも聞いてください。`,
+           bubbles:['もっと質問は？クリック →','ユーザーの不満を知りたい？','競合の評判を比較しようか？','クリックして実際の声から回答'],
+           off:'Q&A はオンライン環境が必要です。', err:'エラーが発生しました 🙏' },
+      es:{ title:'Pregunta al informe', ph:'Pregunta sobre las voces reales…', send:'Enviar', think:'Leyendo las voces…',
+           greet: n => `Acabo de leer las ${n} voces reales. Pregúntame lo que sea sobre “${IDEA}”.`,
+           bubbles:['¿Más preguntas? Haz clic →','¿Qué es lo que más se queja la gente?','¿Comparo las reseñas de la competencia?','Haz clic — respondo con voces reales'],
+           off:'El Q&A requiere conexión (local o Render).', err:'Algo salió mal, inténtalo de nuevo 🙏' },
+      fr:{ title:'Interroger le rapport', ph:'Posez une question sur les avis…', send:'Envoyer', think:'Lecture des avis…',
+           greet: n => `Je viens de lire les ${n} avis réels. Demandez-moi ce que vous voulez sur « ${IDEA} ».`,
+           bubbles:['D\'autres questions ? Cliquez →','Curieux des plaintes des utilisateurs ?','Je compare les avis des concurrents ?','Cliquez — je réponds avec de vrais avis'],
+           off:'Le Q&A nécessite une connexion (local ou Render).', err:'Une erreur est survenue 🙏' },
+      de:{ title:'Bericht befragen', ph:'Frag nach den echten Stimmen…', send:'Senden', think:'Lese die Stimmen…',
+           greet: n => `Ich habe gerade alle ${n} echten Nutzerstimmen gelesen. Frag mich alles über „${IDEA}".`,
+           bubbles:['Mehr Fragen? Klick mich →','Neugierig, was Nutzer am meisten kritisieren?','Soll ich die Konkurrenz-Reviews vergleichen?','Klick — Antworten aus echten Stimmen'],
+           off:'Q&A braucht eine Online-Verbindung.', err:'Etwas ist schiefgelaufen 🙏' },
+    };
+    const IDEA = (data.meta && data.meta.idea) || '';
+    const L = () => PET[LANG()] || PET.en;
+    const VOICES = (data.voices || []);
+    // compact context for the LLM: title (quote) + sentiment + community
+    const ctx = () => VOICES.map(v => ({ t: v.title || '', s: v.sentiment, sub: subOf(v.url) }))
+                            .filter(v => v.t).slice(0, 140);
+
+    // ---- sprite animation engine (RuntimePet sheet: 8×9 cells of 192×208) ----
+    const SHEET_W = 1536, SHEET_H = 1872, CELL = 192, CELLH = 208, PETW = 96;
+    const scale = PETW / CELL, cw = CELL * scale, ch = CELLH * scale;
+    const ANIM = {
+      idle:    { row:0, d:[280,110,110,140,140,320] },
+      waving:  { row:3, d:[140,140,140,280] },
+      jumping: { row:4, d:[140,140,140,140,280] },
+      failed:  { row:5, d:[140,140,140,140,140,140,140,240] },
+      waiting: { row:6, d:[150,150,150,150,150,260] },
+      review:  { row:8, d:[150,150,150,150,150,280] },
+    };
+    let cur='idle', fi=0, atimer=0, tempUntil=0;
+
+    // ---- styles ----
+    const css = document.createElement('style');
+    css.textContent = `
+    .rp-wrap{position:fixed;right:20px;bottom:18px;z-index:9000;font-family:inherit}
+    @media print{.rp-wrap{display:none!important}}
+    .rp-pet{width:${PETW}px;height:${ch}px;background:url('/assets/pet/spritesheet.webp') no-repeat;
+      background-size:${SHEET_W*scale}px ${SHEET_H*scale}px;cursor:pointer;image-rendering:pixelated;
+      filter:drop-shadow(0 8px 16px rgba(20,40,30,.28));transition:transform .15s;user-select:none;-webkit-user-select:none}
+    .rp-pet:hover{transform:translateY(-3px) scale(1.04)}
+    .rp-pet.rp-hide{display:none}
+    .rp-bubble{position:absolute;right:8px;bottom:${ch+8}px;max-width:210px;background:#0a6b43;color:#fff;
+      font-size:12.5px;line-height:1.5;padding:9px 12px;border-radius:13px 13px 4px 13px;box-shadow:0 10px 26px -10px rgba(10,60,40,.5);
+      cursor:pointer;opacity:0;transform:translateY(6px) scale(.96);transition:opacity .3s,transform .3s;pointer-events:none}
+    .rp-bubble.rp-show{opacity:1;transform:none;pointer-events:auto}
+    .rp-bubble:after{content:'';position:absolute;right:22px;bottom:-6px;border:6px solid transparent;border-top-color:#0a6b43;border-bottom:0}
+    .rp-chat{position:absolute;right:0;bottom:${ch+12}px;width:330px;max-width:calc(100vw - 36px);height:440px;max-height:70vh;
+      background:rgba(255,255,255,.92);backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);
+      border:1px solid rgba(10,107,67,.18);border-radius:16px;box-shadow:0 24px 60px -18px rgba(20,40,30,.4);
+      display:none;flex-direction:column;overflow:hidden}
+    .rp-chat.rp-open{display:flex;animation:rpIn .22s ease both}
+    @keyframes rpIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+    .rp-head{display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid rgba(10,107,67,.12);
+      background:rgba(10,107,67,.05)}
+    .rp-head .rp-h-ic{width:8px;height:8px;border-radius:50%;background:#0a6b43;flex:none}
+    .rp-head .rp-h-t{flex:1;font-size:13px;font-weight:700;color:#0a3a26;letter-spacing:.01em}
+    .rp-head .rp-x{cursor:pointer;color:#5a6b62;font-size:18px;line-height:1;border:0;background:none;padding:2px 4px}
+    .rp-head .rp-x:hover{color:#0a6b43}
+    .rp-msgs{flex:1;overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:9px}
+    .rp-msg{max-width:86%;font-size:13px;line-height:1.55;padding:8px 11px;border-radius:12px;white-space:pre-wrap;word-break:break-word}
+    .rp-msg.me{align-self:flex-end;background:#0a6b43;color:#fff;border-bottom-right-radius:4px}
+    .rp-msg.bot{align-self:flex-start;background:#eef3f0;color:#142b22;border-bottom-left-radius:4px}
+    .rp-msg.think{color:#5a6b62;font-style:italic;background:#f1f5f3}
+    .rp-foot{display:flex;gap:7px;padding:10px;border-top:1px solid rgba(10,107,67,.12)}
+    .rp-foot textarea{flex:1;resize:none;border:1px solid rgba(10,107,67,.2);border-radius:10px;padding:8px 10px;
+      font-size:13px;font-family:inherit;line-height:1.4;max-height:80px;color:#142b22;background:#fff;outline:none}
+    .rp-foot textarea:focus{border-color:#0a6b43;box-shadow:0 0 0 3px rgba(10,107,67,.12)}
+    .rp-foot button{flex:none;border:0;background:#0a6b43;color:#fff;border-radius:10px;padding:0 14px;font-size:13px;
+      font-weight:700;cursor:pointer;font-family:inherit}
+    .rp-foot button:hover{background:#085536}.rp-foot button:disabled{opacity:.5;cursor:default}
+    @media(max-width:640px){.rp-wrap{display:none!important}}   /* phones: no desk-pet */
+    `;
+    document.head.appendChild(css);
+
+    // ---- DOM ----
+    const wrap = document.createElement('div'); wrap.className = 'rp-wrap';
+    wrap.innerHTML = `
+      <div class="rp-chat" id="rpChat">
+        <div class="rp-head"><span class="rp-h-ic"></span><span class="rp-h-t" id="rpTitle"></span>
+          <button class="rp-x" id="rpClose" aria-label="close">×</button></div>
+        <div class="rp-msgs" id="rpMsgs"></div>
+        <div class="rp-foot"><textarea id="rpIn" rows="1"></textarea><button id="rpSend"></button></div>
+      </div>
+      <div class="rp-bubble" id="rpBubble"></div>
+      <div class="rp-pet" id="rpPet" title=""></div>`;
+    document.body.appendChild(wrap);
+    const $pet=wrap.querySelector('#rpPet'), $bubble=wrap.querySelector('#rpBubble'),
+          $chat=wrap.querySelector('#rpChat'), $msgs=wrap.querySelector('#rpMsgs'),
+          $in=wrap.querySelector('#rpIn'), $send=wrap.querySelector('#rpSend'),
+          $title=wrap.querySelector('#rpTitle'), $close=wrap.querySelector('#rpClose');
+
+    // hide the pet entirely if the sprite can't load (e.g. opened as a bare file)
+    const probe = new Image();
+    probe.onerror = () => { wrap.style.display='none'; };
+    probe.src = '/assets/pet/spritesheet.webp';
+
+    // ---- animation ----
+    function setFrame(){ const a=ANIM[cur]||ANIM.idle; $pet.style.backgroundPosition=`${-fi*cw}px ${-a.row*ch}px`; }
+    function play(name,restart){ if(!ANIM[name]) name='idle'; if(restart||cur!==name){cur=name;fi=0;}
+      clearTimeout(atimer); setFrame(); const a=ANIM[cur];
+      atimer=setTimeout(()=>{ fi=(fi+1)%a.d.length;
+        if(tempUntil && Date.now()>tempUntil){ tempUntil=0; cur=thinking?'review':'idle'; fi=0; }
+        play(cur); }, a.d[fi]||160); }
+    function playTemp(name,ms){ tempUntil=Date.now()+ms; play(name,true); }
+    let thinking=false;
+    play('idle');
+
+    // ---- localization refresh (follows the report language toggle) ----
+    function relang(){ const t=L(); $title.textContent=t.title; $in.placeholder=t.ph; $send.textContent=t.send;
+      $pet.title=t.bubbles[0]; }
+    relang();
+    new MutationObserver(relang).observe(document.body,{attributes:true,attributeFilter:['data-lang']});
+
+    // ---- bubble nudges ----
+    let bIdx=0, bTimer=0;
+    function showBubble(){ if($chat.classList.contains('rp-open')) return;
+      const arr=L().bubbles; $bubble.textContent=arr[bIdx%arr.length]; bIdx++;
+      $bubble.classList.add('rp-show'); playTemp('review',1900);   // a "thinking" beat as it nudges
+      clearTimeout(bTimer); bTimer=setTimeout(()=>$bubble.classList.remove('rp-show'),6500); }
+    // rotate a fresh nudge roughly every 20s
+    function scheduleBubble(){ setTimeout(()=>{ showBubble(); scheduleBubble(); }, 20000); }
+    // first nudge soon after the report opens / user starts scrolling
+    let firstNudge=false;
+    const nudgeSoon=()=>{ if(firstNudge) return; firstNudge=true; setTimeout(showBubble, 1200); };
+    setTimeout(nudgeSoon, 3000);
+    window.addEventListener('scroll', nudgeSoon, { once:true, passive:true });
+    scheduleBubble();
+
+    // ---- chat ----
+    const history=[]; let greeted=false, busy=false;
+    function addMsg(text,who){ const d=document.createElement('div'); d.className='rp-msg '+who; d.textContent=text;
+      $msgs.appendChild(d); $msgs.scrollTop=$msgs.scrollHeight; return d; }
+    function openChat(){ $bubble.classList.remove('rp-show'); $chat.classList.add('rp-open'); playTemp('jumping',1200);
+      if(!greeted){ greeted=true; addMsg(L().greet(VOICES.length),'bot'); } setTimeout(()=>$in.focus(),120); }
+    function closeChat(){ $chat.classList.remove('rp-open'); }
+    async function ask(){ const q=$in.value.trim(); if(!q||busy) return;
+      busy=true; $send.disabled=true; addMsg(q,'me'); history.push({role:'user',content:q}); $in.value='';
+      const tip=addMsg(L().think,'think'); thinking=true; play('review',true);
+      try{
+        const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ idea:IDEA, lang:LANG(), question:q, history:history.slice(0,-1), voices:ctx() })});
+        const j=await r.json().catch(()=>null);
+        tip.remove();
+        if(j && j.ok && j.answer){ addMsg(j.answer,'bot'); history.push({role:'assistant',content:j.answer}); }
+        else { addMsg(L().off,'bot'); playTemp('failed',1400); }
+      }catch(e){ tip.remove(); addMsg(L().off,'bot'); playTemp('failed',1400); }
+      thinking=false; if(tempUntil===0) play('idle',true);
+      busy=false; $send.disabled=false; $in.focus();
+    }
+    $pet.addEventListener('click', ()=> $chat.classList.contains('rp-open') ? closeChat() : openChat());
+    $bubble.addEventListener('click', openChat);
+    $close.addEventListener('click', closeChat);
+    $send.addEventListener('click', ask);
+    $in.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ask(); } });
+    $in.addEventListener('input', ()=>{ $in.style.height='auto'; $in.style.height=Math.min(80,$in.scrollHeight)+'px'; });
+  })();
 })();
 </script>
 </body>

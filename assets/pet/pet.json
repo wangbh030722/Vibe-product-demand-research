@@ -1,0 +1,22 @@
+{
+  "id": "pixel-you",
+  "displayName": "Pixel You",
+  "description": "A cute pixel chibi person pet based on the provided portrait and full-body photos.",
+  "spritesheetPath": "spritesheet.webp",
+  "runtime": {
+    "supportsContext": true,
+    "contextSchema": "runtime-context-v1",
+    "preferredSources": [
+      "codex",
+      "terminal",
+      "opencode",
+      "claude-code"
+    ],
+    "collectorCommand": [
+      "python3",
+      "/Users/binghan/.codex/skills/hatch-runtime-pet/scripts/collect_runtime_context.py",
+      "--sources",
+      "codex,terminal,opencode,claude-code"
+    ]
+  }
+}
