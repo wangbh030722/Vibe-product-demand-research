@@ -11,3 +11,7 @@ collected/
 
 # downloaded share tooling
 /bin/
+
+# local tooling + OS junk
+.claude/
+.DS_Store

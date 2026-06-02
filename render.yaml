@@ -16,7 +16,11 @@ services:
         sync: false
       - key: OPENAI_BASE_URL        # optional (e.g. https://api.deepseek.com/v1)
         sync: false
-      - key: OPENAI_MODEL           # optional (e.g. deepseek-chat)
-        sync: false
+      # Hybrid model: fast non-reasoning model for bulk scoring/curation, and a
+      # higher-quality reasoning model for the qualitative synthesis stages.
+      - key: OPENAI_MODEL           # scoring / curation / translation
+        value: deepseek-chat
+      - key: OPENAI_SYNTH_MODEL     # qualitative synthesis (decompose + synth)
+        value: deepseek-v4-flash
       - key: REDDIT_SOURCE          # optional: auto | arcticshift | pullpush
         value: auto

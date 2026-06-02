@@ -34,9 +34,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from llm_client import chat_json  # type: ignore
+from llm_client import chat_json, load_dotenv  # type: ignore
 
 STAGES = ["scope", "collect", "curate", "cluster", "synth", "render"]
+
+
+def _synth_model():
+    """The qualitative synthesis/narrative stages use the (slower, higher-quality)
+    reasoning model; everything else uses the fast non-thinking default. Returns the
+    model name or None (→ chat_json falls back to OPENAI_MODEL)."""
+    import os
+    load_dotenv()
+    return os.environ.get("OPENAI_SYNTH_MODEL") or None
 
 
 # --------------------------------------------------------------------------- #
@@ -210,8 +219,9 @@ real subs. player ids lowercase a-z0-9_-."""
 # Stage 2 · COLLECT                                                            #
 # --------------------------------------------------------------------------- #
 
-# Target size of the RELEVANT base pool ("999 real Reddit comments").
-TARGET_POOL = 999
+# Target size of the RELEVANT base pool. Bigger pool → after dedup/clean/relevance
+# filtering, MORE genuinely-relevant voices survive (user wants a deeper evidence base).
+TARGET_POOL = 1999
 
 
 def stage_collect(scope: dict, wd: Path, skip: bool, log=None) -> list[dict]:
@@ -444,8 +454,9 @@ def stage_discover_brands(idea: str, scope: dict, pool: list[dict], wd: Path,
         return scope
     sys_msg = ("You extract real consumer PRODUCT / BRAND names from forum post "
                "titles. Output STRICT JSON only.")
-    user = (f"Product idea / category: {idea}\n\n"
-            "Post titles:\n" + "\n".join("- " + t for t in titles) + "\n\n"
+    def _user(batch):
+        return (f"Product idea / category: {idea}\n\n"
+            "Post titles:\n" + "\n".join("- " + t for t in batch) + "\n\n"
             "TASK: list the distinct real PRODUCT or BRAND names that appear and that "
             "a shopper in this category would consider or compare — direct competitors "
             "AND adjacent alternatives people compare against (even if they don't match "
@@ -454,14 +465,37 @@ def stage_discover_brands(idea: str, scope: dict, pool: list[dict], wd: Path,
             "Also give each brand's OFFICIAL site domain if you are confident "
             "(e.g. loopearplugs.com), else '' — do NOT guess.\n"
             'Return JSON: {"brands":[{"name":"<Brand/Product>","count":<int>,"website":"<domain or \'\'>"}]}')
-    try:
-        # bigger output budget — at 1500 the brand list hit finish_reason=length and
-        # came back empty (json-mode truncation) on a real run.
-        res = chat_json(sys_msg, user, temperature=0.2, max_tokens=4000, timeout=150)
-    except Exception as e:
-        _log(f"品牌挖掘跳过(LLM 失败): {e}")
-        return scope
-    found = res.get("brands", []) or []
+    # CHUNKED so a long title list can't blow past the model's output limit (the
+    # finish_reason=length → empty failure a tester hit). Merge brand counts across
+    # batches; any single failed batch is just skipped.
+    merged = {}
+    batches = [titles[s:s+30] for s in range(0, len(titles), 30)]
+
+    def _mine(batch):
+        return chat_json(sys_msg, _user(batch), temperature=0.2,
+                         max_tokens=4096, timeout=120)
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    results = []
+    if batches:
+        with ThreadPoolExecutor(max_workers=min(6, len(batches))) as ex:
+            futs = [ex.submit(_mine, b) for b in batches]
+            for f in as_completed(futs):
+                try:
+                    results.append(f.result())
+                except Exception as e:
+                    _log(f"品牌挖掘某批跳过: {e}")
+    for res in results:
+        for b in (res.get("brands") or []):
+            nm = (b.get("name") or "").strip()
+            if not nm: continue
+            key = nm.lower()
+            if key not in merged:
+                merged[key] = {"name": nm, "count": 0, "website": (b.get("website") or "").strip()}
+            merged[key]["count"] += int(b.get("count") or 0)
+            if not merged[key]["website"] and b.get("website"):
+                merged[key]["website"] = b.get("website").strip()
+    found = list(merged.values())
     import re as _re
     MAX_PLAYERS, MIN_MENTIONS = 14, 3
     new = []
@@ -650,7 +684,7 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
     # Output is index-only (tiny) so we can afford a wide candidate window, but keep
     # the request small enough to finish reliably from a remote host (cross-border
     # latency to some LLM providers makes huge requests time out / return empty).
-    over = min(len(ranked), 200)
+    over = min(len(ranked), 300)
     # Source-balanced candidate window: cap any single subreddit at 55% so the LLM
     # sees a mix of communities (one run was 99% r/sleep), NOT just the dominant one.
     # The LLM still gates relevance, so balancing the input can't pull in off-topic.
@@ -706,16 +740,25 @@ Keep every genuinely relevant item in THIS batch (real on-topic items are 2-3); 
     # only loses that chunk — the others still curate with the LLM, so we don't
     # collapse the whole run to the weak keyword-only fallback. Indices stay global.
     CHUNK = 90
-    keep, chunk_fail, chunk_total = [], 0, 0
-    for s in range(0, len(indexed), CHUNK):
-        part = indexed[s:s + CHUNK]
-        chunk_total += 1
-        try:
-            res = chat_json(sys_msg, build_user(part), temperature=0.2, max_tokens=5000, timeout=150)
-            keep.extend(res.get("keep", []) or [])
-        except Exception as e:
-            chunk_fail += 1
-            print(f"    ! curate chunk {chunk_total} failed ({e})", file=sys.stderr)
+    parts = [indexed[s:s + CHUNK] for s in range(0, len(indexed), CHUNK)]
+    keep, chunk_fail, chunk_total = [], 0, len(parts)
+
+    def _curate_chunk(part):
+        res = chat_json(sys_msg, build_user(part), temperature=0.2, max_tokens=5000, timeout=150)
+        return res.get("keep", []) or []
+
+    # Chunks are independent (indices are global) → run them concurrently so curate
+    # is bounded by the SLOWEST chunk, not their sum. One bad chunk only loses itself.
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    if parts:
+        with ThreadPoolExecutor(max_workers=min(6, len(parts))) as ex:
+            futs = [ex.submit(_curate_chunk, p) for p in parts]
+            for f in as_completed(futs):
+                try:
+                    keep.extend(f.result())
+                except Exception as e:
+                    chunk_fail += 1
+                    print(f"    ! curate chunk failed ({e})", file=sys.stderr)
     if chunk_fail:
         print(f"    ! {chunk_fail}/{chunk_total} 个筛选批次失败,其余批次仍由大模型筛选,"
               f"缺口用关键词兜底", file=sys.stderr)
@@ -869,7 +912,8 @@ def stage_decompose(idea: str, target_market: str, scope: dict,
 方法论: 客观唯物(只基于上面真实声音、带证据 id,不空谈)、辩证(点出取舍/张力)、
 第一性(回到根本任务)。{mode_hint}
 不要编造数据;evidence 必须是上面出现过的真实 id。"""
-    res = chat_json("你是资深用户研究员,只输出严格 JSON。", user, temperature=0.3, max_tokens=6000)
+    res = chat_json("你是资深用户研究员,只输出严格 JSON。", user, temperature=0.3, max_tokens=6000,
+                    model=_synth_model())
     # keep only valid voice ids in evidence (drop any hallucinated refs)
     valid_ids = {v["id"] for v in voices}
     for key in ("scenarios", "personas", "unmet_needs", "workarounds"):
@@ -949,7 +993,7 @@ paths 写作要求(2-3 个「可能的切入方向」,不是拍板的推荐):每
 不要下「就做某某」的定论,而是给「如果相信 X 假设并验证了 Y,这条路值得一试,但要注意 Z」
 式的思考脚手架,把判断权留给读者。
 Rules: status=real only if voices clearly show real demand."""
-    res = chat_json(sys_msg, user, temperature=0.4)
+    res = chat_json(sys_msg, user, temperature=0.4, max_tokens=8000, model=_synth_model())
     save(out, res)
     return res
 
@@ -1245,9 +1289,11 @@ def stage_expand(idea: str, target_market: str, scope: dict,
     cap = 60 + depth * 40
     xwd = wd / "_expand"
     xwd.mkdir(exist_ok=True)
+    _log(f"AI 打分相关性 · 从 {len(uniq)} 条里筛强相关…")
     new = stage_curate(idea, scope, uniq, xwd, cap, False)
     if not new:
         return []
+    _log(f"归类到需求主题 · 整理 {len(new)} 条新原声…")
 
     # Map each new voice to an EXISTING theme id (LLM classify, keyword fallback).
     valid = {t["id"] for t in themes}
