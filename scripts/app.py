@@ -484,8 +484,16 @@ FORM_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
   /* the JUST-generated report glows softly to guide the eye when the popup was blocked */
   @keyframes rNewGlow{0%,100%{box-shadow:0 0 0 1px var(--accent-line),0 0 13px -3px rgba(10,107,67,.35)}
     50%{box-shadow:0 0 0 1px var(--accent),0 0 22px 1px rgba(10,107,67,.5)}}
-  .recent-list a.r-new{border-color:var(--accent);background:rgba(236,243,239,.7);animation:rNewGlow 1.9s ease-in-out infinite}
+  .recent-list a.r-new{position:relative;border-color:var(--accent);background:rgba(236,243,239,.7);animation:rNewGlow 1.9s ease-in-out infinite}
   .recent-list a.r-new .r-idea{color:var(--accent)}
+  /* a fading arrow on the LEFT of the just-generated card, jabbing toward it — so a
+     user who left the tab and came back instantly spots what's new */
+  .recent-list a.r-new::before{content:'NEW →';position:absolute;right:100%;top:50%;margin-right:9px;
+    transform:translateY(-50%);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;
+    color:var(--accent);white-space:nowrap;pointer-events:none;animation:rNewPoint 1.25s ease-in-out infinite}
+  @keyframes rNewPoint{0%,100%{opacity:.12;transform:translateY(-50%) translateX(-5px)}
+    50%{opacity:1;transform:translateY(-50%) translateX(2px)}}
+  @media(max-width:680px){.recent-list a.r-new::before{display:none}}   /* no room beside the card on phones */
   .recent-list a.r-new .r-new-tag{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:#fff;background:var(--accent);
     border-radius:5px;padding:2px 6px;margin-left:8px;flex:none}
   .recent-list .r-idea{font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
