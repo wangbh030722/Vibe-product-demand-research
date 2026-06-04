@@ -75,6 +75,36 @@ def _looks_like_listing(title: str) -> bool:
     return False
 
 
+# Marks a BRAND SELF-PROMO / official-marketing post (softer than a listing): launch
+# announcements, founder "I built this" plugs, discount/affiliate pushes, giveaways.
+# Checked against title + body so we catch posts that read normal but are an ad.
+_PROMO_RE = re.compile(
+    r"(we(?:'re| are)?\s+(?:just\s+)?(?:launch|excited|thrilled|proud|introduc)"
+    r"|introducing\s+(?:the\s+|our\s+|my\s+)"
+    r"|our\s+(?:new|latest)\b|just\s+launched|now\s+available|just\s+dropped"
+    r"|check\s+(?:it|us|them)\s+out|check\s+out\s+(?:my|our|the)\b"
+    r"|link\s+in\s+(?:bio|comments|profile)"
+    r"|\buse\s+code\b|\bpromo\s*code\b|coupon\s+code"
+    r"|\d{1,2}\s*%\s*off\s+(?:with|using|code|when|today|now|site-?wide|store-?wide|your\s+order)"
+    r"|\bdm\s+me\b|shop\s+now|order\s+now|pre-?order|grab\s+yours|limited\s+time\s+offer"
+    r"|\bgiveaway\b|\bkickstarter\b|\bindiegogo\b|early\s+bird"
+    r"|i\s+(?:built|created|designed|developed)\s+(?:a|an|this|my)\b"
+    r"|(?:my|our)\s+(?:startup|company|brand)\b"
+    r"|(?:we|our\s+team)\s+(?:designed|developed|created|built|make|are\s+selling))", re.I)
+
+def _looks_promotional(title: str, text: str = "") -> bool:
+    """Brand self-promotion / official ad, vs an organic user post."""
+    blob = ((title or "") + " " + (text or "")).strip()
+    if not blob:
+        return False
+    return bool(_PROMO_RE.search(blob))
+
+
+def _is_ad(title: str, text: str = "") -> bool:
+    """Either a marketplace listing OR brand self-promotion — not a real user voice."""
+    return _looks_like_listing(title) or _looks_promotional(title, text)
+
+
 def _sub_of(url: str) -> str:
     m = re.search(r"/r/([A-Za-z0-9_]+)", url or "")
     return m.group(1).lower() if m else "other"
@@ -114,11 +144,14 @@ def compute_quality(data: dict) -> dict:
         return q
     dup = sum(c - 1 for c in Counter(_norm_title(v.get("title")) for v in voices).values() if c > 1)
     listing = sum(1 for v in voices if _looks_like_listing(v.get("title")))
+    # final voices only carry the title (no body), so promo is judged title-level here
+    promo = sum(1 for v in voices if _looks_promotional(v.get("title")))
     subs = Counter((re.search(r"/r/([A-Za-z0-9_]+)", v.get("url") or "") or [None, "other"])[1].lower()
                    for v in voices)
     top_sub, top_n = subs.most_common(1)[0]
     q["dup_title_pct"]   = round(dup / n * 100)
     q["listing_pct"]     = round(listing / n * 100)
+    q["promo_pct"]       = round(promo / n * 100)
     q["top_source"]      = top_sub
     q["top_source_pct"]  = round(top_n / n * 100)
     q["other_pct"]       = round(sum(1 for v in voices if v.get("player") == "other") / n * 100)
@@ -126,6 +159,8 @@ def compute_quality(data: dict) -> dict:
         q["warnings"].append(f"重复标题占比 {q['dup_title_pct']}% 偏高")
     if q["listing_pct"] > 5:
         q["warnings"].append(f"疑似广告 listing 占比 {q['listing_pct']}% 偏高")
+    if q["promo_pct"] > 6:
+        q["warnings"].append(f"疑似官方广告/自荐占比 {q['promo_pct']}% 偏高")
     if q["top_source_pct"] > 72:
         q["warnings"].append(f"来源过度集中:r/{q['top_source']} 占 {q['top_source_pct']}%")
     return q
@@ -408,10 +443,11 @@ def stage_collect(scope: dict, wd: Path, skip: bool, log=None) -> list[dict]:
     #   2. collapse near-identical TITLES (reposts/crossposts/spam share a title but
     #      have different post ids, so id-dedup alone left e.g. the SAME item 11x).
     # Done after ranking so the kept copy of each title is the strongest one.
-    seen_t, cleaned, n_drop = set(), [], 0
+    seen_t, cleaned, n_drop, n_ad = set(), [], 0, 0
     for r in deduped:
-        if _looks_like_listing(r.get("title")):
-            n_drop += 1; continue
+        # drop marketplace listings AND brand self-promo / official ads (title+body)
+        if _is_ad(r.get("title"), r.get("text")):
+            n_drop += 1; n_ad += 1; continue
         nt = _norm_title(r.get("title"))
         if nt and nt in seen_t:
             n_drop += 1; continue
@@ -424,7 +460,7 @@ def stage_collect(scope: dict, wd: Path, skip: bool, log=None) -> list[dict]:
     # per-item relevance call. Cap at the 999 target.
     pool = cleaned[:TARGET_POOL]
     if n_drop:
-        _log(f"已剔除 {n_drop} 条重复/广告 listing")
+        _log(f"已剔除 {n_drop} 条重复/广告(其中疑似广告/官方自荐 {n_ad} 条)")
     n_kw = sum(1 for r in pool if kw_hits(r) >= 1)
     save(out, pool)
     _log(f"已锁定 {len(pool)} 条相关 Reddit 真实评论(其中 {n_kw} 条命中产品关键词)")
@@ -689,7 +725,10 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
     # sees a mix of communities (one run was 99% r/sleep), NOT just the dominant one.
     # The LLM still gates relevance, so balancing the input can't pull in off-topic.
     cand_idx = _balance_sources_idx(ranked, over, cap_frac=0.55)
+    # include a short BODY excerpt (x) so the LLM can tell organic discussion from a
+    # brand ad that happens to have a normal-looking title.
     indexed = [{"i": i, "t": (ranked[i].get("title") or "")[:120],
+                "x": (ranked[i].get("text") or "").strip()[:140],
                 "s": ranked[i].get("score") or 0, "sub": _sub_of(ranked[i].get("url"))}
                for i in cand_idx]
     pool = ranked  # reconstruct voices from this same ranked order
@@ -698,7 +737,7 @@ def stage_curate(idea: str, scope: dict, pool: list[dict], wd: Path,
         return f"""Product idea: {idea}
 Player ids: {json.dumps(player_ids, ensure_ascii=False)}
 
-Candidate pool (i = index, t = title, s = score, sub = subreddit):
+Candidate pool (i = index, t = title, x = body excerpt, s = score, sub = subreddit):
 {json.dumps(cands, ensure_ascii=False)}
 
 TASK: score each candidate's relevance to the product idea. Return ONLY the
@@ -715,10 +754,16 @@ RELEVANCE:
   1 = same broad area but not about this product's job.
   (omit anything that's noise: memes, theft, shipping rants, unboxing, jokes,
    unrelated off-topic — just don't include them.)
-  HARD REJECT (never keep): product LISTINGS / ad copy / affiliate spam — titles
-  that read like a shop catalog entry (model/series numbers, spec dumps like
-  "350000 flashes", "for face & body home use", "portable waterproof electric",
-  promo phrases). We want real user discussion, not marketplace listings.
+  HARD REJECT (never keep) — we want REAL user discussion, not marketing:
+   - product LISTINGS / ad copy / affiliate spam — titles that read like a shop
+     catalog entry (model/series numbers, spec dumps like "350000 flashes",
+     "for face & body home use", "portable waterproof electric", promo phrases).
+   - BRAND SELF-PROMOTION / official marketing: launch & "now available"
+     announcements, "introducing our new…", founder/maker self-plugs ("I built
+     this", "my startup/brand"), discount-code / coupon / "% off" pushes,
+     giveaways, Kickstarter/Indiegogo plugs, "DM me / link in bio / shop now".
+     If the post is the SELLER talking up their own product rather than a user
+     sharing a genuine experience or complaint, drop it.
 
 SENTIMENT — classify honestly, do NOT default to "pos":
   neg = a complaint, problem, disappointment, defect, leak, return, "wish it
@@ -817,7 +862,7 @@ Keep every genuinely relevant item in THIS batch (real on-topic items are 2-3); 
                 # NEVER pad with listings or duplicate titles — that's the junk we
                 # cleaned out. Only the keyword-relevance bar is relaxed in tiers.
                 if (not u or u in have or kw_hits(r) < min_kw
-                        or _looks_like_listing(r.get("title")) or (nt and nt in have_t)):
+                        or _is_ad(r.get("title"), r.get("text")) or (nt and nt in have_t)):
                     continue
                 have.add(u); have_t.add(nt)
                 title = (r.get("title") or "")[:120]; tl = title.lower()
